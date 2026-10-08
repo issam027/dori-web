@@ -6,6 +6,7 @@ import { findFirstAuthorizedPath, protectedRoutes } from '@/core/permissions/rou
 import { useBrandStore } from '@/core/theme/brand-store';
 import { AppProviders } from './AppProviders';
 import { AppShell } from './layouts/AppShell';
+import { ExperiencePreview } from './layouts/ExperiencePreview';
 import { PublicExperienceLayout } from './layouts/PublicExperienceLayout';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ChangePasswordPage } from '@/features/auth/ChangePasswordPage';
@@ -13,6 +14,17 @@ import { ProfilePage } from '@/features/profile/ProfilePage';
 import { PortfolioPage } from '@/features/portfolio/PortfolioPage';
 import { DeskPage } from '@/features/queue-operations/DeskPage';
 import { MyQueuesPage } from '@/features/queue-operations/MyQueuesPage';
+import { AppointmentsPage } from '@/features/appointments/AppointmentsPage';
+import { ControlRoomPage } from '@/features/supervision/ControlRoomPage';
+import { ReportsPage } from '@/features/supervision/ReportsPage';
+import { NotificationsPage } from '@/features/supervision/NotificationsPage';
+import { KioskPage } from '@/features/public-experiences/KioskPage';
+import { DisplayPage } from '@/features/public-experiences/DisplayPage';
+import { TrackPage } from '@/features/public-experiences/TrackPage';
+import { HealthPage } from '@/features/health/HealthPage';
+import { LegalPage } from '@/features/legal/LegalPage';
+import { OnboardingPage } from '@/features/onboarding/OnboardingPage';
+import { SettingsPage } from '@/features/onboarding/SettingsPage';
 
 function Page({ title }: { title: string }) {
   const { t } = useTranslation();
@@ -52,6 +64,30 @@ function LandingRedirect() {
   return <Navigate replace to={user ? findFirstAuthorizedPath(user) : '/login'} />;
 }
 
+function ExperienceRoute({ mode }: { mode: 'kiosk' | 'display' | 'tracking' }) {
+  const status = useSessionStore((state) => state.status);
+  const user = useSessionStore((state) => state.user);
+  const isHumanPreview = status === 'authenticated' && user?.userType === 'human';
+  const content =
+    mode === 'kiosk' ? (
+      <KioskPage />
+    ) : mode === 'display' ? (
+      <DisplayPage />
+    ) : (
+      <TrackPage preview={isHumanPreview} />
+    );
+
+  if (isHumanPreview) {
+    return (
+      <AppShell>
+        <ExperiencePreview mode={mode}>{content}</ExperiencePreview>
+      </AppShell>
+    );
+  }
+
+  return <PublicExperienceLayout mode={mode}>{content}</PublicExperienceLayout>;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -68,18 +104,11 @@ function AppRoutes() {
         path="/legal"
         element={
           <PublicExperienceLayout mode="public">
-            <ProtectedPlaceholder name="legal" />
+            <LegalPage />
           </PublicExperienceLayout>
         }
       />
-      <Route
-        path="/track"
-        element={
-          <PublicExperienceLayout mode="tracking">
-            <ProtectedPlaceholder name="tracking" />
-          </PublicExperienceLayout>
-        }
-      />
+      <Route path="/track" element={<ExperienceRoute mode="tracking" />} />
       <Route element={<ProtectedRoute />}>
         <Route
           path="/change-password"
@@ -104,7 +133,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute
               permissions={route.permissions}
-              userTypes={route.technicalUser ? ['kiosk'] : undefined}
+              userTypes={
+                route.allUserTypes ? undefined : route.technicalUser ? ['kiosk'] : ['human']
+              }
             />
           }
         >
@@ -119,14 +150,40 @@ function AppRoutes() {
                 <AppShell>
                   <MyQueuesPage />
                 </AppShell>
+              ) : route.path === '/appointments' ? (
+                <AppShell>
+                  <AppointmentsPage />
+                </AppShell>
               ) : route.path === '/portfolio' ? (
                 <AppShell>
                   <PortfolioPage />
                 </AppShell>
+              ) : route.path === '/control-room' ? (
+                <AppShell>
+                  <ControlRoomPage />
+                </AppShell>
+              ) : route.path === '/reports' ? (
+                <AppShell>
+                  <ReportsPage />
+                </AppShell>
+              ) : route.path === '/notifications' ? (
+                <AppShell>
+                  <NotificationsPage />
+                </AppShell>
+              ) : route.path === '/health' ? (
+                <AppShell>
+                  <HealthPage />
+                </AppShell>
+              ) : route.path === '/onboarding' ? (
+                <AppShell>
+                  <OnboardingPage />
+                </AppShell>
+              ) : route.path.startsWith('/settings') ? (
+                <AppShell>
+                  <SettingsPage />
+                </AppShell>
               ) : route.path === '/kiosk' || route.path === '/display' ? (
-                <PublicExperienceLayout mode={route.path === '/kiosk' ? 'kiosk' : 'display'}>
-                  <ProtectedPlaceholder name={route.path.slice(1)} />
-                </PublicExperienceLayout>
+                <ExperienceRoute mode={route.path === '/kiosk' ? 'kiosk' : 'display'} />
               ) : (
                 <AppShell>
                   <ProtectedPlaceholder name={route.path.slice(1)} />

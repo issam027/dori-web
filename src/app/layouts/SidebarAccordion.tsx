@@ -52,9 +52,9 @@ const sections: readonly NavSection[] = [
       {
         path: '/kiosk',
         labelKey: 'nav.kiosk',
-        permissions: ['registration_register', 'appointment_lookup'],
+        permissions: [],
       },
-      { path: '/display', labelKey: 'nav.display', permissions: ['queue_view'] },
+      { path: '/display', labelKey: 'nav.display', permissions: [] },
       { path: '/track', labelKey: 'nav.tracking', permissions: [] },
     ],
   },
@@ -73,7 +73,7 @@ const sections: readonly NavSection[] = [
   },
 ];
 
-export function SidebarAccordion() {
+export function SidebarAccordion({ siteCount }: { siteCount?: number }) {
   const { t } = useTranslation();
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
@@ -82,10 +82,14 @@ export function SidebarAccordion() {
       sections
         .map((section) => ({
           ...section,
-          items: section.items.filter((item) => hasAnyPermission(user, item.permissions)),
+          items: section.items.filter(
+            (item) =>
+              hasAnyPermission(user, item.permissions) &&
+              !(item.path === '/portfolio' && siteCount !== undefined && siteCount <= 1),
+          ),
         }))
         .filter((section) => section.items.length > 0),
-    [user],
+    [siteCount, user],
   );
   const activeSection = visibleSections.find((section) =>
     section.items.some((item) => location.pathname.startsWith(item.path)),
@@ -137,7 +141,11 @@ export function SidebarAccordion() {
           );
         })}
       </nav>
-      <NavLink className="legal-link" to="/legal">
+      <NavLink
+        className="legal-link"
+        to="/legal"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+      >
         {t('nav.legal')}
       </NavLink>
     </aside>

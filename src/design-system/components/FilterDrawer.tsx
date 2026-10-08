@@ -25,7 +25,7 @@ export function FilterDrawer({
           {children}
           <Dialog.Close asChild>
             <button className="button" type="button">
-              {t('common.close')}
+              {t('common.cancel')}
             </button>
           </Dialog.Close>
         </Dialog.Content>

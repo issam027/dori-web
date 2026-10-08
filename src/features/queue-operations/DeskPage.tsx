@@ -13,6 +13,7 @@ import { registrationsControllerFindOne } from '@/api/generated/registrations/re
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
+import { EmptyState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { canCallNext, useOperationStore } from './operation-store';
@@ -28,6 +29,7 @@ export function DeskPage() {
   const activeCall = useOperationStore((state) => state.activeCall);
   const recentCalls = useOperationStore((state) => state.recentCalls);
   const [pending, setPending] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [receipt, setReceipt] = useState<{
     call: NonNullable<typeof activeCall>;
@@ -75,7 +77,18 @@ export function DeskPage() {
     })),
   });
   const refresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['queue'] });
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['queues'] }),
+        queryClient.invalidateQueries({ queryKey: ['queue-sessions'] }),
+        queryClient.invalidateQueries({ queryKey: ['queue-status'] }),
+        queryClient.invalidateQueries({ queryKey: ['queue-preview'] }),
+        queryClient.invalidateQueries({ queryKey: ['registrations'] }),
+      ]);
+    } finally {
+      setRefreshing(false);
+    }
   };
   const run = async (action: () => Promise<void>) => {
     setPending(true);
@@ -110,175 +123,200 @@ export function DeskPage() {
         eyebrow="Opérations"
         title="Cockpit guichet"
         description="Une session active est requise pour appeler le prochain client."
+        actions={
+          <button
+            className="button"
+            type="button"
+            disabled={pending || refreshing}
+            onClick={() => void refresh()}
+          >
+            <span className={refreshing ? 'refresh-icon is-spinning' : 'refresh-icon'}>↻</span>{' '}
+            {refreshing ? 'Actualisation…' : 'Actualiser'}
+          </button>
+        }
       />
+      {queues.isSuccess && allowed.length === 0 ? (
+        <EmptyState
+          title="Aucune file active"
+          description="Aucune file n’est configurée ou active pour ce site."
+        />
+      ) : null}
+      {siteId !== null && allowed.length > 0 ? (
+        <QuickRegistration siteId={siteId} queues={allowed} />
+      ) : null}
       {error ? (
         <p role="alert" className="field-error">
           {error}
         </p>
       ) : null}
-      <Card>
-        <h2>Prochains éligibles</h2>
-        <div className="preview-list">
-          {previews.data?.data.map((item) => (
-            <span key={item.registrationId}>
-              <strong>{item.ticketNumber}</strong> · {item.queueName} · {item.person.firstName}{' '}
-              {item.person.lastName}
-            </span>
-          ))}
-        </div>
-      </Card>
-      <Card>
-        <h2>Prise en charge</h2>
-        {activeCall ? (
-          <div className="active-call">
-            <strong>{activeCall.ticketNumber}</strong>
-            <StatusBadge tone="accent">En cours</StatusBadge>
-            <p>Guichet {activeCall.threadNumber}</p>
-            {activeRegistration.data ? (
-              <p>
-                Anciennete :{' '}
-                {Math.max(
-                  0,
-                  Math.floor(
-                    (new Date(activeCall.calledAt).getTime() -
-                      new Date(activeRegistration.data.data.createdAt).getTime()) /
-                      60000,
-                  ),
-                )}{' '}
-                min · SLA {activeRegistration.data.data.status}
-              </p>
-            ) : null}
-            {activeRegistration.data ? (
-              <button
-                className="button"
-                type="button"
-                onClick={() => {
-                  setNotesOpen(true);
-                }}
-              >
-                Consulter les notes
-              </button>
-            ) : null}
-            <button
-              className="button button-primary"
-              disabled={pending}
-              onClick={() => {
-                close('served');
-              }}
-            >
-              Servi
-            </button>
-            <button
-              className="button"
-              disabled={pending}
-              onClick={() => {
-                close('no_show');
-              }}
-            >
-              Absent
-            </button>
+      {allowed.length > 0 ? (
+        <Card>
+          <h2>Prochains éligibles</h2>
+          <div className="preview-list">
+            {previews.data?.data.map((item) => (
+              <span key={item.registrationId}>
+                <strong>{item.ticketNumber}</strong> · {item.queueName} · {item.person.firstName}{' '}
+                {item.person.lastName}
+              </span>
+            ))}
           </div>
-        ) : (
-          <p>Aucune personne en cours.</p>
-        )}
-        <h3>Quatre derniers appels</h3>
-        <ol>
-          {recentCalls.map((call) => (
-            <li key={call.registrationId}>
-              {call.ticketNumber} — guichet {call.threadNumber}
-            </li>
-          ))}
-        </ol>
-      </Card>
-      <div className="queue-card-grid">
-        {allowed.map((queue, index) => {
-          const mine = sessions[index]?.data?.data.items.find(
-            (session) => session.userId === user?.userId,
-          );
-          const occupied = sessions[index]?.data?.data.items.find(
-            (session) => session.mode === 'active' && session.userId !== user?.userId,
-          );
-          const active = mine?.mode === 'active' && mine.threadNumber != null;
-          return (
-            <Card key={queue.queueId}>
-              <h2>{queue.queueName}</h2>
-              <p>
-                {statuses[index]?.data?.data.waitingCount ?? '—'} en attente · SLA estimé{' '}
-                {statuses[index]?.data?.data.estimatedWaitMinutes ?? '—'} min
-              </p>
-              {mine ? (
-                <>
-                  <StatusBadge tone={active ? 'success' : 'neutral'}>
-                    {active ? `Guichet ${String(mine.threadNumber)}` : 'Consultation'}
-                  </StatusBadge>
-                  <button
-                    className="button"
-                    disabled={pending || Boolean(activeCall)}
-                    onClick={() => {
-                      void run(async () => {
-                        await queueEngineControllerCloseSession(queue.queueId, mine.sessionId);
-                        await refresh();
-                      });
-                    }}
-                  >
-                    Libérer
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="button"
-                    disabled={pending}
-                    onClick={() => {
-                      void run(async () => {
-                        await queueEngineControllerOpenSession(queue.queueId, {
-                          mode: 'consultation_only',
-                        });
-                        await refresh();
-                      });
-                    }}
-                  >
-                    Consulter
-                  </button>
-                  <button
-                    className="button"
-                    disabled={pending}
-                    onClick={() => {
-                      const takeOver =
-                        Boolean(occupied) &&
-                        window.confirm('Ce guichet est occupé. Confirmer la reprise ?');
-                      if (occupied && !takeOver) return;
-                      void run(async () => {
-                        await queueEngineControllerOpenSession(queue.queueId, {
-                          mode: 'active',
-                          threadNumber: occupied?.threadNumber ?? 1,
-                          takeOver,
-                        });
-                        await refresh();
-                      });
-                    }}
-                  >
-                    {occupied ? 'Reprendre le guichet' : 'Occuper le guichet'}
-                  </button>
-                </>
-              )}
+        </Card>
+      ) : null}
+      {allowed.length > 0 ? (
+        <Card>
+          <h2>Prise en charge</h2>
+          {activeCall ? (
+            <div className="active-call">
+              <strong>{activeCall.ticketNumber}</strong>
+              <StatusBadge tone="accent">En cours</StatusBadge>
+              <p>Guichet {activeCall.threadNumber}</p>
+              {activeRegistration.data ? (
+                <p>
+                  Anciennete :{' '}
+                  {Math.max(
+                    0,
+                    Math.floor(
+                      (new Date(activeCall.calledAt).getTime() -
+                        new Date(activeRegistration.data.data.createdAt).getTime()) /
+                        60000,
+                    ),
+                  )}{' '}
+                  min · SLA {activeRegistration.data.data.status}
+                </p>
+              ) : null}
+              {activeRegistration.data ? (
+                <button
+                  className="button"
+                  type="button"
+                  onClick={() => {
+                    setNotesOpen(true);
+                  }}
+                >
+                  Consulter les notes
+                </button>
+              ) : null}
               <button
                 className="button button-primary"
-                disabled={!canCallNext(active, activeCall, pending)}
+                disabled={pending}
                 onClick={() => {
-                  void run(async () => {
-                    await callNextAndCommit(queue.queueId);
-                    await refresh();
-                  });
+                  close('served');
                 }}
               >
-                Appeler le suivant
+                Servi
               </button>
-            </Card>
-          );
-        })}
-      </div>
-      {siteId !== null ? <QuickRegistration siteId={siteId} queues={allowed} /> : null}
+              <button
+                className="button"
+                disabled={pending}
+                onClick={() => {
+                  close('no_show');
+                }}
+              >
+                Absent
+              </button>
+            </div>
+          ) : (
+            <p>Aucune personne en cours.</p>
+          )}
+          <h3>Quatre derniers appels</h3>
+          <ol>
+            {recentCalls.map((call) => (
+              <li key={call.registrationId}>
+                {call.ticketNumber} — guichet {call.threadNumber}
+              </li>
+            ))}
+          </ol>
+        </Card>
+      ) : null}
+      {allowed.length > 0 ? (
+        <div className="queue-card-grid">
+          {allowed.map((queue, index) => {
+            const mine = sessions[index]?.data?.data.items.find(
+              (session) => session.userId === user?.userId,
+            );
+            const occupied = sessions[index]?.data?.data.items.find(
+              (session) => session.mode === 'active' && session.userId !== user?.userId,
+            );
+            const active = mine?.mode === 'active' && mine.threadNumber != null;
+            return (
+              <Card key={queue.queueId}>
+                <h2>{queue.queueName}</h2>
+                <p>
+                  {statuses[index]?.data?.data.waitingCount ?? '—'} en attente · SLA estimé{' '}
+                  {statuses[index]?.data?.data.estimatedWaitMinutes ?? '—'} min
+                </p>
+                {mine ? (
+                  <>
+                    <StatusBadge tone={active ? 'success' : 'neutral'}>
+                      {active ? `Guichet ${String(mine.threadNumber)}` : 'Consultation'}
+                    </StatusBadge>
+                    <button
+                      className="button"
+                      disabled={pending || Boolean(activeCall)}
+                      onClick={() => {
+                        void run(async () => {
+                          await queueEngineControllerCloseSession(queue.queueId, mine.sessionId);
+                          await refresh();
+                        });
+                      }}
+                    >
+                      Libérer
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="button"
+                      disabled={pending}
+                      onClick={() => {
+                        void run(async () => {
+                          await queueEngineControllerOpenSession(queue.queueId, {
+                            mode: 'consultation_only',
+                          });
+                          await refresh();
+                        });
+                      }}
+                    >
+                      Consulter
+                    </button>
+                    <button
+                      className="button"
+                      disabled={pending}
+                      onClick={() => {
+                        const takeOver =
+                          Boolean(occupied) &&
+                          window.confirm('Ce guichet est occupé. Confirmer la reprise ?');
+                        if (occupied && !takeOver) return;
+                        void run(async () => {
+                          await queueEngineControllerOpenSession(queue.queueId, {
+                            mode: 'active',
+                            threadNumber: occupied?.threadNumber ?? 1,
+                            takeOver,
+                          });
+                          await refresh();
+                        });
+                      }}
+                    >
+                      {occupied ? 'Reprendre le guichet' : 'Occuper le guichet'}
+                    </button>
+                  </>
+                )}
+                <button
+                  className="button button-primary"
+                  disabled={!canCallNext(active, activeCall, pending)}
+                  onClick={() => {
+                    void run(async () => {
+                      await callNextAndCommit(queue.queueId);
+                      await refresh();
+                    });
+                  }}
+                >
+                  Appeler le suivant
+                </button>
+              </Card>
+            );
+          })}
+        </div>
+      ) : null}
       {notesOpen && activeRegistration.data ? (
         <PersonNotesViewer
           personId={activeRegistration.data.data.personId}

@@ -5,6 +5,7 @@ export interface ProtectedRouteDefinition {
   path: string;
   permissions: readonly string[];
   technicalUser?: boolean;
+  allUserTypes?: boolean;
 }
 
 export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
@@ -17,13 +18,13 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
   { path: '/notifications', permissions: ['notification_view'] },
   {
     path: '/kiosk',
-    permissions: ['registration_register', 'appointment_lookup'],
-    technicalUser: true,
+    permissions: [],
+    allUserTypes: true,
   },
-  { path: '/display', permissions: ['queue_view'], technicalUser: true },
+  { path: '/display', permissions: [], allUserTypes: true },
   { path: '/onboarding', permissions: ['site_create'] },
   {
-    path: '/settings',
+    path: '/settings/*',
     permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
   },
   { path: '/health', permissions: ['system_manage'] },
@@ -31,8 +32,11 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
 
 export function findFirstAuthorizedPath(user: CurrentUserResponseDto): string {
   const route = protectedRoutes.find((candidate) => {
-    if (candidate.technicalUser && user.userType !== 'kiosk') return false;
+    if (!candidate.allUserTypes) {
+      if (user.userType === 'kiosk' && !candidate.technicalUser) return false;
+      if (user.userType !== 'kiosk' && candidate.technicalUser) return false;
+    }
     return hasAnyPermission(user, candidate.permissions);
   });
-  return route?.path ?? '/profile';
+  return route?.path.replace('/*', '') ?? '/profile';
 }

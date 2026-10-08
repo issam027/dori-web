@@ -8,6 +8,7 @@ import {
 import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
+import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 
 export function QuickRegistration({
@@ -25,6 +26,7 @@ export function QuickRegistration({
   const [scheduledTime, setScheduledTime] = useState('');
   const [ticket, setTicket] = useState('');
   const [pending, setPending] = useState(false);
+  const [open, setOpen] = useState(false);
   const tiers = useQuery({
     queryKey: ['tiers'],
     queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
@@ -56,93 +58,112 @@ export function QuickRegistration({
       setPending(false);
     }
   };
+  const canSubmit =
+    !pending &&
+    Boolean(choice) &&
+    Boolean(queueId) &&
+    Boolean(tierId) &&
+    (entryType !== 'appointment' || Boolean(scheduledTime));
   return (
-    <Card>
-      <h2>Accueil rapide</h2>
-      <PersonPickerOrCreate siteId={siteId} value={choice} onChange={setChoice} />
-      <div className="form-grid">
-        <FormField label="File" required>
-          <select
-            value={queueId}
-            onChange={(e) => {
-              setQueueId(Number(e.target.value));
-            }}
+    <>
+      <Card className="quick-registration-launcher">
+        <div>
+          <p className="eyebrow">Accueil</p>
+          <h2>Accueil rapide</h2>
+          <p>Rechercher ou créer une personne, puis générer son ticket.</p>
+        </div>
+        <button className="button button-primary" type="button" onClick={() => { setOpen(true); }}>
+          + Créer un ticket
+        </button>
+      </Card>
+      <Modal
+        open={open}
+        onOpenChange={setOpen}
+        title="Accueil rapide"
+        description="Enregistrez une personne sur une file du site actif."
+        actions={
+          <button
+            className="button button-primary"
+            type="button"
+            disabled={!canSubmit}
+            onClick={() => void submit()}
           >
-            <option value={0}>Choisir</option>
-            {queues.map((queue) => (
-              <option key={queue.queueId} value={queue.queueId}>
-                {queue.queueName}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <FormField label="Forfait" required>
-          <select
-            value={tierId}
-            onChange={(e) => {
-              setTierId(Number(e.target.value));
-            }}
-          >
-            <option value={0}>Choisir</option>
-            {tiers.data?.data.items
-              .filter((tier) => tier.isActive)
-              .map((tier) => (
-                <option key={tier.tierId} value={tier.tierId}>
-                  {tier.tierName}
-                </option>
-              ))}
-          </select>
-        </FormField>
-        <FormField label="Type">
-          <select
-            value={entryType}
-            onChange={(e) => {
-              setEntryType(e.target.value as 'walkin' | 'appointment');
-            }}
-          >
-            <option value="walkin">Sans rendez-vous</option>
-            <option value="appointment">Rendez-vous</option>
-          </select>
-        </FormField>
-        {entryType === 'appointment' ? (
-          <FormField
-            label="Créneau"
-            hint={
-              availability.isSuccess
-                ? 'Disponibilités vérifiées'
-                : 'Choisissez une date et une heure'
-            }
-          >
-            <input
-              type="datetime-local"
-              value={scheduledTime}
-              onChange={(e) => {
-                setScheduledTime(e.target.value);
-              }}
-            />
-          </FormField>
-        ) : null}
-      </div>
-      <button
-        className="button button-primary"
-        disabled={
-          pending ||
-          !choice ||
-          !queueId ||
-          !tierId ||
-          (entryType === 'appointment' && !scheduledTime)
+            Créer le ticket
+          </button>
         }
-        onClick={() => {
-          void submit();
-        }}
       >
-        Créer le ticket
-      </button>
-      {ticket ? (
-        <p role="status">
-          Ticket confirmé : <strong>{ticket}</strong>
-        </p>
-      ) : null}
-    </Card>
+        <div className="quick-registration-form">
+          <PersonPickerOrCreate siteId={siteId} value={choice} onChange={setChoice} />
+          <div className="form-grid">
+            <FormField label="File" required>
+              <select
+                value={queueId}
+                onChange={(e) => {
+                  setQueueId(Number(e.target.value));
+                }}
+              >
+                <option value={0}>Choisir</option>
+                {queues.map((queue) => (
+                  <option key={queue.queueId} value={queue.queueId}>
+                    {queue.queueName}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <FormField label="Forfait" required>
+              <select
+                value={tierId}
+                onChange={(e) => {
+                  setTierId(Number(e.target.value));
+                }}
+              >
+                <option value={0}>Choisir</option>
+                {tiers.data?.data.items
+                  .filter((tier) => tier.isActive)
+                  .map((tier) => (
+                    <option key={tier.tierId} value={tier.tierId}>
+                      {tier.tierName}
+                    </option>
+                  ))}
+              </select>
+            </FormField>
+            <FormField label="Type">
+              <select
+                value={entryType}
+                onChange={(e) => {
+                  setEntryType(e.target.value as 'walkin' | 'appointment');
+                }}
+              >
+                <option value="walkin">Sans rendez-vous</option>
+                <option value="appointment">Rendez-vous</option>
+              </select>
+            </FormField>
+            {entryType === 'appointment' ? (
+              <FormField
+                label="Créneau"
+                hint={
+                  availability.isSuccess
+                    ? 'Disponibilités vérifiées'
+                    : 'Choisissez une date et une heure'
+                }
+              >
+                <input
+                  type="datetime-local"
+                  value={scheduledTime}
+                  onChange={(e) => {
+                    setScheduledTime(e.target.value);
+                  }}
+                />
+              </FormField>
+            ) : null}
+          </div>
+          {ticket ? (
+            <p className="ticket-confirmation" role="status">
+              Ticket confirmé : <strong>{ticket}</strong>
+            </p>
+          ) : null}
+        </div>
+      </Modal>
+    </>
   );
 }

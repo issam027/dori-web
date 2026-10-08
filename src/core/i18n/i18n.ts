@@ -71,6 +71,28 @@ const fallbackResources = {
       'commands.person': 'Rechercher une personne',
       'commands.appointment': 'Créer un rendez-vous',
       'commands.settings': 'Ouvrir la configuration',
+      'legal.back': 'Retour à l’espace précédent',
+      'legal.eyebrow': 'Informations réglementaires',
+      'legal.title': 'Mentions légales et confidentialité',
+      'legal.updated':
+        'Les informations ci-dessous sont fournies par la configuration de ce déploiement.',
+      'legal.publisher': 'Éditeur du service',
+      'legal.entity': 'Entité',
+      'legal.address': 'Adresse',
+      'legal.email': 'Contact légal',
+      'legal.registration': 'Immatriculation',
+      'legal.privacy': 'Données personnelles',
+      'legal.privacyText':
+        'DORI traite uniquement les données nécessaires à la gestion de l’accueil, des rendez-vous et des files, selon les instructions de l’établissement responsable.',
+      'legal.rights': 'Vos droits',
+      'legal.rightsText':
+        'Pour exercer vos droits d’accès, de rectification ou d’opposition, contactez {{email}}.',
+      'legal.cookies': 'Stockage local et cookies',
+      'legal.cookiesText':
+        'Les préférences d’interface peuvent être conservées localement. Les sessions utilisent les mécanismes sécurisés configurés par le service.',
+      'legal.security': 'Sécurité',
+      'legal.securityText':
+        'Les accès sont limités par authentification, permissions et périmètre. Les liens publics de suivi reposent sur un token opaque.',
     },
   },
   en: {
@@ -140,6 +162,27 @@ const fallbackResources = {
       'commands.person': 'Find a person',
       'commands.appointment': 'Create an appointment',
       'commands.settings': 'Open settings',
+      'legal.back': 'Back to previous area',
+      'legal.eyebrow': 'Regulatory information',
+      'legal.title': 'Legal notice and privacy',
+      'legal.updated': 'The information below is supplied by this deployment configuration.',
+      'legal.publisher': 'Service publisher',
+      'legal.entity': 'Entity',
+      'legal.address': 'Address',
+      'legal.email': 'Legal contact',
+      'legal.registration': 'Registration',
+      'legal.privacy': 'Personal data',
+      'legal.privacyText':
+        'DORI processes only the data required to manage reception, appointments and queues, under the instructions of the responsible establishment.',
+      'legal.rights': 'Your rights',
+      'legal.rightsText':
+        'To exercise your access, correction or objection rights, contact {{email}}.',
+      'legal.cookies': 'Local storage and cookies',
+      'legal.cookiesText':
+        'Interface preferences may be stored locally. Sessions use the secure mechanisms configured by the service.',
+      'legal.security': 'Security',
+      'legal.securityText':
+        'Access is limited through authentication, permissions and scope. Public tracking links use an opaque token.',
     },
   },
   ar: {
@@ -209,6 +252,26 @@ const fallbackResources = {
       'commands.person': 'البحث عن شخص',
       'commands.appointment': 'إنشاء موعد',
       'commands.settings': 'فتح الإعدادات',
+      'legal.back': 'العودة إلى المساحة السابقة',
+      'legal.eyebrow': 'المعلومات التنظيمية',
+      'legal.title': 'الإشعارات القانونية والخصوصية',
+      'legal.updated': 'المعلومات أدناه مقدمة من إعدادات هذا النشر.',
+      'legal.publisher': 'ناشر الخدمة',
+      'legal.entity': 'الجهة',
+      'legal.address': 'العنوان',
+      'legal.email': 'جهة الاتصال القانونية',
+      'legal.registration': 'التسجيل',
+      'legal.privacy': 'البيانات الشخصية',
+      'legal.privacyText':
+        'تعالج DORI فقط البيانات اللازمة لإدارة الاستقبال والمواعيد وقوائم الانتظار وفق تعليمات المؤسسة المسؤولة.',
+      'legal.rights': 'حقوقك',
+      'legal.rightsText': 'لممارسة حقوق الوصول أو التصحيح أو الاعتراض، تواصل عبر {{email}}.',
+      'legal.cookies': 'التخزين المحلي وملفات الارتباط',
+      'legal.cookiesText':
+        'يمكن حفظ تفضيلات الواجهة محلياً. تستخدم الجلسات آليات الأمان التي تم إعدادها للخدمة.',
+      'legal.security': 'الأمان',
+      'legal.securityText':
+        'يتم تقييد الوصول بالمصادقة والصلاحيات والنطاق. تستخدم روابط التتبع العامة رمزاً مبهماً.',
     },
   },
 } as const;

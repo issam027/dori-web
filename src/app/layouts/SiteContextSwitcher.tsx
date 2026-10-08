@@ -15,24 +15,33 @@ export function SiteContextSwitcher({
   onSelect: (siteId: number) => void;
 }) {
   const { t } = useTranslation();
-  if (sites.length <= 1)
-    return sites[0] ? <strong className="site-name">{sites[0].name}</strong> : null;
+  if (sites.length <= 1) return null;
+  const activeSite = sites.find((site) => site.id === activeSiteId) ?? sites[0];
   return (
-    <label className="site-switcher">
-      <span className="sr-only">{t('site.change')}</span>
-      <select
-        value={activeSiteId ?? ''}
-        onChange={(event) => {
-          onSelect(Number(event.target.value));
-        }}
-        aria-label={t('site.change')}
-      >
+    <details className="site-switcher">
+      <summary aria-label={t('site.change')}>
+        <span aria-hidden="true">⌂</span>
+        <span>
+          <small>Site actif</small>
+          <strong>{activeSite?.name}</strong>
+        </span>
+        <span aria-hidden="true">▾</span>
+      </summary>
+      <div className="site-menu">
         {sites.map((site) => (
-          <option key={site.id} value={site.id}>
+          <button
+            key={site.id}
+            type="button"
+            aria-current={site.id === activeSiteId ? 'true' : undefined}
+            onClick={(event) => {
+              onSelect(site.id);
+              event.currentTarget.closest('details')?.removeAttribute('open');
+            }}
+          >
             {site.name}
-          </option>
+          </button>
         ))}
-      </select>
-    </label>
+      </div>
+    </details>
   );
 }

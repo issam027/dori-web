@@ -9,6 +9,9 @@ interface ScopeState {
   clear: () => void;
 }
 
+const activeSiteStorageKey = 'dori.activeSiteId';
+const storedSiteId = Number(sessionStorage.getItem(activeSiteStorageKey));
+
 function assertScoped(
   resourceId: number,
   allowedIds: number[],
@@ -21,10 +24,11 @@ function assertScoped(
 }
 
 export const useScopeStore = create<ScopeState>((set) => ({
-  activeSiteId: null,
+  activeSiteId: Number.isInteger(storedSiteId) && storedSiteId > 0 ? storedSiteId : null,
   activeQueueId: null,
   setActiveSite: (siteId, scope) => {
     assertScoped(siteId, scope.siteIds, scope.isGlobal, 'Site');
+    sessionStorage.setItem(activeSiteStorageKey, String(siteId));
     set({ activeSiteId: siteId, activeQueueId: null });
   },
   setActiveQueue: (queueId, scope) => {
@@ -32,6 +36,7 @@ export const useScopeStore = create<ScopeState>((set) => ({
     set({ activeQueueId: queueId });
   },
   clear: () => {
+    sessionStorage.removeItem(activeSiteStorageKey);
     set({ activeSiteId: null, activeQueueId: null });
   },
 }));

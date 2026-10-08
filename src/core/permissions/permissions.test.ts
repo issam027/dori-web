@@ -20,6 +20,17 @@ describe('permissions and scope', () => {
     expect(isWithinScope(user.scope, { queueId: 99 })).toBe(false);
   });
 
+  it('keeps technical kiosk identities on technical routes', () => {
+    expect(
+      findFirstAuthorizedPath({
+        ...user,
+        userType: 'kiosk',
+        roles: ['kiosk'],
+        permissions: ['queue_view', 'registration_register', 'appointment_lookup'],
+      }),
+    ).toBe('/kiosk');
+  });
+
   it('selects the first route from effective permissions, not role names', () => {
     expect(findFirstAuthorizedPath(user)).toBe('/desk');
     expect(

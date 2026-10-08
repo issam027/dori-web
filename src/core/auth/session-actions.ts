@@ -30,9 +30,19 @@ export async function hydrateSession(): Promise<void> {
   try {
     const response = await authControllerMe();
     useSessionStore.getState().authenticate(response.data);
-    const firstSite = response.data.scope.siteIds[0];
-    if (firstSite !== undefined)
-      useScopeStore.getState().setActiveSite(firstSite, response.data.scope);
+    const restoredSite = useScopeStore.getState().activeSiteId;
+    const restoredSiteIsAllowed =
+      restoredSite !== null &&
+      (response.data.scope.isGlobal || response.data.scope.siteIds.includes(restoredSite));
+    const onlySite =
+      response.data.scope.siteIds.length === 1 ? response.data.scope.siteIds[0] : undefined;
+    if (restoredSiteIsAllowed) {
+      useScopeStore.getState().setActiveSite(restoredSite, response.data.scope);
+    } else if (onlySite !== undefined) {
+      useScopeStore.getState().setActiveSite(onlySite, response.data.scope);
+    } else {
+      useScopeStore.getState().clear();
+    }
   } catch (error: unknown) {
     useSessionStore.getState().clear();
     useScopeStore.getState().clear();

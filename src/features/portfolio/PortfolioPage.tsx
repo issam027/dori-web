@@ -35,6 +35,16 @@ export function PortfolioPage() {
         eyebrow="Organisation"
         title="Portefeuille de sites"
         description="Sélectionnez le site sur lequel vous souhaitez travailler."
+        actions={
+          <button
+            className="button"
+            type="button"
+            disabled={sites.isFetching}
+            onClick={() => void sites.refetch()}
+          >
+            {sites.isFetching ? 'Actualisation…' : 'Actualiser'}
+          </button>
+        }
       />
       <div className="metrics-grid">
         <MetricCard label="Sites autorisés" value={allowed.length} />
@@ -57,8 +67,14 @@ export function PortfolioPage() {
             key={site.siteId}
             className={site.siteId === activeSiteId ? 'site-card site-card-active' : 'site-card'}
           >
-            <div>
-              <p className="eyebrow">{site.siteType}</p>
+            <div className="site-card-heading">
+              <span
+                className={
+                  site.siteId === activeSiteId ? 'status-badge status-success' : 'status-badge'
+                }
+              >
+                {site.siteId === activeSiteId ? 'Site actif' : 'Disponible'}
+              </span>
               <h2>{site.siteName}</h2>
               <p>{site.siteLocation ?? site.timezone}</p>
             </div>
@@ -83,16 +99,21 @@ export function PortfolioPage() {
                 <span>{summaries[index].data.data.appointmentsToday} RDV aujourd'hui</span>
               </div>
             ) : null}
-            {user && user.scope.siteIds.length > 1 ? (
+            {user && allowed.length > 1 ? (
               <button
-                className="button button-primary"
+                className={
+                  site.siteId === activeSiteId
+                    ? 'button button-primary site-select-button'
+                    : 'button site-select-button'
+                }
                 type="button"
-                disabled={site.siteId === activeSiteId}
                 onClick={() => {
-                  void changeActiveSite(queryClient, site.siteId, user.scope);
+                  if (site.siteId !== activeSiteId) {
+                    void changeActiveSite(queryClient, site.siteId, user.scope);
+                  }
                 }}
               >
-                {site.siteId === activeSiteId ? 'Site actif' : 'Activer ce site'}
+                {site.siteId === activeSiteId ? 'Continuer sur ce site' : 'Activer ce site'}
               </button>
             ) : null}
           </Card>

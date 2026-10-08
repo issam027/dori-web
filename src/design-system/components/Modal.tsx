@@ -23,12 +23,16 @@ export function Modal({ open, onOpenChange, title, description, children, action
               <Dialog.Title>{title}</Dialog.Title>
               {description ? <Dialog.Description>{description}</Dialog.Description> : null}
             </div>
-            <Dialog.Close className="icon-button" aria-label={t('common.close')}>
-              ×
-            </Dialog.Close>
           </header>
           <div className="dialog-body">{children}</div>
-          {actions ? <footer className="dialog-actions">{actions}</footer> : null}
+          <footer className="dialog-actions">
+            <Dialog.Close asChild>
+              <button className="button" type="button">
+                {t('common.cancel')}
+              </button>
+            </Dialog.Close>
+            {actions}
+          </footer>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -48,7 +52,6 @@ export function ConfirmDialog({
   onConfirm: () => void;
   destructive?: boolean;
 }) {
-  const { t } = useTranslation();
   return (
     <Modal
       open={open}
@@ -57,15 +60,6 @@ export function ConfirmDialog({
       description={description}
       actions={
         <>
-          <button
-            className="button"
-            type="button"
-            onClick={() => {
-              onOpenChange(false);
-            }}
-          >
-            {t('common.cancel')}
-          </button>
           <button
             className={`button ${destructive ? 'button-danger' : 'button-primary'}`}
             type="button"

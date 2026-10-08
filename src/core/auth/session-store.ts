@@ -13,7 +13,7 @@ interface SessionState {
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
-  status: 'anonymous',
+  status: 'hydrating',
   user: null,
   beginHydration: () => {
     set({ status: 'hydrating' });

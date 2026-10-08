@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 import { usersControllerUpdateUser } from '@/api/generated/users/users';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -43,25 +44,26 @@ export function ProfilePage() {
         title="Mon profil"
         description="Votre identité, vos habilitations et vos préférences."
       />
-      <div className="profile-grid">
-        <Card>
-          <h2>Identité</h2>
+      <div className="profile-layout">
+        <Card className="profile-identity-card">
+          <div className="profile-portrait">
+            <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
+            <h2>{user.username}</h2>
+            <p>{user.roles.join(' · ') || 'Compte utilisateur'}</p>
+            <span className="status-badge status-success">Compte actif</span>
+          </div>
           <dl className="detail-list">
             <div>
-              <dt>Nom utilisateur</dt>
-              <dd>{user.username}</dd>
-            </div>
-            <div>
               <dt>Type de compte</dt>
-              <dd>{user.userType}</dd>
+              <dd>{user.userType === 'human' ? 'Humain' : 'Technique'}</dd>
             </div>
             <div>
-              <dt>Rôles</dt>
-              <dd>{user.roles.join(', ') || '—'}</dd>
+              <dt>Permissions</dt>
+              <dd>{user.permissions.length}</dd>
             </div>
             <div>
               <dt>Dernière connexion</dt>
-              <dd>{user.lastLogin ?? '—'}</dd>
+              <dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '—'}</dd>
             </div>
             <div>
               <dt>Scope</dt>
@@ -73,8 +75,13 @@ export function ProfilePage() {
             </div>
           </dl>
         </Card>
-        <Card>
-          <h2>Préférences modifiables</h2>
+        <Card className="profile-settings-card">
+          <div className="card-heading">
+            <div>
+              <h2>Informations et préférences</h2>
+              <p>Le rôle et le périmètre sont gérés par un administrateur.</p>
+            </div>
+          </div>
           <form
             className="form-stack"
             onSubmit={(e) => {
@@ -96,6 +103,33 @@ export function ProfilePage() {
               Enregistrer
             </button>
           </form>
+          <div className="profile-security-panel">
+            <div>
+              <strong>Sécurité du compte</strong>
+              <p>Modifiez votre mot de passe depuis un parcours dédié et sécurisé.</p>
+            </div>
+            <Link className="button" to="/change-password">
+              Changer mon mot de passe
+            </Link>
+          </div>
+        </Card>
+      </div>
+      <div className="metrics-grid profile-scope-metrics">
+        <Card>
+          <span className="metric-label">Périmètre</span>
+          <strong className="metric-value">
+            {user.scope.isGlobal ? 'Global' : `${String(user.scope.siteIds.length)} site(s)`}
+          </strong>
+        </Card>
+        <Card>
+          <span className="metric-label">Files autorisées</span>
+          <strong className="metric-value">
+            {user.scope.isGlobal ? 'Toutes' : user.scope.queueIds.length}
+          </strong>
+        </Card>
+        <Card>
+          <span className="metric-label">Langue</span>
+          <strong className="metric-value">{user.languagePreference ?? 'fr'}</strong>
         </Card>
       </div>
     </div>

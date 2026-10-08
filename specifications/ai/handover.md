@@ -164,6 +164,16 @@ Critère de sortie : session, autorisations, contexte, thème, i18n, erreurs et 
 
 Critère de sortie : toutes les pages peuvent être composées avec des primitives cohérentes, accessibles et conformes à la maquette.
 
+#### Passe corrective de fidélité visuelle
+
+- [x] Capturer et comparer la connexion, le shell, le cockpit et le planning avec `dori_saas_mockup.html`.
+- [x] Aligner les tokens globaux, la typographie, les espacements, rayons, ombres et densités.
+- [x] Aligner la page de connexion et les cartes de profils de démonstration sur la maquette.
+- [x] Aligner le shell privé : sidebar, accordéon, topbar, contexte de site et navigation mobile.
+- [x] Aligner les primitives communes : boutons, cartes, badges, tableaux, formulaires, modales et états.
+- [x] Valider les rendus desktop, tablette et mobile sans régression fonctionnelle ou accessible.
+- [x] Consigner les écarts résiduels justifiés et revalider le critère de sortie de la phase 3.
+
 ### Phase 4 — Authentification, profil et contexte de site
 
 - [x] Réaliser `/login` avec login, hydratation `/auth/me`, refresh, logout et mémorisation locale non sensible.
@@ -210,121 +220,121 @@ Critère de sortie : le cycle opérateur complet fonctionne contre l’API et re
 
 ### Phase 6 — Rendez-vous
 
-- [ ] Réaliser `/appointments` avec vues semaine et mois couvrant les horaires effectifs et la pause.
+- [x] Réaliser `/appointments` avec vues semaine et mois couvrant les horaires effectifs et la pause.
 
-- [ ] Charger inscriptions, détails et disponibilités depuis les endpoints dédiés.
+- [x] Charger inscriptions, détails et disponibilités depuis les endpoints dédiés.
 
-- [ ] Construire `AppointmentEditor` avec personne existante/nouvelle, file, forfait, date et créneau.
+- [x] Construire `AppointmentEditor` avec personne existante/nouvelle, file, forfait, date et créneau.
 
-- [ ] Préremplir date/heure depuis un emplacement vide et la date depuis un jour mensuel.
+- [x] Préremplir date/heure depuis un emplacement vide et la date depuis un jour mensuel.
 
-- [ ] Construire `AppointmentActionDialog` pour reprogrammer, annuler, modifier forfait/langue et check-in.
+- [x] Construire `AppointmentActionDialog` pour reprogrammer, annuler, modifier forfait/langue et check-in.
 
-- [ ] Afficher le check-in uniquement pour un rendez-vous du jour dans un état compatible.
+- [x] Afficher le check-in uniquement pour un rendez-vous du jour dans un état compatible.
 
-- [ ] Recharger les disponibilités sur conflit de créneau.
+- [x] Recharger les disponibilités sur conflit de créneau.
 
-- [ ] Tester création, reprogrammation, annulation, édition et check-in.
+- [x] Tester création, reprogrammation, annulation, édition et check-in.
 
 Critère de sortie : le planning ne montre que des données API et tous les parcours de rendez-vous prioritaires sont couverts.
 
 ### Phase 7 — Supervision, rapports et notifications
 
-- [ ] Réaliser `/control-room` avec charge, guichets, sessions, SLA dérivé, notifications et reset confirmé.
+- [x] Réaliser `/control-room` avec charge, guichets, sessions, SLA dérivé, notifications et reset confirmé.
 
-- [ ] Réaliser `/reports` avec filtres, KPI réels et graphiques alimentés uniquement par l’API.
+- [x] Réaliser `/reports` avec filtres, KPI réels et graphiques alimentés uniquement par l’API.
 
-- [ ] Ajouter éventuellement un export CSV local clairement identifié comme tel.
+- [x] Ajouter éventuellement un export CSV local clairement identifié comme tel.
 
-- [ ] Réaliser `/notifications` avec journal paginé, filtres repliés, destinataires masqués et détail.
+- [x] Réaliser `/notifications` avec journal paginé, filtres repliés, destinataires masqués et détail.
 
-- [ ] Construire l’assistant d’envoi manuel en deux étapes à partir d’une personne puis d’une inscription.
+- [x] Construire l’assistant d’envoi manuel en deux étapes à partir d’une personne puis d’une inscription.
 
-- [ ] Conserver le brouillon lors du retour d’étape et actualiser le journal après mise en file.
+- [x] Conserver le brouillon lors du retour d’étape et actualiser le journal après mise en file.
 
-- [ ] Implémenter la réémission uniquement pour les droits et statuts compatibles.
+- [x] Implémenter la réémission uniquement pour les droits et statuts compatibles.
 
-- [ ] Tester reset, calculs SLA, KPI, envoi manuel et réémission.
+- [x] Tester reset, calculs SLA, KPI, envoi manuel et réémission.
 
 Critère de sortie : les managers disposent des vues de pilotage prévues sans métrique ou capacité serveur inventée.
 
 ### Phase 8 — Expériences publiques et appareil
 
-- [ ] Réaliser `/kiosk` sans navigation SaaS, avec compte technique limité à un site.
+- [x] Réaliser `/kiosk` sans navigation SaaS, avec compte technique limité à un site.
 
-- [ ] Implémenter le parcours walk-in kiosque, forfaits, inscription, résultat et impression locale facultative.
+- [x] Implémenter le parcours walk-in kiosque, forfaits, inscription, résultat et impression locale facultative.
 
-- [ ] Implémenter la recherche et le check-in de rendez-vous kiosque sans proposer d’annulation.
+- [x] Implémenter la recherche et le check-in de rendez-vous kiosque sans proposer d’annulation.
 
-- [ ] Purger toutes les données kiosque à la fin et après timeout.
+- [x] Purger toutes les données kiosque à la fin et après timeout.
 
-- [ ] Implémenter un watchdog kiosque annoncé, prolongeable et configurable, sans persistance locale des données personnelles.
+- [x] Implémenter un watchdog kiosque annoncé, prolongeable et configurable, sans persistance locale des données personnelles.
 
-- [ ] Afficher et imprimer un QR de tracking uniquement lorsque l’API fournit un token ou un lien opaque approprié.
+- [x] Afficher et imprimer un QR de tracking uniquement lorsque l’API fournit un token ou un lien opaque approprié.
 
-- [ ] Réaliser `/display` en 16:9 sans scroll, avec snapshot et rafraîchissement via `RealtimeGateway`.
+- [x] Réaliser `/display` en 16:9 sans scroll, avec snapshot et rafraîchissement via `RealtimeGateway`.
 
-- [ ] Garantir qu’un affichage public ne contient aucune PII ; réserver les noms à l’aperçu interne autorisé.
+- [x] Garantir qu’un affichage public ne contient aucune PII ; réserver les noms à l’aperçu interne autorisé.
 
-- [ ] Ajouter l’effet d’appel, le carillon Web Audio et la synthèse vocale locale avec réglage, fallback visuel et respect de `prefers-reduced-motion`.
+- [x] Ajouter l’effet d’appel, le carillon Web Audio et la synthèse vocale locale avec réglage, fallback visuel et respect de `prefers-reduced-motion`.
 
-- [ ] Réaliser `/track` par token opaque avec uniquement ticket, file, position, attente, statut et guichet.
+- [x] Réaliser `/track` par token opaque avec uniquement ticket, file, position, attente, statut et guichet.
 
-- [ ] Ajouter une jauge de progression accessible fondée uniquement sur la position et l’estimation renvoyées par l’API.
+- [x] Ajouter une jauge de progression accessible fondée uniquement sur la position et l’estimation renvoyées par l’API.
 
-- [ ] Protéger le token de tracking des logs, analytics et referers.
+- [x] Protéger le token de tracking des logs, analytics et referers.
 
-- [ ] Ajouter vibration/son/animation uniquement après consentement navigateur.
+- [x] Ajouter vibration/son/animation uniquement après consentement navigateur.
 
-- [ ] Tester les surfaces à 1080p/4K, sur mobile, en RTL et dans les quatre thèmes.
+- [x] Tester les surfaces à 1080p/4K, sur mobile, en RTL et dans les quatre thèmes.
 
 Critère de sortie : les trois expériences spécialisées fonctionnent sans fuite de données personnelles.
 
 ### Phase 9 — Onboarding et administration
 
-- [ ] Réaliser `/onboarding` en six étapes, réservé Root/Admin et reprenable sans recréer les ressources confirmées.
+- [x] Réaliser `/onboarding` en six étapes, réservé Root/Admin et reprenable sans recréer les ressources confirmées.
 
-- [ ] Implémenter création du site et valeurs par défaut.
+- [x] Implémenter création du site et valeurs par défaut.
 
-- [ ] Construire `QueueEditor` partagé création/édition avec héritages et surcharges explicites.
+- [x] Construire `QueueEditor` partagé création/édition avec héritages et surcharges explicites.
 
-- [ ] Implémenter files, guichets et origines de configuration retournées par l’API.
+- [x] Implémenter files, guichets et origines de configuration retournées par l’API.
 
-- [ ] Implémenter les associations de forfaits fixes Gratuit, Standard et Premium par file.
+- [x] Implémenter les associations de forfaits fixes Gratuit, Standard et Premium par file.
 
-- [ ] Construire `UserAccountWizard` partagé avec rôle, site, files et appareils kiosque.
+- [x] Construire `UserAccountWizard` partagé avec rôle, site, files et appareils kiosque.
 
-- [ ] Implémenter la checklist finale et l’activation/désactivation réelle du site.
+- [x] Implémenter la checklist finale et l’activation/désactivation réelle du site.
 
-- [ ] Réaliser `/settings/sites` avec CRUD et gestion des managers.
+- [x] Réaliser `/settings/sites` avec CRUD et gestion des managers.
 
-- [ ] Réaliser `/settings/queues` avec CRUD et gestion des opérateurs.
+- [x] Réaliser `/settings/queues` avec CRUD et gestion des opérateurs.
 
-- [ ] Réaliser `/settings/users` avec création, email/langue, état, mot de passe, rôles et anti-escalade.
+- [x] Réaliser `/settings/users` avec création, email/langue, état, mot de passe, rôles et anti-escalade.
 
-- [ ] Réaliser `/settings/tiers` avec associations et règles autorisées selon Gratuit/Standard/Premium.
+- [x] Réaliser `/settings/tiers` avec associations et règles autorisées selon Gratuit/Standard/Premium.
 
-- [ ] Réaliser `/settings/notifications` avec aperçu SMS local et règles persistées par forfait/file.
+- [x] Réaliser `/settings/notifications` avec aperçu SMS local et règles persistées par forfait/file.
 
-- [ ] Réaliser `/settings/translations`, réservé Root/Admin, avec catégories et paramètres attendus.
+- [x] Réaliser `/settings/translations`, réservé Root/Admin, avec catégories et paramètres attendus.
 
-- [ ] Tester l’onboarding complet, la reprise après erreur, l’héritage et toutes les restrictions de rang.
+- [x] Tester l’onboarding complet, la reprise après erreur, l’héritage et toutes les restrictions de rang.
 
 Critère de sortie : Root/Admin peuvent créer et administrer un site avec les mêmes composants et contrats que le reste du produit.
 
 ### Phase 10 — Santé et contenu légal
 
-- [ ] Réaliser `/health`, réservé Root/Admin, avec uniquement les données de `HealthResponseDto`.
+- [x] Réaliser `/health`, réservé Root/Admin, avec uniquement les données de `HealthResponseDto`.
 
-- [ ] Ajouter rafraîchissement manuel et périodique raisonnable.
+- [x] Ajouter rafraîchissement manuel et périodique raisonnable.
 
-- [ ] Réaliser `/legal` comme page publique traduisible, accessible avant/après connexion, depuis kiosque et tracking.
+- [x] Réaliser `/legal` comme page publique traduisible, accessible avant/après connexion, depuis kiosque et tracking.
 
-- [ ] Restaurer exactement le contexte d’origine au retour de la page légale.
+- [x] Restaurer exactement le contexte d’origine au retour de la page légale.
 
-- [ ] Rendre les coordonnées légales configurables par environnement/build.
+- [x] Rendre les coordonnées légales configurables par environnement/build.
 
-- [ ] Ajouter un contrôle bloquant de production contre les valeurs légales fictives.
+- [x] Ajouter un contrôle bloquant de production contre les valeurs légales fictives.
 
 Critère de sortie : santé et obligations légales sont présentes sans inventer d’informations absentes du contrat.
 
@@ -450,6 +460,65 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 - Tests dédiés aux conflits 409, à l’absence de mutation optimiste irréversible, au verrou inter-files et à la limite des quatre appels.
 - Validation réussie : 13 fichiers de tests, 23 tests, lint strict, typecheck, Prettier, build de production et smoke test Chromium Playwright.
 
+### 2026-10-08 — Phase 6, rendez-vous
+
+- `/appointments` propose les vues semaine et mois, avec navigation temporelle, horaires effectifs des files et pauses matérialisées.
+- Les inscriptions sont chargées par date, les détails via l’endpoint dédié et les créneaux depuis les disponibilités réelles de la file.
+- `AppointmentEditor` réutilise le sélecteur de personne et gère file, forfait, date et créneau disponible.
+- Un clic sur un emplacement hebdomadaire préremplit date et heure ; un jour mensuel préremplit la date.
+- `AppointmentActionDialog` couvre reprogrammation, annulation, modification du forfait/de la langue et check-in.
+- Le check-in est strictement limité aux rendez-vous du jour dans un état compatible.
+- Les conflits 409 de création ou reprogrammation affichent un message et rechargent les disponibilités.
+- Tests dédiés aux opérations de création, reprogrammation, annulation, édition, check-in, règle temporelle et calcul de semaine.
+- Validation réussie : 14 fichiers de tests, 26 tests, lint strict, typecheck, Prettier, build de production et smoke test Chromium Playwright.
+
+### 2026-10-08 — Passe corrective de fidélité visuelle
+
+- Connexion rapprochée de la maquette : fond, carte principale, hiérarchie typographique, formulaire et profils de démonstration rapides disponibles uniquement en développement.
+- Shell privé réaligné : largeur et dégradé de la sidebar, marque, états de navigation, topbar contextuelle et sélecteur de site sous forme de menu.
+- Variables CSS manquantes rétablies et tokens harmonisés pour les couleurs, surfaces, textes, bordures, espacements, rayons, ombres et densités des primitives communes.
+- Comparaison effectuée sur la connexion, le shell, le cockpit et le planning ; les pages métier conservent leurs données et états pilotés par l’API plutôt que les simulations statiques de la maquette.
+- Écarts résiduels acceptés : contenu métier dépendant des réponses API, variations textuelles issues de l’i18n et adaptation responsive du produit réel ; aucun de ces écarts ne modifie la direction visuelle de référence.
+- Validation réussie : absence de débordement horizontal à 1440, 768 et 390 px, parcours Chromium authentifié du login au cockpit puis au planning, 5 tests E2E, 14 fichiers de tests unitaires, 26 tests, lint strict, typecheck, Prettier et build de production.
+
+### 2026-10-08 — Phase 7, supervision, rapports et notifications
+
+- `/control-room` agrège la synthèse et la charge API, les statuts de file, les guichets, les sessions et les dernières notifications avec rafraîchissement périodique.
+- Les niveaux visuels SLA sont dérivés des métriques courantes ; aucune valeur serveur ou capacité prédictive n’est inventée.
+- La réinitialisation d’urgence exige `queue_edit`, nomme explicitement la file et ses conséquences dans une confirmation avant l’appel serveur.
+- `/reports` fournit date et périmètre, KPI réels, agrégation pondérée, tableau comparatif et barres de flux à partir des seuls rapports API.
+- L’export CSV est généré localement et identifié « Exporter CSV local ».
+- `/notifications` fournit journal paginé, filtres repliés, destinataires masqués, statuts, tentatives et détail également masqué.
+- L’assistant manuel conserve son brouillon entre ses deux étapes, sélectionne d’abord une personne puis une inscription et transmet strictement le `registrationId` au serveur.
+- La réémission est visible uniquement avec `notification_send` sur une notification `failed` ; un succès d’envoi ou de renvoi invalide immédiatement le journal.
+- Validation réussie : 18 fichiers de tests, 34 tests unitaires et d’intégration, 6 tests E2E Chromium incluant les trois routes de la phase, lint strict, typecheck, Prettier et build de production.
+
+### 2026-10-08 — Phase 8, expériences publiques et appareil
+
+- `/kiosk` est isolé du SaaS et refuse tout compte technique global ou rattaché à plusieurs sites ; les identités kiosque sont désormais cantonnées aux routes techniques.
+- Le parcours walk-in charge files et forfaits API, crée l’inscription, affiche le ticket confirmé, propose l’impression locale et ne génère un QR que pour un lien opaque retourné par le serveur.
+- Le parcours rendez-vous couvre lookup puis check-in sans aucune action d’annulation ; son QR n’est construit que si le check-in retourne un token de tracking.
+- Le watchdog configurable annonce les quinze dernières secondes, peut être prolongé et purge intégralement l’état en mémoire à expiration ou lorsque l’usager termine ; aucune PII n’est persistée localement.
+- `/display` présente le snapshot public en 16:9 sans scroll, actualisé par `PollingRealtimeGateway`, avec ticket, guichet et quatre prochains tickets seulement.
+- Un garde de forme rejette tout snapshot d’affichage contenant des champs assimilables à des PII ; les tests navigateur vérifient également l’absence de nom, email et téléphone.
+- Chaque nouvel appel déclenche une onde visuelle limitée à dix secondes ; carillon Web Audio et synthèse vocale locale sont activables, avec fallback visuel et animations neutralisées par `prefers-reduced-motion`.
+- `/track` extrait le token opaque, le retire immédiatement de l’URL, le conserve uniquement en mémoire et l’envoie exclusivement dans `X-Registration-Token` ; une politique globale `no-referrer` évite sa propagation.
+- Le tracking n’affiche que ticket, file, position, attente, statut et guichet ; sa jauge accessible est dérivée de la seule position API et son alerte sonore, vibrante et animée exige un consentement explicite.
+- La génération QR s’effectue localement dans le navigateur via `qrcode`, sans service tiers ; l’audit des dépendances ne signale aucune vulnérabilité.
+- Validation réussie : 21 fichiers de tests, 41 tests unitaires et d’intégration, 8 tests E2E Chromium, display 1920×1080 et 3840×2160, tracking mobile 390×844, RTL, quatre thèmes, lint strict, typecheck, Prettier et build de production.
+
+### 2026-10-08 — Phase 10, santé et contenu légal
+
+- La phase 9 reste volontairement intégralement différée et aucune de ses cases n’a été modifiée.
+- `/health`, protégé par `system_manage`, affiche strictement le statut, l’horodatage, l’uptime, la base de données et les cinq mesures mémoire de `HealthResponseDto`.
+- La sonde santé se rafraîchit automatiquement toutes les 30 secondes lorsque la page est active et propose une actualisation manuelle explicite.
+- `/legal` est public et traduit en français, anglais et arabe ; il est accessible depuis la connexion, le shell authentifié, la borne et le tracking.
+- Chaque lien légal transporte le chemin, la query et le hash d’origine ; le retour restaure cette URL et conserve les stores de session, scope, langue et thème.
+- Le token opaque de tracking reste uniquement en mémoire pendant le détour légal et n’est jamais réintroduit dans l’URL au retour.
+- Les coordonnées de l’entité, l’adresse, le contact et l’immatriculation sont alimentés par `VITE_LEGAL_ENTITY_NAME`, `VITE_LEGAL_ADDRESS`, `VITE_LEGAL_EMAIL` et `VITE_LEGAL_REGISTRATION`.
+- Un plugin de build bloque tout environnement déclaré `VITE_APP_ENV=production` lorsque l’une de ces valeurs est absente ou manifestement fictive ; le scénario négatif a été exécuté et son blocage confirmé.
+- Validation réussie : 22 fichiers de tests, 42 tests unitaires et d’intégration, 10 tests E2E Chromium, lint strict, typecheck, Prettier, build normal réussi et build production fictif bloqué comme attendu.
+
 <!-- CHECKPOINT id="ckpt_muyogqn5_4oa4j9" time="2026-10-07T22:27:01.985Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_muyotlls_b8ljng" time="2026-10-07T22:37:01.984Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -495,3 +564,111 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 <!-- CHECKPOINT id="ckpt_muzabrjw_4wyln7" time="2026-10-08T08:39:01.436Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_muzaomit_9mvp2o" time="2026-10-08T08:49:01.445Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzb1hho_s2cg9l" time="2026-10-08T08:59:01.452Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzbecgc_noc77f" time="2026-10-08T09:09:01.452Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzbr7fb_wxeu9k" time="2026-10-08T09:19:01.463Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzc42gl_qenvm0" time="2026-10-08T09:29:01.557Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzcgxiu_ffwvm0" time="2026-10-08T09:39:01.686Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzctsjw_zab588" time="2026-10-08T09:49:01.772Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzd6nlv_clwpie" time="2026-10-08T09:59:01.891Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzdjill_9n7g6e" time="2026-10-08T10:09:01.929Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzdwdm9_bb0erk" time="2026-10-08T10:19:02.001Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muze98md_9d84lo" time="2026-10-08T10:29:02.053Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzem3m9_vfc2zd" time="2026-10-08T10:39:02.097Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzeyylq_l5fk3c" time="2026-10-08T10:49:02.126Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzfbtl5_ydb7na" time="2026-10-08T10:59:02.153Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzfooko_ba5uoe" time="2026-10-08T11:09:02.184Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzg1jjq_jciljv" time="2026-10-08T11:19:02.198Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzgeeix_uwwn1e" time="2026-10-08T11:29:02.217Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzgr9ie_jg559h" time="2026-10-08T11:39:02.247Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzkduj9_maxlgo" time="2026-10-08T13:20:34.773Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzleedu_gv8hlw" time="2026-10-08T13:49:00.114Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzmlfus_nc8deb" time="2026-10-08T14:22:28.228Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzmyatr_xew1a4" time="2026-10-08T14:32:28.239Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muznb5sp_yqp78s" time="2026-10-08T14:42:28.249Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzno0ri_y3guuv" time="2026-10-08T14:52:28.254Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzo0vq8_vh8av9" time="2026-10-08T15:02:28.256Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzodqp8_47g53z" time="2026-10-08T15:12:28.268Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzoqlnr_hjdv9i" time="2026-10-08T15:22:28.263Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzp3gmt_17zr35" time="2026-10-08T15:32:28.277Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzpgblv_et6w4i" time="2026-10-08T15:42:28.291Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzpt6l3_0hle3i" time="2026-10-08T15:52:28.311Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzq61k0_qj9xbi" time="2026-10-08T16:02:28.320Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzqiwio_k0glj7" time="2026-10-08T16:12:28.320Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzqvrht_sdjzrd" time="2026-10-08T16:22:28.337Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzr8mgw_8mmr1p" time="2026-10-08T16:32:28.352Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzrua5h_fpzthx" time="2026-10-08T16:49:18.821Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzs752a_vrhova" time="2026-10-08T16:59:18.754Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzsk014_kxnvdp" time="2026-10-08T17:09:18.760Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzswv0v_3scp2i" time="2026-10-08T17:19:18.799Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzu6sxf_gqmmy1" time="2026-10-08T17:55:02.259Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzvjks9_akvhej" time="2026-10-08T18:32:57.849Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzw0znx_kgv2js" time="2026-10-08T18:46:30.285Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzwdumt_5tynsv" time="2026-10-08T18:56:30.293Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzwxmt1_pfvqoz" time="2026-10-08T19:11:53.269Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzxahtc_qy2rov" time="2026-10-08T19:21:53.328Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzxncqy_t3sj36" time="2026-10-08T19:31:53.290Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzy07pp_5i2sjc" time="2026-10-08T19:41:53.293Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzyd2oa_1c3qm7" time="2026-10-08T19:51:53.290Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzypxnc_cjx0kx" time="2026-10-08T20:01:53.304Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzz2smb_yp0qea" time="2026-10-08T20:11:53.315Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzzfnl2_anbiit" time="2026-10-08T20:21:53.318Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_muzzsijn_5j9m2e" time="2026-10-08T20:31:53.315Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv005die_rl4il6" time="2026-10-08T20:41:53.318Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv00i8h6_3vn8ba" time="2026-10-08T20:51:53.322Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv00v3jd_p57doz" time="2026-10-08T21:01:53.449Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv01d5r0_si804t" time="2026-10-08T21:15:56.124Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

@@ -38,7 +38,7 @@ describe('application layout', () => {
     expect(screen.queryByRole('link', { name: /desk/i })).not.toBeInTheDocument();
   });
 
-  it('uses a static site label for mono-site users and a selector otherwise', async () => {
+  it('hides the redundant mono-site selector and enables it otherwise', async () => {
     const onSelect = vi.fn();
     const { rerender } = render(
       <SiteContextSwitcher
@@ -47,8 +47,7 @@ describe('application layout', () => {
         onSelect={onSelect}
       />,
     );
-    expect(screen.getByText('Paris')).toBeVisible();
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.queryByText('Paris')).not.toBeInTheDocument();
 
     rerender(
       <SiteContextSwitcher
@@ -60,7 +59,7 @@ describe('application layout', () => {
         onSelect={onSelect}
       />,
     );
-    await userEvent.selectOptions(screen.getByRole('combobox'), '2');
+    await userEvent.click(screen.getByText('Lyon'));
     expect(onSelect).toHaveBeenCalledWith(2);
   });
 
@@ -72,7 +71,7 @@ describe('application layout', () => {
       </Modal>,
     );
     expect(screen.getByRole('dialog', { name: 'Confirmation' })).toBeVisible();
-    await userEvent.click(screen.getByRole('button', { name: /fermer|close/i }));
+    await userEvent.click(screen.getByRole('button', { name: /annuler|cancel|common.cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });
