@@ -1,0 +1,11 @@
+dist
+coverage
+node_modules
+playwright-report
+test-results
+src/api/generated
+specifications/docs-json.json
+specifications/dori_saas_mockup.html
+specifications/final_ihm_specification.md
+specifications/spec_front.md
+specifications/ai/handover.md
