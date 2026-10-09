@@ -14,7 +14,7 @@
     "audit:phase11": "node tools/phase11-audit.mjs",
     "audit:i18n": "node tools/i18n-ui-audit.mjs",
     "audit:security": "npm audit --audit-level=high",
-    "build": "tsc -b && vite build",
+    "build": "npm run api:generate && tsc -b && vite build",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
