@@ -22,21 +22,35 @@ export function LegalPage() {
         : '/login';
   return (
     <article className="legal-page">
-      <button
-        type="button"
-        className="button"
-        onClick={() => {
-          void navigate(destination, { replace: true });
-        }}
-      >
-        {t('legal.back')}
-      </button>
-      <header>
-        <p className="eyebrow">{t('legal.eyebrow')}</p>
-        <h1>{t('legal.title')}</h1>
-        <p>{t('legal.updated')}</p>
+      <header className="legal-hero">
+        <div>
+          <p className="eyebrow">{t('legal.eyebrow')}</p>
+          <h1>{t('legal.title')}</h1>
+          <p>{t('legal.updated')}</p>
+        </div>
+        <button
+          type="button"
+          className="button"
+          onClick={() => {
+            void navigate(destination, { replace: true });
+          }}
+        >
+          {t('legal.back')}
+        </button>
       </header>
-      <section>
+      <div className="legal-summary" role="note">
+        <span className="status-badge status-success">{t('legal.summarySecure')}</span>
+        <span className="status-badge status-info">{t('legal.summarySaas')}</span>
+        <p>{t('legal.introduction')}</p>
+      </div>
+      <nav className="legal-toc" aria-label={t('legal.contents')}>
+        <a href="#publisher">{t('legal.publisher')}</a>
+        <a href="#service">{t('legal.service')}</a>
+        <a href="#privacy">{t('legal.privacy')}</a>
+        <a href="#retention">{t('legal.retention')}</a>
+        <a href="#security">{t('legal.security')}</a>
+      </nav>
+      <section id="publisher">
         <h2>{t('legal.publisher')}</h2>
         <dl className="detail-list">
           <dt>{t('legal.entity')}</dt>
@@ -51,9 +65,15 @@ export function LegalPage() {
           <dd>{legalConfig.registration}</dd>
         </dl>
       </section>
-      <section>
+      <section id="service">
+        <h2>{t('legal.service')}</h2>
+        <p>{t('legal.serviceText')}</p>
+      </section>
+      <section id="privacy">
         <h2>{t('legal.privacy')}</h2>
         <p>{t('legal.privacyText')}</p>
+        <h3>{t('legal.purposes')}</h3>
+        <p>{t('legal.purposesText')}</p>
       </section>
       <section>
         <h2>{t('legal.rights')}</h2>
@@ -63,10 +83,21 @@ export function LegalPage() {
         <h2>{t('legal.cookies')}</h2>
         <p>{t('legal.cookiesText')}</p>
       </section>
-      <section>
+      <section id="retention">
+        <h2>{t('legal.retention')}</h2>
+        <p>{t('legal.retentionText')}</p>
+      </section>
+      <section id="security">
         <h2>{t('legal.security')}</h2>
         <p>{t('legal.securityText')}</p>
       </section>
+      <footer className="legal-contact">
+        <strong>{t('legal.contactTitle')}</strong>
+        <p>{t('legal.contactText', { email: legalConfig.email })}</p>
+        <a className="button button-primary" href={`mailto:${legalConfig.email}`}>
+          {legalConfig.email}
+        </a>
+      </footer>
     </article>
   );
 }

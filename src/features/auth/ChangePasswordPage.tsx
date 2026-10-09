@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,7 +13,7 @@ import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
 
-const schema = z
+const createSchema = (t: TFunction) => z
   .object({
     currentPassword: z.string().min(1),
     newPassword: z.string().min(10).max(20),
@@ -19,18 +21,19 @@ const schema = z
   })
   .refine((v) => v.newPassword === v.confirmation, {
     path: ['confirmation'],
-    message: 'Les mots de passe diffèrent.',
+    message: t('validation.passwordsDiffer'),
   });
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export function ChangePasswordPage() {
+  const { t: __t } = useTranslation();
   const navigate = useNavigate();
   const [apiError, setApiError] = useState('');
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({ resolver: zodResolver(createSchema(__t)) });
   const submit = handleSubmit(async ({ currentPassword, newPassword }) => {
     setApiError('');
     try {
@@ -39,14 +42,20 @@ export function ChangePasswordPage() {
       const user = useSessionStore.getState().user;
       if (user) void navigate(findFirstAuthorizedPath(user), { replace: true });
     } catch {
-      setApiError('Le mot de passe n’a pas pu être modifié.');
+      setApiError(
+        __t(
+          'ui.expression.auth.change_password_page.le_mot_de_passe_n_a_pas_pu_etre_modifie_1lvgut4',
+        ),
+      );
     }
   });
   return (
     <div className="page-stack">
       <PageHeader
-        title="Changer le mot de passe"
-        description="Choisissez un mot de passe de 10 à 20 caractères."
+        title={__t('ui.auth.change_password_page.changer_le_mot_de_passe_1i41l8b')}
+        description={__t(
+          'ui.auth.change_password_page.choisissez_un_mot_de_passe_de_10_a_20_caracteres_1gdne07',
+        )}
       />
       <Card>
         <form
@@ -55,7 +64,10 @@ export function ChangePasswordPage() {
             void submit(e);
           }}
         >
-          <FormField label="Mot de passe actuel" required>
+          <FormField
+            label={__t('ui.auth.change_password_page.mot_de_passe_actuel_43q4tg')}
+            required
+          >
             <input
               type="password"
               autoComplete="current-password"
@@ -63,13 +75,17 @@ export function ChangePasswordPage() {
             />
           </FormField>
           <FormField
-            label="Nouveau mot de passe"
+            label={__t('ui.auth.change_password_page.nouveau_mot_de_passe_hl1ug5')}
             required
             error={errors.newPassword ? 'Entre 10 et 20 caractères.' : undefined}
           >
             <input type="password" autoComplete="new-password" {...register('newPassword')} />
           </FormField>
-          <FormField label="Confirmation" required error={errors.confirmation?.message}>
+          <FormField
+            label={__t('ui.auth.change_password_page.confirmation_p3snlg')}
+            required
+            error={errors.confirmation?.message}
+          >
             <input type="password" autoComplete="new-password" {...register('confirmation')} />
           </FormField>
           {apiError ? (
@@ -78,7 +94,7 @@ export function ChangePasswordPage() {
             </p>
           ) : null}
           <button className="button button-primary" disabled={isSubmitting} type="submit">
-            Enregistrer
+            {__t('ui.auth.change_password_page.enregistrer_sywgdx')}
           </button>
         </form>
       </Card>

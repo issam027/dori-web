@@ -7,6 +7,7 @@ export function EntityPicker<TEntity>({
   render,
   onSelect,
   label,
+  compact = false,
 }: {
   entities: readonly TEntity[];
   selectedKey: Key | null;
@@ -14,9 +15,14 @@ export function EntityPicker<TEntity>({
   render: (entity: TEntity) => ReactNode;
   onSelect: (entity: TEntity) => void;
   label: string;
+  compact?: boolean;
 }) {
   return (
-    <div className="entity-picker" role="listbox" aria-label={label}>
+    <div
+      className={`entity-picker${compact ? ' entity-picker-compact' : ''}`}
+      role="listbox"
+      aria-label={label}
+    >
       {entities.map((entity) => {
         const key = getKey(entity);
         const selected = key === selectedKey;

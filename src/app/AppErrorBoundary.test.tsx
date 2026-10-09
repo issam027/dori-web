@@ -16,7 +16,8 @@ describe('AppErrorBoundary', () => {
 
     expect(screen.getByRole('alert')).toBeVisible();
     expect(screen.getByRole('heading', { name: /rencontré une erreur/i })).toBeVisible();
-    expect(screen.getByText('Aucun ticket disponible')).toBeVisible();
+    expect(screen.getAllByText('UNHANDLED_UI_ERROR')[0]).toBeVisible();
+    expect(screen.queryByText('Aucun ticket disponible')).not.toBeInTheDocument();
     expect(screen.getByText('Incident', { selector: 'dt' })).toBeVisible();
     consoleError.mockRestore();
   });

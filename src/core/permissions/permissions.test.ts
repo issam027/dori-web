@@ -28,7 +28,7 @@ describe('permissions and scope', () => {
         roles: ['kiosk'],
         permissions: ['queue_view', 'registration_register', 'appointment_lookup'],
       }),
-    ).toBe('/kiosk');
+    ).toBe('/device-mode');
   });
 
   it('selects the first route from effective permissions, not role names', () => {

@@ -1,10 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
 import { registrationsControllerGetAvailability } from '@/api/generated/registrations/registrations';
 import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
 import { Modal } from '@/design-system/components/Modal';
-import { appointmentLocalParts, appointmentUtcIso, canCheckIn } from './appointment-rules';
+import {
+  appointmentLocalParts,
+  appointmentUtcIso,
+  canCheckIn,
+  dateInTimeZone,
+} from './appointment-rules';
 import {
   cancelAppointment,
   checkInAppointment,
@@ -25,6 +31,7 @@ export function AppointmentActionDialog({
   onOpenChange: (open: boolean) => void;
   timeZone: string;
 }) {
+  const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
   const initialParts = appointment.scheduledTime
     ? appointmentLocalParts(appointment.scheduledTime, timeZone)
@@ -58,13 +65,24 @@ export function AppointmentActionDialog({
     try {
       await action();
       await refresh();
-      notify({ tone: 'success', title: 'Rendez-vous mis à jour', message: successMessage });
+      notify({
+        tone: 'success',
+        title: __t('notifications.appointment.updated'),
+        message: successMessage,
+      });
     } catch (cause) {
       notifyError(cause);
       if (slotSensitive && (cause as { status?: number }).status === 409) {
-        setError('Créneau indisponible, disponibilités actualisées.');
+        setError(
+          __t(
+            'ui.expression.appointments.appointment_action_dialog.creneau_indisponible_disponibilites_actualis_qha9t5',
+          ),
+        );
         await availability.refetch();
-      } else setError('Action impossible.');
+      } else
+        setError(
+          __t('ui.expression.appointments.appointment_action_dialog.action_impossible_m9jriy'),
+        );
     }
   };
   return (
@@ -75,7 +93,7 @@ export function AppointmentActionDialog({
     >
       <div className="form-stack">
         <label>
-          Reprogrammer
+          {__t('ui.appointments.appointment_action_dialog.reprogrammer_13ws2nk')}
           <input
             type="datetime-local"
             value={scheduledTime}
@@ -102,10 +120,10 @@ export function AppointmentActionDialog({
             );
           }}
         >
-          Reprogrammer
+          {__t('ui.appointments.appointment_action_dialog.reprogrammer_13ws2nk')}
         </button>
         <label>
-          Forfait
+          {__t('ui.appointments.appointment_action_dialog.forfait_ke31ak')}
           <select
             value={tierId}
             onChange={(e) => {
@@ -120,15 +138,19 @@ export function AppointmentActionDialog({
           </select>
         </label>
         <label>
-          Langue
+          {__t('ui.appointments.appointment_action_dialog.langue_4vkz5r')}
           <select
             value={languagePreference}
             onChange={(e) => {
               setLanguagePreference(e.target.value);
             }}
           >
-            <option value="fr">Français</option>
-            <option value="en">English</option>
+            <option value="fr">
+              {__t('ui.appointments.appointment_action_dialog.francais_1x2mspi')}
+            </option>
+            <option value="en">
+              {__t('ui.appointments.appointment_action_dialog.english_7nql6j')}
+            </option>
             <option value="ar">العربية</option>
           </select>
         </label>
@@ -146,9 +168,9 @@ export function AppointmentActionDialog({
             );
           }}
         >
-          Enregistrer les modifications
+          {__t('ui.appointments.appointment_action_dialog.enregistrer_les_modifications_qazi4g')}
         </button>
-        {canCheckIn(appointment, new Date().toISOString().slice(0, 10)) ? (
+        {canCheckIn(appointment, dateInTimeZone(timeZone)) ? (
           <button
             className="button button-primary"
             type="button"
@@ -159,21 +181,27 @@ export function AppointmentActionDialog({
               );
             }}
           >
-            Check-in
+            {__t('ui.appointments.appointment_action_dialog.check_in_vjjlq9')}
           </button>
         ) : null}
         <button
           className="button button-danger"
           type="button"
           onClick={() => {
-            if (window.confirm('Annuler ce rendez-vous ?'))
+            if (
+              window.confirm(
+                __t(
+                  'ui.expression.appointments.appointment_action_dialog.annuler_ce_rendez_vous_1m9fzvz',
+                ),
+              )
+            )
               void mutate(
                 () => cancelAppointment(appointment.registrationId),
                 'Le rendez-vous a bien été annulé.',
               );
           }}
         >
-          Annuler le rendez-vous
+          {__t('ui.appointments.appointment_action_dialog.annuler_le_rendez_vous_1u8by95')}
         </button>
         {error ? (
           <p role="alert" className="field-error">

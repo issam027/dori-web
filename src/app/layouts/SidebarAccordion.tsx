@@ -3,11 +3,31 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
+import {
+  Activity,
+  Bell,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  FileBarChart,
+  HeartPulse,
+  LayoutDashboard,
+  Monitor,
+  Settings,
+  ShieldCheck,
+  Smartphone,
+  Store,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 
 interface NavItem {
   path: string;
   labelKey: string;
   permissions: readonly string[];
+  icon: LucideIcon;
 }
 interface NavSection {
   id: string;
@@ -24,25 +44,20 @@ const sections: readonly NavSection[] = [
         path: '/desk',
         labelKey: 'nav.desk',
         permissions: ['registration_call', 'session_operate'],
+        icon: LayoutDashboard,
       },
       {
         path: '/my-queues',
         labelKey: 'nav.myQueues',
         permissions: ['registration_view', 'queue_view'],
+        icon: ClipboardList,
       },
       {
         path: '/appointments',
         labelKey: 'nav.appointments',
         permissions: ['appointment_manage', 'appointment_checkin'],
+        icon: CalendarDays,
       },
-      {
-        path: '/control-room',
-        labelKey: 'nav.controlRoom',
-        permissions: ['report_view', 'queue_view'],
-      },
-      { path: '/portfolio', labelKey: 'nav.portfolio', permissions: ['site_view'] },
-      { path: '/reports', labelKey: 'nav.reports', permissions: ['report_view'] },
-      { path: '/notifications', labelKey: 'nav.notifications', permissions: ['notification_view'] },
     ],
   },
   {
@@ -53,27 +68,77 @@ const sections: readonly NavSection[] = [
         path: '/kiosk',
         labelKey: 'nav.kiosk',
         permissions: [],
+        icon: Store,
       },
-      { path: '/display', labelKey: 'nav.display', permissions: [] },
-      { path: '/track', labelKey: 'nav.tracking', permissions: [] },
+      { path: '/display', labelKey: 'nav.display', permissions: [], icon: Monitor },
+      { path: '/track', labelKey: 'nav.tracking', permissions: [], icon: Smartphone },
+    ],
+  },
+  {
+    id: 'pilotage',
+    labelKey: 'nav.pilotage',
+    items: [
+      {
+        path: '/control-room',
+        labelKey: 'nav.controlRoom',
+        permissions: ['report_view', 'queue_view'],
+        icon: Activity,
+      },
+      {
+        path: '/reports',
+        labelKey: 'nav.reports',
+        permissions: ['report_view'],
+        icon: FileBarChart,
+      },
+      {
+        path: '/notifications',
+        labelKey: 'nav.notifications',
+        permissions: ['notification_view'],
+        icon: Bell,
+      },
     ],
   },
   {
     id: 'administration',
     labelKey: 'nav.administration',
     items: [
-      { path: '/onboarding', labelKey: 'nav.onboarding', permissions: ['site_create'] },
+      {
+        path: '/portfolio',
+        labelKey: 'nav.portfolio',
+        permissions: ['site_view'],
+        icon: BriefcaseBusiness,
+      },
+      {
+        path: '/onboarding',
+        labelKey: 'nav.onboarding',
+        permissions: ['site_create'],
+        icon: Store,
+      },
       {
         path: '/settings',
         labelKey: 'nav.settings',
         permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
+        icon: Settings,
       },
-      { path: '/health', labelKey: 'nav.health', permissions: ['system_manage'] },
+      { path: '/health', labelKey: 'nav.health', permissions: ['system_manage'], icon: HeartPulse },
     ],
   },
 ];
 
-export function SidebarAccordion({ siteCount }: { siteCount?: number }) {
+export function SidebarAccordion({
+  siteCount,
+  collapsed = false,
+  mobileOpen = false,
+  onToggleCollapsed = () => undefined,
+  onCloseMobile = () => undefined,
+}: {
+  siteCount?: number;
+  collapsed?: boolean;
+  mobileOpen?: boolean;
+  onToggleCollapsed?: () => void;
+  onCloseMobile?: () => void;
+}) {
+  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
@@ -104,14 +169,26 @@ export function SidebarAccordion({ siteCount }: { siteCount?: number }) {
       : (activeSection ?? null);
 
   return (
-    <aside className="sidebar">
+    <aside
+      className={`sidebar${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
+    >
       <div className="sidebar-brand">
-        <span className="brand-mark">D</span>
-        <strong>DORI</strong>
+        <span className="brand-mark">{__t('ui.shell.layouts.sidebar_accordion.d_1hkaexf')}</span>
+        <strong className="sidebar-label">
+          {__t('ui.shell.layouts.sidebar_accordion.dori_9y7skh')}
+        </strong>
+        <button
+          className="sidebar-mobile-close"
+          type="button"
+          onClick={onCloseMobile}
+          aria-label={__t('ui.shell.layouts.sidebar_accordion.fermer_le_menu_1fo6hqo')}
+        >
+          <X aria-hidden="true" />
+        </button>
       </div>
       <nav className="sidebar-nav" aria-label={t('nav.main')}>
         {visibleSections.map((section) => {
-          const open = openedSection === section.id;
+          const open = collapsed || openedSection === section.id;
           return (
             <section className="nav-section" key={section.id}>
               <button
@@ -131,8 +208,14 @@ export function SidebarAccordion({ siteCount }: { siteCount?: number }) {
               {open ? (
                 <div className="nav-links">
                   {section.items.map((item) => (
-                    <NavLink key={item.path} to={item.path}>
-                      {t(item.labelKey)}
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      title={t(item.labelKey)}
+                      onClick={onCloseMobile}
+                    >
+                      <item.icon aria-hidden="true" />
+                      <span className="sidebar-label">{t(item.labelKey)}</span>
                     </NavLink>
                   ))}
                 </div>
@@ -145,9 +228,23 @@ export function SidebarAccordion({ siteCount }: { siteCount?: number }) {
         className="legal-link"
         to="/legal"
         state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        title={t('nav.legal')}
+        onClick={onCloseMobile}
       >
-        {t('nav.legal')}
+        <ShieldCheck aria-hidden="true" />
+        <span className="sidebar-label">{t('nav.legal')}</span>
       </NavLink>
+      <button
+        className="sidebar-collapse"
+        type="button"
+        onClick={onToggleCollapsed}
+        aria-label={collapsed ? 'Agrandir le menu' : 'Réduire le menu'}
+      >
+        {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
+        <span className="sidebar-label">
+          {__t('ui.shell.layouts.sidebar_accordion.reduire_zrtdhr')}
+        </span>
+      </button>
     </aside>
   );
 }

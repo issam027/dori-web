@@ -22,4 +22,27 @@ describe('translation bundles', () => {
     expect(getLoadedBundleVersion('en')).toBe(3);
     expect(i18n.t('desk.title')).toBe('Desk');
   });
+
+  it('lets the remote ihm bundle override a local fallback with the same key', async () => {
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/translations/bundle', () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: {
+            locale: 'fr',
+            category: 'ihm',
+            version: 987,
+            entries: { 'auth.login': 'Connexion fournie par le service' },
+          },
+        }),
+      ),
+    );
+
+    await i18n.changeLanguage('fr');
+    expect(i18n.t('auth.login')).toBe('Connexion');
+    await loadTranslationBundle('fr', 'ihm');
+    expect(i18n.t('auth.login')).toBe('Connexion fournie par le service');
+  });
 });

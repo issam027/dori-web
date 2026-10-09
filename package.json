@@ -11,12 +11,16 @@
     "dev": "vite",
     "api:generate": "orval --config orval.config.ts",
     "api:check": "npm run api:generate && git diff --exit-code -- src/api/generated",
+    "audit:phase11": "node tools/phase11-audit.mjs",
+    "audit:i18n": "node tools/i18n-ui-audit.mjs",
+    "audit:security": "npm audit --audit-level=high",
     "build": "tsc -b && vite build",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "verify": "npm run api:check && npm run audit:phase11 && npm run audit:i18n && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -38,6 +42,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.64.0",

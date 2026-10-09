@@ -14,6 +14,7 @@ export function SiteContextSwitcher({
   activeSiteId: number | null;
   onSelect: (siteId: number) => void;
 }) {
+  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   if (sites.length <= 1) return null;
   const activeSite = sites.find((site) => site.id === activeSiteId) ?? sites[0];
@@ -22,7 +23,7 @@ export function SiteContextSwitcher({
       <summary aria-label={t('site.change')}>
         <span aria-hidden="true">⌂</span>
         <span>
-          <small>Site actif</small>
+          <small>{__t('ui.shell.layouts.site_context_switcher.site_actif_uvd9tt')}</small>
           <strong>{activeSite?.name}</strong>
         </span>
         <span aria-hidden="true">▾</span>

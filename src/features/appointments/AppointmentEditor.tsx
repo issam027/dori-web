@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -29,6 +30,7 @@ export function AppointmentEditor({
   initialTime?: string;
   timeZone: string;
 }) {
+  const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2>(1);
   const [person, setPerson] = useState<PersonChoice | null>(null);
@@ -60,14 +62,23 @@ export function AppointmentEditor({
           : { person: person.person }),
       });
       await queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      notify({ tone: 'success', title: 'Rendez-vous créé', message: 'Le rendez-vous a bien été enregistré.' });
+      notify({
+        tone: 'success',
+        title: __t('notifications.appointment.created'),
+        message: __t('notifications.appointment.createdMessage'),
+      });
       onOpenChange(false);
     } catch (cause) {
       notifyError(cause);
       if ((cause as { status?: number }).status === 409) {
-        setError('Ce créneau vient d’être réservé. Les disponibilités ont été actualisées.');
+        setError(
+          __t(
+            'ui.expression.appointments.appointment_editor.ce_creneau_vient_d_etre_reserve_les_disponib_1bkik3g',
+          ),
+        );
         await availability.refetch();
-      } else setError('Création impossible.');
+      } else
+        setError(__t('ui.expression.appointments.appointment_editor.creation_impossible_1g64rg5'));
     }
   };
   const slots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
@@ -84,7 +95,7 @@ export function AppointmentEditor({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Nouveau rendez-vous"
+      title={__t('ui.appointments.appointment_editor.nouveau_rendez_vous_1dqutse')}
       description={`Étape ${String(step)} sur 2 · ${step === 1 ? 'Personne' : 'Service et créneau'}`}
       actions={
         <>
@@ -96,7 +107,7 @@ export function AppointmentEditor({
                 setStep(1);
               }}
             >
-              ← Personne
+              {__t('ui.appointments.appointment_editor.personne_16xin39')}
             </button>
           ) : null}
           {step === 1 ? (
@@ -108,7 +119,7 @@ export function AppointmentEditor({
                 setStep(2);
               }}
             >
-              Continuer →
+              {__t('ui.appointments.appointment_editor.continuer_5vzly4')}
             </button>
           ) : (
             <button
@@ -117,7 +128,7 @@ export function AppointmentEditor({
               disabled={!person || !queueId || !tierId}
               onClick={() => void submit()}
             >
-              Créer le rendez-vous
+              {__t('ui.appointments.appointment_editor.creer_le_rendez_vous_1xjfxor')}
             </button>
           )}
         </>
@@ -133,8 +144,14 @@ export function AppointmentEditor({
             <div className="appointment-step-heading">
               <span className="ticket-chip">1</span>
               <div>
-                <h3>Qui souhaitez-vous recevoir ?</h3>
-                <p>Recherchez une personne existante ou saisissez ses coordonnées.</p>
+                <h3>
+                  {__t('ui.appointments.appointment_editor.qui_souhaitez_vous_recevoir_1o2rz3u')}
+                </h3>
+                <p>
+                  {__t(
+                    'ui.appointments.appointment_editor.recherchez_une_personne_existante_ou_saisissez_s_1vsirzx',
+                  )}
+                </p>
               </div>
             </div>
             <PersonPickerOrCreate siteId={siteId} value={person} onChange={setPerson} />
@@ -146,9 +163,15 @@ export function AppointmentEditor({
                 {personLabel.slice(0, 2).toUpperCase()}
               </span>
               <div>
-                <small>Personne sélectionnée</small>
+                <small>
+                  {__t('ui.appointments.appointment_editor.personne_selectionnee_1m33vg9')}
+                </small>
                 <strong>{personLabel}</strong>
-                <span>{person?.kind === 'existing' ? 'Fiche existante' : 'Nouvelle personne'}</span>
+                <span>
+                  {person?.kind === 'existing'
+                    ? __t('ui.expression.appointments.appointment_editor.fiche_existante_18g8h45')
+                    : __t('ui.expression.appointments.appointment_editor.nouvelle_personne_1mo0xl')}
+                </span>
               </div>
               <button
                 className="button button-small"
@@ -157,26 +180,32 @@ export function AppointmentEditor({
                   setStep(1);
                 }}
               >
-                Modifier
+                {__t('ui.appointments.appointment_editor.modifier_1s45w8g')}
               </button>
             </div>
             <div className="appointment-step-heading">
               <span className="ticket-chip">2</span>
               <div>
-                <h3>Service et créneau</h3>
-                <p>Choisissez la file, le niveau de service et une disponibilité.</p>
+                <h3>{__t('ui.appointments.appointment_editor.service_et_creneau_1ml8wea')}</h3>
+                <p>
+                  {__t(
+                    'ui.appointments.appointment_editor.choisissez_la_file_le_niveau_de_service_et_une_d_enig89',
+                  )}
+                </p>
               </div>
             </div>
             <div className="form-grid">
               <label>
-                File
+                {__t('ui.appointments.appointment_editor.file_bygjtv')}
                 <select
                   value={queueId}
                   onChange={(e) => {
                     setQueueId(Number(e.target.value));
                   }}
                 >
-                  <option value={0}>Choisir</option>
+                  <option value={0}>
+                    {__t('ui.appointments.appointment_editor.choisir_4zi3t4')}
+                  </option>
                   {queues
                     .filter((q) => q.appointmentsEnabled)
                     .map((q) => (
@@ -187,14 +216,16 @@ export function AppointmentEditor({
                 </select>
               </label>
               <label>
-                Forfait
+                {__t('ui.appointments.appointment_editor.forfait_ke31ak')}
                 <select
                   value={tierId}
                   onChange={(e) => {
                     setTierId(Number(e.target.value));
                   }}
                 >
-                  <option value={0}>Choisir</option>
+                  <option value={0}>
+                    {__t('ui.appointments.appointment_editor.choisir_4zi3t4')}
+                  </option>
                   {tiers.data?.data.items.map((tier) => (
                     <option key={tier.tierId} value={tier.tierId}>
                       {tier.tierName}
@@ -203,7 +234,7 @@ export function AppointmentEditor({
                 </select>
               </label>
               <label>
-                Date
+                {__t('ui.appointments.appointment_editor.date_ggjuyh')}
                 <input
                   type="date"
                   value={date}
@@ -213,7 +244,7 @@ export function AppointmentEditor({
                 />
               </label>
               <label>
-                Créneau
+                {__t('ui.appointments.appointment_editor.creneau_7gzdko')}
                 <select
                   value={effectiveTime}
                   onChange={(e) => {
@@ -222,7 +253,8 @@ export function AppointmentEditor({
                 >
                   {slots.map((slot) => (
                     <option key={slot.time} value={slotTime(slot.time)}>
-                      {slotTime(slot.time)} ({slot.available} place(s))
+                      {slotTime(slot.time)} ({slot.available}{' '}
+                      {__t('ui.appointments.appointment_editor.place_s_fej3an')}
                     </option>
                   ))}
                 </select>

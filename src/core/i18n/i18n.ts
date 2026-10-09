@@ -1,10 +1,14 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { translationsControllerGetBundle } from '@/api/generated/translations/translations';
+import { generatedUiFallbackFr } from './generated-ui-fallback.fr';
+import { generatedUiExpressionFallbackFr } from './generated-ui-expressions.fr';
 
 const fallbackResources = {
   fr: {
-    translation: {
+    fallback: {
+      ...generatedUiFallbackFr,
+      ...generatedUiExpressionFallbackFr,
       'app.name': 'DORI',
       'bootstrap.eyebrow': 'DORI',
       'bootstrap.title': 'Socle de l’application initialisé',
@@ -19,8 +23,84 @@ const fallbackResources = {
       'errors.forbidden': 'Vous n’avez pas accès à cet espace.',
       'errors.notFound': 'Cette page est introuvable.',
       'errors.unexpected': 'Une erreur inattendue est survenue.',
+      'errors.actionImpossible': 'Action impossible.',
+      'validation.usernameRequired': 'Identifiant requis',
+      'validation.passwordRequired': 'Mot de passe requis',
+      'validation.passwordsDiffer': 'Les mots de passe diffèrent.',
+      'validation.emailInvalid': 'Adresse email invalide.',
+      'demo.root': 'Root',
+      'demo.rootDetail': 'Toute la plateforme',
+      'demo.admin': 'Admin',
+      'demo.adminDetail': 'Configuration',
+      'demo.manager': 'Manager',
+      'demo.managerDetail': 'Supervision',
+      'demo.operator': 'Hôtesse',
+      'demo.operatorDetail': 'Guichet et files',
+      'demo.kiosk': 'Kiosque',
+      'demo.kioskDetail': 'Borne et écran',
+      'onboarding.siteIdentityHelp':
+        'Le nom est requis ; les autres champs reçoivent les valeurs par défaut de l’API.',
+      'onboarding.defaultsHelp': 'Ces valeurs deviennent les paramètres hérités des files.',
+      'onboarding.queueOverrideHelp':
+        'Choisissez l’héritage ou une surcharge propre à la file.',
+      'onboarding.tiersHelp':
+        'Sélectionnez au moins un niveau pour chaque file. Le premier niveau sélectionné sera proposé par défaut.',
+      'onboarding.accountsHelp':
+        'Comptes humains, kiosque et écran de salle avec leurs périmètres.',
+      'onboarding.validationHelp': 'Validez le parcours avant l’ouverture au public.',
+      'settings.siteHelp':
+        'Identité, valeurs opérationnelles par défaut, responsables et activation réelle.',
+      'settings.queuesHelp': 'Paramètres effectifs, héritage, guichets et opérateurs.',
+      'settings.usersHelp':
+        'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
+      'settings.tiersHelp':
+        'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
+      'settings.rulesHelp':
+        'Règles persistantes par file et niveau, avec simulation locale.',
+      'settings.translationsHelp':
+        'Catégories IHM, SMS et erreurs, avec paramètres attendus.',
+      'errorBoundary.eyebrow': 'Incident interface',
+      'errorBoundary.title': 'Cette page a rencontré une erreur',
+      'errorBoundary.description':
+        'Le reste de l’application reste disponible. Vous pouvez copier le diagnostic ci-dessous.',
+      'errorBoundary.incident': 'Incident',
+      'errorBoundary.time': 'Heure',
+      'errorBoundary.route': 'Route',
+      'errorBoundary.message': 'Message',
+      'errorBoundary.http': 'HTTP',
+      'errorBoundary.correlationId': 'Identifiant de corrélation',
+      'errorBoundary.technicalDetails': 'Détails techniques',
+      'errorBoundary.reload': 'Recharger la page',
+      'errorBoundary.copied': 'Diagnostic copié',
+      'errorBoundary.copy': 'Copier le diagnostic',
+      'errorBoundary.privacy':
+        'Les jetons d’authentification et les paramètres d’URL ne sont pas inclus.',
       'auth.login': 'Connexion',
       'auth.logout': 'Déconnexion',
+      'notifications.appointment.updated': 'Rendez-vous mis à jour',
+      'notifications.appointment.created': 'Rendez-vous créé',
+      'notifications.appointment.createdMessage': 'Le rendez-vous a bien été enregistré.',
+      'notifications.note.created': 'Note ajoutée',
+      'notifications.note.createdMessage': 'La note de {{name}} est enregistrée.',
+      'notifications.site.activated': 'Site activé',
+      'notifications.site.activatedMessage': '{{site}} est prêt à être utilisé.',
+      'notifications.profile.saved': 'Profil enregistré',
+      'notifications.queue.reset': 'File réinitialisée',
+      'notifications.queue.resetMessage': '{{queue}} a bien été réinitialisée.',
+      'notifications.delivery.queued': 'Notification mise en file',
+      'notifications.delivery.queuedMessage':
+        'Le journal a été actualisé. Vous pouvez suivre son statut d’envoi.',
+      'notifications.delivery.requeued': 'Réémission mise en file',
+      'notifications.delivery.requeuedMessage': 'Le statut sera actualisé dans le journal.',
+      'notifications.visit.served': 'Passage terminé',
+      'notifications.visit.noShow': 'Absence enregistrée',
+      'notifications.visit.closedMessage': 'Le ticket {{ticket}} a été clôturé.',
+      'notifications.visit.called': 'Personne appelée',
+      'notifications.visit.queued': 'Personne ajoutée à la file',
+      'notifications.visit.ticketMessage': 'Ticket {{ticket}}',
+      'notifications.desk.released': 'Guichet libéré',
+      'notifications.desk.takenOver': 'Guichet repris',
+      'notifications.desk.opened': 'Guichet occupé',
       'profile.title': 'Mon profil',
       'routes.placeholder': 'Espace {{name}} prêt à être construit.',
       'common.close': 'Fermer',
@@ -31,6 +111,7 @@ const fallbackResources = {
       'nav.main': 'Navigation principale',
       'nav.operations': 'Opérations',
       'nav.experiences': 'Expériences',
+      'nav.pilotage': 'Pilotage',
       'nav.administration': 'Administration',
       'nav.desk': 'Cockpit guichet',
       'nav.myQueues': 'Mes files',
@@ -41,10 +122,10 @@ const fallbackResources = {
       'nav.notifications': 'Notifications',
       'nav.kiosk': 'Borne kiosque',
       'nav.display': 'Écran salle',
-      'nav.tracking': 'Tracking mobile',
-      'nav.onboarding': 'Nouveau site',
-      'nav.settings': 'Configuration',
-      'nav.health': 'Santé de la plateforme',
+      'nav.tracking': 'Suivi mobile',
+      'nav.onboarding': 'Créer un site',
+      'nav.settings': 'Paramètres du site',
+      'nav.health': 'État de la plateforme',
       'nav.legal': 'Mentions légales · Confidentialité',
       'pagination.label': 'Pagination',
       'pagination.previous': 'Précédent',
@@ -93,10 +174,27 @@ const fallbackResources = {
       'legal.security': 'Sécurité',
       'legal.securityText':
         'Les accès sont limités par authentification, permissions et périmètre. Les liens publics de suivi reposent sur un token opaque.',
+      'legal.summarySecure': 'Données protégées',
+      'legal.summarySaas': 'Service SaaS',
+      'legal.introduction':
+        'Cette page présente les règles applicables à la plateforme DORI, à ses espaces opérateurs et à ses expériences publiques. Elle complète les engagements contractuels conclus avec chaque établissement client.',
+      'legal.contents': 'Sommaire des informations légales',
+      'legal.service': 'Objet et disponibilité du service',
+      'legal.serviceText':
+        'DORI fournit un service de gestion des files, rendez-vous et parcours d’accueil. Les fonctionnalités accessibles dépendent du niveau de service, de la configuration du site et des autorisations attribuées au compte.',
+      'legal.purposes': 'Finalités et responsabilités',
+      'legal.purposesText':
+        'L’établissement client détermine les finalités et les durées applicables aux données des visiteurs. DORI agit comme fournisseur technique et limite le traitement aux opérations nécessaires au service, à sa sécurité et à son support.',
+      'legal.retention': 'Conservation et suppression',
+      'legal.retentionText':
+        'Les durées de conservation sont définies par l’établissement et sa politique applicable. Les journaux techniques sont limités aux données nécessaires au diagnostic et ne doivent contenir ni secret ni information personnelle en clair.',
+      'legal.contactTitle': 'Une question juridique ou relative à vos données ?',
+      'legal.contactText':
+        'Adressez votre demande à {{email}} en précisant l’établissement concerné. Une vérification d’identité peut être demandée avant toute communication de données.',
     },
   },
   en: {
-    translation: {
+    fallback: {
       'app.name': 'DORI',
       'bootstrap.eyebrow': 'DORI',
       'bootstrap.title': 'Application foundation initialized',
@@ -110,8 +208,80 @@ const fallbackResources = {
       'errors.forbidden': 'You cannot access this area.',
       'errors.notFound': 'This page could not be found.',
       'errors.unexpected': 'An unexpected error occurred.',
+      'errors.actionImpossible': 'Action could not be completed.',
+      'validation.usernameRequired': 'Username is required',
+      'validation.passwordRequired': 'Password is required',
+      'validation.passwordsDiffer': 'Passwords do not match.',
+      'validation.emailInvalid': 'Invalid email address.',
+      'demo.root': 'Root',
+      'demo.rootDetail': 'Entire platform',
+      'demo.admin': 'Admin',
+      'demo.adminDetail': 'Configuration',
+      'demo.manager': 'Manager',
+      'demo.managerDetail': 'Supervision',
+      'demo.operator': 'Host',
+      'demo.operatorDetail': 'Desk and queues',
+      'demo.kiosk': 'Kiosk',
+      'demo.kioskDetail': 'Kiosk and display',
+      'onboarding.siteIdentityHelp':
+        'The name is required; other fields use the API defaults.',
+      'onboarding.defaultsHelp': 'These values become the inherited queue settings.',
+      'onboarding.queueOverrideHelp': 'Choose inheritance or a queue-specific override.',
+      'onboarding.tiersHelp':
+        'Select at least one tier for each queue. The first selected tier will be offered by default.',
+      'onboarding.accountsHelp': 'Human, kiosk and display accounts with their scopes.',
+      'onboarding.validationHelp': 'Validate the journey before opening it to the public.',
+      'settings.siteHelp':
+        'Identity, operational defaults, owners and actual activation.',
+      'settings.queuesHelp': 'Effective settings, inheritance, desks and operators.',
+      'settings.usersHelp':
+        'Account, email, language, status, password, role and scope.',
+      'settings.tiersHelp':
+        'Fixed Free, Standard and Premium catalog; availability by queue.',
+      'settings.rulesHelp': 'Persistent rules by queue and tier, with local simulation.',
+      'settings.translationsHelp':
+        'UI, SMS and error categories, with their expected parameters.',
+      'errorBoundary.eyebrow': 'Interface incident',
+      'errorBoundary.title': 'This page encountered an error',
+      'errorBoundary.description':
+        'The rest of the application remains available. You can copy the diagnostic below.',
+      'errorBoundary.incident': 'Incident',
+      'errorBoundary.time': 'Time',
+      'errorBoundary.route': 'Route',
+      'errorBoundary.message': 'Message',
+      'errorBoundary.http': 'HTTP',
+      'errorBoundary.correlationId': 'Correlation ID',
+      'errorBoundary.technicalDetails': 'Technical details',
+      'errorBoundary.reload': 'Reload page',
+      'errorBoundary.copied': 'Diagnostic copied',
+      'errorBoundary.copy': 'Copy diagnostic',
+      'errorBoundary.privacy': 'Authentication tokens and URL parameters are not included.',
       'auth.login': 'Sign in',
       'auth.logout': 'Sign out',
+      'notifications.appointment.updated': 'Appointment updated',
+      'notifications.appointment.created': 'Appointment created',
+      'notifications.appointment.createdMessage': 'The appointment was successfully saved.',
+      'notifications.note.created': 'Note added',
+      'notifications.note.createdMessage': 'The note for {{name}} was saved.',
+      'notifications.site.activated': 'Site activated',
+      'notifications.site.activatedMessage': '{{site}} is ready to use.',
+      'notifications.profile.saved': 'Profile saved',
+      'notifications.queue.reset': 'Queue reset',
+      'notifications.queue.resetMessage': '{{queue}} was successfully reset.',
+      'notifications.delivery.queued': 'Notification queued',
+      'notifications.delivery.queuedMessage':
+        'The log was refreshed. You can follow its delivery status.',
+      'notifications.delivery.requeued': 'Resend queued',
+      'notifications.delivery.requeuedMessage': 'The status will be refreshed in the log.',
+      'notifications.visit.served': 'Visit completed',
+      'notifications.visit.noShow': 'Absence recorded',
+      'notifications.visit.closedMessage': 'Ticket {{ticket}} was closed.',
+      'notifications.visit.called': 'Person called',
+      'notifications.visit.queued': 'Person added to the queue',
+      'notifications.visit.ticketMessage': 'Ticket {{ticket}}',
+      'notifications.desk.released': 'Desk released',
+      'notifications.desk.takenOver': 'Desk taken over',
+      'notifications.desk.opened': 'Desk opened',
       'profile.title': 'My profile',
       'routes.placeholder': 'The {{name}} area is ready to be built.',
       'common.close': 'Close',
@@ -122,6 +292,7 @@ const fallbackResources = {
       'nav.main': 'Main navigation',
       'nav.operations': 'Operations',
       'nav.experiences': 'Experiences',
+      'nav.pilotage': 'Management',
       'nav.administration': 'Administration',
       'nav.desk': 'Desk cockpit',
       'nav.myQueues': 'My queues',
@@ -183,10 +354,27 @@ const fallbackResources = {
       'legal.security': 'Security',
       'legal.securityText':
         'Access is limited through authentication, permissions and scope. Public tracking links use an opaque token.',
+      'legal.summarySecure': 'Protected data',
+      'legal.summarySaas': 'SaaS service',
+      'legal.introduction':
+        'This page describes the rules applying to the DORI platform, operator workspaces and public experiences. It complements the contractual commitments agreed with each customer organisation.',
+      'legal.contents': 'Legal information contents',
+      'legal.service': 'Service purpose and availability',
+      'legal.serviceText':
+        'DORI provides queue, appointment and reception journey management. Available features depend on the service tier, site configuration and permissions assigned to the account.',
+      'legal.purposes': 'Purposes and responsibilities',
+      'legal.purposesText':
+        'The customer organisation determines the purposes and retention periods applying to visitor data. DORI acts as a technical provider and limits processing to service delivery, security and support.',
+      'legal.retention': 'Retention and deletion',
+      'legal.retentionText':
+        'Retention periods are defined by the organisation and its applicable policy. Technical logs are limited to diagnostic needs and must not contain secrets or personal information in plain text.',
+      'legal.contactTitle': 'A legal or privacy question?',
+      'legal.contactText':
+        'Send your request to {{email}} and identify the relevant organisation. Identity verification may be required before data is disclosed.',
     },
   },
   ar: {
-    translation: {
+    fallback: {
       'app.name': 'دوري',
       'bootstrap.eyebrow': 'دوري',
       'bootstrap.title': 'تم إعداد أساس التطبيق',
@@ -212,6 +400,7 @@ const fallbackResources = {
       'nav.main': 'التنقل الرئيسي',
       'nav.operations': 'العمليات',
       'nav.experiences': 'التجارب',
+      'nav.pilotage': 'القيادة',
       'nav.administration': 'الإدارة',
       'nav.desk': 'شباك الاستقبال',
       'nav.myQueues': 'صفوفي',
@@ -280,11 +469,15 @@ void i18n.use(initReactI18next).init({
   resources: fallbackResources,
   lng: 'fr',
   fallbackLng: 'fr',
+  ns: ['translation', 'fallback'],
+  defaultNS: 'translation',
+  fallbackNS: 'fallback',
   interpolation: { escapeValue: false },
   returnNull: false,
 });
 
 const loadedBundleVersions = new Map<string, number>();
+const bundleRequests = new Map<string, Promise<number>>();
 
 type TranslationCategory = 'ihm' | 'sms' | 'error';
 
@@ -292,17 +485,30 @@ export async function loadTranslationBundle(
   locale: string,
   category: TranslationCategory = 'ihm',
 ): Promise<number> {
-  const response = await translationsControllerGetBundle({ locale, category });
-  const bundle = response.data;
-  const cacheKey = `${bundle.locale}:${bundle.category}`;
-  const currentVersion = loadedBundleVersions.get(cacheKey);
+  const requestKey = `${locale}:${category}`;
+  const pending = bundleRequests.get(requestKey);
+  if (pending) return pending;
 
-  if (currentVersion !== bundle.version) {
-    i18n.addResourceBundle(bundle.locale, 'translation', bundle.entries, true, true);
-    loadedBundleVersions.set(cacheKey, bundle.version);
-  }
-  await i18n.changeLanguage(locale);
-  return bundle.version;
+  const request = (async () => {
+    const response = await translationsControllerGetBundle({ locale, category });
+    const bundle = response.data;
+    const cacheKey = `${bundle.locale}:${bundle.category}`;
+    const currentVersion = loadedBundleVersions.get(cacheKey);
+
+    if (currentVersion !== bundle.version) {
+      if (i18n.hasResourceBundle(bundle.locale, 'translation')) {
+        i18n.removeResourceBundle(bundle.locale, 'translation');
+      }
+      i18n.addResourceBundle(bundle.locale, 'translation', bundle.entries, true, true);
+      loadedBundleVersions.set(cacheKey, bundle.version);
+    }
+    await i18n.changeLanguage(locale);
+    return bundle.version;
+  })().finally(() => {
+    bundleRequests.delete(requestKey);
+  });
+  bundleRequests.set(requestKey, request);
+  return request;
 }
 
 export function getLoadedBundleVersion(

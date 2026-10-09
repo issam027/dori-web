@@ -9,6 +9,7 @@ export interface ProtectedRouteDefinition {
 }
 
 export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
+  { path: '/device-mode', permissions: [], technicalUser: true },
   { path: '/portfolio', permissions: ['site_view'] },
   { path: '/desk', permissions: ['registration_call', 'session_operate'] },
   { path: '/my-queues', permissions: ['registration_view', 'queue_view'] },

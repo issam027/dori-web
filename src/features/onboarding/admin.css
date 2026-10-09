@@ -6,11 +6,12 @@
   display: grid;
   grid-template-columns: minmax(260px, 0.82fr) minmax(0, 2fr);
   gap: 18px;
-  align-items: start;
+  align-items: stretch;
 }
 .setup-navigation {
   position: sticky;
   top: 84px;
+  height: 100%;
 }
 .setup-navigation h2,
 .setup-content h2,

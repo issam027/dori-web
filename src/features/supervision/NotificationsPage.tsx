@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
@@ -43,6 +44,7 @@ function ManualNotificationWizard({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { t: __t } = useTranslation();
   const client = useQueryClient();
   const siteId = useScopeStore((s) => s.activeSiteId);
   const [step, setStep] = useState(1);
@@ -91,8 +93,8 @@ function ManualNotificationWizard({
       await client.invalidateQueries({ queryKey: ['notifications'] });
       notify({
         tone: 'success',
-        title: 'Notification mise en file',
-        message: 'Le journal a été actualisé. Vous pouvez suivre son statut d’envoi.',
+        title: __t('notifications.delivery.queued'),
+        message: __t('notifications.delivery.queuedMessage'),
       });
       onOpenChange(false);
       setStep(1);
@@ -105,7 +107,7 @@ function ManualNotificationWizard({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Nouvelle notification"
+      title={__t('ui.supervision.notifications_page.nouvelle_notification_1mnw5o2')}
       description={`Étape ${String(step)} sur 3 · ${step === 1 ? 'Choisir la personne' : step === 2 ? 'Choisir le passage' : 'Rédiger et confirmer'}`}
       actions={
         <>
@@ -117,7 +119,7 @@ function ManualNotificationWizard({
                 setStep(step - 1);
               }}
             >
-              ← Retour
+              {__t('ui.supervision.notifications_page.retour_18dwyy2')}
             </button>
           ) : null}
           {step === 1 ? (
@@ -129,7 +131,7 @@ function ManualNotificationWizard({
                 setStep(2);
               }}
             >
-              Continuer
+              {__t('ui.supervision.notifications_page.continuer_1dbvwde')}
             </button>
           ) : step === 2 ? (
             <button
@@ -140,7 +142,7 @@ function ManualNotificationWizard({
                 setStep(3);
               }}
             >
-              Rédiger le message →
+              {__t('ui.supervision.notifications_page.rediger_le_message_11hqhqr')}
             </button>
           ) : (
             <button
@@ -155,7 +157,11 @@ function ManualNotificationWizard({
                 send.mutate();
               }}
             >
-              {send.isPending ? 'Envoi en cours…' : 'Envoyer la notification'}
+              {send.isPending
+                ? __t('ui.expression.supervision.notifications_page.envoi_en_cours_wrdm0l')
+                : __t(
+                    'ui.expression.supervision.notifications_page.envoyer_la_notification_yb0lpd',
+                  )}
             </button>
           )}
         </>
@@ -163,7 +169,10 @@ function ManualNotificationWizard({
     >
       {step === 1 ? (
         <div className="notification-wizard-step">
-          <div className="wizard-track" aria-label="Étape 1 sur 3">
+          <div
+            className="wizard-track"
+            aria-label={__t('ui.supervision.notifications_page.etape_1_sur_3_g6yr9g')}
+          >
             <span className="done" />
             <span />
             <span />
@@ -171,18 +180,22 @@ function ManualNotificationWizard({
           <div className="notification-guidance">
             <span className="ticket-chip">1</span>
             <div>
-              <h3>À qui souhaitez-vous écrire ?</h3>
-              <p>Recherchez la personne concernée par son nom ou ses coordonnées.</p>
+              <h3>{__t('ui.supervision.notifications_page.a_qui_souhaitez_vous_ecrire_qsxij3')}</h3>
+              <p>
+                {__t(
+                  'ui.supervision.notifications_page.recherchez_la_personne_concernee_par_son_nom_ou__tipor4',
+                )}
+              </p>
             </div>
           </div>
           <label>
-            Rechercher une personne
+            {__t('ui.supervision.notifications_page.rechercher_une_personne_ger18e')}
             <input
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
-              placeholder="Nom, email ou téléphone"
+              placeholder={__t('ui.supervision.notifications_page.nom_email_ou_telephone_10wtb1')}
             />
           </label>
           <div className="picker-list">
@@ -209,7 +222,10 @@ function ManualNotificationWizard({
         </div>
       ) : step === 2 ? (
         <div className="notification-wizard-step">
-          <div className="wizard-track" aria-label="Étape 2 sur 3">
+          <div
+            className="wizard-track"
+            aria-label={__t('ui.supervision.notifications_page.etape_2_sur_3_1eyht11')}
+          >
             <span className="done" />
             <span className="done" />
             <span />
@@ -217,8 +233,12 @@ function ManualNotificationWizard({
           <div className="notification-guidance">
             <span className="ticket-chip">2</span>
             <div>
-              <h3>Quel passage est concerné ?</h3>
-              <p>Choisissez le ticket auquel la notification sera rattachée.</p>
+              <h3>{__t('ui.supervision.notifications_page.quel_passage_est_concerne_ythpcs')}</h3>
+              <p>
+                {__t(
+                  'ui.supervision.notifications_page.choisissez_le_ticket_auquel_la_notification_sera_ck6t53',
+                )}
+              </p>
             </div>
           </div>
           <Card className="notification-person-recap">
@@ -241,7 +261,10 @@ function ManualNotificationWizard({
                   setRegistration(item);
                 }}
               >
-                <strong>Ticket {item.ticketNumber}</strong>
+                <strong>
+                  {__t('ui.supervision.notifications_page.ticket_1nrpxxh')}
+                  {item.ticketNumber}
+                </strong>
                 <span>
                   {item.businessDate} · {item.status}
                 </span>
@@ -249,12 +272,19 @@ function ManualNotificationWizard({
             ))}
           </div>
           {registrations.isSuccess && registrations.data.data.items.length === 0 ? (
-            <p className="field-hint">Aucun passage récent n’est disponible pour cette personne.</p>
+            <p className="field-hint">
+              {__t(
+                'ui.supervision.notifications_page.aucun_passage_recent_n_est_disponible_pour_cette_1xprp0p',
+              )}
+            </p>
           ) : null}
         </div>
       ) : (
         <div className="notification-wizard-step">
-          <div className="wizard-track" aria-label="Étape 3 sur 3">
+          <div
+            className="wizard-track"
+            aria-label={__t('ui.supervision.notifications_page.etape_3_sur_3_51ykkm')}
+          >
             <span className="done" />
             <span className="done" />
             <span className="done" />
@@ -262,8 +292,12 @@ function ManualNotificationWizard({
           <div className="notification-guidance">
             <span className="ticket-chip">3</span>
             <div>
-              <h3>Rédigez votre message</h3>
-              <p>Vérifiez le canal et le destinataire avant l’envoi.</p>
+              <h3>{__t('ui.supervision.notifications_page.redigez_votre_message_1a07wcw')}</h3>
+              <p>
+                {__t(
+                  'ui.supervision.notifications_page.verifiez_le_canal_et_le_destinataire_avant_l_env_jfp76y',
+                )}
+              </p>
             </div>
           </div>
           <Card className="notification-person-recap">
@@ -271,11 +305,12 @@ function ManualNotificationWizard({
               {person?.firstName} {person?.lastName}
             </strong>
             <p>
-              Inscription {registration?.ticketNumber} · #{registration?.registrationId}
+              {__t('ui.supervision.notifications_page.inscription_1bzavbp')}
+              {registration?.ticketNumber} · #{registration?.registrationId}
             </p>
           </Card>
           <label className="form-field">
-            Canal
+            {__t('ui.supervision.notifications_page.canal_1219p1c')}
             <select
               value={channel}
               onChange={(e) => {
@@ -283,39 +318,58 @@ function ManualNotificationWizard({
               }}
             >
               <option value="sms" disabled={!person?.phoneNumber}>
-                SMS {!person?.phoneNumber ? '— indisponible' : ''}
+                {__t('ui.supervision.notifications_page.sms_q3rkiy')}
+                {!person?.phoneNumber
+                  ? __t('ui.expression.supervision.notifications_page.indisponible_527qxz')
+                  : ''}
               </option>
               <option value="email" disabled={!person?.email}>
-                Email {!person?.email ? '— indisponible' : ''}
+                {__t('ui.supervision.notifications_page.email_inbfc7')}
+                {!person?.email
+                  ? __t('ui.expression.supervision.notifications_page.indisponible_527qxz')
+                  : ''}
               </option>
             </select>
           </label>
           <p className="notification-recipient">
-            Destinataire :{' '}
+            {__t('ui.supervision.notifications_page.destinataire_1m2olzi')}{' '}
             <strong>
               {maskRecipient(channel === 'sms' ? person?.phoneNumber : person?.email)}
             </strong>
           </p>
           <label className="form-field">
-            Message
+            {__t('ui.supervision.notifications_page.message_1cam7ic')}
             <textarea
               rows={5}
               value={content}
               onChange={(e) => {
                 setContent(e.target.value);
               }}
-              placeholder="Saisissez un message clair et concis…"
+              placeholder={__t(
+                'ui.supervision.notifications_page.saisissez_un_message_clair_et_concis_1f79kui',
+              )}
               maxLength={480}
             />
-            <small className="field-hint">{content.length} / 480 caractères</small>
+            <small className="field-hint">
+              {content.length} {__t('ui.supervision.notifications_page.480_caracteres_198qcea')}
+            </small>
           </label>
           <div className="notification-preview">
-            <span>{channel === 'sms' ? 'Aperçu SMS' : 'Aperçu email'}</span>
-            <p>{content || 'Votre message apparaîtra ici.'}</p>
+            <span>
+              {channel === 'sms'
+                ? __t('ui.expression.supervision.notifications_page.apercu_sms_1baojkm')
+                : __t('ui.expression.supervision.notifications_page.apercu_email_117cipf')}
+            </span>
+            <p>
+              {content ||
+                __t(
+                  'ui.expression.supervision.notifications_page.votre_message_apparaitra_ici_kkqap3',
+                )}
+            </p>
           </div>
           {send.isError ? (
             <p role="alert" className="error-text">
-              L’envoi n’a pas pu être mis en file.
+              {__t('ui.supervision.notifications_page.l_envoi_n_a_pas_pu_etre_mis_en_file_k30dtn')}
             </p>
           ) : null}
         </div>
@@ -325,6 +379,7 @@ function ManualNotificationWizard({
 }
 
 export function NotificationsPage() {
+  const { t: __t } = useTranslation();
   const client = useQueryClient();
   const user = useSessionStore((s) => s.user);
   const canSend = hasPermission(user, 'notification_send');
@@ -362,8 +417,8 @@ export function NotificationsPage() {
       await client.invalidateQueries({ queryKey: ['notifications'] });
       notify({
         tone: 'success',
-        title: 'Réémission mise en file',
-        message: 'Le statut sera actualisé dans le journal.',
+        title: __t('notifications.delivery.requeued'),
+        message: __t('notifications.delivery.requeuedMessage'),
       });
     },
   });
@@ -373,14 +428,16 @@ export function NotificationsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Communication"
-        title="Notifications"
-        description="Journal d’envoi, détail et émission manuelle."
+        title={__t('ui.supervision.notifications_page.notifications_fki4un')}
+        description={__t(
+          'ui.supervision.notifications_page.journal_d_envoi_detail_et_emission_manuelle_pbxvuy',
+        )}
         actions={
           <div className="action-row">
             <FilterDrawer activeCount={activeFilters}>
               <div className="form-stack">
                 <label>
-                  Canal
+                  {__t('ui.supervision.notifications_page.canal_1219p1c')}
                   <select
                     value={channel}
                     onChange={(e) => {
@@ -388,13 +445,19 @@ export function NotificationsPage() {
                       setPage(1);
                     }}
                   >
-                    <option value="">Tous</option>
-                    <option value="sms">SMS</option>
-                    <option value="email">Email</option>
+                    <option value="">
+                      {__t('ui.supervision.notifications_page.tous_1eotn8w')}
+                    </option>
+                    <option value="sms">
+                      {__t('ui.supervision.notifications_page.sms_q3rkiy')}
+                    </option>
+                    <option value="email">
+                      {__t('ui.supervision.notifications_page.email_inbfc7')}
+                    </option>
                   </select>
                 </label>
                 <label>
-                  Statut
+                  {__t('ui.supervision.notifications_page.statut_1yaum3a')}
                   <select
                     value={status}
                     onChange={(e) => {
@@ -402,14 +465,16 @@ export function NotificationsPage() {
                       setPage(1);
                     }}
                   >
-                    <option value="">Tous</option>
+                    <option value="">
+                      {__t('ui.supervision.notifications_page.tous_1eotn8w')}
+                    </option>
                     {['pending', 'processing', 'sent', 'delivered', 'failed'].map((s) => (
                       <option key={s}>{s}</option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  Date
+                  {__t('ui.supervision.notifications_page.date_ggjuyh')}
                   <input
                     type="date"
                     value={date}
@@ -429,7 +494,7 @@ export function NotificationsPage() {
                   setWizard(true);
                 }}
               >
-                Nouvel envoi
+                {__t('ui.supervision.notifications_page.nouvel_envoi_1kutyxn')}
               </button>
             ) : null}
           </div>
@@ -437,7 +502,7 @@ export function NotificationsPage() {
       />
       <Card>
         <DataTable
-          caption="Journal des notifications"
+          caption={__t('ui.supervision.notifications_page.journal_des_notifications_1gdlx9g')}
           rows={items}
           getRowKey={(row) => row.notificationId}
           columns={[
@@ -484,7 +549,7 @@ export function NotificationsPage() {
                       setDetailId(row.notificationId);
                     }}
                   >
-                    Détail
+                    {__t('ui.supervision.notifications_page.detail_qlpl2o')}
                   </button>
                   {canResendNotification(row.notificationStatus, canSend) ? (
                     <button
@@ -495,7 +560,7 @@ export function NotificationsPage() {
                         resend.mutate(row.notificationId);
                       }}
                     >
-                      Réémettre
+                      {__t('ui.supervision.notifications_page.reemettre_1d0q7c4')}
                     </button>
                   ) : null}
                 </div>
@@ -515,7 +580,7 @@ export function NotificationsPage() {
         onOpenChange={(open) => {
           if (!open) setDetailId(undefined);
         }}
-        title="Détail de la notification"
+        title={__t('ui.supervision.notifications_page.detail_de_la_notification_xau4jx')}
       >
         <NotificationDetail notification={detail.data?.data} />
       </Modal>
@@ -524,20 +589,21 @@ export function NotificationsPage() {
 }
 
 function NotificationDetail({ notification }: { notification?: NotificationResponseDto }) {
-  if (!notification) return <p>Chargement…</p>;
+  const { t: __t } = useTranslation();
+  if (!notification) return <p>{__t('ui.supervision.notifications_page.chargement_16kwy5p')}</p>;
   return (
     <dl className="detail-list">
-      <dt>Inscription</dt>
+      <dt>{__t('ui.supervision.notifications_page.inscription_1bzavbp')}</dt>
       <dd>#{notification.registrationId}</dd>
-      <dt>Destinataire</dt>
+      <dt>{__t('ui.supervision.notifications_page.destinataire_1qtg5cw')}</dt>
       <dd>{maskRecipient(notification.recipient)}</dd>
-      <dt>Canal</dt>
+      <dt>{__t('ui.supervision.notifications_page.canal_1219p1c')}</dt>
       <dd>{notification.channel}</dd>
-      <dt>Statut</dt>
+      <dt>{__t('ui.supervision.notifications_page.statut_1yaum3a')}</dt>
       <dd>{notification.notificationStatus}</dd>
-      <dt>Contenu</dt>
+      <dt>{__t('ui.supervision.notifications_page.contenu_1hxusj9')}</dt>
       <dd>{notification.notificationContent}</dd>
-      <dt>Échec</dt>
+      <dt>{__t('ui.supervision.notifications_page.echec_14peoen')}</dt>
       <dd>{notification.failureReason ?? '—'}</dd>
     </dl>
   );

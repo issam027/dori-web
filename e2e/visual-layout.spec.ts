@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 async function mockAuthenticatedApi(page: Page, technical = false) {
   await page.route('**/api/v1/**', async (route) => {
@@ -39,6 +40,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
                 'notification_view',
                 'notification_send',
                 'queue_edit',
+                'site_create',
                 'system_manage',
               ],
           mustChangePassword: false,
@@ -317,8 +319,8 @@ test('authenticated shell matches the expected visual structure', async ({ page 
     .first()
     .click();
   await page.goto('/desk');
-  await expect(page.getByRole('complementary')).toBeVisible();
-  await expect(page.getByRole('complementary')).toHaveCSS('background-image', /linear-gradient/);
+  await expect(page.locator('.sidebar')).toBeVisible();
+  await expect(page.locator('.sidebar')).toHaveCSS('background-image', /linear-gradient/);
   await expect(page.getByRole('banner')).toHaveCSS('position', 'sticky');
   await expect(page.getByRole('banner').getByRole('heading', { name: /cockpit/i })).toBeVisible();
   await expect(page.getByText('Clinique El Manar').first()).toBeVisible();
@@ -373,12 +375,14 @@ test('human users keep the application context while previewing device experienc
   await page.goto('/kiosk');
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-kiosk')).toBeVisible();
-  await expect(page.getByRole('heading', { name: /borne libre-service/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
+  await expect(page.getByText('PrÃ©visualisation')).toHaveCount(0);
 
   await page.goto('/display?queueId=10');
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-display')).toBeVisible();
-  await expect(page.getByRole('heading', { name: /affichage tv/i })).toBeVisible();
+  await expect(page.getByText('A014')).toBeVisible();
+  await expect(page.getByText('PrÃ©visualisation')).toHaveCount(0);
 });
 
 test('phase 8 tracking consumes its token and works on mobile RTL in four themes', async ({
@@ -391,6 +395,8 @@ test('phase 8 tracking consumes its token and works on mobile RTL in four themes
   await expect(page).toHaveURL(/\/track$/);
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-tracking')).toBeVisible();
+  await expect(page.getByLabel('Tracking ID')).toBeVisible();
+  await expect(page.locator('.tracking-screen').getByLabel('Tracking ID')).toHaveCount(0);
   await expect(page.getByText('A014')).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
   await page.evaluate("document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'");
@@ -458,4 +464,84 @@ test('phase 7 supervision routes render API-backed views', async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText('+3••••78')).toBeVisible();
   await expect(page.getByRole('button', { name: /nouvel envoi/i })).toBeVisible();
+});
+
+test('WCAG 2.2 AA automated audit has no serious violations', async ({ page }) => {
+  await page.goto('/login');
+  const loginResults = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+  expect(
+    loginResults.violations.filter((violation) =>
+      ['critical', 'serious'].includes(violation.impact ?? ''),
+    ),
+  ).toEqual([]);
+
+  await mockAuthenticatedApi(page);
+  await activateFirstSite(page);
+  await page.goto('/desk');
+  const appResults = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+  expect(
+    appResults.violations.filter((violation) =>
+      ['critical', 'serious'].includes(violation.impact ?? ''),
+    ),
+  ).toEqual([]);
+});
+
+test('desktop, tablet, mobile and TV remain usable in all four themes', async ({ page }) => {
+  test.setTimeout(60_000);
+  await mockAuthenticatedApi(page);
+  await activateFirstSite(page);
+  const viewports = [
+    { width: 1440, height: 900 },
+    { width: 768, height: 1024 },
+    { width: 390, height: 844 },
+    { width: 1920, height: 1080 },
+  ];
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    for (const theme of ['light', 'soft-light', 'soft-dark', 'dark']) {
+      await page.evaluate(`document.documentElement.dataset.theme = ${JSON.stringify(theme)}`);
+      await page.goto('/desk');
+      await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+      expect(
+        await page.evaluate<boolean>(
+          'document.documentElement.scrollWidth <= document.documentElement.clientWidth',
+        ),
+      ).toBe(true);
+    }
+  }
+});
+
+test('sidebar keeps its state across routes and follows desktop, tablet and mobile modes', async ({
+  page,
+}) => {
+  await mockAuthenticatedApi(page);
+  await activateFirstSite(page);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/desk');
+  await expect(page.getByRole('button', { name: 'Ouvrir le menu' })).toBeHidden();
+  await page.getByRole('button', { name: 'Réduire le menu' }).click();
+  await expect(page.locator('.sidebar')).toHaveClass(/is-collapsed/);
+
+  for (const path of ['/kiosk', '/track', '/onboarding', '/legal']) {
+    await page.evaluate(
+      `window.history.pushState({}, '', ${JSON.stringify(path)}); window.dispatchEvent(new Event('popstate'));`,
+    );
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page.locator('.sidebar')).toHaveClass(/is-collapsed/);
+  }
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto('/desk');
+  await expect(page.locator('.sidebar')).toHaveClass(/is-collapsed/);
+  await expect(page.getByRole('button', { name: 'Ouvrir le menu' })).toBeHidden();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: 'Ouvrir le menu' })).toBeVisible();
+  await page.getByRole('button', { name: 'Ouvrir le menu' }).click();
+  await expect(page.locator('.sidebar')).toHaveClass(/is-mobile-open/);
 });

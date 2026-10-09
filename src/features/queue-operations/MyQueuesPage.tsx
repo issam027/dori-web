@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -16,6 +17,7 @@ import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
 
 export function MyQueuesPage() {
+  const { t: __t } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [page, setPage] = useState(1);
   const [queueId, setQueueId] = useState<number | undefined>();
@@ -34,7 +36,7 @@ export function MyQueuesPage() {
         queueId,
         status: 'waiting',
         page,
-        pageSize: 20,
+        pageSize: 10,
         sort: 'createdAt:asc',
       }),
     enabled: siteId !== null,
@@ -57,32 +59,34 @@ export function MyQueuesPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Opérations"
-        title="Mes files"
-        description="Vue consolidée des personnes en attente dans vos files."
-        actions={
-          <button
-            className="button"
-            type="button"
-            disabled={registrations.isFetching}
-            onClick={() => void registrations.refetch()}
-          >
-            {registrations.isFetching ? 'Actualisation…' : 'Actualiser'}
-          </button>
-        }
+        title={__t('ui.queue-operations.my_queues_page.mes_files_17hxf37')}
+        description={__t(
+          'ui.queue-operations.my_queues_page.vue_consolidee_des_personnes_en_attente_dans_vos_n63by0',
+        )}
       />
       {queues.isSuccess && queues.data.data.items.length === 0 ? (
         <EmptyState
-          title="Aucune file configurée"
-          description="Ce site ne possède actuellement aucune file."
+          title={__t('ui.queue-operations.my_queues_page.aucune_file_configuree_1rf5ow7')}
+          description={__t(
+            'ui.queue-operations.my_queues_page.ce_site_ne_possede_actuellement_aucune_file_93symj',
+          )}
         />
       ) : null}
       {queues.data?.data.items.length ? (
         <Card className="queue-filter-banner">
           <div>
-            <h2>Périmètre de la file</h2>
-            <p>Affichez toutes les files autorisées ou concentrez-vous sur une seule.</p>
+            <h2>{__t('ui.queue-operations.my_queues_page.perimetre_de_la_file_8gpp9p')}</h2>
+            <p>
+              {__t(
+                'ui.queue-operations.my_queues_page.affichez_toutes_les_files_autorisees_ou_concentr_6akqo5',
+              )}
+            </p>
           </div>
-          <div className="queue-filter-tabs" role="group" aria-label="Filtrer par file">
+          <div
+            className="queue-filter-tabs"
+            role="group"
+            aria-label={__t('ui.queue-operations.my_queues_page.filtrer_par_file_jg7lak')}
+          >
             <button
               className="button"
               type="button"
@@ -92,7 +96,8 @@ export function MyQueuesPage() {
                 setPage(1);
               }}
             >
-              Toutes · {queues.data.data.total}
+              {__t('ui.queue-operations.my_queues_page.toutes_tin5fo')}
+              {queues.data.data.total}
             </button>
             {queues.data.data.items.map((queue) => (
               <button
@@ -113,14 +118,14 @@ export function MyQueuesPage() {
       ) : null}
       {queues.data?.data.items.length ? (
         <DataTable
-          caption="Inscriptions dans mes files"
+          caption={__t('ui.queue-operations.my_queues_page.inscriptions_dans_mes_files_1937v4q')}
           rows={items}
           getRowKey={(item) => item.registrationId}
           columns={[
             {
               key: 'position',
               header: 'Position',
-              render: (item) => (page - 1) * 20 + items.indexOf(item) + 1,
+              render: (item) => (page - 1) * 10 + items.indexOf(item) + 1,
             },
             {
               key: 'queue',
@@ -147,15 +152,7 @@ export function MyQueuesPage() {
               key: 'age',
               header: 'Ancienneté / SLA',
               render: (item) => {
-                const minutes = Math.max(
-                  0,
-                  Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 60000),
-                );
-                return (
-                  <StatusBadge tone={minutes > 30 ? 'warning' : 'success'}>
-                    {minutes} min
-                  </StatusBadge>
-                );
+                return <StatusBadge tone="neutral">{item.status}</StatusBadge>;
               },
             },
             { key: 'tier', header: 'Forfait', render: (item) => `#${String(item.tierId)}` },
@@ -172,8 +169,11 @@ export function MyQueuesPage() {
                   }}
                 >
                   {notes[items.indexOf(item)]?.data?.data.total
-                    ? `Voir / ajouter (${String(notes[items.indexOf(item)]?.data?.data.total)})`
-                    : 'Ajouter'}
+                    ? __t(
+                        'ui.expression.queue-operations.my_queues_page.voir_ajouter_value0_7sl59g',
+                        { value0: String(notes[items.indexOf(item)]?.data?.data.total) },
+                      )
+                    : __t('ui.expression.queue-operations.my_queues_page.ajouter_17wnmfl')}
                 </button>
               ),
             },

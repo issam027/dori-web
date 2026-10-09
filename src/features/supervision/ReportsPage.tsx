@@ -1,21 +1,31 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   reportsControllerGetDailyQueueReport,
   reportsControllerGetDashboardSummary,
 } from '@/api/generated/reports/reports';
 import { queuesControllerFindAll } from '@/api/generated/queues/queues';
+import { sitesControllerFindSite } from '@/api/generated/sites/sites';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { aggregateReports, reportsToCsv } from './report-utils';
+import { dateInTimeZone } from '@/features/appointments/appointment-rules';
 
-const today = () => new Date().toISOString().slice(0, 10);
+const fallbackTimeZone = 'UTC';
 
 export function ReportsPage() {
+  const { t: __t } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
-  const [date, setDate] = React.useState(today());
+  const [date, setDate] = React.useState('');
+  const site = useQuery({
+    queryKey: ['site', siteId],
+    queryFn: () => sitesControllerFindSite(siteId ?? 0),
+    enabled: Boolean(siteId),
+  });
+  const effectiveDate = date || dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
   const queues = useQuery({
     queryKey: ['queues', 'reports', siteId],
     queryFn: () =>
@@ -35,14 +45,14 @@ export function ReportsPage() {
       'reports',
       'daily',
       siteId,
-      date,
+      effectiveDate,
       queues.data?.data.items.map((queue) => queue.queueId),
     ],
     enabled: Boolean(queues.data),
     queryFn: () =>
       Promise.all(
         (queues.data?.data.items ?? []).map((queue) =>
-          reportsControllerGetDailyQueueReport(queue.queueId, { date }).then(
+          reportsControllerGetDailyQueueReport(queue.queueId, { date: effectiveDate }).then(
             (response) => response.data,
           ),
         ),
@@ -56,7 +66,7 @@ export function ReportsPage() {
     );
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dori-rapport-${date}.csv`;
+    link.download = `dori-rapport-${effectiveDate}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -70,28 +80,35 @@ export function ReportsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Pilotage"
-        title="Rapports"
-        description="Indicateurs calculés exclusivement à partir des rapports retournés par l’API."
+        title={__t('ui.supervision.reports_page.rapports_14c3yxg')}
+        description={__t(
+          'ui.supervision.reports_page.indicateurs_calcules_exclusivement_a_partir_des__m4wt8a',
+        )}
         actions={
           <button type="button" className="button" disabled={!items.length} onClick={exportCsv}>
-            Exporter CSV local
+            {__t('ui.supervision.reports_page.exporter_csv_local_17y7htf')}
           </button>
         }
       />
       <Card>
         <div className="filter-row">
           <label>
-            Date
+            {__t('ui.supervision.reports_page.date_ggjuyh')}
             <input
               type="date"
-              value={date}
+              value={effectiveDate}
               onChange={(event) => {
                 setDate(event.target.value);
               }}
             />
           </label>
           <span className="muted">
-            Périmètre : {siteId ? `site ${String(siteId)}` : 'tous les sites autorisés'}
+            {__t('ui.supervision.reports_page.perimetre_7st5rt')}
+            {siteId
+              ? __t('ui.expression.supervision.reports_page.site_value0_1junx4d', {
+                  value0: String(siteId),
+                })
+              : __t('ui.expression.supervision.reports_page.tous_les_sites_autorises_26s89r')}
           </span>
         </div>
       </Card>
@@ -113,12 +130,14 @@ export function ReportsPage() {
         ))}
       </div>
       {!reports.isLoading && !items.length ? (
-        <EmptyState title="Aucune donnée pour cette date" />
+        <EmptyState
+          title={__t('ui.supervision.reports_page.aucune_donnee_pour_cette_date_10z1svu')}
+        />
       ) : (
         <Card>
-          <h2>Performance par file</h2>
+          <h2>{__t('ui.supervision.reports_page.performance_par_file_r9y7ow')}</h2>
           <DataTable
-            caption="Rapports quotidiens par file"
+            caption={__t('ui.supervision.reports_page.rapports_quotidiens_par_file_zpefzk')}
             rows={items}
             getRowKey={(row) => row.queueId}
             columns={[

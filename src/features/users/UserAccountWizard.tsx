@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import type { QueueResponseDto, RoleResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { usersControllerCreateUser } from '@/api/generated/users/users';
@@ -23,6 +24,7 @@ export function UserAccountWizard({
   currentRoleRank: number;
   onCreated: () => void;
 }) {
+  const { t: __t } = useTranslation();
   const [step, setStep] = useState(1);
   const [f, setF] = useState({
     username: '',
@@ -69,7 +71,7 @@ export function UserAccountWizard({
     <WizardModal
       open={open}
       onOpenChange={onOpenChange}
-      title="Créer un compte"
+      title={__t('ui.users.user_account_wizard.creer_un_compte_10qf0uh')}
       step={step}
       stepCount={3}
       onPrevious={
@@ -91,7 +93,7 @@ export function UserAccountWizard({
       {step === 1 ? (
         <div className="form-grid">
           <label>
-            Nom d’utilisateur *
+            {__t('ui.users.user_account_wizard.nom_d_utilisateur_1hvh0kp')}
             <input
               value={f.username}
               onChange={(e) => {
@@ -100,7 +102,7 @@ export function UserAccountWizard({
             />
           </label>
           <label>
-            Email
+            {__t('ui.users.user_account_wizard.email_inbfc7')}
             <input
               type="email"
               value={f.email}
@@ -110,7 +112,7 @@ export function UserAccountWizard({
             />
           </label>
           <label>
-            Mot de passe *
+            {__t('ui.users.user_account_wizard.mot_de_passe_mh0blw')}
             <input
               type="password"
               minLength={10}
@@ -122,36 +124,42 @@ export function UserAccountWizard({
             />
           </label>
           <label>
-            Langue
+            {__t('ui.users.user_account_wizard.langue_4vkz5r')}
             <select
               value={f.language}
               onChange={(e) => {
                 setF({ ...f, language: e.target.value });
               }}
             >
-              <option>fr</option>
-              <option>ar</option>
-              <option>en</option>
+              <option>{__t('ui.users.user_account_wizard.fr_o6dm29')}</option>
+              <option>{__t('ui.users.user_account_wizard.ar_puedq2')}</option>
+              <option>{__t('ui.users.user_account_wizard.en_i2aop6')}</option>
             </select>
           </label>
           <label>
-            Type
+            {__t('ui.users.user_account_wizard.type_1m2zofh')}
             <select
               value={f.type}
               onChange={(e) => {
                 setF({ ...f, type: e.target.value });
               }}
             >
-              <option value="human">Humain</option>
-              <option value="kiosk">Kiosque / display</option>
+              <option value="human">{__t('ui.users.user_account_wizard.humain_18e4n9r')}</option>
+              <option value="kiosk">
+                {__t('ui.users.user_account_wizard.kiosque_display_grd2mz')}
+              </option>
             </select>
           </label>
         </div>
       ) : null}
       {step === 2 ? (
         <div>
-          <h3>Rôle initial</h3>
-          <p className="muted">Les rôles de rang supérieur au vôtre sont masqués.</p>
+          <h3>{__t('ui.users.user_account_wizard.role_initial_1ui063g')}</h3>
+          <p className="muted">
+            {__t(
+              'ui.users.user_account_wizard.les_roles_de_rang_superieur_au_votre_sont_masque_12o499c',
+            )}
+          </p>
           <div className="choice-grid">
             {allowed.map((r) => (
               <button
@@ -164,7 +172,8 @@ export function UserAccountWizard({
               >
                 <b>{r.roleName}</b>
                 <small>
-                  Rang {r.rank} · {r.description}
+                  {__t('ui.users.user_account_wizard.rang_93hxer')}
+                  {r.rank} · {r.description}
                 </small>
               </button>
             ))}
@@ -173,8 +182,8 @@ export function UserAccountWizard({
       ) : null}
       {step === 3 ? (
         <div>
-          <h3>Périmètre</h3>
-          <h4>Sites</h4>
+          <h3>{__t('ui.users.user_account_wizard.perimetre_ai7per')}</h3>
+          <h4>{__t('ui.users.user_account_wizard.sites_iwtnzb')}</h4>
           <div className="choice-grid">
             {sites.map((s) => (
               <label className="check-row" key={s.siteId}>
@@ -189,7 +198,7 @@ export function UserAccountWizard({
               </label>
             ))}
           </div>
-          <h4>Files</h4>
+          <h4>{__t('ui.users.user_account_wizard.files_1s4j38w')}</h4>
           <div className="choice-grid">
             {queues.map((q) => (
               <label className="check-row" key={q.queueId}>

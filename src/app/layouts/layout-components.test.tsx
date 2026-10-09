@@ -31,11 +31,11 @@ describe('application layout', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('link', { name: /desk/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /cockpit|desk/i })).toBeVisible();
     expect(screen.queryByRole('link', { name: /param/i })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /exp/i }));
-    expect(screen.getByRole('link', { name: /display|affichage/i })).toBeVisible();
-    expect(screen.queryByRole('link', { name: /desk/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /display|affichage|écran salle/i })).toBeVisible();
+    expect(screen.queryByRole('link', { name: /cockpit|desk/i })).not.toBeInTheDocument();
   });
 
   it('hides the redundant mono-site selector and enables it otherwise', async () => {

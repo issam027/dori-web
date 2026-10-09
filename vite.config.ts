@@ -24,10 +24,43 @@ export function legalProductionGuard(env: Record<string, string>): Plugin {
   };
 }
 
+export function securityHeaders(env: Record<string, string>): Plugin {
+  const apiOrigin = (() => {
+    try {
+      return new URL(env.VITE_API_BASE_URL || 'http://localhost:3000').origin;
+    } catch {
+      return 'http://localhost:3000';
+    }
+  })();
+  const policy = [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "style-src 'self' 'unsafe-inline'",
+    `connect-src 'self' ${apiOrigin} ws: wss:`,
+    "script-src 'self'",
+  ].join('; ');
+  return {
+    name: 'dori-security-headers',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) =>
+        html.replace(
+          '<meta name="referrer" content="no-referrer" />',
+          `<meta name="referrer" content="no-referrer" />\n    <meta http-equiv="Content-Security-Policy" content="${policy}" />`,
+        ),
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    plugins: [legalProductionGuard(env), react()],
+    plugins: [legalProductionGuard(env), securityHeaders(env), react()],
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   };
 });

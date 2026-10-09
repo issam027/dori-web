@@ -13,6 +13,11 @@ export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+export function dateInTimeZone(timeZone: string, value: Date = new Date()): string {
+  const parts = zonedParts(value, timeZone);
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
 function zonedParts(value: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone,

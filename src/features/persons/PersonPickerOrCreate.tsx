@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
 import type { PersonIdentityDto, PersonResponseDto } from '@/api/generated/models';
 import { personsControllerFindPersons } from '@/api/generated/persons/persons';
 import { EntityPicker } from '@/design-system/components/EntityPicker';
 import { FormField, PhoneInput } from '@/design-system/components/FormField';
+import { Pagination } from '@/design-system/components/Pagination';
 
 export type PersonChoice =
   { kind: 'existing'; person: PersonResponseDto } | { kind: 'new'; person: PersonIdentityDto };
@@ -15,10 +18,12 @@ export function PersonPickerOrCreate({
 }: {
   siteId: number;
   value: PersonChoice | null;
-  onChange: (choice: PersonChoice) => void;
+  onChange: (choice: PersonChoice | null) => void;
 }) {
+  const { t: __t } = useTranslation();
   const [mode, setMode] = useState<'existing' | 'new'>('existing');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [draft, setDraft] = useState<PersonIdentityDto>({
     lastName: '',
     phoneNumber: '',
@@ -26,60 +31,107 @@ export function PersonPickerOrCreate({
     languagePreference: 'fr',
   });
   const people = useQuery({
-    queryKey: ['persons', siteId, search],
+    queryKey: ['persons', siteId, search.trim(), page],
     queryFn: () =>
-      personsControllerFindPersons({ siteId, search: search || undefined, page: 1, pageSize: 20 }),
-    enabled: mode === 'existing',
+      personsControllerFindPersons({
+        siteId,
+        search: search.trim(),
+        page,
+        pageSize: 5,
+      }),
+    enabled: mode === 'existing' && search.trim().length >= 3,
   });
+  const draftIsValid =
+    Boolean(draft.lastName.trim()) && /^\+[1-9][0-9]{6,14}$/.test(draft.phoneNumber);
+  useEffect(() => {
+    if (mode !== 'new') return;
+    onChange(draftIsValid ? { kind: 'new', person: draft } : null);
+  }, [draft, draftIsValid, mode, onChange]);
   return (
-    <fieldset className="form-stack">
-      <legend>Personne</legend>
+    <div className="person-picker form-stack">
       <div className="segmented">
         <button
           type="button"
           aria-pressed={mode === 'existing'}
           onClick={() => {
             setMode('existing');
+            onChange(null);
           }}
         >
-          Personne connue
+          {__t('ui.persons.person_picker_or_create.personne_connue_10o7xp7')}
         </button>
         <button
           type="button"
           aria-pressed={mode === 'new'}
           onClick={() => {
             setMode('new');
+            onChange(null);
           }}
         >
-          Nouvelle personne
+          {__t('ui.persons.person_picker_or_create.nouvelle_personne_1mo0xl')}
         </button>
       </div>
       {mode === 'existing' ? (
         <>
-          <FormField label="Rechercher">
-            <input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-            />
-          </FormField>
-          <EntityPicker
-            entities={people.data?.data.items ?? []}
-            selectedKey={value?.kind === 'existing' ? value.person.personId : null}
-            getKey={(person) => person.personId}
-            label="Résultats"
-            render={(person) =>
-              `${person.firstName} ${person.lastName} — ${person.phoneNumber ?? ''}`
-            }
-            onSelect={(person) => {
-              onChange({ kind: 'existing', person });
-            }}
-          />
+          <div className="person-search">
+            <FormField
+              label={__t('ui.persons.person_picker_or_create.rechercher_une_personne_ger18e')}
+            >
+              <div className="input-with-action">
+                <input
+                  value={search}
+                  placeholder={__t(
+                    'ui.persons.person_picker_or_create.nom_telephone_ou_email_9m7yu9',
+                  )}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setPage(1);
+                    onChange(null);
+                  }}
+                />
+                <span
+                  className={
+                    people.isFetching ? 'search-indicator is-searching' : 'search-indicator'
+                  }
+                >
+                  <Search aria-hidden="true" />
+                </span>
+              </div>
+            </FormField>
+            {search.trim().length > 0 && search.trim().length < 3 ? (
+              <small className="form-hint">
+                {__t('ui.persons.person_picker_or_create.saisissez_au_moins_3_caracteres_1trlzeu')}
+              </small>
+            ) : null}
+          </div>
+          {search.trim().length >= 3 ? (
+            <>
+              <EntityPicker
+                compact
+                entities={people.data?.data.items ?? []}
+                selectedKey={value?.kind === 'existing' ? value.person.personId : null}
+                getKey={(person) => person.personId}
+                label={people.isFetching ? 'Recherche en cours…' : 'Résultats'}
+                render={(person) =>
+                  `${person.firstName} ${person.lastName} — ${person.phoneNumber ?? ''}`
+                }
+                onSelect={(person) => {
+                  onChange({ kind: 'existing', person });
+                }}
+              />
+              {(people.data?.data.totalPages ?? 0) > 1 ? (
+                <Pagination
+                  page={people.data?.data.page ?? page}
+                  totalPages={people.data?.data.totalPages ?? 1}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          ) : null}
         </>
       ) : (
         <>
-          <FormField label="Nom" required>
+          <FormField label={__t('ui.persons.person_picker_or_create.nom_15eqct1')} required>
             <input
               value={draft.lastName}
               onChange={(e) => {
@@ -87,7 +139,7 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label="Prénom">
+          <FormField label={__t('ui.persons.person_picker_or_create.prenom_h4ba4')}>
             <input
               value={draft.firstName}
               onChange={(e) => {
@@ -95,7 +147,10 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label="Téléphone E.164" required>
+          <FormField
+            label={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
+            required
+          >
             <PhoneInput
               value={draft.phoneNumber}
               onChange={(e) => {
@@ -103,18 +158,17 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <button
-            className="button"
-            type="button"
-            disabled={!draft.lastName || !/^\+[1-9][0-9]{6,14}$/.test(draft.phoneNumber)}
-            onClick={() => {
-              onChange({ kind: 'new', person: draft });
-            }}
-          >
-            Utiliser cette personne
-          </button>
+          <p className={draftIsValid ? 'form-valid-hint' : 'form-hint'} role="status">
+            {draftIsValid
+              ? __t(
+                  'ui.expression.persons.person_picker_or_create.informations_valides_vous_pouvez_continuer_1myt7p9',
+                )
+              : __t(
+                  'ui.expression.persons.person_picker_or_create.renseignez_un_nom_et_un_telephone_au_format__gar0el',
+                )}
+          </p>
         </>
       )}
-    </fieldset>
+    </div>
   );
 }

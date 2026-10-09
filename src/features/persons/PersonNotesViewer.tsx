@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -20,6 +21,7 @@ export function PersonNotesViewer({
   onOpenChange: (open: boolean) => void;
   initialMode?: 'view' | 'add';
 }) {
+  const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
   const [index, setIndex] = useState(0);
   const [adding, setAdding] = useState(initialMode === 'add');
@@ -48,7 +50,11 @@ export function PersonNotesViewer({
       setAdding(false);
       setIndex(0);
       await queryClient.invalidateQueries({ queryKey: ['persons', personId, 'notes'] });
-      notify({ tone: 'success', title: 'Note ajoutée', message: `La note de ${personName} est enregistrée.` });
+      notify({
+        tone: 'success',
+        title: __t('notifications.note.created'),
+        message: __t('notifications.note.createdMessage', { name: personName }),
+      });
     } catch (error) {
       notifyError(error);
     }
@@ -58,7 +64,9 @@ export function PersonNotesViewer({
       open={open}
       onOpenChange={onOpenChange}
       title={`Notes de ${personName}`}
-      description="Historique partagé avec les opérateurs autorisés de ce site."
+      description={__t(
+        'ui.persons.person_notes_viewer.historique_partage_avec_les_operateurs_autorises_oesch4',
+      )}
       actions={
         <>
           {adding && items.length ? (
@@ -69,7 +77,7 @@ export function PersonNotesViewer({
                 setAdding(false);
               }}
             >
-              Retour aux notes
+              {__t('ui.persons.person_notes_viewer.retour_aux_notes_1nkxpit')}
             </button>
           ) : !adding ? (
             <button
@@ -79,7 +87,7 @@ export function PersonNotesViewer({
                 setAdding(true);
               }}
             >
-              Ajouter
+              {__t('ui.persons.person_notes_viewer.ajouter_17wnmfl')}
             </button>
           ) : (
             <button
@@ -88,7 +96,7 @@ export function PersonNotesViewer({
               disabled={!content.trim()}
               onClick={() => void add()}
             >
-              Enregistrer la note
+              {__t('ui.persons.person_notes_viewer.enregistrer_la_note_w8aayc')}
             </button>
           )}
         </>
@@ -101,16 +109,22 @@ export function PersonNotesViewer({
               ✎
             </span>
             <div>
-              <h3>Nouvelle note</h3>
-              <p>Cette information sera visible lors des prochains passages sur ce site.</p>
+              <h3>{__t('ui.persons.person_notes_viewer.nouvelle_note_ot3to1')}</h3>
+              <p>
+                {__t(
+                  'ui.persons.person_notes_viewer.cette_information_sera_visible_lors_des_prochain_zpb7ne',
+                )}
+              </p>
             </div>
           </div>
           <label>
-            Contenu de la note
+            {__t('ui.persons.person_notes_viewer.contenu_de_la_note_1b8xbrd')}
             <textarea
-              aria-label="Nouvelle note"
+              aria-label={__t('ui.persons.person_notes_viewer.nouvelle_note_ot3to1')}
               rows={6}
-              placeholder="Ex. Documents à vérifier, besoin d’assistance…"
+              placeholder={__t(
+                'ui.persons.person_notes_viewer.ex_documents_a_verifier_besoin_d_assistance_qql32h',
+              )}
               value={content}
               onChange={(e) => {
                 setContent(e.target.value);
@@ -122,8 +136,11 @@ export function PersonNotesViewer({
         <article className="note-viewer-panel">
           <blockquote>{current.content}</blockquote>
           <small className="note-meta">
-            {current.authorUsername ?? `Utilisateur ${String(current.createdByUserId)}`} ·{' '}
-            {new Date(current.createdAt).toLocaleString()}
+            {current.authorUsername ??
+              __t('ui.expression.persons.person_notes_viewer.utilisateur_value0_q765mf', {
+                value0: String(current.createdByUserId),
+              })}{' '}
+            · {new Date(current.createdAt).toLocaleString()}
           </small>
           {items.length > 1 ? (
             <div className="note-pagination">
@@ -135,7 +152,7 @@ export function PersonNotesViewer({
                   setIndex(index + 1);
                 }}
               >
-                Précédente
+                {__t('ui.persons.person_notes_viewer.precedente_j6o8ea')}
               </button>
               <span>
                 {index + 1} / {items.length}
@@ -148,7 +165,7 @@ export function PersonNotesViewer({
                   setIndex(index - 1);
                 }}
               >
-                Suivante
+                {__t('ui.persons.person_notes_viewer.suivante_1og87ce')}
               </button>
             </div>
           ) : null}
@@ -158,8 +175,12 @@ export function PersonNotesViewer({
           <span className="note-icon" aria-hidden="true">
             ✎
           </span>
-          <h3>Aucune note</h3>
-          <p>Ajoutez la première information utile pour cette personne.</p>
+          <h3>{__t('ui.persons.person_notes_viewer.aucune_note_x1ege2')}</h3>
+          <p>
+            {__t(
+              'ui.persons.person_notes_viewer.ajoutez_la_premiere_information_utile_pour_cette_12nj0ek',
+            )}
+          </p>
         </div>
       )}
     </Modal>

@@ -12,6 +12,7 @@ export function PublicExperienceLayout({
   mode: 'public' | 'kiosk' | 'display' | 'tracking';
   children: ReactNode;
 }) {
+  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,7 +36,9 @@ export function PublicExperienceLayout({
       <div className={`public-layout public-${mode}`}>
         <main className="experience-logout" role="status" aria-live="polite">
           <span className="spinner" aria-hidden="true" />
-          <strong>Déconnexion de l’appareil…</strong>
+          <strong>
+            {__t('ui.shell.layouts.public_experience_layout.deconnexion_de_l_appareil_1tsww9p')}
+          </strong>
         </main>
       </div>
     );

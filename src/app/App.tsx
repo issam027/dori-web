@@ -1,3 +1,4 @@
+import { lazy, Suspense, type ComponentType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -8,25 +9,60 @@ import { AppProviders } from './AppProviders';
 import { AppShell } from './layouts/AppShell';
 import { ExperiencePreview } from './layouts/ExperiencePreview';
 import { PublicExperienceLayout } from './layouts/PublicExperienceLayout';
-import { LoginPage } from '@/features/auth/LoginPage';
-import { ChangePasswordPage } from '@/features/auth/ChangePasswordPage';
-import { ProfilePage } from '@/features/profile/ProfilePage';
-import { PortfolioPage } from '@/features/portfolio/PortfolioPage';
-import { DeskPage } from '@/features/queue-operations/DeskPage';
-import { MyQueuesPage } from '@/features/queue-operations/MyQueuesPage';
-import { AppointmentsPage } from '@/features/appointments/AppointmentsPage';
-import { ControlRoomPage } from '@/features/supervision/ControlRoomPage';
-import { ReportsPage } from '@/features/supervision/ReportsPage';
-import { NotificationsPage } from '@/features/supervision/NotificationsPage';
-import { KioskPage } from '@/features/public-experiences/KioskPage';
-import { DisplayPage } from '@/features/public-experiences/DisplayPage';
-import { TrackPage } from '@/features/public-experiences/TrackPage';
-import { HealthPage } from '@/features/health/HealthPage';
-import { LegalPage } from '@/features/legal/LegalPage';
-import { OnboardingPage } from '@/features/onboarding/OnboardingPage';
-import { SettingsPage } from '@/features/onboarding/SettingsPage';
+
+const lazyNamed = <P extends object, K extends string>(
+  loader: () => Promise<Record<K, ComponentType<P>>>,
+  name: K,
+) => lazy(async () => ({ default: (await loader())[name] }));
+
+const LoginPage = lazyNamed(() => import('@/features/auth/LoginPage'), 'LoginPage');
+const ChangePasswordPage = lazyNamed(
+  () => import('@/features/auth/ChangePasswordPage'),
+  'ChangePasswordPage',
+);
+const ProfilePage = lazyNamed(() => import('@/features/profile/ProfilePage'), 'ProfilePage');
+const PortfolioPage = lazyNamed(
+  () => import('@/features/portfolio/PortfolioPage'),
+  'PortfolioPage',
+);
+const DeskPage = lazyNamed(() => import('@/features/queue-operations/DeskPage'), 'DeskPage');
+const MyQueuesPage = lazyNamed(
+  () => import('@/features/queue-operations/MyQueuesPage'),
+  'MyQueuesPage',
+);
+const AppointmentsPage = lazyNamed(
+  () => import('@/features/appointments/AppointmentsPage'),
+  'AppointmentsPage',
+);
+const ControlRoomPage = lazyNamed(
+  () => import('@/features/supervision/ControlRoomPage'),
+  'ControlRoomPage',
+);
+const ReportsPage = lazyNamed(() => import('@/features/supervision/ReportsPage'), 'ReportsPage');
+const NotificationsPage = lazyNamed(
+  () => import('@/features/supervision/NotificationsPage'),
+  'NotificationsPage',
+);
+const KioskPage = lazyNamed(() => import('@/features/public-experiences/KioskPage'), 'KioskPage');
+const DisplayPage = lazyNamed(
+  () => import('@/features/public-experiences/DisplayPage'),
+  'DisplayPage',
+);
+const DeviceModePage = lazyNamed(
+  () => import('@/features/public-experiences/DeviceModePage'),
+  'DeviceModePage',
+);
+const TrackPage = lazyNamed(() => import('@/features/public-experiences/TrackPage'), 'TrackPage');
+const HealthPage = lazyNamed(() => import('@/features/health/HealthPage'), 'HealthPage');
+const LegalPage = lazyNamed(() => import('@/features/legal/LegalPage'), 'LegalPage');
+const OnboardingPage = lazyNamed(
+  () => import('@/features/onboarding/OnboardingPage'),
+  'OnboardingPage',
+);
+const SettingsPage = lazyNamed(() => import('@/features/onboarding/SettingsPage'), 'SettingsPage');
 
 function Page({ title }: { title: string }) {
+  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const brandName = useBrandStore((state) => state.name);
   const logoUrl = useBrandStore((state) => state.logoUrl);
@@ -37,7 +73,7 @@ function Page({ title }: { title: string }) {
           <img className="brand-logo" src={logoUrl} alt="" />
         ) : (
           <span className="brand-mark" aria-hidden="true">
-            D
+            {__t('ui.shell.app.d_1hkaexf')}
           </span>
         )}
         <div>
@@ -88,6 +124,23 @@ function ExperienceRoute({ mode }: { mode: 'kiosk' | 'display' | 'tracking' }) {
   return <PublicExperienceLayout mode={mode}>{content}</PublicExperienceLayout>;
 }
 
+function LegalRoute() {
+  const status = useSessionStore((state) => state.status);
+  const user = useSessionStore((state) => state.user);
+  if (status === 'authenticated' && user?.userType === 'human') {
+    return (
+      <AppShell>
+        <LegalPage />
+      </AppShell>
+    );
+  }
+  return (
+    <PublicExperienceLayout mode="public">
+      <LegalPage />
+    </PublicExperienceLayout>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -100,14 +153,7 @@ function AppRoutes() {
           </PublicExperienceLayout>
         }
       />
-      <Route
-        path="/legal"
-        element={
-          <PublicExperienceLayout mode="public">
-            <LegalPage />
-          </PublicExperienceLayout>
-        }
-      />
+      <Route path="/legal" element={<LegalRoute />} />
       <Route path="/track" element={<ExperienceRoute mode="tracking" />} />
       <Route element={<ProtectedRoute />}>
         <Route
@@ -182,6 +228,10 @@ function AppRoutes() {
                 <AppShell>
                   <SettingsPage />
                 </AppShell>
+              ) : route.path === '/device-mode' ? (
+                <PublicExperienceLayout mode="public">
+                  <DeviceModePage />
+                </PublicExperienceLayout>
               ) : route.path === '/kiosk' || route.path === '/display' ? (
                 <ExperienceRoute mode={route.path === '/kiosk' ? 'kiosk' : 'display'} />
               ) : (
@@ -214,9 +264,18 @@ function AppRoutes() {
 }
 
 export function App() {
+  const { t: __t } = useTranslation();
   return (
     <AppProviders>
-      <AppRoutes />
+      <Suspense
+        fallback={
+          <div className="route-loading" role="status">
+            {__t('ui.shell.app.chargement_de_l_espace_1wuu7uy')}
+          </div>
+        }
+      >
+        <AppRoutes />
+      </Suspense>
     </AppProviders>
   );
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, CircleAlert, Info, X } from 'lucide-react';
 import {
@@ -13,6 +14,7 @@ const icons = {
 };
 
 function NotificationItem({ item }: { item: AppNotification }) {
+  const { t: __t } = useTranslation();
   const dismiss = useNotificationStore((state) => state.dismiss);
   const [paused, setPaused] = useState(false);
 
@@ -31,31 +33,47 @@ function NotificationItem({ item }: { item: AppNotification }) {
     <article
       className={`app-notification tone-${item.tone}`}
       role={item.tone === 'error' ? 'alert' : 'status'}
-      onMouseEnter={() => { setPaused(true); }}
-      onMouseLeave={() => { setPaused(false); }}
-      onFocus={() => { setPaused(true); }}
-      onBlur={() => { setPaused(false); }}
+      onMouseEnter={() => {
+        setPaused(true);
+      }}
+      onMouseLeave={() => {
+        setPaused(false);
+      }}
+      onFocus={() => {
+        setPaused(true);
+      }}
+      onBlur={() => {
+        setPaused(false);
+      }}
     >
       <Icon className="app-notification-icon" aria-hidden="true" />
       <div className="app-notification-content">
         <strong>{item.title}</strong>
         {item.message ? <p>{item.message}</p> : null}
         {item.correlationId ? (
-          <small>Référence support : {item.correlationId}</small>
+          <small>
+            {__t('ui.design.components.notification_center.reference_support_6nw5u7')}
+            {item.correlationId}
+          </small>
         ) : null}
       </div>
       <button
         type="button"
         className="app-notification-dismiss"
-        aria-label="Fermer la notification"
-        onClick={() => { dismiss(item.id); }}
+        aria-label={__t('ui.design.components.notification_center.fermer_la_notification_120dc1w')}
+        onClick={() => {
+          dismiss(item.id);
+        }}
       >
         <X aria-hidden="true" />
       </button>
       {item.duration > 0 ? (
         <span
           className="app-notification-timer"
-          style={{ animationDuration: `${String(item.duration)}ms`, animationPlayState: paused ? 'paused' : 'running' }}
+          style={{
+            animationDuration: `${String(item.duration)}ms`,
+            animationPlayState: paused ? 'paused' : 'running',
+          }}
           aria-hidden="true"
         />
       ) : null}
@@ -64,9 +82,13 @@ function NotificationItem({ item }: { item: AppNotification }) {
 }
 
 export function NotificationCenter() {
+  const { t: __t } = useTranslation();
   const items = useNotificationStore((state) => state.items);
   return (
-    <aside className="app-notification-center" aria-label="Notifications">
+    <aside
+      className="app-notification-center"
+      aria-label={__t('ui.design.components.notification_center.notifications_fki4un')}
+    >
       {items.map((item) => (
         <NotificationItem item={item} key={item.id} />
       ))}

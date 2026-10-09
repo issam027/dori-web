@@ -3,18 +3,26 @@ import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { LocaleSwitcher } from '@/design-system/components/LocaleSwitcher';
 import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
+import { Menu, RefreshCw } from 'lucide-react';
 
 export function Topbar({
   sites,
   activeSiteId,
   onLogout,
   onOpenCommands,
+  onRefresh,
+  refreshing,
+  onOpenNavigation,
 }: {
   sites: readonly { id: number; name: string }[];
   activeSiteId: number | null;
   onLogout: () => void;
   onOpenCommands: () => void;
+  onRefresh: () => void;
+  refreshing: boolean;
+  onOpenNavigation: () => void;
 }) {
+  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
@@ -37,15 +45,34 @@ export function Topbar({
     )[location.pathname] ?? 'app.name';
   return (
     <header className="topbar">
+      <button
+        className="topbar-icon-button mobile-menu-trigger"
+        type="button"
+        onClick={onOpenNavigation}
+        aria-label={__t('ui.shell.layouts.topbar.ouvrir_le_menu_q76zys')}
+      >
+        <Menu aria-hidden="true" />
+      </button>
       <div className="topbar-title">
         <span className="eyebrow">
-          {sites.find((site) => site.id === activeSiteId)?.name ?? 'Aucun site actif'}
+          {sites.find((site) => site.id === activeSiteId)?.name ??
+            __t('ui.expression.shell.layouts.topbar.aucun_site_actif_hmb19')}
         </span>
         <h1>{t(routeLabel)}</h1>
       </div>
       <div className="topbar-actions">
+        <button
+          className="topbar-icon-button"
+          type="button"
+          onClick={onRefresh}
+          disabled={refreshing}
+          aria-label={refreshing ? 'Actualisation en cours' : 'Actualiser la page'}
+          title={refreshing ? 'Actualisation en cours' : 'Actualiser la page'}
+        >
+          <RefreshCw aria-hidden="true" className={refreshing ? 'is-spinning' : undefined} />
+        </button>
         <button className="command-trigger" type="button" onClick={onOpenCommands}>
-          {t('commands.open')} <kbd>⌘K</kbd>
+          {t('commands.open')} <kbd>{__t('ui.shell.layouts.topbar.k_1f6nlc4')}</kbd>
         </button>
         <LocaleSwitcher />
         <ThemeSwitcher />

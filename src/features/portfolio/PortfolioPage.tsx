@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { reportsControllerGetDashboardSummary } from '@/api/generated/reports/reports';
 import { sitesControllerFindSites } from '@/api/generated/sites/sites';
@@ -10,6 +11,7 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { PageHeader } from '@/design-system/components/PageHeader';
 
 export function PortfolioPage() {
+  const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
@@ -33,23 +35,18 @@ export function PortfolioPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Organisation"
-        title="Portefeuille de sites"
-        description="Sélectionnez le site sur lequel vous souhaitez travailler."
-        actions={
-          <button
-            className="button"
-            type="button"
-            disabled={sites.isFetching}
-            onClick={() => void sites.refetch()}
-          >
-            {sites.isFetching ? 'Actualisation…' : 'Actualiser'}
-          </button>
-        }
+        title={__t('ui.portfolio.portfolio_page.portefeuille_de_sites_13kj62k')}
+        description={__t(
+          'ui.portfolio.portfolio_page.selectionnez_le_site_sur_lequel_vous_souhaitez_t_1pmhaen',
+        )}
       />
       <div className="metrics-grid">
-        <MetricCard label="Sites autorisés" value={allowed.length} />
         <MetricCard
-          label="Contexte actif"
+          label={__t('ui.portfolio.portfolio_page.sites_autorises_kxxnqk')}
+          value={allowed.length}
+        />
+        <MetricCard
+          label={__t('ui.portfolio.portfolio_page.contexte_actif_1hf5mac')}
           value={allowed.find((site) => site.siteId === activeSiteId)?.siteName ?? '—'}
         />
       </div>
@@ -60,7 +57,9 @@ export function PortfolioPage() {
           }}
         />
       ) : null}
-      {sites.isSuccess && allowed.length === 0 ? <EmptyState title="Aucun site autorisé" /> : null}
+      {sites.isSuccess && allowed.length === 0 ? (
+        <EmptyState title={__t('ui.portfolio.portfolio_page.aucun_site_autorise_yhfs0w')} />
+      ) : null}
       <div className="site-grid">
         {allowed.map((site, index) => (
           <Card
@@ -73,30 +72,45 @@ export function PortfolioPage() {
                   site.siteId === activeSiteId ? 'status-badge status-success' : 'status-badge'
                 }
               >
-                {site.siteId === activeSiteId ? 'Site actif' : 'Disponible'}
+                {site.siteId === activeSiteId
+                  ? __t('ui.expression.portfolio.portfolio_page.site_actif_uvd9tt')
+                  : __t('ui.expression.portfolio.portfolio_page.disponible_lmh7q8')}
               </span>
               <h2>{site.siteName}</h2>
               <p>{site.siteLocation ?? site.timezone}</p>
             </div>
             <dl className="detail-list">
               <div>
-                <dt>Devise</dt>
+                <dt>{__t('ui.portfolio.portfolio_page.devise_1pl1r6r')}</dt>
                 <dd>{site.defaultCurrency}</dd>
               </div>
               <div>
-                <dt>Locale</dt>
+                <dt>{__t('ui.portfolio.portfolio_page.locale_1pfta5z')}</dt>
                 <dd>{site.defaultLocale}</dd>
               </div>
               <div>
-                <dt>État</dt>
-                <dd>{site.isActive ? 'Actif' : 'Inactif'}</dd>
+                <dt>{__t('ui.portfolio.portfolio_page.etat_525179')}</dt>
+                <dd>
+                  {site.isActive
+                    ? __t('ui.expression.portfolio.portfolio_page.actif_1410gao')
+                    : __t('ui.expression.portfolio.portfolio_page.inactif_11hqnbx')}
+                </dd>
               </div>
             </dl>
             {canViewSummary && summaries[index]?.data ? (
               <div className="site-summary" aria-label={`Synthese ${site.siteName}`}>
-                <span>{summaries[index].data.data.waitingTotal} en attente</span>
-                <span>{summaries[index].data.data.activeQueues} files actives</span>
-                <span>{summaries[index].data.data.appointmentsToday} RDV aujourd'hui</span>
+                <span>
+                  {summaries[index].data.data.waitingTotal}{' '}
+                  {__t('ui.portfolio.portfolio_page.en_attente_1fzxwnp')}
+                </span>
+                <span>
+                  {summaries[index].data.data.activeQueues}{' '}
+                  {__t('ui.portfolio.portfolio_page.files_actives_nqxf9n')}
+                </span>
+                <span>
+                  {summaries[index].data.data.appointmentsToday}{' '}
+                  {__t('ui.portfolio.portfolio_page.rdv_aujourd_hui_xbfs44')}
+                </span>
               </div>
             ) : null}
             {user && allowed.length > 1 ? (
@@ -113,7 +127,9 @@ export function PortfolioPage() {
                   }
                 }}
               >
-                {site.siteId === activeSiteId ? 'Continuer sur ce site' : 'Activer ce site'}
+                {site.siteId === activeSiteId
+                  ? __t('ui.expression.portfolio.portfolio_page.continuer_sur_ce_site_1iqwc3')
+                  : __t('ui.expression.portfolio.portfolio_page.activer_ce_site_7ymtes')}
               </button>
             ) : null}
           </Card>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { appointmentLocalParts, appointmentUtcIso } from './appointment-rules';
+import { appointmentLocalParts, appointmentUtcIso, dateInTimeZone } from './appointment-rules';
 
 describe('appointment timezone rules', () => {
   it('round-trips a Tunis appointment without using the browser timezone', () => {
@@ -15,5 +15,11 @@ describe('appointment timezone rules', () => {
     expect(appointmentUtcIso('2026-07-15', '14:00', 'Europe/Paris')).toBe(
       '2026-07-15T12:00:00.000Z',
     );
+  });
+
+  it('uses the site civil date rather than the browser or UTC date', () => {
+    const instant = new Date('2026-10-08T23:30:00.000Z');
+    expect(dateInTimeZone('Europe/Paris', instant)).toBe('2026-10-09');
+    expect(dateInTimeZone('America/New_York', instant)).toBe('2026-10-08');
   });
 });

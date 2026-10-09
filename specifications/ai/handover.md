@@ -167,11 +167,17 @@ Critère de sortie : toutes les pages peuvent être composées avec des primitiv
 #### Passe corrective de fidélité visuelle
 
 - [x] Capturer et comparer la connexion, le shell, le cockpit et le planning avec `dori_saas_mockup.html`.
+
 - [x] Aligner les tokens globaux, la typographie, les espacements, rayons, ombres et densités.
+
 - [x] Aligner la page de connexion et les cartes de profils de démonstration sur la maquette.
+
 - [x] Aligner le shell privé : sidebar, accordéon, topbar, contexte de site et navigation mobile.
+
 - [x] Aligner les primitives communes : boutons, cartes, badges, tableaux, formulaires, modales et états.
+
 - [x] Valider les rendus desktop, tablette et mobile sans régression fonctionnelle ou accessible.
+
 - [x] Consigner les écarts résiduels justifiés et revalider le critère de sortie de la phase 3.
 
 ### Phase 4 — Authentification, profil et contexte de site
@@ -343,39 +349,46 @@ Critère de sortie : santé et obligations légales sont présentes sans invente
 #### Passe de stabilisation — erreurs métier et notifications globales
 
 - [x] Centraliser les notifications globales de succès, information, avertissement et erreur dans un composant accessible disponible sur toutes les routes.
+
 - [x] Transformer les erreurs API normalisées en messages métier compréhensibles, avec replis par statut HTTP et référence de corrélation exploitable par le support.
+
 - [x] Dédupliquer, limiter et temporiser les notifications sans bloquer la navigation ni exposer de données personnelles.
+
 - [x] Brancher les mutations critiques sur les notifications globales et conserver les erreurs de formulaire près des champs lorsqu’une correction locale est attendue.
+
 - [x] Couvrir le résolveur d’erreurs et le centre de notifications par des tests, puis valider typecheck, lint, tests et build.
 
 #### Reprise visuelle — expériences kiosque, écran salle et tracking
 
-- [-] Supprimer le bandeau et la barre de prévisualisation pour les comptes humains au profit d’un simple cadre matériel sombre.
-- [-] Réaligner la borne, l’écran salle et le téléphone de tracking sur les compositions, couleurs, volumes et hiérarchies de `dori_saas_mockup.html`.
-- [-] Placer le champ de tracking de test hors de l’écran mobile et le réserver strictement à l’aperçu d’un compte humain.
-- [-] Vérifier les parcours réels, les états vides, le responsive, l’accessibilité et l’absence de régression fonctionnelle.
+- [x] Supprimer le bandeau et la barre de prévisualisation pour les comptes humains au profit d’un simple cadre matériel sombre.
+
+- [x] Réaligner la borne, l’écran salle et le téléphone de tracking sur les compositions, couleurs, volumes et hiérarchies de `dori_saas_mockup.html`.
+
+- [x] Placer le champ de tracking de test hors de l’écran mobile et le réserver strictement à l’aperçu d’un compte humain.
+
+- [x] Vérifier les parcours réels, les états vides, le responsive, l’accessibilité et l’absence de régression fonctionnelle.
 
 - [ ] Vérifier qu’aucun appel HTTP ne se trouve dans un composant de page.
 
-- [ ] Vérifier qu’aucun DTO Swagger n’est copié manuellement et qu’aucun `any` n’est présent.
+- [x] Vérifier qu’aucun DTO Swagger n’est copié manuellement et qu’aucun `any` n’est présent.
 
 - [ ] Vérifier qu’aucune chaîne visible ne reste codée en dur dans les composants.
 
-- [ ] Vérifier CSP, rendu texte des contenus non fiables, dépendances verrouillées et audit de sécurité.
+- [x] Vérifier CSP, rendu texte des contenus non fiables, dépendances verrouillées et audit de sécurité.
 
-- [ ] Vérifier l’absence de PII/secrets dans logs, erreurs, analytics, URLs et fixtures publiques.
+- [x] Vérifier l’absence de PII/secrets dans logs, erreurs, analytics, URLs et fixtures publiques.
 
-- [ ] Vérifier que toute durée métier utilise un timestamp/une horloge serveur disponible et s’affiche dans le fuseau IANA du site.
+- [x] Vérifier que toute durée métier utilise un timestamp/une horloge serveur disponible et s’affiche dans le fuseau IANA du site.
 
-- [ ] Exécuter les tests unitaires, composants et contractuels prévus par la spécification.
+- [x] Exécuter les tests unitaires, composants et contractuels prévus par la spécification.
 
 - [ ] Exécuter les 12 parcours E2E prioritaires listés dans la spécification finale.
 
-- [ ] Exécuter les tests visuels desktop, tablette, mobile et TV pour les quatre thèmes.
+- [x] Exécuter les tests visuels desktop, tablette, mobile et TV pour les quatre thèmes.
 
 - [ ] Auditer WCAG 2.2 AA, clavier, focus, contrastes, lecteurs d’écran et reduced motion.
 
-- [ ] Mesurer le build, le lazy loading par route et les performances des listes volumineuses.
+- [x] Mesurer le build, le lazy loading par route et les performances des listes volumineuses.
 
 - [ ] Comparer les captures finales à `dori_saas_mockup.html` et documenter les écarts justifiés.
 
@@ -387,10 +400,10 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 
 ## 5. Dépendances, risques et éléments hors périmètre
 
-- [!] Obtenir un contrat WebSocket versionné avant d’implémenter des noms de rooms ou d’événements ; utiliser snapshots REST et polling d’ici là.
-- [!] Confirmer la stratégie de stockage du refresh token avec le déploiement API ; préférer un cookie HttpOnly lorsque possible.
-- [!] Obtenir les mentions légales réelles avant toute recette de production.
-- [!] Ne pas exposer : récupération de mot de passe par email, export serveur, paiement, transfert interfile, pause conservant un poste, création libre de forfaits, test d’appel d’onboarding ou santé non fournie.
+- \[!\] Obtenir un contrat WebSocket versionné avant d’implémenter des noms de rooms ou d’événements ; utiliser snapshots REST et polling d’ici là.
+- \[!\] Confirmer la stratégie de stockage du refresh token avec le déploiement API ; préférer un cookie HttpOnly lorsque possible.
+- \[!\] Obtenir les mentions légales réelles avant toute recette de production.
+- \[!\] Ne pas exposer : récupération de mot de passe par email, export serveur, paiement, transfert interfile, pause conservant un poste, création libre de forfaits, test d’appel d’onboarding ou santé non fournie.
 
 ## 6. Journal d’avancement
 
@@ -533,6 +546,27 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 - Les coordonnées de l’entité, l’adresse, le contact et l’immatriculation sont alimentés par `VITE_LEGAL_ENTITY_NAME`, `VITE_LEGAL_ADDRESS`, `VITE_LEGAL_EMAIL` et `VITE_LEGAL_REGISTRATION`.
 - Un plugin de build bloque tout environnement déclaré `VITE_APP_ENV=production` lorsque l’une de ces valeurs est absente ou manifestement fictive ; le scénario négatif a été exécuté et son blocage confirmé.
 - Validation réussie : 22 fichiers de tests, 42 tests unitaires et d’intégration, 10 tests E2E Chromium, lint strict, typecheck, Prettier, build normal réussi et build production fictif bloqué comme attendu.
+
+### 2026-10-08 — Stabilisation des erreurs métier et notifications globales
+
+- Un centre de notifications global, responsive et accessible affiche les succès, informations, avertissements et erreurs sans interrompre la navigation.
+- Les notifications sont limitées aux quatre plus récentes, dédupliquées, temporisées selon leur gravité, mises en pause au survol/focus et désactivent leurs animations avec `prefers-reduced-motion`.
+- Les mutations TanStack Query remontent automatiquement toute erreur non explicitement neutralisée ; les actions asynchrones directes critiques utilisent le même résolveur.
+- Les erreurs API exploitent en priorité leur traduction métier, puis un message sûr selon le statut HTTP ; les messages techniques bruts et données personnelles ne sont jamais affichés.
+- Le correlation ID est présenté comme référence support lorsqu’il est fourni par l’API.
+- Des confirmations globales ont été ajoutées aux parcours rendez-vous, guichet, accueil rapide, notes, profil, activation de site, reset de file et envoi/réémission de notification.
+- L’erreur volontaire d’appel sur une file vide n’a pas été corrigée afin de conserver le scénario de test demandé pour le diagnostic.
+- Validation réussie : 28 fichiers de tests, 52 tests, typecheck, lint et build de production. Le build conserve uniquement l’avertissement connu sur la taille du bundle principal.
+
+### 2026-10-09 — Reprise des trois écrans d’expérience
+
+- Les aperçus humains ne présentent plus de hero, statut de connexion ni fausse barre de navigateur ; seul le cadre sombre du matériel subsiste, dans le shell applicatif courant.
+- La borne reprend l’enveloppe claire encadrée, le bandeau DORI/site, la session sécurisée et la cinématique en quatre étapes de la maquette : file, identité, niveau de service, vérification puis ticket confirmé.
+- Chaque étape de borne limite les choix visibles, bloque la suite tant que les données requises ne sont pas valides et conserve le watchdog de purge des données personnelles.
+- L’écran salle reprend le panneau 16:9 bleu pétrole, le branding du site, le numéro appelé dominant, le guichet contrasté et les quatre prochains tickets, sans PII.
+- Le tracking reprend le cadre téléphone, l’encoche, le badge direct, la jauge de position, l’estimation et le panneau de guidance ; son état appelé conserve les alertes consenties.
+- Le champ Tracking ID de test est placé au-dessus et hors du téléphone uniquement pour un compte humain ; il reste absent du véritable lien public.
+- Validation réussie : 28 fichiers de tests, 52 tests, 11 scénarios E2E, typecheck, lint et build. Le seul avertissement restant est celui déjà connu sur la taille du bundle principal.
 
 <!-- CHECKPOINT id="ckpt_muyogqn5_4oa4j9" time="2026-10-07T22:27:01.985Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
@@ -696,17 +730,6 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 
 <!-- CHECKPOINT id="ckpt_mv02sia9_3ve6ma" time="2026-10-08T21:55:51.825Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
-### 2026-10-08 — Stabilisation des erreurs métier et notifications globales
-
-- Un centre de notifications global, responsive et accessible affiche les succès, informations, avertissements et erreurs sans interrompre la navigation.
-- Les notifications sont limitées aux quatre plus récentes, dédupliquées, temporisées selon leur gravité, mises en pause au survol/focus et désactivent leurs animations avec `prefers-reduced-motion`.
-- Les mutations TanStack Query remontent automatiquement toute erreur non explicitement neutralisée ; les actions asynchrones directes critiques utilisent le même résolveur.
-- Les erreurs API exploitent en priorité leur traduction métier, puis un message sûr selon le statut HTTP ; les messages techniques bruts et données personnelles ne sont jamais affichés.
-- Le correlation ID est présenté comme référence support lorsqu’il est fourni par l’API.
-- Des confirmations globales ont été ajoutées aux parcours rendez-vous, guichet, accueil rapide, notes, profil, activation de site, reset de file et envoi/réémission de notification.
-- L’erreur volontaire d’appel sur une file vide n’a pas été corrigée afin de conserver le scénario de test demandé pour le diagnostic.
-- Validation réussie : 28 fichiers de tests, 52 tests, typecheck, lint et build de production. Le build conserve uniquement l’avertissement connu sur la taille du bundle principal.
-
 <!-- CHECKPOINT id="ckpt_mv035d90_kz1s45" time="2026-10-08T22:05:51.828Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv03i87q_fead67" time="2026-10-08T22:15:51.830Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -722,3 +745,170 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 <!-- CHECKPOINT id="ckpt_mv07luak_01azxe" time="2026-10-09T00:10:38.876Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv09akql_kgl0hm" time="2026-10-09T00:57:52.509Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0a1ni6_krv60d" time="2026-10-09T01:18:55.806Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0h0ucd_739a2s" time="2026-10-09T04:34:15.325Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0key7x_nixp4b" time="2026-10-09T06:09:12.381Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0l57p1_va0ie9" time="2026-10-09T06:29:37.717Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0lskjj_u5qwly" time="2026-10-09T06:47:47.455Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0m5fiv_cteaux" time="2026-10-09T06:57:47.479Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0mir58_wh4lyr" time="2026-10-09T07:08:09.068Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0mvm4w_23o1iq" time="2026-10-09T07:18:09.104Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0n8h3l_utnrt0" time="2026-10-09T07:28:09.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0nlc25_68a8cc" time="2026-10-09T07:38:09.101Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0ny70z_gi8pa1" time="2026-10-09T07:48:09.107Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0occ4u_1udc9n" time="2026-10-09T07:59:08.910Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0op74d_kiyclq" time="2026-10-09T08:09:08.941Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+### 2026-10-09 — Phase 11, durcissement automatisé
+
+- Ajout d’un audit statique bloquant sur les appels HTTP bruts dans les pages, les DTO recopiés, les injections HTML dynamiques, les journaux non contrôlés et le verrouillage des dépendances.
+- Ajout d’une CSP générée selon l’environnement, d’une politique `no-referrer` et d’un audit npm bloquant ; aucun paquet vulnérable n’est signalé.
+- Assainissement de l’Error Boundary : aucun message d’exception brut ni donnée personnelle n’est affiché ou journalisé en production.
+- Correction des dates métier de check-in et de rapports pour employer la date civile du fuseau IANA du site ; tests dédiés aux écarts de date et à l’heure d’été.
+- Chargement différé de toutes les pages : le build produit un chunk par route, avec un chunk principal de 392,38 kB (124,94 kB gzip) et aucune alerte de taille Vite.
+- Validation de la génération OpenAPI reproductible, du lint, du typage, de 53 tests unitaires/composants et du build de production.
+- Correction des contrastes globaux détectés par Axe ; aucune violation sérieuse ou critique ne subsiste sur la connexion et le cockpit audités.
+- Validation de 13 scénarios Playwright, dont les surfaces publiques sans PII et la matrice desktop, tablette, mobile et TV dans les quatre thèmes.
+- Les douze parcours métier E2E de la section 12.4 ne sont pas assimilés au simple nombre de tests Playwright et restent donc volontairement non cochés.
+- La traduction exhaustive des chaînes visibles, l’extraction de tous les appels clients générés hors des pages et la recette lecteur d’écran restent à terminer.
+- Conformément à la demande, comparaison finale à la maquette, documentation d’exploitation et recette de la section 14 sont reportées et restent non cochées.
+
+<!-- CHECKPOINT id="ckpt_mv0p224i_2hdnda" time="2026-10-09T08:19:08.994Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0pex1q_n19wau" time="2026-10-09T08:29:08.942Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0prs0m_0shcwg" time="2026-10-09T08:39:08.950Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0q4mzl_evh15b" time="2026-10-09T08:49:08.961Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0qhhyg_onuuf0" time="2026-10-09T08:59:08.968Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0qucx9_qzhymj" time="2026-10-09T09:09:08.973Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0r77vz_qgc113" time="2026-10-09T09:19:08.975Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0rk2us_16aarf" time="2026-10-09T09:29:08.980Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0rwxtf_soz5k4" time="2026-10-09T09:39:08.979Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0s9ssc_ajl5rv" time="2026-10-09T09:49:08.988Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0smnr2_142hld" time="2026-10-09T09:59:08.990Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0szipu_nm403p" time="2026-10-09T10:09:08.994Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0tv7eh_6idpkr" time="2026-10-09T10:33:47.321Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0u82c3_88ypz9" time="2026-10-09T10:43:47.283Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0uzec8_ngd1ak" time="2026-10-09T11:05:02.552Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0vc9b1_5nawtt" time="2026-10-09T11:15:02.557Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0vp4am_lnotw3" time="2026-10-09T11:25:02.590Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0w1za6_b7y84g" time="2026-10-09T11:35:02.622Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0weuhi_37rckq" time="2026-10-09T11:45:02.934Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0wrpam_gzkh2j" time="2026-10-09T11:55:02.734Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0x4k9d_v5uzuq" time="2026-10-09T12:05:02.737Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0xhf8g_pwvue4" time="2026-10-09T12:15:02.752Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+### 2026-10-09 — Ajustements cockpit, files et expériences publiques
+
+- [x] Conserver le défilement naturel du kiosque et compacter l’écran final en paysage (en-tête horizontal, ticket/QR redimensionnés, actions côte à côte).
+- [x] Retirer « Quatre derniers appels » de la carte de prise en charge du cockpit.
+- [x] Remplacer le récapitulatif unique par une liste cumulative de cartes servi/absent avec identité, date d’arrivée, heures d’arrivée, d’appel et de sortie.
+- [x] Restaurer l’écran salle avec l’ensemble des tickets en cours, leur guichet et leur file, ainsi qu’une prévisualisation compacte des prochains tickets.
+- [x] Paginer « Mes files » par groupes de 10 personnes et corriger le calcul des positions.
+- [x] Compacter les cinq résultats de recherche de personne dans une zone interne bornée pour éviter d’allonger les modales.
+- [x] Valider le lint, le typage, les 55 tests automatisés, le build de production et `git diff --check`.
+
+### 2026-10-09 — Justificatifs de passage et choix du mode appareil
+
+- [x] Rendre les cartes de passages plus discrètes avec une surface atténuée et une bordure pointillée.
+- [x] Ajouter l’impression individuelle d’un justificatif 80 mm pour chaque passage servi ou absent.
+- [x] Ajouter un écran de choix réservé au compte kiosque entre borne d’accueil et écran de salle.
+- [x] Faire de cet écran la destination initiale d’un profil kiosque après authentification, sans empêcher les liens directs vers `/kiosk` et `/display`.
+- [x] Valider le lint, le typage, les tests ciblés du routage et de la recherche, le build de production et `git diff --check`.
+
+### 2026-10-09 — Multi-files, plein écran et justificatifs compacts
+
+- [x] Renforcer les contrastes des pages `/device-mode` et `/legal`, y compris le panneau de contact sombre.
+- [x] Ajouter une déconnexion complète et explicite depuis `/device-mode`.
+- [x] Agréger sur l’écran salle les snapshots de toutes les files actives autorisées au compte kiosque, avec le nom de la file pour chaque appel et prochain ticket.
+- [x] Corriger le plein écran de la salle et supprimer les bandes latérales héritées du ratio 16:9 contraint.
+- [x] Empêcher le pavé guichet de masquer le numéro du ticket avec une grille bornée et des textes adaptatifs.
+- [x] Limiter la largeur des cartes de passage dans le cockpit pour conserver leur rôle secondaire.
+- [x] Contraindre le justificatif à une page 80 mm et ajouter en-tête DORI, date d’impression, mention à la demande du client et emplacement de signature/cachet.
+- [x] Valider le lint, le typage, les tests ciblés, le build de production et `git diff --check`.
+
+### 2026-10-09 — Toasts, récapitulatifs secondaires et navigation
+
+- [x] Transformer les notifications globales non stylées en toasts flottants, temporisés, empilables et adaptés au mobile.
+- [x] Limiter les cartes de récapitulatif de passage à 20 rem afin qu’elles restent plus petites que les cartes opérationnelles du cockpit.
+- [x] Réorganiser la navigation en quatre ensembles logiques : Opérations, Expériences, Pilotage et Administration.
+- [x] Déplacer Supervision, Rapports et Notifications dans Pilotage, et Portefeuille de sites dans Administration.
+- [x] Clarifier les libellés français : Suivi mobile, Créer un site, Paramètres du site et État de la plateforme.
+- [x] Valider le lint, le typage, les huit tests ciblés, le build de production et `git diff --check`.
+
+### 2026-10-09 — Internationalisation exhaustive de l’interface
+
+- [x] Extraire 571 textes JSX et attributs visibles en dur dans un catalogue de secours i18n à clés stables.
+- [x] Extraire 130 libellés conditionnels, confirmations, messages d’erreur et textes interpolés avec conservation de leurs paramètres.
+- [x] Migrer les messages des notifications globales vers des clés métier explicites.
+- [x] Migrer les validations Zod visibles de connexion, changement de mot de passe et profil vers des schémas dépendants de la langue active.
+- [x] Migrer les aides de configuration transmises par propriétés (`text`, `emptyLabel`, `successMessage`) et les libellés conditionnels/interpolés.
+- [x] Migrer les derniers textes visibles de l’Error Boundary.
+- [x] Séparer le namespace local `fallback` du namespace distant `translation` pour garantir la priorité du bundle API `ihm`.
+- [x] Charger automatiquement le bundle distant `ihm` à chaque changement de langue et conserver le catalogue local si l’API est indisponible.
+- [x] Remplacer entièrement le namespace distant lors d’un changement de version afin d’éviter les clés serveur obsolètes.
+- [x] Tester explicitement qu’une clé distante remplace la même clé locale et qu’une clé distante absente retombe sur le français local.
+- [x] Ajouter `audit:i18n` au pipeline de vérification pour bloquer les nouveaux textes JSX, attributs visibles et toasts en dur.
+- [x] Valider l’audit i18n, le lint, le typage, les 56 tests et le build de production.
+
+### 2026-10-09 — Internationalisation exhaustive de l’interface (en cours)
+
+- [x] Inventorier les composants contenant encore des textes visibles en dur (31 fichiers de production identifiés).
+- [x] Charger systématiquement le bundle distant de catégorie `ihm` lors d’un changement de langue, avec repli sur les ressources locales en cas d’échec réseau.
+- [x] Dédupliquer les chargements simultanés d’un même bundle `locale:category`.
+- [x] Garantir explicitement la priorité des entrées distantes avec une fusion profonde en mode écrasement.
+- [x] Ajouter un test démontrant qu’une clé `ihm` distante remplace bien son fallback local.
+- [ ] Migrer les textes en dur des composants partagés et des layouts vers des clés i18n.
+- [ ] Migrer les textes en dur des modules Authentification, Profil, Personnes et Utilisateurs.
+- [ ] Migrer les textes en dur des modules Cockpit, Files et Rendez-vous.
+- [ ] Migrer les textes en dur des modules Supervision, Rapports, Notifications et Santé.
+- [ ] Migrer les textes en dur de l’Onboarding, de la Configuration et du Portefeuille.
+- [ ] Migrer les textes en dur des trois expériences publiques Kiosque, Écran salle et Suivi mobile.
+- [ ] Ajouter un audit automatisé empêchant la réintroduction de textes visibles en dur.
+- [ ] Exécuter la validation complète après disparition de tous les textes visibles en dur.
+
+<!-- CHECKPOINT id="ckpt_mv0xua77_afonq3" time="2026-10-09T12:25:02.755Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0y756a_yt95t3" time="2026-10-09T12:35:02.770Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0yk057_q3fudn" time="2026-10-09T12:45:02.779Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0ywv47_la9f7p" time="2026-10-09T12:55:02.791Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0z9q36_lqi56d" time="2026-10-09T13:05:02.802Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0zml25_0e1k3s" time="2026-10-09T13:15:02.813Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv0zzg11_rziu4h" time="2026-10-09T13:25:02.821Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

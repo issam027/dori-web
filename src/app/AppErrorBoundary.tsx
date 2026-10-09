@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, Clipboard, RefreshCcw, RotateCcw } from 'lucide-react';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
+import { i18n } from '@/core/i18n/i18n';
 
 interface AppErrorBoundaryState {
   error: Error | null;
@@ -24,6 +25,21 @@ const emptyState: AppErrorBoundaryState = {
   copied: false,
 };
 
+function safeErrorCode(error: Error | null): string {
+  return error instanceof NormalizedApiError ? error.code : 'UNHANDLED_UI_ERROR';
+}
+
+function logIncident(kind: string, error: Error): void {
+  if (!import.meta.env.DEV) return;
+  const apiError = error instanceof NormalizedApiError ? error : null;
+  console.error(kind, {
+    name: error.name,
+    code: safeErrorCode(error),
+    status: apiError?.status,
+    correlationId: apiError?.correlationId,
+  });
+}
+
 export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorBoundaryState> {
   state: AppErrorBoundaryState = emptyState;
 
@@ -39,7 +55,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   }
 
   private captureRuntimeError = (error: Error) => {
-    console.error('[DORI unhandled runtime incident]', error);
+    logIncident('[DORI unhandled runtime incident]', error);
     this.setState({
       error,
       componentStack: '',
@@ -71,7 +87,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, componentStack: info.componentStack ?? '' });
-    console.error('[DORI UI incident]', error, info);
+    logIncident('[DORI UI incident]', error);
   }
 
   componentDidUpdate(previousProps: AppErrorBoundaryProps): void {
@@ -88,13 +104,13 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
       `Date: ${occurredAt}`,
       `Route: ${window.location.pathname}`,
       `Navigateur: ${navigator.userAgent}`,
-      `Erreur: ${error?.name ?? 'Error'} — ${error?.message ?? 'Erreur inconnue'}`,
+      `Erreur: ${safeErrorCode(error)}`,
       apiError?.status ? `HTTP: ${String(apiError.status)}` : '',
       apiError?.code ? `Code API: ${apiError.code}` : '',
       apiError?.correlationId ? `Correlation ID: ${apiError.correlationId}` : '',
       '',
       'Pile JavaScript:',
-      error?.stack ?? 'Indisponible',
+      error?.stack?.split('\n').slice(1).join('\n') || 'Indisponible',
       '',
       'Pile React:',
       componentStack || 'Indisponible',
@@ -115,44 +131,42 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           <AlertTriangle size={28} />
         </div>
         <div className="runtime-error-heading">
-          <p className="eyebrow">Incident interface</p>
-          <h1>Cette page a rencontré une erreur</h1>
-          <p>
-            Le reste de l’application reste disponible. Vous pouvez copier le diagnostic ci-dessous.
-          </p>
+          <p className="eyebrow">{i18n.t('errorBoundary.eyebrow')}</p>
+          <h1>{i18n.t('errorBoundary.title')}</h1>
+          <p>{i18n.t('errorBoundary.description')}</p>
         </div>
         <dl className="runtime-error-summary">
           <div>
-            <dt>Incident</dt>
+            <dt>{i18n.t('errorBoundary.incident')}</dt>
             <dd>{this.state.incidentId}</dd>
           </div>
           <div>
-            <dt>Heure</dt>
+            <dt>{i18n.t('errorBoundary.time')}</dt>
             <dd>{new Date(this.state.occurredAt).toLocaleString()}</dd>
           </div>
           <div>
-            <dt>Route</dt>
+            <dt>{i18n.t('errorBoundary.route')}</dt>
             <dd>{window.location.pathname}</dd>
           </div>
           <div>
-            <dt>Message</dt>
-            <dd>{this.state.error.message}</dd>
+            <dt>{i18n.t('errorBoundary.message')}</dt>
+            <dd>{safeErrorCode(this.state.error)}</dd>
           </div>
           {apiError?.status ? (
             <div>
-              <dt>HTTP</dt>
+              <dt>{i18n.t('errorBoundary.http')}</dt>
               <dd>{apiError.status}</dd>
             </div>
           ) : null}
           {apiError?.correlationId ? (
             <div>
-              <dt>Correlation ID</dt>
+              <dt>{i18n.t('errorBoundary.correlationId')}</dt>
               <dd>{apiError.correlationId}</dd>
             </div>
           ) : null}
         </dl>
         <details className="runtime-error-details">
-          <summary>Détails techniques</summary>
+          <summary>{i18n.t('errorBoundary.technicalDetails')}</summary>
           <pre>{this.diagnostic()}</pre>
         </details>
         <div className="runtime-error-actions">
@@ -163,7 +177,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
               this.setState(emptyState);
             }}
           >
-            <RotateCcw size={17} /> Réessayer
+            <RotateCcw size={17} /> {i18n.t('common.retry')}
           </button>
           <button
             className="button"
@@ -172,7 +186,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
               window.location.reload();
             }}
           >
-            <RefreshCcw size={17} /> Recharger la page
+            <RefreshCcw size={17} /> {i18n.t('errorBoundary.reload')}
           </button>
           <button
             className="button"
@@ -184,12 +198,10 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
             }}
           >
             <Clipboard size={17} />{' '}
-            {this.state.copied ? 'Diagnostic copié' : 'Copier le diagnostic'}
+            {this.state.copied ? i18n.t('errorBoundary.copied') : i18n.t('errorBoundary.copy')}
           </button>
         </div>
-        <p className="runtime-error-privacy">
-          Les jetons d’authentification et les paramètres d’URL ne sont pas inclus.
-        </p>
+        <p className="runtime-error-privacy">{i18n.t('errorBoundary.privacy')}</p>
       </section>
     );
   }

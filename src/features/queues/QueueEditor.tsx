@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import type { CreateQueueDto, QueueResponseDto } from '@/api/generated/models';
 import { Modal } from '@/design-system/components/Modal';
@@ -22,6 +23,7 @@ export function QueueEditor({
   initial?: QueueResponseDto | CreateQueueDto;
   onSave: (value: CreateQueueDto) => Promise<void> | void;
 }) {
+  const { t: __t } = useTranslation();
   const [value, setValue] = useState<CreateQueueDto>(() => ({ ...defaults, ...initial }));
   const [advanced, setAdvanced] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,7 +35,9 @@ export function QueueEditor({
       open={open}
       onOpenChange={onOpenChange}
       title={initial ? 'Modifier la file' : 'Nouvelle file'}
-      description="Les champs laissés sur Hériter utilisent les paramètres du site."
+      description={__t(
+        'ui.queues.queue_editor.les_champs_laisses_sur_heriter_utilisent_les_par_fa5g5c',
+      )}
       actions={
         <button
           className="button button-primary"
@@ -51,13 +55,13 @@ export function QueueEditor({
             })();
           }}
         >
-          Enregistrer
+          {__t('ui.queues.queue_editor.enregistrer_sywgdx')}
         </button>
       }
     >
       <div className="form-grid">
         <label>
-          Code *
+          {__t('ui.queues.queue_editor.code_1ej1ao2')}
           <input
             maxLength={10}
             value={value.queueCode}
@@ -67,7 +71,7 @@ export function QueueEditor({
           />
         </label>
         <label>
-          Nom
+          {__t('ui.queues.queue_editor.nom_15eqct1')}
           <input
             value={value.queueName ?? ''}
             onChange={(e) => {
@@ -76,7 +80,7 @@ export function QueueEditor({
           />
         </label>
         <label>
-          Guichets
+          {__t('ui.queues.queue_editor.guichets_j0id8z')}
           <input
             type="number"
             min="1"
@@ -87,7 +91,7 @@ export function QueueEditor({
           />
         </label>
         <label>
-          Attente moyenne
+          {__t('ui.queues.queue_editor.attente_moyenne_1r05351')}
           <input
             type="number"
             min="0"
@@ -98,31 +102,31 @@ export function QueueEditor({
           />
         </label>
         <label>
-          Devise
+          {__t('ui.queues.queue_editor.devise_1pl1r6r')}
           <select
             value={value.currency ?? ''}
             onChange={(e) => {
               field('currency', e.target.value || null);
             }}
           >
-            <option value="">Hériter du site</option>
-            <option>TND</option>
-            <option>EUR</option>
-            <option>USD</option>
+            <option value="">{__t('ui.queues.queue_editor.heriter_du_site_1w0a5wk')}</option>
+            <option>{__t('ui.queues.queue_editor.tnd_gge1jd')}</option>
+            <option>{__t('ui.queues.queue_editor.eur_1i746uf')}</option>
+            <option>{__t('ui.queues.queue_editor.usd_174gkvb')}</option>
           </select>
         </label>
         <label>
-          Locale
+          {__t('ui.queues.queue_editor.locale_1pfta5z')}
           <select
             value={value.locale ?? ''}
             onChange={(e) => {
               field('locale', e.target.value || null);
             }}
           >
-            <option value="">Hériter du site</option>
-            <option>fr</option>
-            <option>ar</option>
-            <option>en</option>
+            <option value="">{__t('ui.queues.queue_editor.heriter_du_site_1w0a5wk')}</option>
+            <option>{__t('ui.queues.queue_editor.fr_o6dm29')}</option>
+            <option>{__t('ui.queues.queue_editor.ar_puedq2')}</option>
+            <option>{__t('ui.queues.queue_editor.en_i2aop6')}</option>
           </select>
         </label>
       </div>
@@ -133,12 +137,15 @@ export function QueueEditor({
           setAdvanced(!advanced);
         }}
       >
-        {advanced ? 'Masquer' : 'Afficher'} les surcharges avancées
+        {advanced
+          ? __t('ui.expression.queues.queue_editor.masquer_12fkzf1')
+          : __t('ui.expression.queues.queue_editor.afficher_pem1r')}{' '}
+        {__t('ui.queues.queue_editor.les_surcharges_avancees_yu2ula')}
       </button>
       {advanced ? (
         <div className="form-grid admin-advanced-fields">
           <label>
-            Rendez-vous
+            {__t('ui.queues.queue_editor.rendez_vous_1jmjhs7')}
             <select
               value={
                 value.appointmentsEnabled === undefined ? '' : String(value.appointmentsEnabled)
@@ -150,13 +157,13 @@ export function QueueEditor({
                 );
               }}
             >
-              <option value="">Hériter</option>
-              <option value="true">Activés</option>
-              <option value="false">Désactivés</option>
+              <option value="">{__t('ui.queues.queue_editor.heriter_urvbs6')}</option>
+              <option value="true">{__t('ui.queues.queue_editor.actives_1ntg7nc')}</option>
+              <option value="false">{__t('ui.queues.queue_editor.desactives_1jqymmi')}</option>
             </select>
           </label>
           <label>
-            Durée du créneau
+            {__t('ui.queues.queue_editor.duree_du_creneau_jith7i')}
             <input
               type="number"
               min="1"
@@ -170,7 +177,7 @@ export function QueueEditor({
             />
           </label>
           <label>
-            Capacité
+            {__t('ui.queues.queue_editor.capacite_1nhjc3d')}
             <input
               type="number"
               min="1"
@@ -181,7 +188,7 @@ export function QueueEditor({
             />
           </label>
           <label>
-            Ouverture
+            {__t('ui.queues.queue_editor.ouverture_pawjjg')}
             <input
               type="time"
               value={value.workingHoursStart ?? ''}
@@ -191,7 +198,7 @@ export function QueueEditor({
             />
           </label>
           <label>
-            Fermeture
+            {__t('ui.queues.queue_editor.fermeture_46skya')}
             <input
               type="time"
               value={value.workingHoursEnd ?? ''}
@@ -201,7 +208,7 @@ export function QueueEditor({
             />
           </label>
           <label>
-            Tolérance retard
+            {__t('ui.queues.queue_editor.tolerance_retard_gttjc8')}
             <input
               type="number"
               min="0"

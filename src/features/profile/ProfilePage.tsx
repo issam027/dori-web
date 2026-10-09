@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,13 +14,14 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 
-const schema = z.object({
-  email: z.union([z.literal(''), z.email('Adresse email invalide.')]),
+const createSchema = (t: TFunction) => z.object({
+  email: z.union([z.literal(''), z.email(t('validation.emailInvalid'))]),
   languagePreference: z.string().min(2),
 });
-type ProfileForm = z.infer<typeof schema>;
+type ProfileForm = z.infer<ReturnType<typeof createSchema>>;
 
 export function ProfilePage() {
+  const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
   const [saved, setSaved] = useState(false);
   const {
@@ -26,7 +29,7 @@ export function ProfilePage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProfileForm>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createSchema(__t)),
     values: { email: user?.email ?? '', languagePreference: user?.languagePreference ?? 'fr' },
   });
   if (!user) return null;
@@ -39,7 +42,7 @@ export function ProfilePage() {
       });
       await hydrateSession();
       setSaved(true);
-      notify({ tone: 'success', title: 'Profil enregistré' });
+      notify({ tone: 'success', title: __t('notifications.profile.saved') });
     } catch (error) {
       notifyError(error);
     }
@@ -48,36 +51,50 @@ export function ProfilePage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Compte"
-        title="Mon profil"
-        description="Votre identité, vos habilitations et vos préférences."
+        title={__t('ui.profile.profile_page.mon_profil_9ov59t')}
+        description={__t(
+          'ui.profile.profile_page.votre_identite_vos_habilitations_et_vos_preferen_1ixmftf',
+        )}
       />
       <div className="profile-layout">
         <Card className="profile-identity-card">
           <div className="profile-portrait">
             <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
             <h2>{user.username}</h2>
-            <p>{user.roles.join(' · ') || 'Compte utilisateur'}</p>
-            <span className="status-badge status-success">Compte actif</span>
+            <p>
+              {user.roles.join(' · ') ||
+                __t('ui.expression.profile.profile_page.compte_utilisateur_1twv5sm')}
+            </p>
+            <span className="status-badge status-success">
+              {__t('ui.profile.profile_page.compte_actif_12z992e')}
+            </span>
           </div>
           <dl className="detail-list">
             <div>
-              <dt>Type de compte</dt>
-              <dd>{user.userType === 'human' ? 'Humain' : 'Technique'}</dd>
+              <dt>{__t('ui.profile.profile_page.type_de_compte_h99ahc')}</dt>
+              <dd>
+                {user.userType === 'human'
+                  ? __t('ui.expression.profile.profile_page.humain_18e4n9r')
+                  : __t('ui.expression.profile.profile_page.technique_tmfbah')}
+              </dd>
             </div>
             <div>
-              <dt>Permissions</dt>
+              <dt>{__t('ui.profile.profile_page.permissions_11gikqr')}</dt>
               <dd>{user.permissions.length}</dd>
             </div>
             <div>
-              <dt>Dernière connexion</dt>
+              <dt>{__t('ui.profile.profile_page.derniere_connexion_2t8q7t')}</dt>
               <dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '—'}</dd>
             </div>
             <div>
-              <dt>Scope</dt>
+              <dt>{__t('ui.profile.profile_page.scope_rpvfkb')}</dt>
               <dd>
                 {user.scope.isGlobal
-                  ? 'Global'
-                  : `${String(user.scope.siteIds.length)} site(s), ${String(user.scope.queueIds.length)} file(s)`}
+                  ? __t('ui.expression.profile.profile_page.global_rrldxq')
+                  : __t('ui.expression.profile.profile_page.value0_site_s_value1_file_s_l4y6h', {
+                      value0: String(user.scope.siteIds.length),
+                      value1: String(user.scope.queueIds.length),
+                    })}
               </dd>
             </div>
           </dl>
@@ -85,8 +102,12 @@ export function ProfilePage() {
         <Card className="profile-settings-card">
           <div className="card-heading">
             <div>
-              <h2>Informations et préférences</h2>
-              <p>Le rôle et le périmètre sont gérés par un administrateur.</p>
+              <h2>{__t('ui.profile.profile_page.informations_et_preferences_10ds0hx')}</h2>
+              <p>
+                {__t(
+                  'ui.profile.profile_page.le_role_et_le_perimetre_sont_geres_par_un_admini_q8b8gl',
+                )}
+              </p>
             </div>
           </div>
           <form
@@ -95,48 +116,67 @@ export function ProfilePage() {
               void submit(e);
             }}
           >
-            <FormField label="Email" error={errors.email?.message}>
+            <FormField
+              label={__t('ui.profile.profile_page.email_inbfc7')}
+              error={errors.email?.message}
+            >
               <input type="email" autoComplete="email" {...register('email')} />
             </FormField>
-            <FormField label="Langue">
+            <FormField label={__t('ui.profile.profile_page.langue_4vkz5r')}>
               <select {...register('languagePreference')}>
-                <option value="fr">Français</option>
-                <option value="en">English</option>
+                <option value="fr">{__t('ui.profile.profile_page.francais_1x2mspi')}</option>
+                <option value="en">{__t('ui.profile.profile_page.english_7nql6j')}</option>
                 <option value="ar">العربية</option>
               </select>
             </FormField>
-            {saved ? <p role="status">Profil enregistré.</p> : null}
+            {saved ? (
+              <p role="status">{__t('ui.profile.profile_page.profil_enregistre_1kk86qt')}</p>
+            ) : null}
             <button className="button button-primary" disabled={isSubmitting} type="submit">
-              Enregistrer
+              {__t('ui.profile.profile_page.enregistrer_sywgdx')}
             </button>
           </form>
           <div className="profile-security-panel">
             <div>
-              <strong>Sécurité du compte</strong>
-              <p>Modifiez votre mot de passe depuis un parcours dédié et sécurisé.</p>
+              <strong>{__t('ui.profile.profile_page.securite_du_compte_jw1voy')}</strong>
+              <p>
+                {__t(
+                  'ui.profile.profile_page.modifiez_votre_mot_de_passe_depuis_un_parcours_d_o6z9ng',
+                )}
+              </p>
             </div>
             <Link className="button" to="/change-password">
-              Changer mon mot de passe
+              {__t('ui.profile.profile_page.changer_mon_mot_de_passe_1pun60i')}
             </Link>
           </div>
         </Card>
       </div>
       <div className="metrics-grid profile-scope-metrics">
         <Card>
-          <span className="metric-label">Périmètre</span>
+          <span className="metric-label">{__t('ui.profile.profile_page.perimetre_ai7per')}</span>
           <strong className="metric-value">
-            {user.scope.isGlobal ? 'Global' : `${String(user.scope.siteIds.length)} site(s)`}
+            {user.scope.isGlobal
+              ? __t('ui.expression.profile.profile_page.global_rrldxq')
+              : __t('ui.expression.profile.profile_page.value0_site_s_a2wlej', {
+                  value0: String(user.scope.siteIds.length),
+                })}
           </strong>
         </Card>
         <Card>
-          <span className="metric-label">Files autorisées</span>
+          <span className="metric-label">
+            {__t('ui.profile.profile_page.files_autorisees_z62lee')}
+          </span>
           <strong className="metric-value">
-            {user.scope.isGlobal ? 'Toutes' : user.scope.queueIds.length}
+            {user.scope.isGlobal
+              ? __t('ui.expression.profile.profile_page.toutes_1krg1dl')
+              : user.scope.queueIds.length}
           </strong>
         </Card>
         <Card>
-          <span className="metric-label">Langue</span>
-          <strong className="metric-value">{user.languagePreference ?? 'fr'}</strong>
+          <span className="metric-label">{__t('ui.profile.profile_page.langue_4vkz5r')}</span>
+          <strong className="metric-value">
+            {user.languagePreference ?? __t('ui.expression.profile.profile_page.fr_o6dm29')}
+          </strong>
         </Card>
       </div>
     </div>

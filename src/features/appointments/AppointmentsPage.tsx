@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
@@ -26,6 +27,7 @@ function monthDates(anchor: Date): string[] {
 }
 
 export function AppointmentsPage() {
+  const { t: __t } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [view, setView] = useState<'week' | 'month'>('week');
   const [anchor, setAnchor] = useState(() => new Date());
@@ -116,8 +118,10 @@ export function AppointmentsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Planning"
-        title="Rendez-vous"
-        description="Données et disponibilités chargées depuis l’API."
+        title={__t('ui.appointments.appointments_page.rendez_vous_1jmjhs7')}
+        description={__t(
+          'ui.appointments.appointments_page.donnees_et_disponibilites_chargees_depuis_l_api_15vqaj',
+        )}
         actions={
           <div className="segmented">
             <button
@@ -128,7 +132,7 @@ export function AppointmentsPage() {
                 setView('week');
               }}
             >
-              Semaine
+              {__t('ui.appointments.appointments_page.semaine_1h9600n')}
             </button>
             <button
               className="button"
@@ -138,7 +142,7 @@ export function AppointmentsPage() {
                 setView('month');
               }}
             >
-              Mois
+              {__t('ui.appointments.appointments_page.mois_s4y96t')}
             </button>
           </div>
         }
@@ -149,10 +153,16 @@ export function AppointmentsPage() {
             ▦
           </span>
           <div>
-            <h2>Rendez-vous indisponibles</h2>
+            <h2>{__t('ui.appointments.appointments_page.rendez_vous_indisponibles_877wds')}</h2>
             <p>
-              Le site <strong>{site.data?.data.siteName ?? `#${String(siteId)}`}</strong> ne gère
-              pas les rendez-vous.
+              {__t('ui.appointments.appointments_page.le_site_x7168t')}
+              <strong>
+                {site.data?.data.siteName ??
+                  __t('ui.expression.appointments.appointments_page.value0_g7s8cl', {
+                    value0: String(siteId),
+                  })}
+              </strong>{' '}
+              {__t('ui.appointments.appointments_page.ne_gere_pas_les_rendez_vous_ioiivw')}
             </p>
           </div>
         </div>
@@ -161,7 +171,7 @@ export function AppointmentsPage() {
         <>
           <div className="calendar-toolbar">
             <select
-              aria-label="File"
+              aria-label={__t('ui.appointments.appointments_page.file_bygjtv')}
               value={selectedQueue?.queueId ?? 0}
               onChange={(e) => {
                 setQueueId(Number(e.target.value));
@@ -180,7 +190,7 @@ export function AppointmentsPage() {
                 move(-1);
               }}
             >
-              Précédent
+              {__t('ui.appointments.appointments_page.precedent_v4av9v')}
             </button>
             <strong>
               {dates[0]} — {dates.at(-1)}
@@ -192,7 +202,7 @@ export function AppointmentsPage() {
                 move(1);
               }}
             >
-              Suivant
+              {__t('ui.appointments.appointments_page.suivant_182am67')}
             </button>
           </div>
           {view === 'week' ? (
@@ -241,7 +251,7 @@ export function AppointmentsPage() {
                       >
                         <span>{time}</span>
                         {isBreak ? (
-                          <em>Pause</em>
+                          <em>{__t('ui.appointments.appointments_page.pause_j4z771')}</em>
                         ) : appointments.length ? (
                           appointments.map((item) => (
                             <button

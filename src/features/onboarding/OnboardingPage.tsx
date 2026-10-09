@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queuesControllerCreateForSite } from '@/api/generated/queues/queues';
@@ -31,6 +32,7 @@ const steps = [
 ];
 
 export function OnboardingPage() {
+  const { t: __t } = useTranslation();
   const [draft, setState] = useState<OnboardingDraft>(() => loadOnboardingDraft());
   const [queueOpen, setQueueOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -98,18 +100,23 @@ export function OnboardingPage() {
         setState(structuredClone(initialOnboardingDraft));
         notify({
           tone: 'success',
-          title: 'Site activé',
-          message: `${activatedSite} est prêt à être utilisé.`,
+          title: __t('notifications.site.activated'),
+          message: __t('notifications.site.activatedMessage', { site: activatedSite }),
           duration: 8_000,
         });
         setMessage(
-          `Le site ${activatedSite} est maintenant actif. La configuration est terminée et l’assistant a été réinitialisé.`,
+          __t(
+            'ui.expression.onboarding.onboarding_page.le_site_value0_est_maintenant_actif_la_confi_i2kxg7',
+            { value0: activatedSite },
+          ),
         );
         return;
       }
       value.step = Math.min(6, draft.step + 1);
       save(value);
-      setMessage('Étape enregistrée avec succès.');
+      setMessage(
+        __t('ui.expression.onboarding.onboarding_page.etape_enregistree_avec_succes_1ngds6l'),
+      );
     } catch (error) {
       notifyError(error);
       setMessage(error instanceof Error ? error.message : 'Erreur. Relancez cette étape.');
@@ -121,25 +128,38 @@ export function OnboardingPage() {
     <div className="page-stack admin-page">
       <PageHeader
         eyebrow="Administration guidée"
-        title="Configurer un nouveau site"
-        description="Une configuration progressive, enregistrée à chaque étape."
-        actions={<span className="status-badge status-info">Étape {draft.step} sur 6</span>}
+        title={__t('ui.onboarding.onboarding_page.configurer_un_nouveau_site_se1lly')}
+        description={__t(
+          'ui.onboarding.onboarding_page.une_configuration_progressive_enregistree_a_chaq_1a6adol',
+        )}
+        actions={
+          <span className="status-badge status-info">
+            {__t('ui.onboarding.onboarding_page.etape_1mygumc')}
+            {draft.step} {__t('ui.onboarding.onboarding_page.sur_6_13lm64r')}
+          </span>
+        }
       />
       {draft.confirmedSiteId ? (
         <Card className="resume-card">
           <div>
-            <b>Configuration reprise automatiquement</b>
+            <b>
+              {__t('ui.onboarding.onboarding_page.configuration_reprise_automatiquement_1omvb9k')}
+            </b>
             <p>
-              Site #{draft.confirmedSiteId} confirmé · {Object.keys(draft.confirmedQueueIds).length}{' '}
-              file(s) confirmée(s)
+              {__t('ui.onboarding.onboarding_page.site_olnjkb')}
+              {draft.confirmedSiteId} {__t('ui.onboarding.onboarding_page.confirme_1l0a5sj')}
+              {Object.keys(draft.confirmedQueueIds).length}{' '}
+              {__t('ui.onboarding.onboarding_page.file_s_confirmee_s_tysem1')}
             </p>
           </div>
-          <span className="status-badge status-success">Brouillon local</span>
+          <span className="status-badge status-success">
+            {__t('ui.onboarding.onboarding_page.brouillon_local_13vfu7e')}
+          </span>
         </Card>
       ) : null}
       <div className="onboarding-layout">
         <Card className="setup-navigation">
-          <h2>Parcours de configuration</h2>
+          <h2>{__t('ui.onboarding.onboarding_page.parcours_de_configuration_ho7ct7')}</h2>
           {steps.map((label, index) => (
             <button
               key={label}
@@ -154,7 +174,9 @@ export function OnboardingPage() {
                 <b>{label}</b>
               </span>
               {index + 1 < draft.step ? (
-                <span className="status-badge status-success">Terminé</span>
+                <span className="status-badge status-success">
+                  {__t('ui.onboarding.onboarding_page.termine_1osoj4f')}
+                </span>
               ) : null}
             </button>
           ))}
@@ -193,7 +215,7 @@ export function OnboardingPage() {
                 save({ ...draft, step: draft.step - 1 });
               }}
             >
-              ← Précédent
+              {__t('ui.onboarding.onboarding_page.precedent_1jxxpxn')}
             </button>
             <div>
               <button
@@ -202,7 +224,7 @@ export function OnboardingPage() {
                   saveOnboardingDraft(draft);
                 }}
               >
-                Enregistrer le brouillon
+                {__t('ui.onboarding.onboarding_page.enregistrer_le_brouillon_l3dxt2')}
               </button>
               <button
                 className="button button-primary"
@@ -217,7 +239,9 @@ export function OnboardingPage() {
                 }
                 onClick={() => void next()}
               >
-                {draft.step === 6 ? 'Activer le site' : 'Enregistrer et continuer →'}
+                {draft.step === 6
+                  ? __t('ui.expression.onboarding.onboarding_page.activer_le_site_o1qxct')
+                  : __t('ui.expression.onboarding.onboarding_page.enregistrer_et_continuer_86kufl')}
               </button>
             </div>
           </div>
@@ -255,16 +279,17 @@ function Identity({
   draft: OnboardingDraft;
   update: (key: keyof OnboardingDraft['site'], value: unknown) => void;
 }) {
+  const { t: __t } = useTranslation();
   const s = draft.site;
   return (
     <section>
       <Title
-        title="Identité du site"
-        text="Le nom est requis ; les autres champs reçoivent les defaults API."
+        title={__t('ui.onboarding.onboarding_page.identite_du_site_zo71q1')}
+        text={__t('onboarding.siteIdentityHelp')}
       />
       <div className="form-grid">
         <label>
-          Nom du site *
+          {__t('ui.onboarding.onboarding_page.nom_du_site_8jydmt')}
           <input
             required
             maxLength={100}
@@ -276,19 +301,19 @@ function Identity({
           />
         </label>
         <label>
-          Type
+          {__t('ui.onboarding.onboarding_page.type_1m2zofh')}
           <select
             value={s.siteType}
             onChange={(e) => {
               update('siteType', e.target.value);
             }}
           >
-            <option value="public">Public</option>
-            <option value="private">Privé</option>
+            <option value="public">{__t('ui.onboarding.onboarding_page.public_1kufgkg')}</option>
+            <option value="private">{__t('ui.onboarding.onboarding_page.prive_wl0j0n')}</option>
           </select>
         </label>
         <label>
-          Localisation
+          {__t('ui.onboarding.onboarding_page.localisation_17ojrsd')}
           <input
             maxLength={255}
             value={s.siteLocation ?? ''}
@@ -298,7 +323,7 @@ function Identity({
           />
         </label>
         <label>
-          URL du logo
+          {__t('ui.onboarding.onboarding_page.url_du_logo_c2wc60')}
           <input
             type="url"
             value={s.siteLogoUrl ?? ''}
@@ -308,29 +333,29 @@ function Identity({
           />
         </label>
         <label>
-          Fuseau IANA
+          {__t('ui.onboarding.onboarding_page.fuseau_iana_1oq0ubh')}
           <select
             value={s.timezone}
             onChange={(e) => {
               update('timezone', e.target.value);
             }}
           >
-            <option>Africa/Tunis</option>
-            <option>Europe/Paris</option>
-            <option>Africa/Casablanca</option>
+            <option>{__t('ui.onboarding.onboarding_page.africa_tunis_19dhj3f')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.europe_paris_uijlvz')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.africa_casablanca_17mzro5')}</option>
           </select>
         </label>
         <label>
-          Locale
+          {__t('ui.onboarding.onboarding_page.locale_1pfta5z')}
           <select
             value={s.defaultLocale}
             onChange={(e) => {
               update('defaultLocale', e.target.value);
             }}
           >
-            <option>fr</option>
-            <option>ar</option>
-            <option>en</option>
+            <option>{__t('ui.onboarding.onboarding_page.fr_o6dm29')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.ar_puedq2')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.en_i2aop6')}</option>
           </select>
         </label>
       </div>
@@ -344,6 +369,7 @@ function Defaults({
   draft: OnboardingDraft;
   update: (key: keyof OnboardingDraft['site'], value: unknown) => void;
 }) {
+  const { t: __t } = useTranslation();
   const s = draft.site;
   const n = (key: keyof OnboardingDraft['site'], value: string) => {
     update(key, Number(value));
@@ -351,25 +377,25 @@ function Defaults({
   return (
     <section>
       <Title
-        title="Defaults opérationnels du site"
-        text="Ces valeurs deviennent les paramètres hérités des files."
+        title={__t('ui.onboarding.onboarding_page.defaults_operationnels_du_site_14zcjwg')}
+        text={__t('onboarding.defaultsHelp')}
       />
       <div className="form-grid">
         <label>
-          Devise
+          {__t('ui.onboarding.onboarding_page.devise_1pl1r6r')}
           <select
             value={s.defaultCurrency}
             onChange={(e) => {
               update('defaultCurrency', e.target.value);
             }}
           >
-            <option>TND</option>
-            <option>EUR</option>
-            <option>USD</option>
+            <option>{__t('ui.onboarding.onboarding_page.tnd_gge1jd')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.eur_1i746uf')}</option>
+            <option>{__t('ui.onboarding.onboarding_page.usd_174gkvb')}</option>
           </select>
         </label>
         <label>
-          Durée créneau
+          {__t('ui.onboarding.onboarding_page.duree_creneau_m06yzt')}
           <input
             type="number"
             min="1"
@@ -380,7 +406,7 @@ function Defaults({
           />
         </label>
         <label>
-          Capacité
+          {__t('ui.onboarding.onboarding_page.capacite_1nhjc3d')}
           <input
             type="number"
             min="1"
@@ -391,7 +417,7 @@ function Defaults({
           />
         </label>
         <label>
-          Tolérance retard
+          {__t('ui.onboarding.onboarding_page.tolerance_retard_gttjc8')}
           <input
             type="number"
             min="0"
@@ -402,7 +428,7 @@ function Defaults({
           />
         </label>
         <label>
-          Ouverture
+          {__t('ui.onboarding.onboarding_page.ouverture_pawjjg')}
           <input
             type="time"
             value={s.defaultWorkingHoursStart}
@@ -412,7 +438,7 @@ function Defaults({
           />
         </label>
         <label>
-          Fermeture
+          {__t('ui.onboarding.onboarding_page.fermeture_46skya')}
           <input
             type="time"
             value={s.defaultWorkingHoursEnd}
@@ -422,7 +448,7 @@ function Defaults({
           />
         </label>
         <label>
-          Début interruption
+          {__t('ui.onboarding.onboarding_page.debut_interruption_p6tydw')}
           <input
             type="time"
             value={s.defaultBreakStart}
@@ -432,7 +458,7 @@ function Defaults({
           />
         </label>
         <label>
-          Fin interruption
+          {__t('ui.onboarding.onboarding_page.fin_interruption_rvpfsx')}
           <input
             type="time"
             value={s.defaultBreakEnd}
@@ -444,8 +470,8 @@ function Defaults({
       </div>
       <label className="check-row">
         <span>
-          <b>Rendez-vous activés par défaut</b>
-          <small>Hérité par les files</small>
+          <b>{__t('ui.onboarding.onboarding_page.rendez_vous_actives_par_defaut_1hj9c46')}</b>
+          <small>{__t('ui.onboarding.onboarding_page.herite_par_les_files_3hg7nw')}</small>
         </span>
         <input
           type="checkbox"
@@ -457,7 +483,7 @@ function Defaults({
       </label>
       <label className="check-row">
         <span>
-          <b>Reporter l’attente au lendemain</b>
+          <b>{__t('ui.onboarding.onboarding_page.reporter_l_attente_au_lendemain_fz0gel')}</b>
         </span>
         <input
           type="checkbox"
@@ -471,31 +497,36 @@ function Defaults({
   );
 }
 function QueuesStep({ draft, open }: { draft: OnboardingDraft; open: () => void }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Title
-        title="Files & guichets"
-        text="Choisissez l’héritage ou une surcharge propre à la file."
+        title={__t('ui.onboarding.onboarding_page.files_guichets_ez0b9k')}
+        text={__t('onboarding.queueOverrideHelp')}
         action={
           <button className="button button-primary" onClick={open}>
-            + Ajouter une file
+            {__t('ui.onboarding.onboarding_page.ajouter_une_file_1m9v20c')}
           </button>
         }
       />
       <div className="inheritance-note">
-        <b>Principe d’héritage</b>
-        <p>Une valeur absente ou remise à « Hériter » utilise le default du site.</p>
+        <b>{__t('ui.onboarding.onboarding_page.principe_d_heritage_fss2wz')}</b>
+        <p>
+          {__t(
+            'ui.onboarding.onboarding_page.une_valeur_absente_ou_remise_a_heriter_utilise_l_w8z1c5',
+          )}
+        </p>
       </div>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Nom</th>
-              <th>Guichets</th>
-              <th>RDV</th>
-              <th>Devise</th>
-              <th>API</th>
+              <th>{__t('ui.onboarding.onboarding_page.code_xoaiok')}</th>
+              <th>{__t('ui.onboarding.onboarding_page.nom_15eqct1')}</th>
+              <th>{__t('ui.onboarding.onboarding_page.guichets_j0id8z')}</th>
+              <th>{__t('ui.onboarding.onboarding_page.rdv_1f03hpr')}</th>
+              <th>{__t('ui.onboarding.onboarding_page.devise_1pl1r6r')}</th>
+              <th>{__t('ui.onboarding.onboarding_page.api_y14yjr')}</th>
             </tr>
           </thead>
           <tbody>
@@ -508,17 +539,21 @@ function QueuesStep({ draft, open }: { draft: OnboardingDraft; open: () => void 
                 <td>{q.threadCount ?? 1}</td>
                 <td>
                   {q.appointmentsEnabled === undefined
-                    ? 'Hérité'
+                    ? __t('ui.expression.onboarding.onboarding_page.herite_604lqs')
                     : q.appointmentsEnabled
-                      ? 'Activés'
-                      : 'Désactivés'}
+                      ? __t('ui.expression.onboarding.onboarding_page.actives_1ntg7nc')
+                      : __t('ui.expression.onboarding.onboarding_page.desactives_1jqymmi')}
                 </td>
-                <td>{q.currency || 'Héritée'}</td>
+                <td>
+                  {q.currency || __t('ui.expression.onboarding.onboarding_page.heritee_zqggrn')}
+                </td>
                 <td>
                   <span
                     className={`status-badge ${draft.confirmedQueueIds[q.queueCode] ? 'status-success' : ''}`}
                   >
-                    {draft.confirmedQueueIds[q.queueCode] ? 'Confirmée' : 'Brouillon'}
+                    {draft.confirmedQueueIds[q.queueCode]
+                      ? __t('ui.expression.onboarding.onboarding_page.confirmee_b2ivxx')
+                      : __t('ui.expression.onboarding.onboarding_page.brouillon_107uxdl')}
                   </span>
                 </td>
               </tr>
@@ -540,6 +575,7 @@ function TiersStep({
   draft: OnboardingDraft;
   save: (value: OnboardingDraft) => void;
 }) {
+  const { t: __t } = useTranslation();
   const queues = Object.entries(draft.confirmedQueueIds);
   const toggle = (queueId: number, tierId: number) => {
     const key = String(queueId);
@@ -557,13 +593,17 @@ function TiersStep({
   return (
     <section>
       <Title
-        title="Niveaux de service"
-        text="Sélectionnez au moins un niveau pour chaque file. Le premier niveau sélectionné sera proposé par défaut."
+        title={__t('ui.onboarding.onboarding_page.niveaux_de_service_1yfgjsz')}
+        text={__t('onboarding.tiersHelp')}
       />
-      {loading ? <p>Chargement du catalogue…</p> : null}
+      {loading ? (
+        <p>{__t('ui.onboarding.onboarding_page.chargement_du_catalogue_jb8lrx')}</p>
+      ) : null}
       {fixed.length === 0 && !loading ? (
         <p className="admin-message" role="alert">
-          Aucun niveau Gratuit, Standard ou Premium actif n’est disponible dans le catalogue API.
+          {__t(
+            'ui.onboarding.onboarding_page.aucun_niveau_gratuit_standard_ou_premium_actif_n_1ezzg3u',
+          )}
         </p>
       ) : null}
       {queues.map(([queueCode, queueId]) => {
@@ -573,12 +613,19 @@ function TiersStep({
             <div className="card-heading">
               <div>
                 <h3>{queueCode}</h3>
-                <p>{selected.length} niveau(x) sélectionné(s)</p>
+                <p>
+                  {selected.length}{' '}
+                  {__t('ui.onboarding.onboarding_page.niveau_x_selectionne_s_1jjwnqj')}
+                </p>
               </div>
               {selected.length ? (
-                <span className="status-badge status-success">Configuration prête</span>
+                <span className="status-badge status-success">
+                  {__t('ui.onboarding.onboarding_page.configuration_prete_zm42va')}
+                </span>
               ) : (
-                <span className="status-badge status-warning">Sélection requise</span>
+                <span className="status-badge status-warning">
+                  {__t('ui.onboarding.onboarding_page.selection_requise_10mlh1n')}
+                </span>
               )}
             </div>
             <div className="tier-card-grid">
@@ -595,7 +642,9 @@ function TiersStep({
                     }}
                   >
                     <span className={`status-badge ${isSelected ? 'status-success' : ''}`}>
-                      {isSelected ? 'Sélectionné' : 'Sélectionner'}
+                      {isSelected
+                        ? __t('ui.expression.onboarding.onboarding_page.selectionne_vsjazw')
+                        : __t('ui.expression.onboarding.onboarding_page.selectionner_xccxvi')}
                     </span>
                     <h3>{tier.tierName}</h3>
                     <p>{tier.description || tier.tierCode}</p>
@@ -610,20 +659,23 @@ function TiersStep({
   );
 }
 function TeamStep() {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Title
-        title="Équipe & appareils"
-        text="Comptes humains, kiosque et display avec leurs périmètres."
+        title={__t('ui.onboarding.onboarding_page.equipe_appareils_1to6dbn')}
+        text={__t('onboarding.accountsHelp')}
       />
       <div className="empty-admin-state">
         <span className="ticket-chip">5</span>
-        <h3>Assistant de comptes partagé</h3>
+        <h3>{__t('ui.onboarding.onboarding_page.assistant_de_comptes_partage_1xm12zj')}</h3>
         <p>
-          Créez le rôle initial puis affectez les sites et files dans la configuration centralisée.
+          {__t(
+            'ui.onboarding.onboarding_page.creez_le_role_initial_puis_affectez_les_sites_et_1atzy25',
+          )}
         </p>
         <a className="button button-primary" href="/settings/users">
-          Ouvrir les utilisateurs
+          {__t('ui.onboarding.onboarding_page.ouvrir_les_utilisateurs_1075h32')}
         </a>
       </div>
     </section>
@@ -636,6 +688,7 @@ function ReviewStep({
   draft: OnboardingDraft;
   save: (value: OnboardingDraft) => void;
 }) {
+  const { t: __t } = useTranslation();
   const checks = [
     ['Site et paramètres', Boolean(draft.confirmedSiteId)],
     ['Files et guichets', Object.keys(draft.confirmedQueueIds).length > 0],
@@ -643,22 +696,31 @@ function ReviewStep({
   ] as const;
   return (
     <section>
-      <Title title="Recette & activation" text="Validez le parcours avant l’ouverture au public." />
+      <Title
+        title={__t('ui.onboarding.onboarding_page.recette_activation_g8mgcf')}
+        text={__t('onboarding.validationHelp')}
+      />
       {checks.map(([label, done]) => (
         <div className="check-row" key={label}>
           <b>{label}</b>
           <span className={`status-badge ${done ? 'status-success' : 'status-warning'}`}>
-            {done ? 'Validé' : 'À faire'}
+            {done
+              ? __t('ui.expression.onboarding.onboarding_page.valide_cy7xbc')
+              : __t('ui.expression.onboarding.onboarding_page.a_faire_ds4uh6')}
           </span>
         </div>
       ))}
       <div className="check-row">
         <div>
-          <b>Test d’appel complet</b>
-          <p>Occuper un guichet, appeler puis servir.</p>
+          <b>{__t('ui.onboarding.onboarding_page.test_d_appel_complet_jj4cr6')}</b>
+          <p>
+            {__t('ui.onboarding.onboarding_page.occuper_un_guichet_appeler_puis_servir_rwhdmf')}
+          </p>
         </div>
         {draft.testValidated ? (
-          <span className="status-badge status-success">Validé</span>
+          <span className="status-badge status-success">
+            {__t('ui.onboarding.onboarding_page.valide_cy7xbc')}
+          </span>
         ) : (
           <button
             className="button"
@@ -666,7 +728,7 @@ function ReviewStep({
               save({ ...draft, testValidated: true });
             }}
           >
-            Lancer le test
+            {__t('ui.onboarding.onboarding_page.lancer_le_test_1isdfon')}
           </button>
         )}
       </div>

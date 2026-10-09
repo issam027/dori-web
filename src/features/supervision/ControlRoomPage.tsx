@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { notificationsControllerFindNotifications } from '@/api/generated/notifications/notifications';
@@ -23,6 +24,7 @@ import { slaTone } from './sla';
 import { notify } from '@/core/notifications/notification-store';
 
 export function ControlRoomPage() {
+  const { t: __t } = useTranslation();
   const siteId = useScopeStore((s) => s.activeSiteId);
   const user = useSessionStore((s) => s.user);
   const client = useQueryClient();
@@ -78,8 +80,10 @@ export function ControlRoomPage() {
       await client.invalidateQueries({ queryKey: ['reports'] });
       notify({
         tone: 'success',
-        title: 'File réinitialisée',
-        message: queueName ? `${queueName} a bien été réinitialisée.` : undefined,
+        title: __t('notifications.queue.reset'),
+        message: queueName
+          ? __t('notifications.queue.resetMessage', { queue: queueName })
+          : undefined,
       });
     },
   });
@@ -94,8 +98,10 @@ export function ControlRoomPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Pilotage"
-        title="Supervision temps réel"
-        description="Charge, guichets, sessions et alertes issues de l’API, actualisées toutes les 15 secondes."
+        title={__t('ui.supervision.control_room_page.supervision_temps_reel_1phf055')}
+        description={__t(
+          'ui.supervision.control_room_page.charge_guichets_sessions_et_alertes_issues_de_l__145vd08',
+        )}
       />
       <div className="metric-grid">
         {[
@@ -114,7 +120,9 @@ export function ControlRoomPage() {
         ))}
       </div>
       {!load.isLoading && !items.length ? (
-        <EmptyState title="Aucune file à superviser" />
+        <EmptyState
+          title={__t('ui.supervision.control_room_page.aucune_file_a_superviser_nfwqyo')}
+        />
       ) : (
         <div className="queue-card-grid">
           {items.map((queue, index) => {
@@ -131,30 +139,45 @@ export function ControlRoomPage() {
                     <h2>{queue.queueName}</h2>
                   </div>
                   <StatusBadge tone={tone}>
-                    SLA {status?.estimatedWaitMinutes ?? '—'} min
+                    {__t('ui.supervision.control_room_page.sla_jzx5rl')}
+                    {status?.estimatedWaitMinutes ?? '—'}{' '}
+                    {__t('ui.supervision.control_room_page.min_1jxbmtz')}
                   </StatusBadge>
                 </div>
                 <div className="queue-load">
                   <strong>{queue.waitingCount}</strong>
-                  <span>en attente · forfait dominant {queue.dominantTier}</span>
+                  <span>
+                    {__t('ui.supervision.control_room_page.en_attente_forfait_dominant_qg8jh9')}
+                    {queue.dominantTier}
+                  </span>
                 </div>
                 <p>
-                  {status?.activeThreads ?? 0} guichet(s) actif(s) · {queueSessions.length}{' '}
-                  session(s)
+                  {status?.activeThreads ?? 0}{' '}
+                  {__t('ui.supervision.control_room_page.guichet_s_actif_s_9ozuae')}
+                  {queueSessions.length} {__t('ui.supervision.control_room_page.session_s_1mascuh')}
                 </p>
                 {queueSessions.length ? (
                   <ul className="compact-list">
                     {queueSessions.map((session) => (
                       <li key={session.sessionId}>
-                        Guichet {session.threadNumber ?? 'flottant'} ·{' '}
-                        {session.username ?? `opérateur #${String(session.userId)}`}
+                        {__t('ui.supervision.control_room_page.guichet_15ztv8y')}
+                        {session.threadNumber ??
+                          __t('ui.expression.supervision.control_room_page.flottant_1p6rb7l')}{' '}
+                        ·{' '}
+                        {session.username ??
+                          __t(
+                            'ui.expression.supervision.control_room_page.operateur_value0_117wv0a',
+                            { value0: String(session.userId) },
+                          )}
                       </li>
                     ))}
                   </ul>
                 ) : null}
                 {tone === 'danger' ? (
                   <p className="alert-inline" role="alert">
-                    Seuil local de vigilance dépassé : vérifiez la charge de cette file.
+                    {__t(
+                      'ui.supervision.control_room_page.seuil_local_de_vigilance_depasse_verifiez_la_cha_1prw58b',
+                    )}
                   </p>
                 ) : null}
                 {hasPermission(user, 'queue_edit') ? (
@@ -165,7 +188,7 @@ export function ControlRoomPage() {
                       setResetQueue({ id: queue.queueId, name: queue.queueName });
                     }}
                   >
-                    Réinitialisation d’urgence
+                    {__t('ui.supervision.control_room_page.reinitialisation_d_urgence_1tnfw2n')}
                   </button>
                 ) : null}
               </Card>
@@ -174,14 +197,19 @@ export function ControlRoomPage() {
         </div>
       )}
       <Card>
-        <h2>Notifications récentes</h2>
+        <h2>{__t('ui.supervision.control_room_page.notifications_recentes_vf482q')}</h2>
         <ul className="compact-list">
           {notifications.data?.data.items.map((notification) => (
             <li key={notification.notificationId}>
               <strong>
-                {notification.ticketNumber ?? `#${String(notification.registrationId)}`}
+                {notification.ticketNumber ??
+                  __t('ui.expression.supervision.control_room_page.value0_g7s8cl', {
+                    value0: String(notification.registrationId),
+                  })}
               </strong>{' '}
-              · {notification.channel.toUpperCase()} vers {maskRecipient(notification.recipient)} ·{' '}
+              · {notification.channel.toUpperCase()}{' '}
+              {__t('ui.supervision.control_room_page.vers_1r1ik4j')}
+              {maskRecipient(notification.recipient)} ·{' '}
               <StatusBadge
                 tone={
                   notification.notificationStatus === 'failed'
@@ -202,7 +230,7 @@ export function ControlRoomPage() {
         onOpenChange={(open) => {
           if (!open) setResetQueue(undefined);
         }}
-        title="Réinitialisation d’urgence"
+        title={__t('ui.supervision.control_room_page.reinitialisation_d_urgence_1tnfw2n')}
         description={`La file « ${resetQueue?.name ?? ''} » sera réinitialisée. Les inscriptions en attente du jour seront clôturées selon le mode configuré côté serveur. Cette action ne peut pas être annulée.`}
         confirmLabel={reset.isPending ? 'Réinitialisation…' : 'Confirmer la réinitialisation'}
         destructive

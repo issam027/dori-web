@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { i18n } from '@/core/i18n/i18n';
+import { i18n, loadTranslationBundle } from '@/core/i18n/i18n';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 
 export function PreferenceSynchronizer() {
@@ -11,7 +11,7 @@ export function PreferenceSynchronizer() {
     document.documentElement.dir = ['ar', 'fa', 'he', 'ur'].includes(locale.split('-')[0] ?? '')
       ? 'rtl'
       : 'ltr';
-    void i18n.changeLanguage(locale);
+    void loadTranslationBundle(locale, 'ihm').catch(() => i18n.changeLanguage(locale));
   }, [locale]);
 
   useEffect(() => {

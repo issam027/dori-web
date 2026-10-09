@@ -1,46 +1,69 @@
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery } from '@tanstack/react-query';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
   RegistrationResponseDto,
 } from '@/api/generated/models';
-import { queuesControllerFindAll } from '@/api/generated/queues/queues';
+import { queuesControllerFindAll, queuesControllerGetStatus } from '@/api/generated/queues/queues';
 import {
   registrationsControllerCheckIn,
   registrationsControllerLookup,
   registrationsControllerRegister,
 } from '@/api/generated/registrations/registrations';
-import { serviceTiersControllerGetQueueTiers } from '@/api/generated/tiers/tiers';
+import {
+  serviceTiersControllerGetQueueTiers,
+  serviceTiersControllerGetRules,
+} from '@/api/generated/tiers/tiers';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
 import { TrackingQr } from './TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from './useKioskWatchdog';
+import { presentError } from '@/core/notifications/error-presentation';
+import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 
 type Flow = 'home' | 'walkin' | 'appointment' | 'result';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber' | 'trackingUrl'> & {
   queueName?: string;
 };
 
+function trackingUrlOnCurrentHost(value?: string | null): string | null {
+  if (!value) return null;
+  const source = new URL(value, window.location.origin);
+  const token = source.searchParams.get('token');
+  if (!token) return null;
+  return `${window.location.origin}/track?token=${encodeURIComponent(token)}`;
+}
+
 export function KioskPage() {
+  const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const [flow, setFlow] = useState<Flow>('home');
+  const [walkinStep, setWalkinStep] = useState<1 | 2 | 3 | 4>(1);
   const [queueId, setQueueId] = useState<number>();
   const [tier, setTier] = useState<QueueTierResponseDto>();
   const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneCountry, setPhoneCountry] = useState('+33');
+  const [phoneNational, setPhoneNational] = useState('');
   const [ticket, setTicket] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [found, setFound] = useState<RegistrationResponseDto>();
   const [result, setResult] = useState<Result>();
   const purge = useCallback(() => {
     setFlow('home');
+    setWalkinStep(1);
     setQueueId(undefined);
     setTier(undefined);
     setLastName('');
-    setPhone('');
+    setFirstName('');
+    setEmail('');
+    setPhoneCountry('+33');
+    setPhoneNational('');
     setTicket('');
     setScheduledTime('');
     setFound(undefined);
@@ -66,6 +89,12 @@ export function KioskPage() {
         pageSize: 100,
       }),
   });
+  const queueStatuses = useQueries({
+    queries: (queues.data?.data.items ?? []).map((queue) => ({
+      queryKey: ['kiosk', 'queue-status', queue.queueId],
+      queryFn: () => queuesControllerGetStatus(queue.queueId),
+    })),
+  });
   const tiers = useQuery({
     queryKey: ['kiosk', 'tiers', queueId],
     enabled: Boolean(queueId),
@@ -76,6 +105,17 @@ export function KioskPage() {
         sort: 'displayOrder:asc',
       }),
   });
+  const tierRules = useQueries({
+    queries: (tiers.data?.data.items ?? []).map((item) => ({
+      queryKey: ['kiosk', 'tier-rules', item.queueId, item.tierId],
+      queryFn: () =>
+        serviceTiersControllerGetRules(item.queueId, item.tierId, { page: 1, pageSize: 100 }),
+      enabled: item.isActive,
+    })),
+  });
+  const phone = `${phoneCountry}${phoneNational.replace(/\D/g, '').replace(/^0+/, '')}`;
+  const phoneValid = /^\+[1-9]\d{6,14}$/.test(phone);
+  const emailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const register = useMutation({
     mutationFn: () => {
       if (!queueId || !tier) throw new Error('File et forfait requis');
@@ -87,6 +127,8 @@ export function KioskPage() {
         person: {
           lastName,
           phoneNumber: phone,
+          ...(firstName.trim() ? { firstName: firstName.trim() } : {}),
+          ...(email.trim() ? { email: email.trim() } : {}),
           languagePreference: document.documentElement.lang || 'fr',
         },
       });
@@ -94,12 +136,17 @@ export function KioskPage() {
     onSuccess: ({ data }) => {
       setResult({
         ticketNumber: data.ticketNumber,
-        trackingUrl: data.trackingUrl,
+        trackingUrl: trackingUrlOnCurrentHost(data.trackingUrl),
         queueName: queues.data?.data.items.find((item) => item.queueId === queueId)?.queueName,
       });
       setFlow('result');
     },
   });
+  const registrationError = register.error
+    ? register.error instanceof NormalizedApiError && register.error.status === 409
+      ? 'Ce numéro de téléphone est déjà associé à une personne. Adressez-vous à l’accueil pour retrouver votre dossier.'
+      : presentError(register.error).message
+    : '';
   const lookup = useMutation({
     mutationFn: () =>
       registrationsControllerLookup(
@@ -131,8 +178,12 @@ export function KioskPage() {
   if (!validScope)
     return (
       <section className="kiosk-screen">
-        <h1>Borne indisponible</h1>
-        <p>Sélectionnez un site actif pour utiliser cette expérience.</p>
+        <h1>{__t('ui.public-experiences.kiosk_page.borne_indisponible_crj57x')}</h1>
+        <p>
+          {__t(
+            'ui.public-experiences.kiosk_page.selectionnez_un_site_actif_pour_utiliser_cette_e_p6tmjj',
+          )}
+        </p>
       </section>
     );
   if (!queues.isPending && queues.data?.data.items.length === 0)
@@ -141,8 +192,12 @@ export function KioskPage() {
         <span className="empty-state-icon" aria-hidden="true">
           ≡
         </span>
-        <h1>Aucune file configurée</h1>
-        <p>Ce site ne dispose actuellement d’aucune file active.</p>
+        <h1>{__t('ui.public-experiences.kiosk_page.aucune_file_configuree_1rf5ow7')}</h1>
+        <p>
+          {__t(
+            'ui.public-experiences.kiosk_page.ce_site_ne_dispose_actuellement_d_aucune_file_ac_7s9gmf',
+          )}
+        </p>
       </section>
     );
   return (
@@ -154,16 +209,28 @@ export function KioskPage() {
     >
       {watchdog.warning && flow !== 'home' ? (
         <div className="kiosk-timeout" role="alertdialog" aria-live="assertive">
-          <strong>Session inactive</strong>
-          <span>Effacement dans {watchdog.remainingSeconds} secondes.</span>
+          <strong>{__t('ui.public-experiences.kiosk_page.session_inactive_1jzrqso')}</strong>
+          <span>
+            {__t('ui.public-experiences.kiosk_page.effacement_dans_1ror7ih')}
+            {watchdog.remainingSeconds} {__t('ui.public-experiences.kiosk_page.secondes_1kq4svx')}
+          </span>
           <button type="button" className="button button-primary" onClick={watchdog.prolong}>
-            Continuer
+            {__t('ui.public-experiences.kiosk_page.continuer_1dbvwde')}
           </button>
         </div>
       ) : null}
       {flow === 'home' ? (
         <>
-          <h1>Comment pouvons-nous vous aider ?</h1>
+          <div className="kiosk-welcome">
+            <h1>
+              {__t('ui.public-experiences.kiosk_page.comment_pouvons_nous_vous_accueillir_1ii9ogv')}
+            </h1>
+            <p>
+              {__t(
+                'ui.public-experiences.kiosk_page.touchez_votre_situation_pour_commencer_covkye',
+              )}
+            </p>
+          </div>
           <div className="kiosk-choices">
             <button
               type="button"
@@ -171,7 +238,7 @@ export function KioskPage() {
                 setFlow('walkin');
               }}
             >
-              Je viens sans rendez-vous
+              {__t('ui.public-experiences.kiosk_page.je_viens_sans_rendez_vous_1reoz0q')}
             </button>
             <button
               type="button"
@@ -179,36 +246,192 @@ export function KioskPage() {
                 setFlow('appointment');
               }}
             >
-              J’ai un rendez-vous
+              {__t('ui.public-experiences.kiosk_page.j_ai_un_rendez_vous_fkfvt9')}
             </button>
           </div>
         </>
       ) : null}
       {flow === 'walkin' ? (
         <div className="kiosk-panel">
-          <h1>Prendre un ticket</h1>
-          <div className="kiosk-tiles">
-            {queues.data?.data.items.map((queue) => (
-              <button
-                type="button"
-                className={queueId === queue.queueId ? 'selected' : ''}
-                key={queue.queueId}
-                onClick={() => {
-                  setQueueId(queue.queueId);
-                  setTier(undefined);
-                }}
-              >
-                {queue.queueName}
-              </button>
+          <div className="kiosk-progress" aria-label={`Étape ${String(walkinStep)} sur 4`}>
+            {[1, 2, 3, 4].map((step) => (
+              <span className={step <= walkinStep ? 'done' : ''} key={step} />
             ))}
           </div>
-          {queueId ? (
-            <>
-              <h2>Choisissez votre forfait</h2>
-              <div className="kiosk-tiles">
-                {tiers.data?.data.items
-                  .filter((item) => item.isActive)
-                  .map((item) => (
+          <div className="kiosk-stage-title">
+            <span>
+              {__t('ui.public-experiences.kiosk_page.etape_1mygumc')}
+              {walkinStep} {__t('ui.public-experiences.kiosk_page.sur_4_145ldip')}
+            </span>
+            <h1>
+              {
+                [
+                  '',
+                  'Quel service souhaitez-vous ?',
+                  'Vos informations',
+                  'Votre niveau de service',
+                  'Vérifiez votre demande',
+                ][walkinStep]
+              }
+            </h1>
+            <p>
+              {
+                [
+                  '',
+                  'Choisissez la file qui correspond à votre besoin.',
+                  'Ces informations servent uniquement à créer et suivre votre ticket.',
+                  'Les options proposées sont celles configurées pour cette file.',
+                  'Confirmez les informations avant la création du ticket.',
+                ][walkinStep]
+              }
+            </p>
+          </div>
+          {walkinStep === 1 ? (
+            <div className="kiosk-tiles">
+              {queues.data?.data.items.map((queue, index) => (
+                <button
+                  type="button"
+                  className={queueId === queue.queueId ? 'selected' : ''}
+                  key={queue.queueId}
+                  onClick={() => {
+                    setQueueId(queue.queueId);
+                    setTier(undefined);
+                  }}
+                >
+                  <small>
+                    {__t('ui.public-experiences.kiosk_page.service_disponible_1wf3ald')}
+                  </small>
+                  <strong>{queue.queueName}</strong>
+                  <span className="kiosk-wait-estimate">
+                    {queueStatuses[index]?.data
+                      ? __t(
+                          'ui.expression.public-experiences.kiosk_page.environ_value0_min_value1_en_attente_fu76o',
+                          {
+                            value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
+                            value1: String(queueStatuses[index].data.data.waitingCount),
+                          },
+                        )
+                      : __t(
+                          'ui.expression.public-experiences.kiosk_page.estimation_en_cours_oo9gjf',
+                        )}
+                  </span>
+                  <span>
+                    {queueId === queue.queueId
+                      ? __t('ui.expression.public-experiences.kiosk_page.selectionne_vsjazw')
+                      : __t(
+                          'ui.expression.public-experiences.kiosk_page.choisir_ce_service_1ymypmf',
+                        )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {walkinStep === 2 ? (
+            <div className="kiosk-form-grid">
+              <label>
+                {__t('ui.public-experiences.kiosk_page.nom_de_famille_pi8khu')}
+                <span className="required-mark">*</span>
+                <input
+                  autoComplete="family-name"
+                  value={lastName}
+                  onChange={(event) => {
+                    setLastName(event.target.value);
+                  }}
+                />
+              </label>
+              <label>
+                {__t('ui.public-experiences.kiosk_page.prenom_h4ba4')}
+                <span className="optional">
+                  {__t('ui.public-experiences.kiosk_page.optionnel_aqr9af')}
+                </span>
+                <input
+                  autoComplete="given-name"
+                  value={firstName}
+                  onChange={(event) => {
+                    setFirstName(event.target.value);
+                  }}
+                />
+              </label>
+              <label>
+                {__t('ui.public-experiences.kiosk_page.email_inbfc7')}
+                <span className="optional">
+                  {__t('ui.public-experiences.kiosk_page.optionnel_aqr9af')}
+                </span>
+                <input
+                  autoComplete="email"
+                  type="email"
+                  value={email}
+                  aria-invalid={!emailValid}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                  }}
+                />
+                <small>
+                  {emailValid
+                    ? __t(
+                        'ui.expression.public-experiences.kiosk_page.pour_recevoir_les_informations_si_le_service_1yuhipt',
+                      )
+                    : __t(
+                        'ui.expression.public-experiences.kiosk_page.saisissez_une_adresse_email_valide_1vym397',
+                      )}
+                </small>
+              </label>
+              <label>
+                {__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                <span className="required-mark">*</span>
+                <div className="kiosk-phone-input">
+                  <select
+                    aria-label={__t('ui.public-experiences.kiosk_page.indicatif_pays_1krknxf')}
+                    value={phoneCountry}
+                    onChange={(event) => {
+                      setPhoneCountry(event.target.value);
+                    }}
+                  >
+                    <option value="+33">🇫🇷 +33</option>
+                    <option value="+216">🇹🇳 +216</option>
+                    <option value="+32">🇧🇪 +32</option>
+                    <option value="+41">🇨🇭 +41</option>
+                    <option value="+212">🇲🇦 +212</option>
+                    <option value="+213">🇩🇿 +213</option>
+                  </select>
+                  <input
+                    autoComplete="tel-national"
+                    inputMode="numeric"
+                    placeholder="6 12 34 56 78"
+                    value={phoneNational}
+                    onChange={(event) => {
+                      setPhoneNational(event.target.value.replace(/[^0-9 ]/g, ''));
+                    }}
+                  />
+                </div>
+                <small>
+                  {phoneValid
+                    ? __t(
+                        'ui.expression.public-experiences.kiosk_page.numero_enregistre_value0_18ylmh4',
+                        { value0: phone },
+                      )
+                    : __t(
+                        'ui.expression.public-experiences.kiosk_page.choisissez_le_pays_puis_saisissez_le_numero_ohnccb',
+                      )}
+                </small>
+              </label>
+            </div>
+          ) : null}
+          {walkinStep === 3 ? (
+            <div className="kiosk-tiles kiosk-tier-tiles">
+              {tiers.data?.data.items
+                .filter((item) => item.isActive)
+                .map((item) => {
+                  const tierIndex = tiers.data.data.items.findIndex(
+                    (candidate) => candidate.tierId === item.tierId,
+                  );
+                  const rules =
+                    tierRules[tierIndex]?.data?.data.items.filter((rule) => rule.isActive) ?? [];
+                  const hasWelcome = rules.some((rule) => rule.notificationType === 'welcome');
+                  const hasThreshold = rules.some((rule) => rule.notificationType === 'threshold');
+                  const hasSms = rules.some((rule) => rule.channel === 'sms');
+                  const hasTracking = rules.some((rule) => rule.includeTrackingLink);
+                  return (
                     <button
                       type="button"
                       className={tier?.tierId === item.tierId ? 'selected' : ''}
@@ -217,68 +440,191 @@ export function KioskPage() {
                         setTier(item);
                       }}
                     >
-                      <strong>{item.tier?.tierName ?? `Forfait ${String(item.tierId)}`}</strong>
+                      <small>
+                        {item.isDefault
+                          ? __t('ui.expression.public-experiences.kiosk_page.recommande_ho1o0g')
+                          : __t(
+                              'ui.expression.public-experiences.kiosk_page.option_disponible_16egb8x',
+                            )}
+                      </small>
+                      <strong>
+                        {item.tier?.tierName ??
+                          __t(
+                            'ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z',
+                            { value0: String(item.tierId) },
+                          )}
+                      </strong>
                       <span>
                         {new Intl.NumberFormat(undefined, {
                           style: 'currency',
                           currency: item.currency,
                         }).format(item.price)}
                       </span>
+                      <ul className="kiosk-tier-benefits">
+                        <li className={hasSms ? 'included' : ''}>
+                          {__t('ui.public-experiences.kiosk_page.sms_q3rkiy')}
+                          {hasSms
+                            ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
+                            : __t(
+                                'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
+                              )}
+                        </li>
+                        <li className={hasWelcome ? 'included' : ''}>
+                          {__t('ui.public-experiences.kiosk_page.message_de_bienvenue_1pfo98i')}
+                          {hasWelcome
+                            ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
+                            : __t(
+                                'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
+                              )}
+                        </li>
+                        <li className={hasThreshold ? 'included' : ''}>
+                          {__t('ui.public-experiences.kiosk_page.alerte_d_approche_1d977f9')}
+                          {hasThreshold
+                            ? __t('ui.expression.public-experiences.kiosk_page.incluse_nqq1lk')
+                            : __t(
+                                'ui.expression.public-experiences.kiosk_page.non_configuree_136zuar',
+                              )}
+                        </li>
+                        <li className={hasTracking ? 'included' : ''}>
+                          {__t('ui.public-experiences.kiosk_page.lien_de_suivi_zldvh6')}
+                          {hasTracking
+                            ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
+                            : __t(
+                                'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
+                              )}
+                        </li>
+                      </ul>
                     </button>
-                  ))}
-              </div>
-            </>
+                  );
+                })}
+            </div>
           ) : null}
-          <label>
-            Nom
-            <input
-              autoComplete="off"
-              value={lastName}
-              onChange={(event) => {
-                setLastName(event.target.value);
-              }}
-            />
-          </label>
-          <label>
-            Téléphone
-            <input
-              autoComplete="off"
-              inputMode="tel"
-              placeholder="+33612345678"
-              value={phone}
-              onChange={(event) => {
-                setPhone(event.target.value);
-              }}
-            />
-          </label>
+          {walkinStep === 4 ? (
+            <div className="kiosk-review">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.service_1eklb0k')}</th>
+                    <td>
+                      {queues.data?.data.items.find((item) => item.queueId === queueId)?.queueName}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.attente_estimee_wo76kg')}</th>
+                    <td>
+                      {queueId
+                        ? __t(
+                            'ui.expression.public-experiences.kiosk_page.value0_minutes_1yug5bb',
+                            {
+                              value0: String(
+                                queueStatuses[
+                                  queues.data?.data.items.findIndex(
+                                    (item) => item.queueId === queueId,
+                                  ) ?? -1
+                                ]?.data?.data.estimatedWaitMinutes ?? '—',
+                              ),
+                            },
+                          )
+                        : '—'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.nom_15eqct1')}</th>
+                    <td>{lastName}</td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.prenom_h4ba4')}</th>
+                    <td>
+                      {firstName ||
+                        __t('ui.expression.public-experiences.kiosk_page.non_renseigne_un1dwo')}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.email_inbfc7')}</th>
+                    <td>
+                      {email ||
+                        __t('ui.expression.public-experiences.kiosk_page.non_renseigne_un1dwo')}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}</th>
+                    <td>{phone}</td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.niveau_de_service_1g6qs3d')}</th>
+                    <td>
+                      {tier?.tier?.tierName ??
+                        __t('ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z', {
+                          value0: String(tier?.tierId ?? ''),
+                        })}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>{__t('ui.public-experiences.kiosk_page.tarif_1fpn4rv')}</th>
+                    <td>
+                      {tier
+                        ? new Intl.NumberFormat(undefined, {
+                            style: 'currency',
+                            currency: tier.currency,
+                          }).format(tier.price)
+                        : '—'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+          {registrationError ? (
+            <div className="kiosk-error" role="alert">
+              <strong>
+                {__t('ui.public-experiences.kiosk_page.inscription_impossible_jqnxnm')}
+              </strong>
+              <p>{registrationError}</p>
+              <span>
+                {__t(
+                  'ui.public-experiences.kiosk_page.verifiez_vos_informations_ou_demandez_de_l_aide__wwhufs',
+                )}
+              </span>
+            </div>
+          ) : null}
           <div className="kiosk-actions">
-            <button type="button" onClick={purge}>
-              Retour
+            <button
+              type="button"
+              onClick={() => {
+                if (walkinStep === 1) purge();
+                else setWalkinStep((walkinStep - 1) as 1 | 2 | 3);
+              }}
+            >
+              {__t('ui.public-experiences.kiosk_page.retour_18dwyy2')}
             </button>
             <button
               type="button"
               className="primary"
               disabled={
-                !queueId ||
-                !tier ||
-                !lastName.trim() ||
-                !/^\+[1-9]\d{6,14}$/.test(phone) ||
-                register.isPending
+                (walkinStep === 1 && !queueId) ||
+                (walkinStep === 2 && (!lastName.trim() || !phoneValid || !emailValid)) ||
+                (walkinStep === 3 && !tier) ||
+                (walkinStep === 4 && register.isPending)
               }
               onClick={() => {
-                register.mutate();
+                if (walkinStep === 4) register.mutate();
+                else setWalkinStep((walkinStep + 1) as 2 | 3 | 4);
               }}
             >
-              Obtenir mon ticket
+              {walkinStep === 4
+                ? register.isPending
+                  ? __t('ui.expression.public-experiences.kiosk_page.creation_uqudte')
+                  : __t('ui.expression.public-experiences.kiosk_page.creer_mon_ticket_csckmy')
+                : __t('ui.expression.public-experiences.kiosk_page.continuer_5vzly4')}
             </button>
           </div>
         </div>
       ) : null}
       {flow === 'appointment' ? (
         <div className="kiosk-panel">
-          <h1>Retrouver mon rendez-vous</h1>
+          <h1>{__t('ui.public-experiences.kiosk_page.retrouver_mon_rendez_vous_1w6p9nd')}</h1>
           <label>
-            Numéro de ticket
+            {__t('ui.public-experiences.kiosk_page.numero_de_ticket_17ymtl0')}
             <input
               autoComplete="off"
               value={ticket}
@@ -287,9 +633,9 @@ export function KioskPage() {
               }}
             />
           </label>
-          <p className="separator">ou</p>
+          <p className="separator">{__t('ui.public-experiences.kiosk_page.ou_pkzwmp')}</p>
           <label>
-            Nom
+            {__t('ui.public-experiences.kiosk_page.nom_15eqct1')}
             <input
               autoComplete="off"
               value={lastName}
@@ -299,7 +645,7 @@ export function KioskPage() {
             />
           </label>
           <label>
-            Heure prévue
+            {__t('ui.public-experiences.kiosk_page.heure_prevue_m6637b')}
             <input
               type="datetime-local"
               value={scheduledTime}
@@ -316,13 +662,14 @@ export function KioskPage() {
               lookup.mutate();
             }}
           >
-            Rechercher
+            {__t('ui.public-experiences.kiosk_page.rechercher_1jzbmpc')}
           </button>
           {found ? (
             <Card>
-              <h2>Rendez-vous trouvé</h2>
+              <h2>{__t('ui.public-experiences.kiosk_page.rendez_vous_trouve_u0yq2a')}</h2>
               <p>
-                Ticket <strong>{found.ticketNumber}</strong>
+                {__t('ui.public-experiences.kiosk_page.ticket_1nrpxxh')}
+                <strong>{found.ticketNumber}</strong>
               </p>
               <p>
                 {found.businessDate} ·{' '}
@@ -331,7 +678,7 @@ export function KioskPage() {
                       hour: '2-digit',
                       minute: '2-digit',
                     })
-                  : 'heure non fournie'}
+                  : __t('ui.expression.public-experiences.kiosk_page.heure_non_fournie_cgiv4n')}
               </p>
               <button
                 type="button"
@@ -341,32 +688,54 @@ export function KioskPage() {
                   checkIn.mutate();
                 }}
               >
-                Confirmer ma présence
+                {__t('ui.public-experiences.kiosk_page.confirmer_ma_presence_1efjx0r')}
               </button>
             </Card>
           ) : null}
           <button type="button" onClick={purge}>
-            Retour à l’accueil
+            {__t('ui.public-experiences.kiosk_page.retour_a_l_accueil_48kqql')}
           </button>
         </div>
       ) : null}
       {flow === 'result' && result ? (
         <div className="kiosk-result">
-          <p>Votre ticket</p>
-          <strong>{result.ticketNumber}</strong>
-          <h1>{result.queueName}</h1>
-          <TrackingQr value={result.trackingUrl} />
-          <button
-            type="button"
-            onClick={() => {
-              window.print();
-            }}
-          >
-            Imprimer mon ticket
-          </button>
-          <button type="button" className="primary" onClick={purge}>
-            Terminer
-          </button>
+          <div className="kiosk-result-heading">
+            <span className="kiosk-result-check" aria-hidden="true">
+              ✓
+            </span>
+            <div>
+              <p className="eyebrow">
+                {__t('ui.public-experiences.kiosk_page.inscription_confirmee_kt7nz')}
+              </p>
+              <h1>{__t('ui.public-experiences.kiosk_page.votre_ticket_est_pret_12garfj')}</h1>
+            </div>
+          </div>
+          <div className="kiosk-ticket-result">
+            <div>
+              <small>{__t('ui.public-experiences.kiosk_page.numero_de_ticket_v2lgk')}</small>
+              <strong>{result.ticketNumber}</strong>
+              <span>{result.queueName}</span>
+            </div>
+            <TrackingQr value={result.trackingUrl} />
+          </div>
+          <p className="kiosk-result-guidance">
+            {__t(
+              'ui.public-experiences.kiosk_page.conservez_ce_ticket_et_suivez_l_ecran_de_salle_s_11uvt5o',
+            )}
+          </p>
+          <div className="kiosk-result-actions">
+            <button
+              type="button"
+              onClick={() => {
+                window.print();
+              }}
+            >
+              {__t('ui.public-experiences.kiosk_page.imprimer_mon_ticket_xbrafa')}
+            </button>
+            <button type="button" className="primary" onClick={purge}>
+              {__t('ui.public-experiences.kiosk_page.terminer_19zht57')}
+            </button>
+          </div>
         </div>
       ) : null}
     </section>

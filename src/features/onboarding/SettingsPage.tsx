@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -34,6 +35,7 @@ import { UserAccountWizard } from '@/features/users/UserAccountWizard';
 const sections = ['sites', 'queues', 'users', 'tiers', 'notifications', 'translations'] as const;
 type Section = (typeof sections)[number];
 export function SettingsPage() {
+  const { t: __t } = useTranslation();
   const location = useLocation(),
     qc = useQueryClient(),
     siteId = useScopeStore((s) => s.activeSiteId),
@@ -87,19 +89,32 @@ export function SettingsPage() {
     <div className="page-stack admin-page">
       <PageHeader
         eyebrow="Administration"
-        title="Configuration du service"
-        description="Gérez les ressources réellement proposées par DORI."
+        title={__t('ui.onboarding.settings_page.configuration_du_service_s0tb4b')}
+        description={__t(
+          'ui.onboarding.settings_page.gerez_les_ressources_reellement_proposees_par_do_1l33rzi',
+        )}
         actions={
           <span className="status-badge status-success">
-            Scope : {ss.find((s) => s.siteId === siteId)?.siteName ?? 'global'}
+            {__t('ui.onboarding.settings_page.scope_1kyj8sx')}
+            {ss.find((s) => s.siteId === siteId)?.siteName ??
+              __t('ui.expression.onboarding.settings_page.global_8bmg8e')}
           </span>
         }
       />
       <div className="metrics-grid">
-        <MetricCard label="Files configurées" value={qs.length} />
-        <MetricCard label="Utilisateurs actifs" value={us.filter((u) => u.isActive).length} />
-        <MetricCard label="Niveaux" value={ts.length} />
-        <MetricCard label="Traductions" value={xs.length} />
+        <MetricCard
+          label={__t('ui.onboarding.settings_page.files_configurees_j0ags4')}
+          value={qs.length}
+        />
+        <MetricCard
+          label={__t('ui.onboarding.settings_page.utilisateurs_actifs_gbz8z7')}
+          value={us.filter((u) => u.isActive).length}
+        />
+        <MetricCard label={__t('ui.onboarding.settings_page.niveaux_xbb935')} value={ts.length} />
+        <MetricCard
+          label={__t('ui.onboarding.settings_page.traductions_t3vhxl')}
+          value={xs.length}
+        />
       </div>
       <Card>
         <div className="config-chain">
@@ -119,7 +134,9 @@ export function SettingsPage() {
         <nav className="admin-tabs">
           {sections.map((x) => (
             <Link className={section === x ? 'active' : ''} to={`/settings/${x}`} key={x}>
-              {x === 'queues' ? 'Files' : x.charAt(0).toUpperCase() + x.slice(1)}
+              {x === 'queues'
+                ? __t('ui.expression.onboarding.settings_page.files_1s4j38w')
+                : x.charAt(0).toUpperCase() + x.slice(1)}
             </Link>
           ))}
         </nav>
@@ -230,22 +247,23 @@ type Translations = Awaited<
   ReturnType<typeof translationsControllerFindTranslations>
 >['data']['items'];
 function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Header
-        title="Sites & managers"
-        text="Identité, defaults opérationnels, responsables et activation réelle."
+        title={__t('ui.onboarding.settings_page.sites_managers_1qepn57')}
+        text={__t('settings.siteHelp')}
       />
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Site</th>
-              <th>Localisation</th>
-              <th>Fuseau</th>
-              <th>Devise</th>
-              <th>État</th>
-              <th>Action</th>
+              <th>{__t('ui.onboarding.settings_page.site_1fo419q')}</th>
+              <th>{__t('ui.onboarding.settings_page.localisation_17ojrsd')}</th>
+              <th>{__t('ui.onboarding.settings_page.fuseau_djtg02')}</th>
+              <th>{__t('ui.onboarding.settings_page.devise_1pl1r6r')}</th>
+              <th>{__t('ui.onboarding.settings_page.etat_525179')}</th>
+              <th>{__t('ui.onboarding.settings_page.action_2wk0tb')}</th>
             </tr>
           </thead>
           <tbody>
@@ -262,7 +280,9 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
                 <td>{s.defaultCurrency}</td>
                 <td>
                   <span className={`status-badge ${s.isActive ? 'status-success' : ''}`}>
-                    {s.isActive ? 'Actif' : 'Inactif'}
+                    {s.isActive
+                      ? __t('ui.expression.onboarding.settings_page.actif_1410gao')
+                      : __t('ui.expression.onboarding.settings_page.inactif_11hqnbx')}
                   </span>
                 </td>
                 <td>
@@ -274,7 +294,9 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
                       )
                     }
                   >
-                    {s.isActive ? 'Désactiver' : 'Activer'}
+                    {s.isActive
+                      ? __t('ui.expression.onboarding.settings_page.desactiver_1hfjss1')
+                      : __t('ui.expression.onboarding.settings_page.activer_1qnbdon')}
                   </button>
                 </td>
               </tr>
@@ -283,7 +305,7 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
         </table>
       </div>
       <Link className="button button-primary" to="/onboarding">
-        + Nouveau site complet
+        {__t('ui.onboarding.settings_page.nouveau_site_complet_1r4hy6i')}
       </Link>
     </section>
   );
@@ -299,24 +321,25 @@ function QueuesPanel({
   edit: (q: QueueResponseDto) => void;
   refresh: () => void;
 }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Header
-        title="Files d’attente"
-        text="Paramètres effectifs, héritage, guichets et opérateurs."
+        title={__t('ui.onboarding.settings_page.files_d_attente_162zjyu')}
+        text={__t('settings.queuesHelp')}
         action={create}
-        label="Nouvelle file"
+        label={__t('ui.onboarding.settings_page.nouvelle_file_1sg2isf')}
       />
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>File</th>
-              <th>Guichets</th>
-              <th>RDV</th>
-              <th>Devise / locale</th>
-              <th>Origines</th>
-              <th>Actions</th>
+              <th>{__t('ui.onboarding.settings_page.file_bygjtv')}</th>
+              <th>{__t('ui.onboarding.settings_page.guichets_j0id8z')}</th>
+              <th>{__t('ui.onboarding.settings_page.rdv_1f03hpr')}</th>
+              <th>{__t('ui.onboarding.settings_page.devise_locale_ltzxp4')}</th>
+              <th>{__t('ui.onboarding.settings_page.origines_1gpe3sn')}</th>
+              <th>{__t('ui.onboarding.settings_page.actions_1rx51qc')}</th>
             </tr>
           </thead>
           <tbody>
@@ -326,16 +349,23 @@ function QueuesPanel({
                   <b>
                     {q.queueCode} · {q.queueName}
                   </b>
-                  <small>{q.averageWaitTime} min</small>
+                  <small>
+                    {q.averageWaitTime} {__t('ui.onboarding.settings_page.min_1jxbmtz')}
+                  </small>
                 </td>
                 <td>{q.threadCount}</td>
-                <td>{q.appointmentsEnabled ? 'Activés' : 'Désactivés'}</td>
+                <td>
+                  {q.appointmentsEnabled
+                    ? __t('ui.expression.onboarding.settings_page.actives_1ntg7nc')
+                    : __t('ui.expression.onboarding.settings_page.desactives_1jqymmi')}
+                </td>
                 <td>
                   {q.currency} · {q.locale}
                 </td>
                 <td>
                   <span className="status-badge status-info">
-                    {Object.values(q.configOrigins).filter((v) => v === 'site').length} hérités
+                    {Object.values(q.configOrigins).filter((v) => v === 'site').length}{' '}
+                    {__t('ui.onboarding.settings_page.herites_17zxgud')}
                   </span>
                 </td>
                 <td>
@@ -346,7 +376,7 @@ function QueuesPanel({
                         edit(q);
                       }}
                     >
-                      Modifier
+                      {__t('ui.onboarding.settings_page.modifier_1s45w8g')}
                     </button>
                     <button
                       className="button button-small"
@@ -356,7 +386,9 @@ function QueuesPanel({
                         )
                       }
                     >
-                      {q.isActive ? 'Désactiver' : 'Activer'}
+                      {q.isActive
+                        ? __t('ui.expression.onboarding.settings_page.desactiver_1hfjss1')
+                        : __t('ui.expression.onboarding.settings_page.activer_1qnbdon')}
                     </button>
                   </div>
                 </td>
@@ -377,24 +409,25 @@ function UsersPanel({
   create: () => void;
   refresh: () => void;
 }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Header
-        title="Utilisateurs & rôles"
-        text="Compte, email, langue, statut, mot de passe, rôle et périmètre."
+        title={__t('ui.onboarding.settings_page.utilisateurs_roles_1pyrwap')}
+        text={__t('settings.usersHelp')}
         action={create}
-        label="Nouvel utilisateur"
+        label={__t('ui.onboarding.settings_page.nouvel_utilisateur_137bxy3')}
       />
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Utilisateur</th>
-              <th>Type</th>
-              <th>Rôles</th>
-              <th>Scope</th>
-              <th>Langue</th>
-              <th>Actions</th>
+              <th>{__t('ui.onboarding.settings_page.utilisateur_167aq1s')}</th>
+              <th>{__t('ui.onboarding.settings_page.type_1m2zofh')}</th>
+              <th>{__t('ui.onboarding.settings_page.roles_1wl5wa9')}</th>
+              <th>{__t('ui.onboarding.settings_page.scope_rpvfkb')}</th>
+              <th>{__t('ui.onboarding.settings_page.langue_4vkz5r')}</th>
+              <th>{__t('ui.onboarding.settings_page.actions_1rx51qc')}</th>
             </tr>
           </thead>
           <tbody>
@@ -402,11 +435,15 @@ function UsersPanel({
               <tr key={u.userId}>
                 <td>
                   <b>{u.username}</b>
-                  <small>{u.email ?? 'Sans email'}</small>
+                  <small>
+                    {u.email ?? __t('ui.expression.onboarding.settings_page.sans_email_1g8cvqa')}
+                  </small>
                 </td>
                 <td>{u.userType}</td>
-                <td>Voir la fiche</td>
-                <td>Affectations gérées par l’assistant</td>
+                <td>{__t('ui.onboarding.settings_page.voir_la_fiche_1uk0bt5')}</td>
+                <td>
+                  {__t('ui.onboarding.settings_page.affectations_gerees_par_l_assistant_uyivx1')}
+                </td>
                 <td>{u.languagePreference}</td>
                 <td>
                   <div className="table-actions">
@@ -418,7 +455,9 @@ function UsersPanel({
                         }).then(refresh)
                       }
                     >
-                      {u.isActive ? 'Suspendre' : 'Activer'}
+                      {u.isActive
+                        ? __t('ui.expression.onboarding.settings_page.suspendre_5nkyya')
+                        : __t('ui.expression.onboarding.settings_page.activer_1qnbdon')}
                     </button>
                     <button
                       className="button button-small"
@@ -428,7 +467,7 @@ function UsersPanel({
                         })
                       }
                     >
-                      Réinitialiser MDP
+                      {__t('ui.onboarding.settings_page.reinitialiser_mdp_1jj1i30')}
                     </button>
                   </div>
                 </td>
@@ -441,18 +480,23 @@ function UsersPanel({
   );
 }
 function TiersPanel({ items, open }: { items: Tiers; open: () => void }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Header
-        title="Niveaux de service"
-        text="Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file."
+        title={__t('ui.onboarding.settings_page.niveaux_de_service_1yfgjsz')}
+        text={__t('settings.tiersHelp')}
         action={open}
-        label="Associer un niveau"
+        label={__t('ui.onboarding.settings_page.associer_un_niveau_1u25ann')}
       />
       <div className="tier-card-grid">
         {items.map((t) => (
           <div className="station" key={t.tierId}>
-            <span className="status-badge status-info">{t.isSystem ? 'Système' : 'Catalogue'}</span>
+            <span className="status-badge status-info">
+              {t.isSystem
+                ? __t('ui.expression.onboarding.settings_page.systeme_exy534')
+                : __t('ui.expression.onboarding.settings_page.catalogue_144nvkm')}
+            </span>
             <h3>{t.tierName}</h3>
             <p>
               {t.tierCode} · {t.description}
@@ -464,18 +508,19 @@ function TiersPanel({ items, open }: { items: Tiers; open: () => void }) {
   );
 }
 function NotificationsPanel({ open }: { open: () => void }) {
+  const { t: __t } = useTranslation();
   const [text, setText] = useState('Bienvenue, votre ticket {ticket} est enregistré.');
   return (
     <section>
       <Header
-        title="Règles de notification"
-        text="Règles persistantes par file et niveau, avec simulation locale."
+        title={__t('ui.onboarding.settings_page.regles_de_notification_1bn7ke2')}
+        text={__t('settings.rulesHelp')}
         action={open}
-        label="Nouvelle règle"
+        label={__t('ui.onboarding.settings_page.nouvelle_regle_txat5j')}
       />
       <div className="sms-preview-grid">
         <label>
-          Message
+          {__t('ui.onboarding.settings_page.message_1cam7ic')}
           <textarea
             rows={6}
             maxLength={480}
@@ -485,11 +530,12 @@ function NotificationsPanel({ open }: { open: () => void }) {
             }}
           />
           <small>
-            {text.length}/480 · {Math.ceil(text.length / 160) || 1} segment(s)
+            {text.length}/480 · {Math.ceil(text.length / 160) || 1}{' '}
+            {__t('ui.onboarding.settings_page.segment_s_c5snh2')}
           </small>
         </label>
         <div className="phone-preview">
-          <b>DORI</b>
+          <b>{__t('ui.onboarding.settings_page.dori_9y7skh')}</b>
           <p>{text.replace('{ticket}', 'A-048')}</p>
         </div>
       </div>
@@ -497,23 +543,24 @@ function NotificationsPanel({ open }: { open: () => void }) {
   );
 }
 function TranslationsPanel({ items, open }: { items: Translations; open: () => void }) {
+  const { t: __t } = useTranslation();
   return (
     <section>
       <Header
-        title="Traductions dynamiques"
-        text="Catégories IHM, SMS et erreurs, avec paramètres attendus."
+        title={__t('ui.onboarding.settings_page.traductions_dynamiques_1l3br9')}
+        text={__t('settings.translationsHelp')}
         action={open}
-        label="Nouvelle clé"
+        label={__t('ui.onboarding.settings_page.nouvelle_cle_5he7jx')}
       />
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Clé</th>
-              <th>Catégorie</th>
-              <th>Locale</th>
-              <th>Contenu</th>
-              <th>Variables</th>
+              <th>{__t('ui.onboarding.settings_page.cle_1umb4x5')}</th>
+              <th>{__t('ui.onboarding.settings_page.categorie_1m5ubmo')}</th>
+              <th>{__t('ui.onboarding.settings_page.locale_1pfta5z')}</th>
+              <th>{__t('ui.onboarding.settings_page.contenu_1hxusj9')}</th>
+              <th>{__t('ui.onboarding.settings_page.variables_xqivz6')}</th>
             </tr>
           </thead>
           <tbody>
@@ -547,6 +594,7 @@ function TierModal({
   tiers: Tiers;
   refresh: () => void;
 }) {
+  const { t: __t } = useTranslation();
   const [f, setF] = useState({
     queueId: 0,
     tierId: 0,
@@ -559,7 +607,7 @@ function TierModal({
     <Modal
       open={open}
       onOpenChange={close}
-      title="Associer un niveau"
+      title={__t('ui.onboarding.settings_page.associer_un_niveau_1u25ann')}
       actions={
         <button
           className="button button-primary"
@@ -577,20 +625,20 @@ function TierModal({
             })
           }
         >
-          Associer
+          {__t('ui.onboarding.settings_page.associer_1akns98')}
         </button>
       }
     >
       <div className="form-grid">
         <Select
-          label="File"
+          label={__t('ui.onboarding.settings_page.file_bygjtv')}
           items={queues.map((q) => [q.queueId, q.queueName])}
           change={(id) => {
             setF({ ...f, queueId: id });
           }}
         />
         <Select
-          label="Niveau"
+          label={__t('ui.onboarding.settings_page.niveau_gl02r')}
           items={tiers
             .filter((t) => ['GRATUIT', 'STANDARD', 'PREMIUM'].includes(t.tierCode.toUpperCase()))
             .map((t) => [t.tierId, t.tierName])}
@@ -599,7 +647,7 @@ function TierModal({
           }}
         />
         <label>
-          Prix
+          {__t('ui.onboarding.settings_page.prix_gp2e6u')}
           <input
             type="number"
             min="0"
@@ -610,10 +658,10 @@ function TierModal({
           />
         </label>
         <label>
-          Devise
+          {__t('ui.onboarding.settings_page.devise_1pl1r6r')}
           <input
             maxLength={3}
-            placeholder="Héritée"
+            placeholder={__t('ui.onboarding.settings_page.heritee_zqggrn')}
             value={f.currency}
             onChange={(e) => {
               setF({ ...f, currency: e.target.value.toUpperCase() });
@@ -621,7 +669,7 @@ function TierModal({
           />
         </label>
         <label>
-          Ordre
+          {__t('ui.onboarding.settings_page.ordre_6421pl')}
           <input
             type="number"
             min="0"
@@ -632,7 +680,7 @@ function TierModal({
           />
         </label>
         <label className="check-row">
-          Par défaut
+          {__t('ui.onboarding.settings_page.par_defaut_md7ct3')}
           <input
             type="checkbox"
             checked={f.default}
@@ -658,6 +706,7 @@ function RuleModal({
   tiers: Tiers;
   refresh: () => void;
 }) {
+  const { t: __t } = useTranslation();
   const [f, setF] = useState({
     queueId: 0,
     tierId: 0,
@@ -671,7 +720,7 @@ function RuleModal({
     <Modal
       open={open}
       onOpenChange={close}
-      title="Nouvelle règle"
+      title={__t('ui.onboarding.settings_page.nouvelle_regle_txat5j')}
       actions={
         <button
           className="button button-primary"
@@ -690,65 +739,69 @@ function RuleModal({
             })
           }
         >
-          Enregistrer
+          {__t('ui.onboarding.settings_page.enregistrer_sywgdx')}
         </button>
       }
     >
       <div className="form-grid">
         <Select
-          label="File"
+          label={__t('ui.onboarding.settings_page.file_bygjtv')}
           items={queues.map((q) => [q.queueId, q.queueName])}
           change={(id) => {
             setF({ ...f, queueId: id });
           }}
         />
         <Select
-          label="Niveau"
+          label={__t('ui.onboarding.settings_page.niveau_gl02r')}
           items={tiers.map((t) => [t.tierId, t.tierName])}
           change={(id) => {
             setF({ ...f, tierId: id });
           }}
         />
         <label>
-          Type
+          {__t('ui.onboarding.settings_page.type_1m2zofh')}
           <select
             value={f.type}
             onChange={(e) => {
               setF({ ...f, type: e.target.value });
             }}
           >
-            <option value="welcome">Welcome</option>
-            <option value="threshold">Threshold</option>
+            <option value="welcome">{__t('ui.onboarding.settings_page.welcome_okelqr')}</option>
+            <option value="threshold">{__t('ui.onboarding.settings_page.threshold_6j3qu0')}</option>
           </select>
         </label>
         <label>
-          Canal
+          {__t('ui.onboarding.settings_page.canal_1219p1c')}
           <select
             value={f.channel}
             onChange={(e) => {
               setF({ ...f, channel: e.target.value });
             }}
           >
-            <option value="sms">SMS</option>
-            <option value="email">Email</option>
+            <option value="sms">{__t('ui.onboarding.settings_page.sms_q3rkiy')}</option>
+            <option value="email">{__t('ui.onboarding.settings_page.email_inbfc7')}</option>
           </select>
         </label>
         {f.type === 'threshold' ? (
           <>
             <label>
-              Seuil
+              {__t('ui.onboarding.settings_page.seuil_1fkadkl')}
               <select
                 value={f.threshold}
                 onChange={(e) => {
                   setF({ ...f, threshold: e.target.value });
                 }}
               >
-                <option value="position">Position</option>
-                <option value="estimatedTime">Temps estimé</option>
+                <option value="position">
+                  {__t('ui.onboarding.settings_page.position_1quewx6')}
+                </option>
+                <option value="estimatedTime">
+                  {__t('ui.onboarding.settings_page.temps_estime_1qfllgt')}
+                </option>
               </select>
             </label>
             <label>
-              Valeur
+              {__t('ui.onboarding.settings_page.valeur_oyhka0')}
               <input
                 type="number"
                 min="1"
@@ -773,12 +826,13 @@ function TranslationModal({
   close: (v: boolean) => void;
   refresh: () => void;
 }) {
+  const { t: __t } = useTranslation();
   const [f, setF] = useState({ key: '', category: 'ihm', locale: 'fr', content: '', params: '' });
   return (
     <Modal
       open={open}
       onOpenChange={close}
-      title="Nouvelle traduction"
+      title={__t('ui.onboarding.settings_page.nouvelle_traduction_ujnesk')}
       actions={
         <button
           className="button button-primary"
@@ -799,13 +853,13 @@ function TranslationModal({
             })
           }
         >
-          Enregistrer
+          {__t('ui.onboarding.settings_page.enregistrer_sywgdx')}
         </button>
       }
     >
       <div className="form-grid">
         <label>
-          Clé
+          {__t('ui.onboarding.settings_page.cle_1umb4x5')}
           <input
             value={f.key}
             onChange={(e) => {
@@ -814,20 +868,20 @@ function TranslationModal({
           />
         </label>
         <label>
-          Catégorie
+          {__t('ui.onboarding.settings_page.categorie_1m5ubmo')}
           <select
             value={f.category}
             onChange={(e) => {
               setF({ ...f, category: e.target.value });
             }}
           >
-            <option>ihm</option>
-            <option>sms</option>
-            <option>error</option>
+            <option>{__t('ui.onboarding.settings_page.ihm_y3wikr')}</option>
+            <option>{__t('ui.onboarding.settings_page.sms_1ottih6')}</option>
+            <option>{__t('ui.onboarding.settings_page.error_9bb0pd')}</option>
           </select>
         </label>
         <label>
-          Locale
+          {__t('ui.onboarding.settings_page.locale_1pfta5z')}
           <input
             value={f.locale}
             onChange={(e) => {
@@ -836,9 +890,9 @@ function TranslationModal({
           />
         </label>
         <label>
-          Paramètres
+          {__t('ui.onboarding.settings_page.parametres_1fyvea8')}
           <input
-            placeholder="ticket, position"
+            placeholder={__t('ui.onboarding.settings_page.ticket_position_s2bm2e')}
             value={f.params}
             onChange={(e) => {
               setF({ ...f, params: e.target.value });
@@ -846,7 +900,7 @@ function TranslationModal({
           />
         </label>
         <label className="form-span">
-          Contenu
+          {__t('ui.onboarding.settings_page.contenu_1hxusj9')}
           <textarea
             rows={4}
             value={f.content}
@@ -868,6 +922,7 @@ function Select({
   items: [number, string][];
   change: (id: number) => void;
 }) {
+  const { t: __t } = useTranslation();
   return (
     <label>
       {label}
@@ -876,7 +931,7 @@ function Select({
           change(Number(e.target.value));
         }}
       >
-        <option value="">Choisir</option>
+        <option value="">{__t('ui.onboarding.settings_page.choisir_4zi3t4')}</option>
         {items.map(([id, name]) => (
           <option value={id} key={id}>
             {name}
