@@ -18,6 +18,8 @@ import {
   saveOnboardingDraft,
   type OnboardingDraft,
 } from './onboarding-draft';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 const steps = [
   'Identité du site',
@@ -94,6 +96,12 @@ export function OnboardingPage() {
         const activatedSite = draft.site.siteName;
         clearOnboardingDraft();
         setState(structuredClone(initialOnboardingDraft));
+        notify({
+          tone: 'success',
+          title: 'Site activé',
+          message: `${activatedSite} est prêt à être utilisé.`,
+          duration: 8_000,
+        });
         setMessage(
           `Le site ${activatedSite} est maintenant actif. La configuration est terminée et l’assistant a été réinitialisé.`,
         );
@@ -103,6 +111,7 @@ export function OnboardingPage() {
       save(value);
       setMessage('Étape enregistrée avec succès.');
     } catch (error) {
+      notifyError(error);
       setMessage(error instanceof Error ? error.message : 'Erreur. Relancez cette étape.');
     } finally {
       setBusy(false);

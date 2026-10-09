@@ -340,6 +340,21 @@ Critère de sortie : santé et obligations légales sont présentes sans invente
 
 ### Phase 11 — Durcissement et recette finale
 
+#### Passe de stabilisation — erreurs métier et notifications globales
+
+- [x] Centraliser les notifications globales de succès, information, avertissement et erreur dans un composant accessible disponible sur toutes les routes.
+- [x] Transformer les erreurs API normalisées en messages métier compréhensibles, avec replis par statut HTTP et référence de corrélation exploitable par le support.
+- [x] Dédupliquer, limiter et temporiser les notifications sans bloquer la navigation ni exposer de données personnelles.
+- [x] Brancher les mutations critiques sur les notifications globales et conserver les erreurs de formulaire près des champs lorsqu’une correction locale est attendue.
+- [x] Couvrir le résolveur d’erreurs et le centre de notifications par des tests, puis valider typecheck, lint, tests et build.
+
+#### Reprise visuelle — expériences kiosque, écran salle et tracking
+
+- [-] Supprimer le bandeau et la barre de prévisualisation pour les comptes humains au profit d’un simple cadre matériel sombre.
+- [-] Réaligner la borne, l’écran salle et le téléphone de tracking sur les compositions, couleurs, volumes et hiérarchies de `dori_saas_mockup.html`.
+- [-] Placer le champ de tracking de test hors de l’écran mobile et le réserver strictement à l’aperçu d’un compte humain.
+- [-] Vérifier les parcours réels, les états vides, le responsive, l’accessibilité et l’absence de régression fonctionnelle.
+
 - [ ] Vérifier qu’aucun appel HTTP ne se trouve dans un composant de page.
 
 - [ ] Vérifier qu’aucun DTO Swagger n’est copié manuellement et qu’aucun `any` n’est présent.
@@ -672,3 +687,38 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 <!-- CHECKPOINT id="ckpt_mv00v3jd_p57doz" time="2026-10-08T21:01:53.449Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv01d5r0_si804t" time="2026-10-08T21:15:56.124Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv01q0qh_5ggjgy" time="2026-10-08T21:25:56.153Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv022vpp_ooq52r" time="2026-10-08T21:35:56.173Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv02fnb5_sxecie" time="2026-10-08T21:45:51.809Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv02sia9_3ve6ma" time="2026-10-08T21:55:51.825Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+### 2026-10-08 — Stabilisation des erreurs métier et notifications globales
+
+- Un centre de notifications global, responsive et accessible affiche les succès, informations, avertissements et erreurs sans interrompre la navigation.
+- Les notifications sont limitées aux quatre plus récentes, dédupliquées, temporisées selon leur gravité, mises en pause au survol/focus et désactivent leurs animations avec `prefers-reduced-motion`.
+- Les mutations TanStack Query remontent automatiquement toute erreur non explicitement neutralisée ; les actions asynchrones directes critiques utilisent le même résolveur.
+- Les erreurs API exploitent en priorité leur traduction métier, puis un message sûr selon le statut HTTP ; les messages techniques bruts et données personnelles ne sont jamais affichés.
+- Le correlation ID est présenté comme référence support lorsqu’il est fourni par l’API.
+- Des confirmations globales ont été ajoutées aux parcours rendez-vous, guichet, accueil rapide, notes, profil, activation de site, reset de file et envoi/réémission de notification.
+- L’erreur volontaire d’appel sur une file vide n’a pas été corrigée afin de conserver le scénario de test demandé pour le diagnostic.
+- Validation réussie : 28 fichiers de tests, 52 tests, typecheck, lint et build de production. Le build conserve uniquement l’avertissement connu sur la taille du bundle principal.
+
+<!-- CHECKPOINT id="ckpt_mv035d90_kz1s45" time="2026-10-08T22:05:51.828Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv03i87q_fead67" time="2026-10-08T22:15:51.830Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv03v36t_58vwvx" time="2026-10-08T22:25:51.845Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv06j9dw_fz695g" time="2026-10-08T23:40:38.852Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv06w4co_c4aobk" time="2026-10-08T23:50:38.856Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv078zbr_vt3yq1" time="2026-10-09T00:00:38.871Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv07luak_01azxe" time="2026-10-09T00:10:38.876Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv09akql_kgl0hm" time="2026-10-09T00:57:52.509Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

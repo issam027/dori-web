@@ -20,6 +20,7 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { maskRecipient } from './notification-utils';
 import { slaTone } from './sla';
+import { notify } from '@/core/notifications/notification-store';
 
 export function ControlRoomPage() {
   const siteId = useScopeStore((s) => s.activeSiteId);
@@ -71,9 +72,15 @@ export function ControlRoomPage() {
   const reset = useMutation({
     mutationFn: (queueId: number) => queuesControllerReset(queueId),
     onSuccess: async () => {
+      const queueName = resetQueue?.name;
       setResetQueue(undefined);
       await client.invalidateQueries({ queryKey: ['queue'] });
       await client.invalidateQueries({ queryKey: ['reports'] });
+      notify({
+        tone: 'success',
+        title: 'File réinitialisée',
+        message: queueName ? `${queueName} a bien été réinitialisée.` : undefined,
+      });
     },
   });
   if (load.isError || summary.isError)

@@ -9,6 +9,8 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 const schema = z.object({
   email: z.union([z.literal(''), z.email('Adresse email invalide.')]),
@@ -30,12 +32,17 @@ export function ProfilePage() {
   if (!user) return null;
   const submit = handleSubmit(async (values) => {
     setSaved(false);
-    await usersControllerUpdateUser(user.userId, {
-      email: values.email || undefined,
-      languagePreference: values.languagePreference,
-    });
-    await hydrateSession();
-    setSaved(true);
+    try {
+      await usersControllerUpdateUser(user.userId, {
+        email: values.email || undefined,
+        languagePreference: values.languagePreference,
+      });
+      await hydrateSession();
+      setSaved(true);
+      notify({ tone: 'success', title: 'Profil enregistré' });
+    } catch (error) {
+      notifyError(error);
+    }
   });
   return (
     <div className="page-stack">

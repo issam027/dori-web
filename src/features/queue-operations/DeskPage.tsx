@@ -21,6 +21,8 @@ import { callNextAndCommit } from './operation-actions';
 import { Receipt80mm } from './Receipt80mm';
 import { QuickRegistration } from './QuickRegistration';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 export function DeskPage() {
   const queryClient = useQueryClient();
@@ -96,6 +98,7 @@ export function DeskPage() {
     try {
       await action();
     } catch (cause) {
+      notifyError(cause);
       setError(
         (cause as { status?: number }).status === 409
           ? 'Conflit détecté : les données ont été actualisées.'
@@ -114,6 +117,11 @@ export function DeskPage() {
       else await queueEngineControllerMarkNoShow(call.registrationId);
       useOperationStore.getState().closeCall();
       setReceipt({ call, outcome });
+      notify({
+        tone: 'success',
+        title: outcome === 'served' ? 'Passage terminé' : 'Absence enregistrée',
+        message: `Le ticket ${call.ticketNumber} a été clôturé.`,
+      });
       await refresh();
     });
   };
@@ -255,6 +263,7 @@ export function DeskPage() {
                       onClick={() => {
                         void run(async () => {
                           await queueEngineControllerCloseSession(queue.queueId, mine.sessionId);
+                          notify({ tone: 'success', title: 'Guichet libéré', message: queue.queueName });
                           await refresh();
                         });
                       }}
@@ -268,20 +277,6 @@ export function DeskPage() {
                       className="button"
                       disabled={pending}
                       onClick={() => {
-                        void run(async () => {
-                          await queueEngineControllerOpenSession(queue.queueId, {
-                            mode: 'consultation_only',
-                          });
-                          await refresh();
-                        });
-                      }}
-                    >
-                      Consulter
-                    </button>
-                    <button
-                      className="button"
-                      disabled={pending}
-                      onClick={() => {
                         const takeOver =
                           Boolean(occupied) &&
                           window.confirm('Ce guichet est occupé. Confirmer la reprise ?');
@@ -291,6 +286,11 @@ export function DeskPage() {
                             mode: 'active',
                             threadNumber: occupied?.threadNumber ?? 1,
                             takeOver,
+                          });
+                          notify({
+                            tone: 'success',
+                            title: occupied ? 'Guichet repris' : 'Guichet occupé',
+                            message: queue.queueName,
                           });
                           await refresh();
                         });
@@ -306,6 +306,7 @@ export function DeskPage() {
                   onClick={() => {
                     void run(async () => {
                       await callNextAndCommit(queue.queueId);
+                      notify({ tone: 'success', title: 'Personne appelée', message: queue.queueName });
                       await refresh();
                     });
                   }}

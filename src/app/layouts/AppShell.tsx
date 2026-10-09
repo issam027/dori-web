@@ -10,6 +10,7 @@ import { CommandPalette } from './CommandPalette';
 import { SidebarAccordion } from './SidebarAccordion';
 import { Topbar } from './Topbar';
 import { EmptyState } from '@/design-system/components/FeedbackState';
+import { AppErrorBoundary } from '@/app/AppErrorBoundary';
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
@@ -54,21 +55,23 @@ export function AppShell({ children }: { children: ReactNode }) {
           }}
         />
         <main className="app-content">
-          {requiresSite && activeSiteId === null && !sitesQuery.isLoading ? (
-            <div className="site-required-card">
-              <EmptyState
-                title="Choisissez un site actif"
-                description="Sélectionnez le site sur lequel vous souhaitez travailler depuis votre portefeuille."
-                action={
-                  <Link className="button button-primary" to="/portfolio">
-                    Ouvrir le portefeuille de sites
-                  </Link>
-                }
-              />
-            </div>
-          ) : (
-            children
-          )}
+          <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
+            {requiresSite && activeSiteId === null && !sitesQuery.isLoading ? (
+              <div className="site-required-card">
+                <EmptyState
+                  title="Choisissez un site actif"
+                  description="Sélectionnez le site sur lequel vous souhaitez travailler depuis votre portefeuille."
+                  action={
+                    <Link className="button button-primary" to="/portfolio">
+                      Ouvrir le portefeuille de sites
+                    </Link>
+                  }
+                />
+              </div>
+            ) : (
+              children
+            )}
+          </AppErrorBoundary>
         </main>
       </div>
       <CommandPalette open={commandsOpen} onOpenChange={setCommandsOpen} />

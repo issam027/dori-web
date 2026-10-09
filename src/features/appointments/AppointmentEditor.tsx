@@ -7,6 +7,8 @@ import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { createAppointment } from './appointment-actions';
 import { appointmentUtcIso } from './appointment-rules';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
@@ -58,8 +60,10 @@ export function AppointmentEditor({
           : { person: person.person }),
       });
       await queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      notify({ tone: 'success', title: 'Rendez-vous créé', message: 'Le rendez-vous a bien été enregistré.' });
       onOpenChange(false);
     } catch (cause) {
+      notifyError(cause);
       if ((cause as { status?: number }).status === 409) {
         setError('Ce créneau vient d’être réservé. Les disponibilités ont été actualisées.');
         await availability.refetch();

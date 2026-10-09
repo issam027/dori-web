@@ -2020,6 +2020,105 @@ select:focus-visible {
   align-items: center;
   text-decoration: none;
 }
+.runtime-error-panel {
+  width: min(100%, 58rem);
+  display: grid;
+  gap: var(--space-5);
+  margin-inline: auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid color-mix(in srgb, #c0392b 30%, var(--color-border));
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 100% 0, rgb(192 57 43 / 8%), transparent 35%), var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  animation: ui-reveal 0.25s ease-out;
+}
+.runtime-error-panel.is-global {
+  min-height: calc(100vh - 2rem);
+  align-content: center;
+  margin-block: 1rem;
+}
+.runtime-error-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: #b42318;
+  background: #fff0ee;
+}
+.runtime-error-heading h1,
+.runtime-error-heading p {
+  margin-block: var(--space-1);
+}
+.runtime-error-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-border);
+}
+.runtime-error-summary > div {
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-muted);
+}
+.runtime-error-summary dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.runtime-error-summary dd {
+  margin: var(--space-1) 0 0;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: var(--font-size-sm);
+}
+.runtime-error-details {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+}
+.runtime-error-details summary {
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  font-weight: 750;
+}
+.runtime-error-details pre {
+  max-height: 20rem;
+  overflow: auto;
+  margin: 0;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-navy) 4%, var(--color-surface));
+  font-size: 0.76rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.runtime-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.runtime-error-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.runtime-error-privacy {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+@media (max-width: 40rem) {
+  .runtime-error-summary {
+    grid-template-columns: 1fr;
+  }
+}
 .command-palette {
   inset: 15% auto auto 50%;
   width: min(620px, calc(100vw - 32px));

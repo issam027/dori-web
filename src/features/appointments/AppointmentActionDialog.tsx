@@ -11,6 +11,8 @@ import {
   rescheduleAppointment,
   updateAppointment,
 } from './appointment-actions';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 export function AppointmentActionDialog({
   appointment,
@@ -47,12 +49,18 @@ export function AppointmentActionDialog({
     await queryClient.invalidateQueries({ queryKey: ['appointments'] });
     onOpenChange(false);
   };
-  const mutate = async (action: () => Promise<unknown>, slotSensitive = false) => {
+  const mutate = async (
+    action: () => Promise<unknown>,
+    successMessage: string,
+    slotSensitive = false,
+  ) => {
     setError('');
     try {
       await action();
       await refresh();
+      notify({ tone: 'success', title: 'Rendez-vous mis à jour', message: successMessage });
     } catch (cause) {
+      notifyError(cause);
       if (slotSensitive && (cause as { status?: number }).status === 409) {
         setError('Créneau indisponible, disponibilités actualisées.');
         await availability.refetch();
@@ -89,6 +97,7 @@ export function AppointmentActionDialog({
                     timeZone,
                   ),
                 }),
+              'Le rendez-vous a bien été reprogrammé.',
               true,
             );
           }}
@@ -127,11 +136,13 @@ export function AppointmentActionDialog({
           className="button"
           type="button"
           onClick={() => {
-            void mutate(() =>
-              updateAppointment(appointment.registrationId, {
-                tierId,
-                languagePreference,
-              }),
+            void mutate(
+              () =>
+                updateAppointment(appointment.registrationId, {
+                  tierId,
+                  languagePreference,
+                }),
+              'Les informations du rendez-vous ont été enregistrées.',
             );
           }}
         >
@@ -142,7 +153,10 @@ export function AppointmentActionDialog({
             className="button button-primary"
             type="button"
             onClick={() => {
-              void mutate(() => checkInAppointment(appointment.registrationId));
+              void mutate(
+                () => checkInAppointment(appointment.registrationId),
+                'Le check-in a bien été enregistré.',
+              );
             }}
           >
             Check-in
@@ -153,7 +167,10 @@ export function AppointmentActionDialog({
           type="button"
           onClick={() => {
             if (window.confirm('Annuler ce rendez-vous ?'))
-              void mutate(() => cancelAppointment(appointment.registrationId));
+              void mutate(
+                () => cancelAppointment(appointment.registrationId),
+                'Le rendez-vous a bien été annulé.',
+              );
           }}
         >
           Annuler le rendez-vous

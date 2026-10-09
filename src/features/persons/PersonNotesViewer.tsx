@@ -6,6 +6,8 @@ import {
   personsControllerGetNotes,
 } from '@/api/generated/persons/persons';
 import { Modal } from '@/design-system/components/Modal';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 export function PersonNotesViewer({
   personId,
@@ -40,11 +42,16 @@ export function PersonNotesViewer({
   const current = items[index];
   const add = async () => {
     if (!content.trim()) return;
-    await personsControllerCreateNote(personId, { content: content.trim() });
-    setContent('');
-    setAdding(false);
-    setIndex(0);
-    await queryClient.invalidateQueries({ queryKey: ['persons', personId, 'notes'] });
+    try {
+      await personsControllerCreateNote(personId, { content: content.trim() });
+      setContent('');
+      setAdding(false);
+      setIndex(0);
+      await queryClient.invalidateQueries({ queryKey: ['persons', personId, 'notes'] });
+      notify({ tone: 'success', title: 'Note ajoutée', message: `La note de ${personName} est enregistrée.` });
+    } catch (error) {
+      notifyError(error);
+    }
   };
   return (
     <Modal

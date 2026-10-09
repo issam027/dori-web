@@ -7,6 +7,7 @@ import { AppErrorBoundary } from './AppErrorBoundary';
 import { PreferenceSynchronizer } from './PreferenceSynchronizer';
 import { createQueryClient } from './query-client';
 import { hydrateSession } from '@/core/auth/session-actions';
+import { NotificationCenter } from '@/design-system/components/NotificationCenter';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
@@ -27,6 +28,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <BrowserRouter>
             <PreferenceSynchronizer />
             {children}
+            <NotificationCenter />
           </BrowserRouter>
         </QueryClientProvider>
       </I18nextProvider>

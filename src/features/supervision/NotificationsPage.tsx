@@ -25,6 +25,7 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { canResendNotification, maskRecipient } from './notification-utils';
+import { notify } from '@/core/notifications/notification-store';
 
 const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger' =>
   status === 'delivered'
@@ -88,6 +89,11 @@ function ManualNotificationWizard({
     },
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: ['notifications'] });
+      notify({
+        tone: 'success',
+        title: 'Notification mise en file',
+        message: 'Le journal a été actualisé. Vous pouvez suivre son statut d’envoi.',
+      });
       onOpenChange(false);
       setStep(1);
       setPerson(undefined);
@@ -352,7 +358,14 @@ export function NotificationsPage() {
   });
   const resend = useMutation({
     mutationFn: (id: number) => notificationsControllerResend(id),
-    onSuccess: async () => client.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['notifications'] });
+      notify({
+        tone: 'success',
+        title: 'Réémission mise en file',
+        message: 'Le statut sera actualisé dans le journal.',
+      });
+    },
   });
   const items = journal.data?.data.items ?? [];
   const activeFilters = Number(Boolean(channel)) + Number(Boolean(status)) + Number(Boolean(date));

@@ -10,6 +10,8 @@ import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 export function QuickRegistration({
   siteId,
@@ -54,6 +56,13 @@ export function QuickRegistration({
       });
       setTicket(response.data.ticketNumber);
       await queryClient.invalidateQueries({ queryKey: ['registrations'] });
+      notify({
+        tone: 'success',
+        title: entryType === 'appointment' ? 'Rendez-vous créé' : 'Personne ajoutée à la file',
+        message: `Ticket ${response.data.ticketNumber}`,
+      });
+    } catch (error) {
+      notifyError(error);
     } finally {
       setPending(false);
     }
