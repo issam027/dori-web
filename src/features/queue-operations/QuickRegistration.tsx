@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
 import {
   registrationsControllerGetAvailability,
@@ -35,6 +35,7 @@ export function QuickRegistration({
   const [appointmentTime, setAppointmentTime] = useState('');
   const [ticket, setTicket] = useState('');
   const [pending, setPending] = useState(false);
+  const submissionInFlight = useRef(false);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const tiers = useQuery({
@@ -52,7 +53,8 @@ export function QuickRegistration({
   });
   const availableSlots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
   const submit = async () => {
-    if (!choice || !queueId || !tierId) return;
+    if (!choice || !queueId || !tierId || submissionInFlight.current) return;
+    submissionInFlight.current = true;
     setPending(true);
     setTicket('');
     try {
@@ -70,7 +72,11 @@ export function QuickRegistration({
       });
       setTicket(response.data.ticketNumber);
       setStep(3);
-      await queryClient.invalidateQueries({ queryKey: ['registrations'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['registrations'] }),
+        queryClient.invalidateQueries({ queryKey: ['queue-status'] }),
+        queryClient.invalidateQueries({ queryKey: ['queue-preview'] }),
+      ]);
       notify({
         tone: 'success',
         title:
@@ -82,6 +88,7 @@ export function QuickRegistration({
     } catch (error) {
       notifyError(error);
     } finally {
+      submissionInFlight.current = false;
       setPending(false);
     }
   };

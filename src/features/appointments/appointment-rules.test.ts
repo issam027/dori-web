@@ -15,6 +15,9 @@ describe('appointment timezone rules', () => {
     expect(appointmentUtcIso('2026-07-15', '14:00', 'Europe/Paris')).toBe(
       '2026-07-15T12:00:00.000Z',
     );
+    expect(appointmentUtcIso('2026-01-15', '14:00', 'Europe/Paris')).toBe(
+      '2026-01-15T13:00:00.000Z',
+    );
   });
 
   it('uses the site civil date rather than the browser or UTC date', () => {

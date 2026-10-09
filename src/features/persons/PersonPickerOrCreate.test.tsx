@@ -5,6 +5,7 @@ import { http, HttpResponse } from 'msw';
 import { useState } from 'react';
 import { mockServer } from '@/shared/testing/mock-server';
 import { PersonPickerOrCreate, type PersonChoice } from './PersonPickerOrCreate';
+import { isValidPersonIdentity } from './person-validation';
 
 function renderPicker() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -65,4 +66,25 @@ it('enables the next action as soon as a new person is valid', async () => {
   expect(
     screen.queryByRole('button', { name: /utiliser cette personne/i }),
   ).not.toBeInTheDocument();
+});
+
+it('keeps the next action disabled when an optional email is malformed', async () => {
+  renderPicker();
+  await userEvent.click(screen.getByRole('button', { name: 'Nouvelle personne' }));
+  await userEvent.type(screen.getByRole('textbox', { name: /^nom/i }), 'Martin');
+  await userEvent.type(screen.getByRole('textbox', { name: /t.l.phone/i }), '+33612345678');
+  await userEvent.type(screen.getByRole('textbox', { name: /adresse e-mail/i }), 'incorrect');
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Suivant' })).toBeDisabled();
+  });
+});
+
+it('rejects invalid optional ISO birth dates', () => {
+  expect(
+    isValidPersonIdentity({
+      lastName: 'Martin',
+      phoneNumber: '+33612345678',
+      birthDate: '2026-99-99',
+    }),
+  ).toBe(false);
 });

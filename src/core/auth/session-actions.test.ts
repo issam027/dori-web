@@ -3,7 +3,14 @@ import { QueryClient } from '@tanstack/react-query';
 import { mockServer } from '@/shared/testing/mock-server';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { getAccessToken } from './access-token';
-import { clearSession, getRememberedUsername, hydrateSession, login } from './session-actions';
+import {
+  clearSession,
+  expireSession,
+  getRememberedUsername,
+  hydrateSession,
+  login,
+} from './session-actions';
+import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
 
 describe('hydrateSession', () => {
@@ -115,6 +122,33 @@ describe('hydrateSession', () => {
     await clearSession(queryClient);
     expect(logoutCalled).toBe(true);
     expect(useSessionStore.getState().status).toBe('anonymous');
+    expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+  });
+
+  it('purges session, scope, brand and cached data when authentication expires', async () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(['private'], { secret: true });
+    useSessionStore.getState().authenticate({
+      userId: 1,
+      username: 'operator',
+      userType: 'human',
+      roles: [],
+      permissions: ['queue_view'],
+      mustChangePassword: false,
+      scope: { isGlobal: false, siteIds: [12], queueIds: [25] },
+    });
+    useScopeStore.getState().setActiveSite(12, {
+      isGlobal: false,
+      siteIds: [12],
+      queueIds: [25],
+    });
+    useBrandStore.setState({ name: 'Private site', logoUrl: 'https://invalid.test/logo.svg' });
+
+    await expireSession(queryClient);
+
+    expect(useSessionStore.getState().status).toBe('anonymous');
+    expect(useScopeStore.getState().activeSiteId).toBeNull();
+    expect(useBrandStore.getState()).toMatchObject({ name: 'DORI', logoUrl: null });
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 });

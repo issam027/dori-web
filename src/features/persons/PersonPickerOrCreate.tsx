@@ -7,6 +7,7 @@ import { personsControllerFindPersons } from '@/api/generated/persons/persons';
 import { EntityPicker } from '@/design-system/components/EntityPicker';
 import { FormField, PhoneInput } from '@/design-system/components/FormField';
 import { Pagination } from '@/design-system/components/Pagination';
+import { isValidPersonIdentity } from './person-validation';
 
 export type PersonChoice =
   { kind: 'existing'; person: PersonResponseDto } | { kind: 'new'; person: PersonIdentityDto };
@@ -41,8 +42,7 @@ export function PersonPickerOrCreate({
       }),
     enabled: mode === 'existing' && search.trim().length >= 3,
   });
-  const draftIsValid =
-    Boolean(draft.lastName.trim()) && /^\+[1-9][0-9]{6,14}$/.test(draft.phoneNumber);
+  const draftIsValid = isValidPersonIdentity(draft);
   useEffect(() => {
     if (mode !== 'new') return;
     onChange(draftIsValid ? { kind: 'new', person: draft } : null);

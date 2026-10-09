@@ -169,7 +169,7 @@ export function DisplayPage() {
                       {__t('ui.public-experiences.display_page.veuillez_rejoindre_bdsyjn')}
                     </small>
                     <b>
-                      {__t('ui.public-experiences.display_page.guichet_15ztv8y')}
+                      {__t('ui.public-experiences.display_page.guichet_15ztv8y')}{' '}
                       {call.threadNumber}
                     </b>
                     <span>

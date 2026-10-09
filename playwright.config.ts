@@ -11,6 +11,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1 --port 4173',
     url: 'http://127.0.0.1:4173',
+    // Local runs may reuse the developer's server; CI always owns a fresh deterministic server.
     reuseExistingServer: !process.env.CI,
   },
 });

@@ -19,6 +19,7 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
+    "pretest:e2e": "node tools/check-generated-client.mjs",
     "test:e2e": "playwright test",
     "verify": "npm run api:check && npm run audit:phase11 && npm run audit:i18n && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
     "format": "prettier --write .",

@@ -19,7 +19,7 @@ export function PublicExperienceLayout({
   const queryClient = useQueryClient();
   const logoutStarted = useRef(false);
   const disconnectRequested =
-    (mode === 'kiosk' || mode === 'display') &&
+    (mode === 'kiosk' || mode === 'display' || mode === 'tracking') &&
     new URLSearchParams(location.search).get('deco')?.toLowerCase() === 'true';
   const origin = `${location.pathname}${location.search}${location.hash}`;
 

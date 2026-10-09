@@ -8,9 +8,11 @@
 
 Ce fichier est la source de suivi de la construction de l’application DORI Web. Toute action de réalisation doit apparaître ici avant son exécution et être cochée une fois terminée et vérifiée. Une case ne peut être cochée que si son critère de validation est satisfait. Les décisions, écarts au contrat, blocages et résultats de vérification seront consignés dans le journal en fin de document.
 
+> Réconciliation du 9 octobre 2026 : ce fichier conserve l'historique de construction. Le plan actif de consolidation et de recette est désormais `todo/handover.md`. Les trois travaux finaux volontairement différés restent la comparaison à la maquette, la documentation complète et la recette finale.
+
 ## 2. Sources analysées et ordre d’autorité
 
-- [ ] Inventorier le dépôt : il contient actuellement `README.md` et le dossier `specifications/`, sans socle applicatif.
+- [x] Inventorier le dépôt initial : il contenait alors `README.md` et le dossier `specifications/`, sans socle applicatif (constat historique désormais obsolète).
 
 - [x] Lire intégralement `final_ihm_specification.md` et relever les exigences fonctionnelles, techniques, UX, sécurité, accessibilité et tests.
 
@@ -883,21 +885,21 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 - [x] Ajouter `audit:i18n` au pipeline de vérification pour bloquer les nouveaux textes JSX, attributs visibles et toasts en dur.
 - [x] Valider l’audit i18n, le lint, le typage, les 56 tests et le build de production.
 
-### 2026-10-09 — Internationalisation exhaustive de l’interface (en cours)
+### 2026-10-09 — Internationalisation exhaustive de l’interface (terminée et réconciliée)
 
 - [x] Inventorier les composants contenant encore des textes visibles en dur (31 fichiers de production identifiés).
 - [x] Charger systématiquement le bundle distant de catégorie `ihm` lors d’un changement de langue, avec repli sur les ressources locales en cas d’échec réseau.
 - [x] Dédupliquer les chargements simultanés d’un même bundle `locale:category`.
 - [x] Garantir explicitement la priorité des entrées distantes avec une fusion profonde en mode écrasement.
 - [x] Ajouter un test démontrant qu’une clé `ihm` distante remplace bien son fallback local.
-- [ ] Migrer les textes en dur des composants partagés et des layouts vers des clés i18n.
-- [ ] Migrer les textes en dur des modules Authentification, Profil, Personnes et Utilisateurs.
-- [ ] Migrer les textes en dur des modules Cockpit, Files et Rendez-vous.
-- [ ] Migrer les textes en dur des modules Supervision, Rapports, Notifications et Santé.
-- [ ] Migrer les textes en dur de l’Onboarding, de la Configuration et du Portefeuille.
-- [ ] Migrer les textes en dur des trois expériences publiques Kiosque, Écran salle et Suivi mobile.
-- [ ] Ajouter un audit automatisé empêchant la réintroduction de textes visibles en dur.
-- [ ] Exécuter la validation complète après disparition de tous les textes visibles en dur.
+- [x] Migrer les textes en dur des composants partagés et des layouts vers des clés i18n.
+- [x] Migrer les textes en dur des modules Authentification, Profil, Personnes et Utilisateurs.
+- [x] Migrer les textes en dur des modules Cockpit, Files et Rendez-vous.
+- [x] Migrer les textes en dur des modules Supervision, Rapports, Notifications et Santé.
+- [x] Migrer les textes en dur de l’Onboarding, de la Configuration et du Portefeuille.
+- [x] Migrer les textes en dur des trois expériences publiques Kiosque, Écran salle et Suivi mobile.
+- [x] Ajouter un audit automatisé empêchant la réintroduction de textes visibles en dur.
+- [x] Exécuter la validation complète après disparition de tous les textes visibles en dur (56 tests, audit i18n, lint, typage et build validés).
 
 ### 2026-10-09 — Contrastes des champs dans les quatre thèmes
 

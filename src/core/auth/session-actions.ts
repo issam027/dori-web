@@ -56,6 +56,10 @@ export async function clearSession(queryClient: QueryClient): Promise<void> {
   } catch {
     // Local logout must still complete when the server session is already unavailable.
   }
+  await expireSession(queryClient);
+}
+
+export async function expireSession(queryClient: QueryClient): Promise<void> {
   useSessionStore.getState().clear();
   useScopeStore.getState().clear();
   useBrandStore.getState().reset();

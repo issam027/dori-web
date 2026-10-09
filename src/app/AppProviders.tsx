@@ -8,6 +8,8 @@ import { PreferenceSynchronizer } from './PreferenceSynchronizer';
 import { createQueryClient } from './query-client';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { NotificationCenter } from '@/design-system/components/NotificationCenter';
+import { onAuthenticationExpired } from '@/api/client/http-client';
+import { expireSession } from '@/core/auth/session-actions';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
@@ -20,6 +22,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
       // An absent/expired refresh cookie is the normal anonymous startup path.
     });
   }, []);
+
+  useEffect(
+    () =>
+      onAuthenticationExpired(() => {
+        void expireSession(queryClient);
+      }),
+    [queryClient],
+  );
 
   return (
     <AppErrorBoundary>

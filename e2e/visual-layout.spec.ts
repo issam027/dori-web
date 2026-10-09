@@ -376,13 +376,13 @@ test('human users keep the application context while previewing device experienc
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-kiosk')).toBeVisible();
   await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
-  await expect(page.getByText('PrÃ©visualisation')).toHaveCount(0);
+  await expect(page.getByText('Prévisualisation')).toHaveCount(0);
 
   await page.goto('/display?queueId=10');
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-display')).toBeVisible();
   await expect(page.getByText('A014')).toBeVisible();
-  await expect(page.getByText('PrÃ©visualisation')).toHaveCount(0);
+  await expect(page.getByText('Prévisualisation')).toHaveCount(0);
 });
 
 test('phase 8 tracking consumes its token and works on mobile RTL in four themes', async ({
@@ -417,7 +417,7 @@ test('phase 10 health and legal return preserve the exact origin', async ({ page
   await activateFirstSite(page);
   await page.goto('/desk');
   await page.getByRole('button', { name: /administration/i }).click();
-  await page.getByRole('link', { name: /santé de la plateforme/i }).click();
+  await page.getByRole('link', { name: /état de la plateforme/i }).click();
   await expect(
     page.getByRole('main').getByRole('heading', { name: /santé de la plateforme/i }),
   ).toBeVisible();
@@ -450,6 +450,7 @@ test('phase 7 supervision routes render API-backed views', async ({ page }) => {
   await mockAuthenticatedApi(page);
   await activateFirstSite(page);
   await page.goto('/desk');
+  await page.getByRole('button', { name: /pilotage/i }).click();
   await page.getByRole('link', { name: /supervision/i }).click();
   await expect(
     page.getByRole('main').getByRole('heading', { name: /supervision temps réel/i }),

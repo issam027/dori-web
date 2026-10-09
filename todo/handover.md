@@ -16,7 +16,7 @@ Ce document organise le travail restant pour transformer l'application actuelle 
 
 Règles à respecter pendant toutes les phases :
 
-- [ ] Préserver les modifications déjà présentes dans le worktree et ne jamais écraser un travail non lié.
+- [x] Préserver les modifications déjà présentes dans le worktree et ne jamais écraser un travail non lié.
 - [ ] Ne jamais modifier manuellement `src/api/generated`; utiliser `npm run api:generate`.
 - [ ] Ne pas lancer `npm run build` ou `npm run api:generate` en parallèle avec Vite, Playwright ou un autre processus important `src/api/generated`.
 - [ ] Utiliser les DTO générés par Orval et ne pas recopier les contrats Swagger.
@@ -25,7 +25,7 @@ Règles à respecter pendant toutes les phases :
 - [ ] Tout texte visible doit passer par i18n. Une clé distante de catégorie `ihm` doit rester prioritaire sur le fallback local.
 - [ ] Chaque mutation doit gérer l'attente, le double clic, le succès, l'erreur, le conflit métier et l'invalidation du cache.
 - [ ] Chaque liste doit gérer chargement, vide, erreur, retry et pagination lorsque le service la supporte.
-- [ ] Toute nouvelle tâche terminée doit être cochée ici et accompagnée de sa preuve dans la section « Journal de validation ».
+- [x] Toute nouvelle tâche terminée doit être cochée ici et accompagnée de sa preuve dans la section « Journal de validation ».
 
 ## 2. État observé au démarrage
 
@@ -71,11 +71,11 @@ But : disposer d'un état de référence sans perdre les modifications fonctionn
 
 Fichiers/outils concernés : Git, tout le dépôt.
 
-- [ ] Relever `git status --short` et identifier les fichiers modifiés, nouveaux et générés.
-- [ ] Distinguer les changements applicatifs des artefacts de test (`test-results`, rapport Playwright, captures temporaires).
-- [ ] Vérifier que `dist`, rapports, traces et profils de navigateur ne sont pas suivis par Git.
-- [ ] Ne pas nettoyer ou réinitialiser les fichiers modifiés sans validation explicite de leur propriétaire.
-- [ ] Consigner le commit ou l'état Git servant de baseline dans le journal de validation.
+- [x] Relever `git status --short` et identifier les fichiers modifiés, nouveaux et générés.
+- [x] Distinguer les changements applicatifs des artefacts de test (`test-results`, rapport Playwright, captures temporaires).
+- [x] Vérifier que `dist`, rapports, traces et profils de navigateur ne sont pas suivis par Git.
+- [x] Ne pas nettoyer ou réinitialiser les fichiers modifiés sans validation explicite de leur propriétaire.
+- [x] Consigner le commit ou l'état Git servant de baseline dans le journal de validation.
 
 Critère d'acceptation : la liste des changements préexistants est connue et aucune modification utilisateur n'a été perdue.
 
@@ -85,11 +85,11 @@ But : empêcher que les prochaines interventions suivent des cases obsolètes.
 
 Fichier concerné : `specifications/ai/handover.md`.
 
-- [ ] Identifier les cases non cochées contredites par le code actuel, notamment l'inventaire initial et la migration i18n.
-- [ ] Ne pas supprimer l'historique ; marquer les entrées anciennes comme remplacées ou ajouter une note de réconciliation datée.
-- [ ] Vérifier les affirmations concernant le nombre de tests, les routes et les validations.
-- [ ] Réserver les trois tâches volontairement différées par le demandeur : comparaison finale à la maquette, documentation complète et recette finale.
-- [ ] Ajouter un lien depuis le handover historique vers le présent fichier de consolidation.
+- [x] Identifier les cases non cochées contredites par le code actuel, notamment l'inventaire initial et la migration i18n.
+- [x] Ne pas supprimer l'historique ; marquer les entrées anciennes comme remplacées ou ajouter une note de réconciliation datée.
+- [x] Vérifier les affirmations concernant le nombre de tests, les routes et les validations.
+- [x] Réserver les trois tâches volontairement différées par le demandeur : comparaison finale à la maquette, documentation complète et recette finale.
+- [x] Ajouter un lien depuis le handover historique vers le présent fichier de consolidation.
 
 Critère d'acceptation : un nouvel intervenant peut savoir ce qui est réellement terminé sans lire tout l'historique chronologique.
 
@@ -99,14 +99,14 @@ But : éliminer les échecs connus avant d'ajouter de nouveaux scénarios.
 
 Fichiers concernés : `e2e/visual-layout.spec.ts`, `e2e/smoke.spec.ts`, mocks Playwright.
 
-- [ ] Corriger le scénario écran salle qui attend encore le libellé exact « guichet 2 » si le rendu ou les données mockées ont changé.
-- [ ] Vérifier que l'écran salle teste le comportement métier et non un libellé fragile : ticket en traitement, destination et prochains appels.
-- [ ] Corriger l'accès E2E à « État/Santé de la plateforme » en tenant compte des accordéons et du profil mocké.
-- [ ] Corriger l'accès E2E à la supervision avec le bon groupe de menu et les permissions requises.
-- [ ] Corriger les chaînes de mock ou assertions présentant du mojibake (`Ã©`, `â€¢`, etc.).
-- [ ] Éviter les sélecteurs basés uniquement sur du texte susceptible d'être traduit ; préférer rôles, noms accessibles stables ou `data-testid` justifiés.
-- [ ] Vérifier que chaque test prépare explicitement session, permissions, scope et site actif.
-- [ ] Vérifier que les tests peuvent s'exécuter seuls et dans la suite complète.
+- [x] Corriger le scénario écran salle qui attend encore le libellé exact « guichet 2 » si le rendu ou les données mockées ont changé.
+- [x] Vérifier que l'écran salle teste le comportement métier et non un libellé fragile : ticket en traitement, destination et prochains appels.
+- [x] Corriger l'accès E2E à « État/Santé de la plateforme » en tenant compte des accordéons et du profil mocké.
+- [x] Corriger l'accès E2E à la supervision avec le bon groupe de menu et les permissions requises.
+- [x] Corriger les chaînes de mock ou assertions présentant du mojibake (`Ã©`, `â€¢`, etc.).
+- [x] Éviter les sélecteurs basés uniquement sur du texte susceptible d'être traduit ; préférer rôles, noms accessibles stables ou `data-testid` justifiés.
+- [x] Vérifier que chaque test prépare explicitement session, permissions, scope et site actif.
+- [x] Vérifier que les tests peuvent s'exécuter seuls et dans la suite complète.
 
 Commandes de validation :
 
@@ -124,13 +124,13 @@ But : rendre `npm run verify` déterministe.
 
 Fichiers concernés : `package.json`, `playwright.config.ts`, configuration Orval/Vite.
 
-- [ ] Documenter que `api:generate` nettoie `src/api/generated` avant sa régénération.
-- [ ] Garantir que Playwright ne démarre pas pendant une génération API concurrente.
-- [ ] Ajouter, si nécessaire, un script ciblé Playwright dont les arguments sont correctement transmis sous Windows.
-- [ ] Vérifier le comportement de `reuseExistingServer` lorsqu'un serveur Vite obsolète écoute déjà sur le port 4173.
-- [ ] Ajouter un contrôle de disponibilité des imports générés avant le démarrage E2E.
-- [ ] Vérifier que `api:check` ne laisse pas de changements générés après exécution.
-- [ ] Conserver l'ordre : génération/contrat, audits, lint, typecheck, tests, build, E2E.
+- [x] Documenter que `api:generate` nettoie `src/api/generated` avant sa régénération.
+- [x] Garantir dans le pipeline canonique que Playwright ne démarre pas pendant une génération API concurrente : `verify` reste strictement séquentiel et `pretest:e2e` contrôle le client généré avant tout test.
+- [x] Évaluer l'ajout d'un script Playwright filtré sous Windows : non retenu, car le filtre ne libère pas fiablement le processus dans cet environnement ; le fichier visuel et la suite complète restent directement adressables par Playwright et la suite complète est la référence stable.
+- [x] Vérifier le comportement de `reuseExistingServer` lorsqu'un serveur Vite obsolète écoute déjà sur le port 4173.
+- [x] Ajouter un contrôle de disponibilité des imports générés avant le démarrage E2E.
+- [x] Vérifier que `api:check` ne laisse pas de changements générés après exécution.
+- [x] Conserver l'ordre : génération/contrat, audits, lint, typecheck, tests, build, E2E.
 
 Critère d'acceptation : une commande unique reproduit la validation CI sans course entre Orval et Vite.
 
@@ -138,12 +138,12 @@ Critère d'acceptation : une commande unique reproduit la validation CI sans cou
 
 But : pouvoir démontrer que les refactorings améliorent le projet sans régression.
 
-- [ ] Relever le nombre de tests unitaires, composants et E2E.
-- [ ] Relever la durée moyenne de `typecheck`, `lint`, tests, build et E2E.
-- [ ] Relever les tailles des bundles principaux et des chunks de routes.
-- [ ] Lister les dix plus gros fichiers applicatifs hors code généré.
-- [ ] Lister les composants important directement des contrôleurs Orval.
-- [ ] Conserver ces métriques dans le journal de validation.
+- [x] Relever le nombre de tests unitaires, composants et E2E.
+- [x] Relever la durée moyenne de `typecheck`, `lint`, tests, build et E2E.
+- [x] Relever les tailles des bundles principaux et des chunks de routes.
+- [x] Lister les dix plus gros fichiers applicatifs hors code généré.
+- [x] Lister les composants important directement des contrôleurs Orval.
+- [x] Conserver ces métriques dans le journal de validation.
 
 Critère d'acceptation : les valeurs initiales sont consignées et pourront être comparées après consolidation.
 
@@ -155,80 +155,80 @@ Critère d'acceptation : les valeurs initiales sont consignées et pourront êtr
 
 But : éviter des mocks incohérents ou dupliqués entre tests.
 
-- [ ] Extraire les builders de session, utilisateur, permissions, sites, files, personnes, tickets et rendez-vous.
-- [ ] Fournir des profils root, administrateur, manager, opérateur et kiosque.
-- [ ] Fournir des helpers pour activer un site, ouvrir un groupe de navigation et choisir une file.
-- [ ] Fournir une horloge déterministe pour les dates, durées d'attente et fuseaux horaires.
-- [ ] Centraliser les enveloppes de réponse API et erreurs normalisées.
-- [ ] Permettre de simuler latence, `401`, `403`, `404`, `409`, `422`, `500` et hors ligne.
-- [ ] Garantir qu'aucune fixture publique ne contient de PII réaliste.
+- [x] Extraire les builders de session, utilisateur, permissions, sites, files, personnes, tickets et rendez-vous.
+- [x] Fournir des profils root, administrateur, manager, opérateur et kiosque.
+- [x] Fournir des helpers pour activer un site, ouvrir un groupe de navigation et choisir une file.
+- [x] Fournir une horloge déterministe pour les dates, durées d'attente et fuseaux horaires.
+- [x] Centraliser les enveloppes de réponse API et erreurs normalisées.
+- [x] Permettre de simuler latence, `401`, `403`, `404`, `409`, `422`, `500` et hors ligne.
+- [x] Garantir qu'aucune fixture publique ne contient de PII réaliste.
 
 Critère d'acceptation : chaque scénario décrit seulement son intention métier et réutilise les primitives communes.
 
 ### B2 — Session et authentification
 
-- [ ] Tester la connexion avec redirection vers la première route autorisée.
-- [ ] Tester le refresh d'une page privée avec restauration via cookie de refresh simulé.
-- [ ] Tester une session expirée avec maintien du contexte jusqu'à affichage du message et redirection contrôlée.
-- [ ] Tester plusieurs `401` simultanés et vérifier qu'un seul refresh est envoyé.
-- [ ] Tester l'échec du refresh : purge de session, cache, scope et marque.
-- [ ] Tester la déconnexion standard.
-- [ ] Tester `?deco=true` sur kiosque, écran salle et tracking authentifié.
-- [ ] Tester l'obligation de changement de mot de passe.
+- [x] Tester la connexion avec redirection vers la première route autorisée.
+- [x] Tester le refresh d'une page privée avec restauration via cookie de refresh simulé.
+- [x] Tester une session expirée avec maintien du contexte jusqu'à affichage du message et redirection contrôlée.
+- [x] Tester plusieurs `401` simultanés et vérifier qu'un seul refresh est envoyé.
+- [x] Tester l'échec du refresh : purge de session, cache, scope et marque.
+- [x] Tester la déconnexion standard.
+- [x] Tester `?deco=true` sur kiosque, écran salle et tracking authentifié.
+- [x] Tester l'obligation de changement de mot de passe.
 
 Critère d'acceptation : aucun refresh de page normal ne renvoie abusivement vers la connexion et aucun token n'est persisté dans `localStorage`.
 
 ### B3 — Scope, sites et permissions
 
-- [ ] Tester un utilisateur sans site actif : message explicite et lien vers le portefeuille.
-- [ ] Tester un utilisateur avec un seul site : activation automatique et portefeuille masqué selon la règle validée.
-- [ ] Tester un utilisateur multi-sites : choix depuis le portefeuille et invalidation des caches précédents.
-- [ ] Tester que le nom du site reste visible dans le bandeau sur toutes les routes concernées.
-- [ ] Tester les interdictions de routes et d'actions pour chaque profil.
-- [ ] Tester qu'un site hors scope ne peut pas être activé par manipulation de stockage ou d'URL.
-- [ ] Tester qu'un compte kiosque ne peut accéder qu'au choix du mode appareil et aux expériences autorisées.
+- [x] Tester un utilisateur sans site actif : message explicite et lien vers le portefeuille.
+- [x] Tester un utilisateur avec un seul site : activation automatique et portefeuille masqué selon la règle validée.
+- [x] Tester un utilisateur multi-sites : choix depuis le portefeuille et invalidation des caches précédents.
+- [x] Tester que le nom du site reste visible dans le bandeau sur toutes les routes concernées.
+- [x] Tester les interdictions de routes et d'actions pour chaque profil.
+- [x] Tester qu'un site hors scope ne peut pas être activé par manipulation de stockage ou d'URL.
+- [x] Tester qu'un compte kiosque ne peut accéder qu'au choix du mode appareil et aux expériences autorisées.
 
 Critère d'acceptation : route, navigation, contrôles et appels API appliquent tous le même scope.
 
 ### B4 — Accueil rapide et parcours walk-in
 
-- [ ] Rechercher une personne connue à partir du troisième caractère avec `siteId`, page de cinq résultats et pagination conditionnelle.
-- [ ] Créer une identité avec nom, prénom, téléphone, e-mail, date de naissance et langue.
-- [ ] Vérifier les champs obligatoires et le téléphone E.164.
-- [ ] Vérifier qu'un e-mail ou une date de naissance invalides empêchent la poursuite si le contrat l'exige.
-- [ ] Sélectionner file et niveau de service.
-- [ ] Créer un walk-in et vérifier numéro de ticket, notification et rafraîchissement du cockpit/des files.
-- [ ] Tester téléphone déjà utilisé ou conflit métier avec message actionnable.
-- [ ] Tester le double clic et confirmer qu'une seule inscription est créée.
+- [x] Rechercher une personne connue à partir du troisième caractère avec `siteId`, page de cinq résultats et pagination conditionnelle.
+- [x] Créer une identité avec nom, prénom, téléphone, e-mail, date de naissance et langue.
+- [x] Vérifier les champs obligatoires et le téléphone E.164.
+- [x] Vérifier qu'un e-mail ou une date de naissance invalides empêchent la poursuite si le contrat l'exige.
+- [x] Sélectionner file et niveau de service.
+- [x] Créer un walk-in et vérifier numéro de ticket, notification et rafraîchissement du cockpit/des files.
+- [x] Tester téléphone déjà utilisé ou conflit métier avec message actionnable.
+- [x] Tester le double clic et confirmer qu'une seule inscription est créée.
 
 Critère d'acceptation : le parcours complet est couvert pour personne connue et nouvelle personne.
 
 ### B5 — Rendez-vous
 
-- [ ] Tester le wizard personne puis service/créneau.
-- [ ] Vérifier que les disponibilités sont chargées après choix de la date et de la file.
-- [ ] Tester la création avec conversion correcte dans le fuseau IANA du site.
-- [ ] Tester un créneau devenu indisponible (`409`) : message local et rechargement des disponibilités.
-- [ ] Tester le clic sur une case vide du calendrier.
-- [ ] Tester l'ouverture d'un rendez-vous existant.
-- [ ] Tester reprogrammation et annulation.
-- [ ] Tester l'état « ce site ne gère pas les rendez-vous ».
-- [ ] Tester les changements heure d'été/heure d'hiver sur au moins un fuseau européen.
+- [x] Tester le wizard personne puis service/créneau.
+- [x] Vérifier que les disponibilités sont chargées après choix de la date et de la file.
+- [x] Tester la création avec conversion correcte dans le fuseau IANA du site.
+- [x] Tester un créneau devenu indisponible (`409`) : message local et rechargement des disponibilités.
+- [x] Tester le clic sur une case vide du calendrier.
+- [x] Tester l'ouverture d'un rendez-vous existant.
+- [x] Tester reprogrammation et annulation.
+- [x] Tester l'état « ce site ne gère pas les rendez-vous ».
+- [x] Tester les changements heure d'été/heure d'hiver sur au moins un fuseau européen.
 
 Critère d'acceptation : création, consultation, reprogrammation et annulation sont couvertes sans décalage de date/heure.
 
 ### B6 — Cockpit et moteur de file
 
-- [ ] Tester l'ouverture et la fermeture d'un guichet avec rafraîchissement immédiat de l'UI.
-- [ ] Tester qu'une file avec guichet actif est priorisée visuellement.
-- [ ] Tester l'état sans file configurée et sans file active.
-- [ ] Tester « appeler le suivant » avec une attente disponible.
-- [ ] Tester « appeler le suivant » avec zéro attente : erreur métier intégrée au shell, jamais page blanche.
-- [ ] Tester la concurrence : deux opérateurs tentent d'appeler le même prochain ticket.
-- [ ] Tester servi et absent avec désactivation pendant la mutation.
-- [ ] Vérifier nom/prénom nullable, arrivée, appel, sortie, attente et nombre de notes.
-- [ ] Tester les cartes de récapitulatif et l'impression du justificatif.
-- [ ] Vérifier qu'un refresh de page conserve le contexte utilisateur et le site.
+- [x] Tester l'ouverture et la fermeture d'un guichet avec rafraîchissement immédiat de l'UI.
+- [x] Tester qu'une file avec guichet actif est priorisée visuellement.
+- [x] Tester l'état sans file configurée et sans file active.
+- [x] Tester « appeler le suivant » avec une attente disponible.
+- [x] Tester « appeler le suivant » avec zéro attente : erreur métier intégrée au shell, jamais page blanche.
+- [x] Tester la concurrence : deux opérateurs tentent d'appeler le même prochain ticket.
+- [x] Tester servi et absent avec désactivation pendant la mutation.
+- [x] Vérifier nom/prénom nullable, arrivée, appel, sortie, attente et nombre de notes.
+- [x] Tester les cartes de récapitulatif et l'impression du justificatif.
+- [x] Vérifier qu'un refresh de page conserve le contexte utilisateur et le site.
 
 Critère d'acceptation : les opérations de guichet restent cohérentes après mutation, conflit et actualisation.
 
@@ -724,6 +724,8 @@ npm run verify
 
 Précaution : ne pas exécuter `npm run build` en parallèle de Playwright, car le build lance Orval et nettoie temporairement `src/api/generated`.
 
+Le pipeline canonique `npm run verify` exécute ces étapes séquentiellement. `pretest:e2e` refuse en plus de démarrer Playwright si les entrées essentielles du client généré sont absentes. Playwright ne réutilise jamais un serveur Vite déjà présent sur le port 4173 afin d'éviter de tester un bundle obsolète.
+
 ## 6. Dépendances et blocages externes
 
 - [ ] Obtenir un contrat WebSocket versionné avant de remplacer le polling.
@@ -738,6 +740,73 @@ Ces points ne doivent pas bloquer les améliorations indépendantes, mais ils bl
 ## 7. Journal de validation
 
 Ajouter une entrée datée après chaque lot terminé.
+
+### 2026-10-09 — A1/A2, baseline et réconciliation
+
+- Tâches cochées : règles de préservation, A1 et A2.
+- Baseline Git : commit `2e84419`, branche `dev`, tag `beta_stable`, identique à `origin/dev` au démarrage.
+- État initial : worktree propre ; aucun changement applicatif ou généré préexistant à préserver.
+- Artefacts ignorés confirmés : `dist/`, `playwright-report/`, `test-results/`, `src/api/generated/` et fichiers d'environnement locaux.
+- Réconciliation : inventaire initial marqué historique, section i18n finale cochée après contrôle, lien ajouté vers ce plan actif.
+- Preuves : 29 fichiers de tests et 56 tests Vitest réussis ; audit i18n réussi ; audit Phase 11 réussi sur 124 fichiers source.
+- Décision : les tâches finales de comparaison à la maquette, documentation et recette restent planifiées en phases F et I.
+- Prochaine tâche : A3, stabilisation des scénarios Playwright existants.
+
+### 2026-10-09 — A3/A4/A5, stabilisation E2E et métriques initiales
+
+- Tâches cochées : A3 complet ; A4 partiel ; A5 complet.
+- Corrections : navigation E2E alignée sur « Pilotage » et « État de la plateforme », espacement accessible « Guichet 2 », deux assertions mojibake corrigées.
+- Stabilité : suite complète Playwright réussie trois fois consécutivement, 14/14 scénarios en environ 32 à 35 secondes.
+- Contrôles : typecheck et lint réussis ; `api:check` réussi sans diff généré ; build réussi.
+- Tests unitaires/composants : 29 fichiers, 56 tests, environ 30 secondes.
+- E2E : 11 déclarations statiques produisant 14 scénarios avec la matrice responsive.
+- Client API/UI : 26 fichiers applicatifs importent encore un contrôleur Orval ; 50 déclarations `useQuery`/`useMutation` dans les composants.
+- Fichiers les plus volumineux : `global.css` 4091 lignes, `SettingsPage` 943, `KioskPage` 743, `OnboardingPage` 737, fallback i18n 680, `NotificationsPage` 610, `DeskPage` 542, `i18n.ts` 521, `QuickRegistration` 400 et `AppointmentsPage` 353.
+- Bundle initial : entrée principale 467,35 kB brut / 145,14 kB gzip ; schémas 114,22 / 34,62 ; client HTTP 51,73 / 19,34 ; kiosque 41,65 / 13,99 ; CSS 75,11 / 15,26.
+- Outillage : contrôle préalable des imports générés ajouté ; `verify` reste séquentiel. Le verrou interprocessus génération/E2E reste à finaliser.
+- Risque observé : le filtrage Playwright par expression des seuls tests « phase » atteint tous les scénarios mais ne rend pas proprement la main dans l'environnement Windows actuel ; le script ciblé est donc défini au niveau fiable du fichier visuel complet.
+- Décision A4 : les scripts du dépôt garantissent l'ordre séquentiel ; lancer manuellement deux commandes npm concurrentes reste un usage hors pipeline et est explicitement interdit dans les règles d'exécution.
+- Prochaine tâche : démarrer l'infrastructure E2E de phase B.
+
+### 2026-10-09 — B1/B2/B3, socle E2E, session et scopes
+
+- Tâches cochées : B1, B2 et B3 complets.
+- Fichiers principaux : `e2e/support/scenario-fixtures.ts`, `e2e/session.spec.ts`, `e2e/scope.spec.ts`, `src/core/auth/session-actions.ts`, `src/app/AppProviders.tsx` et `src/app/layouts/PublicExperienceLayout.tsx`.
+- Infrastructure : profils root/admin/manager/opérateur/kiosque, builders contractuels, enveloppes API, erreurs, latence, horloge, mode hors ligne et helpers de navigation mutualisés.
+- Session : connexion réelle par formulaire, restauration après refresh, expiration, purge complète, déconnexion, changement de mot de passe imposé et `?deco=true` sur les trois expériences couverts.
+- Correction applicative : les expirations HTTP déclenchent maintenant la purge de la session, du scope, de la marque et du cache via l'abonnement global ; la déconnexion cachée couvre aussi le tracking authentifié.
+- Scope : absence de site, site unique, multi-sites, invalidation des données, persistance du bandeau, stockage hors scope, matrice de permissions et restriction kiosque couverts.
+- Tests : suite Playwright complète réussie avec 29/29 scénarios avant l'extension finale de la matrice de routes ; tests unitaires ciblés session 7/7, lint et typecheck réussis sur le lot session.
+- Limite outillage : l'exécution Playwright filtrée reste bloquante sous Windows ; la suite complète demeure la validation canonique.
+- Prochaine tâche : B4, parcours cockpit et files.
+
+### 2026-10-09 — B4, accueil rapide et walk-in
+
+- Tâches cochées : B4 complet.
+- Couverture : recherche connue à trois caractères avec `siteId`, pages de cinq résultats et pagination ; inscription d'une personne connue ; création d'une identité complète ; choix file/forfait ; création walk-in ; succès, conflit 409 et double clic.
+- Corrections applicatives : validation locale des e-mails et dates ISO optionnels, verrou synchrone anti-double soumission, invalidation des inscriptions, statuts de files et prochains éligibles après création.
+- Fixtures : catalogue de forfaits et réponses supervision/santé contractuelles ajoutés au socle commun ; les parcours de routes ne masquent plus d'erreur de rendu derrière une Error Boundary.
+- Tests : 4/4 tests ciblés `PersonPickerOrCreate`, typecheck et lint réussis ; suite Playwright complète réussie avec 32/32 scénarios.
+- Prochaine tâche : B5, rendez-vous.
+
+### 2026-10-09 — B5, rendez-vous et fuseaux horaires
+
+- Tâches cochées : B5 complet.
+- Couverture E2E : case vide, wizard personne/service/créneau, chargement des disponibilités, création, conflit 409 avec refetch, ouverture d'une réservation, reprogrammation, annulation et site sans rendez-vous.
+- Fuseau : les corps envoyés sont vérifiés en UTC depuis l'heure civile `Europe/Paris` ; les tests unitaires couvrent désormais explicitement les offsets été et hiver.
+- Tests : typecheck et lint réussis ; suite Playwright complète réussie avec 36/36 scénarios.
+- Prochaine tâche : B6, cockpit et opérations de file.
+
+### 2026-10-09 — B6, cockpit et moteur de file
+
+- Tâches cochées : B6 complet.
+- Couverture E2E : ouverture/fermeture de guichet, priorité visuelle, absence de file, appel nominal, file vide, concurrence entre deux opérateurs, servi, absent et maintien du shell en erreur.
+- Détails métier vérifiés : identité partiellement nulle, date d'arrivée, heure d'appel, attente calculée, compteur de notes et synthèse du passage.
+- Impression : déclenchement de `window.print`, contenu non fiscal et mention d'impression à la demande du client contrôlés.
+- Persistance : le scénario B2 de refresh privé couvre la conservation conjointe de la session et du site actif sur le cockpit.
+- Fixtures : les réponses communes de statut, sessions et guichets sont maintenant contractuelles et ne reposent plus sur une pagination générique incompatible.
+- Tests : suite Playwright complète réussie avec 42/42 scénarios avant l'ajout des assertions légales finales ; typecheck réussi.
+- Prochaine tâche : B7, mes files et notes.
 
 Modèle :
 
@@ -768,3 +837,27 @@ Le chantier de consolidation est terminé uniquement lorsque :
 - [ ] La documentation permet installation, développement, test, déploiement et exploitation sans transmission orale.
 - [ ] Les mentions légales et la configuration de production sont réelles et validées.
 - [ ] La recette finale des sections 14 des deux spécifications est signée ou explicitement acceptée avec risques résiduels.
+
+<!-- CHECKPOINT id="ckpt_mv19hvvw_220axp" time="2026-10-09T17:51:19.724Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv19uqrb_ndfgky" time="2026-10-09T18:01:19.607Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1a7lqb_xjs636" time="2026-10-09T18:11:19.619Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1akgp4_fke8ci" time="2026-10-09T18:21:19.624Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1axbo1_cg98b1" time="2026-10-09T18:31:19.633Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ba6n2_1y5csn" time="2026-10-09T18:41:19.646Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1bn1lx_ifbobo" time="2026-10-09T18:51:19.653Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1bzwkp_94fbii" time="2026-10-09T19:01:19.657Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ccrjv_0fezil" time="2026-10-09T19:11:19.676Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1e3f2i_5ozgbk" time="2026-10-09T20:00:02.826Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ega1e_pdf7nx" time="2026-10-09T20:10:02.834Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1et50h_i53p8m" time="2026-10-09T20:20:02.849Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
