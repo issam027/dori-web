@@ -899,6 +899,24 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 - [ ] Ajouter un audit automatisé empêchant la réintroduction de textes visibles en dur.
 - [ ] Exécuter la validation complète après disparition de tous les textes visibles en dur.
 
+### 2026-10-09 — Contrastes des champs dans les quatre thèmes
+
+- [x] Auditer les jetons de couleur communs aux thèmes clair, clair doux, sombre doux et sombre.
+- [x] Corriger le contraste des boutons primaires dans les thèmes sombres avec une couleur de texte dédiée.
+- [x] Rendre les placeholders, listes natives et champs désactivés lisibles sans opacité globale.
+- [x] Décliner les couleurs succès, avertissement et erreur par thème.
+- [x] Remplacer les fonds clairs figés des écrans d’administration par les jetons du thème actif.
+- [x] Étendre l’audit WCAG automatisé à la connexion, au cockpit et à la configuration dans les quatre thèmes.
+- [x] Valider le typage, le lint et l’audit WCAG étendu sans violation sérieuse ou critique.
+
+### 2026-10-09 — Identité complète saisie par un opérateur
+
+- [x] Aligner la création d’une nouvelle personne sur tous les champs acceptés par `PersonIdentityDto`.
+- [x] Ajouter prénom, nom, téléphone, e-mail, date de naissance et préférence de langue aux parcours Accueil rapide et Rendez-vous.
+- [x] Conserver le site actif comme donnée de contexte non saisissable.
+- [x] Disposer les champs sur deux colonnes, avec retour à une colonne sur mobile.
+- [x] Valider le test ciblé, l’audit i18n, le typage, le lint et le build de production.
+
 <!-- CHECKPOINT id="ckpt_mv0xua77_afonq3" time="2026-10-09T12:25:02.755Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv0y756a_yt95t3" time="2026-10-09T12:35:02.770Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -912,3 +930,39 @@ Critère de sortie : toutes les cases de la définition de fini sont démontrée
 <!-- CHECKPOINT id="ckpt_mv0zml25_0e1k3s" time="2026-10-09T13:15:02.813Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv0zzg11_rziu4h" time="2026-10-09T13:25:02.821Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv10cb06_xy1vyr" time="2026-10-09T13:35:02.838Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv10p5yx_semou2" time="2026-10-09T13:45:02.841Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1120xt_0492xu" time="2026-10-09T13:55:02.849Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv11gi3c_0xsmqm" time="2026-10-09T14:06:18.264Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv11td30_9bkkuu" time="2026-10-09T14:16:18.300Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv12681b_nonna0" time="2026-10-09T14:26:18.287Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv12j2zw_33c4hs" time="2026-10-09T14:36:18.284Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv13jbte_3ef5si" time="2026-10-09T15:04:29.330Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv150b7y_cqcj7x" time="2026-10-09T15:45:41.326Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv15d65q_e780ve" time="2026-10-09T15:55:41.294Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv15q14r_f65vxf" time="2026-10-09T16:05:41.307Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv162w7c_r19de3" time="2026-10-09T16:15:41.448Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv16s4ga_ohiqdg" time="2026-10-09T16:35:18.538Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv17cppl_vkgd5u" time="2026-10-09T16:51:19.209Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv17pkn2_3tpket" time="2026-10-09T17:01:19.166Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv182fm5_mayoyi" time="2026-10-09T17:11:19.181Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv18falp_1vyf3j" time="2026-10-09T17:21:19.213Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv18s5k1_rlgg2b" time="2026-10-09T17:31:19.201Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

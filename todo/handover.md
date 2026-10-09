@@ -1,0 +1,770 @@
+# DORI Web — Handover de consolidation avant recette finale
+
+Dernière mise à jour : 2026-10-09  
+Portée : dépôt `dori-web` complet  
+Statut initial : plan uniquement, aucune tâche de ce document n'est réputée réalisée tant que sa case n'est pas cochée avec une preuve associée.
+
+## 1. Objectif et règles d'exécution
+
+Ce document organise le travail restant pour transformer l'application actuelle en version consolidée, testable, transmissible et prête à faire l'objet d'une recette finale. Il ne remplace pas les spécifications fonctionnelles : en cas d'ambiguïté, les sources de référence restent, dans cet ordre :
+
+1. `specifications/final_ihm_specification.md` ;
+2. `specifications/spec_front.md` ;
+3. `specifications/dori_saas_mockup.html` pour l'intention visuelle et les cinématiques ;
+4. `specifications/docs-json.json` pour le contrat API ;
+5. `specifications/ai/handover.md` pour l'historique des décisions et travaux déjà réalisés.
+
+Règles à respecter pendant toutes les phases :
+
+- [ ] Préserver les modifications déjà présentes dans le worktree et ne jamais écraser un travail non lié.
+- [ ] Ne jamais modifier manuellement `src/api/generated`; utiliser `npm run api:generate`.
+- [ ] Ne pas lancer `npm run build` ou `npm run api:generate` en parallèle avec Vite, Playwright ou un autre processus important `src/api/generated`.
+- [ ] Utiliser les DTO générés par Orval et ne pas recopier les contrats Swagger.
+- [ ] Garder les access tokens uniquement en mémoire et le refresh token dans le cookie HttpOnly géré par l'API.
+- [ ] Ne jamais exposer PII, JWT, refresh token ou token de tracking dans les logs, erreurs, URLs de navigation interne ou fixtures publiques.
+- [ ] Tout texte visible doit passer par i18n. Une clé distante de catégorie `ihm` doit rester prioritaire sur le fallback local.
+- [ ] Chaque mutation doit gérer l'attente, le double clic, le succès, l'erreur, le conflit métier et l'invalidation du cache.
+- [ ] Chaque liste doit gérer chargement, vide, erreur, retry et pagination lorsque le service la supporte.
+- [ ] Toute nouvelle tâche terminée doit être cochée ici et accompagnée de sa preuve dans la section « Journal de validation ».
+
+## 2. État observé au démarrage
+
+- L'application React/Vite couvre les principales routes privées et publiques.
+- Le client API est généré par Orval depuis `specifications/docs-json.json`.
+- L'authentification, les scopes, React Query, i18n, les quatre thèmes et les notifications globales sont en place.
+- Les tests unitaires et composants sont présents, mais les parcours E2E ne couvrent pas encore toute la définition de fini.
+- Trois scénarios E2E historiques sont actuellement instables ou obsolètes : écran salle/guichet, navigation santé et navigation supervision.
+- Plusieurs pages concentrent trop de responsabilités :
+  - `SettingsPage.tsx` : environ 943 lignes ;
+  - `KioskPage.tsx` : environ 743 lignes ;
+  - `OnboardingPage.tsx` : environ 737 lignes ;
+  - `NotificationsPage.tsx` : environ 610 lignes ;
+  - `DeskPage.tsx` : environ 542 lignes ;
+  - `global.css` : plus de 4 000 lignes.
+- Environ 50 requêtes ou mutations React Query sont encore orchestrées directement dans les composants.
+- `FeatureErrorBoundary` existe mais n'est pas utilisé dans les espaces fonctionnels.
+- Le temps réel utilise volontairement un polling tant qu'un contrat WebSocket versionné n'est pas disponible.
+- Le README ne suffit pas encore pour installer, configurer, tester et déployer le projet sans transmission orale.
+- Le handover historique contient des cases anciennes qui ne reflètent plus toujours l'état réel du code.
+
+## 3. Ordre d'exécution recommandé
+
+Ne pas commencer une phase structurelle tant que la phase précédente n'a pas un socle stable.
+
+1. Phase A — Établir une baseline fiable.
+2. Phase B — Stabiliser et compléter les tests E2E métier.
+3. Phase C — Extraire la couche d'accès métier/API.
+4. Phase D — Décomposer les pages et wizards volumineux.
+5. Phase E — Modulariser le design system et le CSS.
+6. Phase F — Finaliser l'accessibilité et la recette visuelle.
+7. Phase G — Renforcer résilience, erreurs et observabilité.
+8. Phase H — Sécurité et préparation production.
+9. Phase I — Documentation, déploiement et recette finale.
+
+---
+
+## Phase A — Baseline, cohérence du dépôt et pipeline
+
+### A1 — Protéger l'état de travail existant
+
+But : disposer d'un état de référence sans perdre les modifications fonctionnelles déjà réalisées.
+
+Fichiers/outils concernés : Git, tout le dépôt.
+
+- [ ] Relever `git status --short` et identifier les fichiers modifiés, nouveaux et générés.
+- [ ] Distinguer les changements applicatifs des artefacts de test (`test-results`, rapport Playwright, captures temporaires).
+- [ ] Vérifier que `dist`, rapports, traces et profils de navigateur ne sont pas suivis par Git.
+- [ ] Ne pas nettoyer ou réinitialiser les fichiers modifiés sans validation explicite de leur propriétaire.
+- [ ] Consigner le commit ou l'état Git servant de baseline dans le journal de validation.
+
+Critère d'acceptation : la liste des changements préexistants est connue et aucune modification utilisateur n'a été perdue.
+
+### A2 — Réconcilier le handover historique
+
+But : empêcher que les prochaines interventions suivent des cases obsolètes.
+
+Fichier concerné : `specifications/ai/handover.md`.
+
+- [ ] Identifier les cases non cochées contredites par le code actuel, notamment l'inventaire initial et la migration i18n.
+- [ ] Ne pas supprimer l'historique ; marquer les entrées anciennes comme remplacées ou ajouter une note de réconciliation datée.
+- [ ] Vérifier les affirmations concernant le nombre de tests, les routes et les validations.
+- [ ] Réserver les trois tâches volontairement différées par le demandeur : comparaison finale à la maquette, documentation complète et recette finale.
+- [ ] Ajouter un lien depuis le handover historique vers le présent fichier de consolidation.
+
+Critère d'acceptation : un nouvel intervenant peut savoir ce qui est réellement terminé sans lire tout l'historique chronologique.
+
+### A3 — Stabiliser les E2E existants
+
+But : éliminer les échecs connus avant d'ajouter de nouveaux scénarios.
+
+Fichiers concernés : `e2e/visual-layout.spec.ts`, `e2e/smoke.spec.ts`, mocks Playwright.
+
+- [ ] Corriger le scénario écran salle qui attend encore le libellé exact « guichet 2 » si le rendu ou les données mockées ont changé.
+- [ ] Vérifier que l'écran salle teste le comportement métier et non un libellé fragile : ticket en traitement, destination et prochains appels.
+- [ ] Corriger l'accès E2E à « État/Santé de la plateforme » en tenant compte des accordéons et du profil mocké.
+- [ ] Corriger l'accès E2E à la supervision avec le bon groupe de menu et les permissions requises.
+- [ ] Corriger les chaînes de mock ou assertions présentant du mojibake (`Ã©`, `â€¢`, etc.).
+- [ ] Éviter les sélecteurs basés uniquement sur du texte susceptible d'être traduit ; préférer rôles, noms accessibles stables ou `data-testid` justifiés.
+- [ ] Vérifier que chaque test prépare explicitement session, permissions, scope et site actif.
+- [ ] Vérifier que les tests peuvent s'exécuter seuls et dans la suite complète.
+
+Commandes de validation :
+
+```bash
+npm run test:e2e
+npm run typecheck
+npm run lint
+```
+
+Critère d'acceptation : la suite E2E existante passe au moins trois fois consécutivement sans retry local.
+
+### A4 — Fiabiliser les scripts de vérification
+
+But : rendre `npm run verify` déterministe.
+
+Fichiers concernés : `package.json`, `playwright.config.ts`, configuration Orval/Vite.
+
+- [ ] Documenter que `api:generate` nettoie `src/api/generated` avant sa régénération.
+- [ ] Garantir que Playwright ne démarre pas pendant une génération API concurrente.
+- [ ] Ajouter, si nécessaire, un script ciblé Playwright dont les arguments sont correctement transmis sous Windows.
+- [ ] Vérifier le comportement de `reuseExistingServer` lorsqu'un serveur Vite obsolète écoute déjà sur le port 4173.
+- [ ] Ajouter un contrôle de disponibilité des imports générés avant le démarrage E2E.
+- [ ] Vérifier que `api:check` ne laisse pas de changements générés après exécution.
+- [ ] Conserver l'ordre : génération/contrat, audits, lint, typecheck, tests, build, E2E.
+
+Critère d'acceptation : une commande unique reproduit la validation CI sans course entre Orval et Vite.
+
+### A5 — Établir les métriques initiales
+
+But : pouvoir démontrer que les refactorings améliorent le projet sans régression.
+
+- [ ] Relever le nombre de tests unitaires, composants et E2E.
+- [ ] Relever la durée moyenne de `typecheck`, `lint`, tests, build et E2E.
+- [ ] Relever les tailles des bundles principaux et des chunks de routes.
+- [ ] Lister les dix plus gros fichiers applicatifs hors code généré.
+- [ ] Lister les composants important directement des contrôleurs Orval.
+- [ ] Conserver ces métriques dans le journal de validation.
+
+Critère d'acceptation : les valeurs initiales sont consignées et pourront être comparées après consolidation.
+
+---
+
+## Phase B — Couverture E2E de la définition de fini
+
+### B1 — Infrastructure commune de scénarios
+
+But : éviter des mocks incohérents ou dupliqués entre tests.
+
+- [ ] Extraire les builders de session, utilisateur, permissions, sites, files, personnes, tickets et rendez-vous.
+- [ ] Fournir des profils root, administrateur, manager, opérateur et kiosque.
+- [ ] Fournir des helpers pour activer un site, ouvrir un groupe de navigation et choisir une file.
+- [ ] Fournir une horloge déterministe pour les dates, durées d'attente et fuseaux horaires.
+- [ ] Centraliser les enveloppes de réponse API et erreurs normalisées.
+- [ ] Permettre de simuler latence, `401`, `403`, `404`, `409`, `422`, `500` et hors ligne.
+- [ ] Garantir qu'aucune fixture publique ne contient de PII réaliste.
+
+Critère d'acceptation : chaque scénario décrit seulement son intention métier et réutilise les primitives communes.
+
+### B2 — Session et authentification
+
+- [ ] Tester la connexion avec redirection vers la première route autorisée.
+- [ ] Tester le refresh d'une page privée avec restauration via cookie de refresh simulé.
+- [ ] Tester une session expirée avec maintien du contexte jusqu'à affichage du message et redirection contrôlée.
+- [ ] Tester plusieurs `401` simultanés et vérifier qu'un seul refresh est envoyé.
+- [ ] Tester l'échec du refresh : purge de session, cache, scope et marque.
+- [ ] Tester la déconnexion standard.
+- [ ] Tester `?deco=true` sur kiosque, écran salle et tracking authentifié.
+- [ ] Tester l'obligation de changement de mot de passe.
+
+Critère d'acceptation : aucun refresh de page normal ne renvoie abusivement vers la connexion et aucun token n'est persisté dans `localStorage`.
+
+### B3 — Scope, sites et permissions
+
+- [ ] Tester un utilisateur sans site actif : message explicite et lien vers le portefeuille.
+- [ ] Tester un utilisateur avec un seul site : activation automatique et portefeuille masqué selon la règle validée.
+- [ ] Tester un utilisateur multi-sites : choix depuis le portefeuille et invalidation des caches précédents.
+- [ ] Tester que le nom du site reste visible dans le bandeau sur toutes les routes concernées.
+- [ ] Tester les interdictions de routes et d'actions pour chaque profil.
+- [ ] Tester qu'un site hors scope ne peut pas être activé par manipulation de stockage ou d'URL.
+- [ ] Tester qu'un compte kiosque ne peut accéder qu'au choix du mode appareil et aux expériences autorisées.
+
+Critère d'acceptation : route, navigation, contrôles et appels API appliquent tous le même scope.
+
+### B4 — Accueil rapide et parcours walk-in
+
+- [ ] Rechercher une personne connue à partir du troisième caractère avec `siteId`, page de cinq résultats et pagination conditionnelle.
+- [ ] Créer une identité avec nom, prénom, téléphone, e-mail, date de naissance et langue.
+- [ ] Vérifier les champs obligatoires et le téléphone E.164.
+- [ ] Vérifier qu'un e-mail ou une date de naissance invalides empêchent la poursuite si le contrat l'exige.
+- [ ] Sélectionner file et niveau de service.
+- [ ] Créer un walk-in et vérifier numéro de ticket, notification et rafraîchissement du cockpit/des files.
+- [ ] Tester téléphone déjà utilisé ou conflit métier avec message actionnable.
+- [ ] Tester le double clic et confirmer qu'une seule inscription est créée.
+
+Critère d'acceptation : le parcours complet est couvert pour personne connue et nouvelle personne.
+
+### B5 — Rendez-vous
+
+- [ ] Tester le wizard personne puis service/créneau.
+- [ ] Vérifier que les disponibilités sont chargées après choix de la date et de la file.
+- [ ] Tester la création avec conversion correcte dans le fuseau IANA du site.
+- [ ] Tester un créneau devenu indisponible (`409`) : message local et rechargement des disponibilités.
+- [ ] Tester le clic sur une case vide du calendrier.
+- [ ] Tester l'ouverture d'un rendez-vous existant.
+- [ ] Tester reprogrammation et annulation.
+- [ ] Tester l'état « ce site ne gère pas les rendez-vous ».
+- [ ] Tester les changements heure d'été/heure d'hiver sur au moins un fuseau européen.
+
+Critère d'acceptation : création, consultation, reprogrammation et annulation sont couvertes sans décalage de date/heure.
+
+### B6 — Cockpit et moteur de file
+
+- [ ] Tester l'ouverture et la fermeture d'un guichet avec rafraîchissement immédiat de l'UI.
+- [ ] Tester qu'une file avec guichet actif est priorisée visuellement.
+- [ ] Tester l'état sans file configurée et sans file active.
+- [ ] Tester « appeler le suivant » avec une attente disponible.
+- [ ] Tester « appeler le suivant » avec zéro attente : erreur métier intégrée au shell, jamais page blanche.
+- [ ] Tester la concurrence : deux opérateurs tentent d'appeler le même prochain ticket.
+- [ ] Tester servi et absent avec désactivation pendant la mutation.
+- [ ] Vérifier nom/prénom nullable, arrivée, appel, sortie, attente et nombre de notes.
+- [ ] Tester les cartes de récapitulatif et l'impression du justificatif.
+- [ ] Vérifier qu'un refresh de page conserve le contexte utilisateur et le site.
+
+Critère d'acceptation : les opérations de guichet restent cohérentes après mutation, conflit et actualisation.
+
+### B7 — Kiosque, écran salle et tracking
+
+- [ ] Tester le parcours kiosque complet en paysage tablette sans scroll évitable sur l'écran final.
+- [ ] Vérifier le masque téléphonique et l'indicatif pays.
+- [ ] Vérifier la synthèse en deux colonnes et tous les choix client.
+- [ ] Vérifier la génération systématique du QR code `/track?token=...`.
+- [ ] Vérifier l'effacement des données après fin ou timeout kiosque.
+- [ ] Tester l'écran salle avec plusieurs files associées au compte technique.
+- [ ] Vérifier appels en cours, destination/file, prochains appels, plein écran 1080p et 4K.
+- [ ] Vérifier qu'aucune PII n'est rendue sur l'écran salle.
+- [ ] Tester tracking réel sans champ de saisie visible.
+- [ ] Tester tracking en preview humain avec champ de token hors du téléphone.
+- [ ] Tester token invalide, expiré et état indisponible.
+
+Critère d'acceptation : les trois expériences publiques fonctionnent dans leurs modes réels et preview sans fuite de contexte privé.
+
+### B8 — Supervision, rapports, notifications et santé
+
+- [ ] Tester les cartes de supervision, leurs états vides et leur rafraîchissement.
+- [ ] Tester les rapports avec période, file/site et absence de données.
+- [ ] Tester la création guidée d'une notification et la validation du destinataire.
+- [ ] Tester les erreurs d'envoi et les confirmations globales.
+- [ ] Tester l'accès à la santé uniquement avec `system_manage`.
+- [ ] Vérifier que les données techniques restent compréhensibles et qu'aucun secret n'est affiché.
+
+Critère d'acceptation : chaque écran de pilotage possède au moins un parcours heureux et un parcours d'erreur automatisés.
+
+---
+
+## Phase C — Couche métier et accès API
+
+### C1 — Définir la convention d'architecture
+
+- [ ] Choisir une convention unique par feature : `api/`, `hooks/`, `components/`, `model/`, `utils/` selon les besoins réels.
+- [ ] Ne pas créer de répertoires vides ou de couches sans responsabilité concrète.
+- [ ] Réserver les imports Orval aux adaptateurs/actions/hooks métier.
+- [ ] Garder les composants visuels indépendants du format d'enveloppe API.
+- [ ] Documenter les règles de nommage des clés React Query.
+- [ ] Définir quand employer un hook, une fonction d'action ou un store Zustand.
+
+Critère d'acceptation : la convention est courte, documentée et appliquée sur une feature pilote.
+
+### C2 — Centraliser les clés et invalidations React Query
+
+- [ ] Étendre `src/api/client/query-keys.ts` pour couvrir sites, files, personnes, inscriptions, rendez-vous, rapports et notifications.
+- [ ] Encoder systématiquement `siteId`, `queueId`, filtres, page et langue dans les clés concernées.
+- [ ] Centraliser les invalidations après chaque mutation.
+- [ ] Vérifier qu'un changement de site annule puis supprime les caches hors scope.
+- [ ] Éviter les chaînes de clés dupliquées écrites directement dans les pages.
+
+Critère d'acceptation : les invalidations sont prévisibles et aucun écran n'affiche les données du site précédent.
+
+### C3 — Créer les hooks métier prioritaires
+
+- [ ] `usePersonsSearch` : seuil de trois caractères, pagination cinq éléments, scope site.
+- [ ] `usePersonNotes` : consultation, ajout et invalidation du compteur.
+- [ ] `useQueues` et `useQueueStatus` : files autorisées, actives et état temps réel.
+- [ ] `useDeskSession` : ouverture, fermeture, threads et session courante.
+- [ ] `useCallNext`, `useMarkServed`, `useMarkNoShow` : concurrence, pending et notifications.
+- [ ] `useAppointments` et `useAvailability` : dates, fuseau et conflits.
+- [ ] `useSites` et `useActiveSite` : activation contrôlée et marque.
+- [ ] `useReports`, `useNotifications`, `useHealth`.
+- [ ] `usePublicTracking`, `useDisplaySnapshot`, `useKioskRegistration`.
+
+Critère d'acceptation : les pages consomment des modèles métier et n'importent plus directement les fonctions contrôleur concernées.
+
+### C4 — Encapsuler les mutations
+
+- [ ] Fournir un comportement commun contre le double clic.
+- [ ] Conserver et exposer le correlation ID des erreurs.
+- [ ] Gérer les erreurs attendues localement et les erreurs inattendues globalement.
+- [ ] Déclencher les notifications traduites depuis une clé stable.
+- [ ] Appliquer les invalidations après succès et après conflit si nécessaire.
+- [ ] Ne jamais faire de rollback optimiste sur une opération de file si le serveur reste la source de vérité.
+
+Critère d'acceptation : une mutation métier a le même comportement UX quel que soit l'écran qui la déclenche.
+
+### C5 — Vérifier l'absence d'appels réseau dans les pages
+
+- [ ] Renforcer `tools/phase11-audit.mjs` pour détecter les imports directs de contrôleurs Orval dans les fichiers `*Page.tsx`.
+- [ ] Prévoir une liste d'exceptions temporaire, explicite et décroissante pendant la migration.
+- [ ] Faire échouer l'audit lorsqu'une nouvelle page réintroduit un contrôleur généré.
+- [ ] Cocher la tâche correspondante du handover historique une fois toutes les exceptions supprimées.
+
+Critère d'acceptation : aucune page ne connaît une URL, Axios ou une fonction contrôleur Orval.
+
+---
+
+## Phase D — Décomposition des composants volumineux
+
+### D1 — Refactorer `SettingsPage`
+
+- [ ] Extraire le routage interne des sections.
+- [ ] Extraire les formulaires site, files, utilisateurs, niveaux de service et traductions.
+- [ ] Extraire les cartes/rangées répétées.
+- [ ] Déplacer les requêtes dans les hooks de la phase C.
+- [ ] Créer un schéma Zod par formulaire lorsque la validation dépasse de simples champs requis.
+- [ ] Ajouter des tests par section et un test d'intégration de navigation.
+
+Critère d'acceptation : `SettingsPage` orchestre les sections sans contenir leur implémentation détaillée.
+
+### D2 — Refactorer `OnboardingPage`
+
+- [ ] Extraire chaque étape du wizard.
+- [ ] Isoler le modèle de brouillon et sa migration de version.
+- [ ] Isoler la synthèse finale et l'activation du site.
+- [ ] Garantir que succès final réinitialise l'écran et affiche une situation compréhensible.
+- [ ] Conserver les deux cartes principales à hauteur cohérente.
+- [ ] Tester reprise du brouillon, abandon et création partiellement échouée.
+
+Critère d'acceptation : chaque étape peut être testée indépendamment et la page ne porte plus les détails des formulaires.
+
+### D3 — Refactorer `KioskPage`
+
+- [ ] Extraire `KioskWelcomeStep`.
+- [ ] Extraire `KioskIdentityStep`.
+- [ ] Extraire `KioskQueueStep`.
+- [ ] Extraire `KioskTierStep`.
+- [ ] Extraire `KioskReviewStep`.
+- [ ] Extraire `KioskTicketResult` et le QR code.
+- [ ] Centraliser l'état du wizard avec transitions explicites.
+- [ ] Garantir la remise à zéro après succès, annulation et watchdog.
+- [ ] Tester chaque transition et les retours arrière.
+
+Critère d'acceptation : aucune étape kiosque ne dépend de variables implicites appartenant à une autre étape.
+
+### D4 — Refactorer `DeskPage`
+
+- [ ] Extraire le bandeau accueil rapide.
+- [ ] Extraire les cartes de file.
+- [ ] Extraire la prochaine personne éligible.
+- [ ] Extraire la prise en charge courante.
+- [ ] Extraire la liste discrète des passages terminés.
+- [ ] Extraire les actions d'impression.
+- [ ] Réduire les callbacks imbriqués et centraliser les commandes métier.
+- [ ] Conserver tailles de cartes homogènes et priorité visuelle du guichet actif.
+
+Critère d'acceptation : les blocs du cockpit peuvent évoluer sans modifier une page monolithique.
+
+### D5 — Refactorer `NotificationsPage`
+
+- [ ] Extraire le wizard « nouvel envoi ».
+- [ ] Séparer choix d'audience, contenu, aperçu et confirmation.
+- [ ] Extraire la recherche de personnes et inscriptions.
+- [ ] Centraliser la validation des canaux et destinataires.
+- [ ] Tester navigation, retour arrière, erreurs et résumé final.
+
+Critère d'acceptation : la création d'une notification suit une machine d'états claire et testable.
+
+### D6 — Simplifier le routage applicatif
+
+- [ ] Remplacer la grande chaîne conditionnelle de `App.tsx` par une configuration associant chemin, composant et layout.
+- [ ] Conserver le lazy loading par route.
+- [ ] Centraliser les règles « public », « shell humain », « preview expérience » et « appareil technique ».
+- [ ] Supprimer le double `useTranslation()` dans `Page`.
+- [ ] Tester 404, forbidden, login, legal et toutes les routes protégées.
+
+Critère d'acceptation : l'ajout d'une route ne demande pas de modifier plusieurs conditions imbriquées.
+
+---
+
+## Phase E — Design system et CSS
+
+### E1 — Cartographier les styles
+
+- [ ] Lister les sélecteurs de `global.css` par famille fonctionnelle.
+- [ ] Repérer les règles dupliquées, surchargées ou devenues inutilisées.
+- [ ] Repérer les couleurs, espacements, rayons et ombres codés en dur.
+- [ ] Identifier les règles spécifiques à l'impression.
+- [ ] Identifier les règles publiques qui doivent rester indépendantes du shell privé.
+
+Critère d'acceptation : chaque bloc CSS possède une destination de module connue avant déplacement.
+
+### E2 — Séparer les tokens des composants
+
+- [ ] Garder dans `tokens` uniquement couleurs, espacements, typographie, rayons, ombres, transitions et thèmes.
+- [ ] Créer des feuilles dédiées aux boutons et contrôles de formulaire.
+- [ ] Créer des feuilles dédiées aux cartes, tableaux, badges et états.
+- [ ] Créer une feuille dédiée aux modales et wizards.
+- [ ] Créer des feuilles par expérience publique : kiosque, display, tracking.
+- [ ] Créer des feuilles par grande feature uniquement lorsque le style n'est pas réutilisable.
+- [ ] Importer les feuilles dans un ordre explicite et stable.
+
+Critère d'acceptation : `global.css` n'est plus un fichier monolithique et les thèmes ne régressent pas.
+
+### E3 — Consolider les composants de formulaire
+
+- [ ] Uniformiser label, marque obligatoire, aide, erreur et succès.
+- [ ] Uniformiser `input`, `select`, `textarea`, téléphone, date et recherche.
+- [ ] Vérifier placeholder, option native, autofill, disabled, readonly et erreur dans les quatre thèmes.
+- [ ] Ajouter une convention de grille deux colonnes/une colonne mobile.
+- [ ] Vérifier l'association `label`/champ et les descriptions accessibles.
+- [ ] Éviter les champs plus petits que 44 px sur surfaces tactiles.
+
+Critère d'acceptation : aucun formulaire métier ne recrée ses propres contrôles visuels.
+
+### E4 — Consolider modales et wizards
+
+- [ ] Utiliser `Modal`/`WizardModal` comme base unique.
+- [ ] Supprimer les croix de fermeture lorsque la règle produit impose un bouton Annuler.
+- [ ] Uniformiser titre, description, progression, corps scrollable et actions fixes.
+- [ ] Vérifier que les recherches compactes ne rallongent pas excessivement la modale.
+- [ ] Gérer fermeture par Échap selon la criticité de l'action.
+- [ ] Restituer le focus au déclencheur à la fermeture.
+
+Critère d'acceptation : accueil rapide, rendez-vous, notes et notifications partagent la même cinématique.
+
+### E5 — Revue des quatre thèmes
+
+- [ ] Vérifier light, soft-light, soft-dark et dark sur toutes les routes.
+- [ ] Vérifier contrastes normal, hover, focus, pressed, disabled, error et success.
+- [ ] Vérifier les graphiques, tableaux, calendriers, overlays et impressions.
+- [ ] Vérifier les expériences publiques, même si certaines utilisent une palette volontairement fixe.
+- [ ] Ajouter une matrice de captures automatisées par thème et viewport.
+
+Critère d'acceptation : aucune information ne dépend seulement de la couleur et aucun texte utile n'est illisible.
+
+---
+
+## Phase F — Accessibilité et recette visuelle
+
+### F1 — Navigation clavier
+
+- [ ] Tester l'ordre de tabulation de chaque route.
+- [ ] Tester sidebar ouverte, réduite et mobile.
+- [ ] Tester calendrier, sélecteurs, tableaux paginés et carrousels.
+- [ ] Vérifier les raccourcis du cockpit et leurs conflits avec les champs de saisie.
+- [ ] Vérifier focus initial, piégeage et restitution des modales.
+- [ ] Vérifier que les zones scrollables peuvent recevoir le focus lorsque nécessaire.
+
+### F2 — Lecteurs d'écran et sémantique
+
+- [ ] Vérifier les titres de pages et la hiérarchie `h1`/`h2`/`h3`.
+- [ ] Vérifier landmarks, navigation, main, header et footer.
+- [ ] Vérifier les noms accessibles des boutons icône.
+- [ ] Vérifier les annonces de chargement, succès, erreur et mise à jour dynamique.
+- [ ] Vérifier les tableaux, calendriers, jauges et compteurs de notes.
+- [ ] Tester au minimum avec NVDA/Chrome ou un équivalent documenté.
+
+### F3 — Mouvement et perception
+
+- [ ] Respecter `prefers-reduced-motion` pour animations, pulse, révélation et rotation.
+- [ ] Ne pas rendre une action compréhensible uniquement par animation.
+- [ ] Vérifier zoom navigateur à 200 % et reflow à 320 px.
+- [ ] Vérifier les tailles tactiles de 44 px.
+- [ ] Vérifier affichage kiosque assis/debout et TV à distance.
+
+### F4 — Comparaison à la maquette
+
+- [ ] Définir une liste de vues de référence dans `dori_saas_mockup.html`.
+- [ ] Capturer les mêmes états dans l'application.
+- [ ] Comparer composition, hiérarchie, espacements, densité, ombres et mouvements.
+- [ ] Corriger les écarts accidentels.
+- [ ] Documenter chaque écart volontaire avec justification UX, accessibilité ou contrat API.
+- [ ] Ne pas recopier un élément de maquette s'il contredit une règle fonctionnelle validée plus récente.
+
+Critère de sortie de la phase : audit WCAG 2.2 AA automatique et manuel consigné, captures comparées et écarts justifiés.
+
+---
+
+## Phase G — Résilience, erreurs et observabilité
+
+### G1 — Brancher les Error Boundaries fonctionnelles
+
+- [ ] Définir les frontières pertinentes : opérations, rendez-vous, administration, supervision et expériences publiques.
+- [ ] Utiliser `FeatureErrorBoundary` ou le remplacer par une implémentation cohérente avec `AppErrorBoundary`.
+- [ ] Conserver shell, navigation, site actif et notifications lors d'une erreur locale.
+- [ ] Proposer réessayer, actualiser la feature, copier une référence et revenir à une route sûre.
+- [ ] Ne pas afficher stack trace ou données sensibles en production.
+- [ ] Tester erreur de rendu, rejet de promesse et erreur API inattendue.
+
+### G2 — Standardiser erreurs métier et conflits
+
+- [ ] Cartographier les codes du catalogue API vers des clés i18n.
+- [ ] Associer à chaque erreur une action possible lorsque pertinente.
+- [ ] Réserver l'espace d'erreur détaillé aux erreurs inattendues.
+- [ ] Pour `409`, rafraîchir le snapshot avant de rendre la main.
+- [ ] Conserver le correlation ID dans le détail support.
+- [ ] Dédupliquer les toasts identiques rapprochés.
+
+### G3 — Mode hors ligne et reprise
+
+- [ ] Détecter perte et retour réseau.
+- [ ] Afficher un bandeau non bloquant.
+- [ ] Autoriser la consultation des données déjà en cache.
+- [ ] Interdire appel, reset, check-in, création ou notification hors ligne.
+- [ ] Ne jamais mettre silencieusement une mutation métier en file locale.
+- [ ] Recharger un snapshot REST au retour réseau.
+
+### G4 — Télémétrie sans PII
+
+- [ ] Définir une interface de télémétrie indépendante du fournisseur.
+- [ ] Journaliser route logique, opération OpenAPI, durée, statut et correlation ID.
+- [ ] Mesurer refresh échoué, reconnexion, mutation échouée et rendu lent.
+- [ ] Masquer ou exclure nom, prénom, téléphone, e-mail, note, JWT et tracking token.
+- [ ] Ajouter des tests garantissant la redaction.
+- [ ] Désactiver ou rediriger proprement la télémétrie en développement/test.
+
+### G5 — Temps réel
+
+- [ ] Conserver le polling actuel tant que le contrat WebSocket n'est pas disponible.
+- [ ] Documenter intervalle, backoff, visibilité onglet et coût réseau.
+- [ ] Éviter plusieurs pollers pour la même ressource.
+- [ ] Suspendre ou ralentir le polling lorsque l'onglet est caché si acceptable métier.
+- [ ] Préparer une interface permettant de remplacer polling par WebSocket.
+- [ ] À réception du contrat WebSocket : versionner événements/rooms, gérer reconnexion et snapshot REST.
+
+Critère de sortie de la phase : une erreur ou coupure n'entraîne jamais une page blanche ni une mutation ambiguë.
+
+---
+
+## Phase H — Sécurité et préparation production
+
+### H1 — Authentification et refresh
+
+- [ ] Confirmer avec le backend que le refresh token est exclusivement en cookie HttpOnly, Secure et SameSite adapté.
+- [ ] Tester la rotation de refresh et le rejet d'un ancien cookie.
+- [ ] Tester la single-flight de refresh avec plusieurs `401` simultanés.
+- [ ] Vérifier que logout invalide la session serveur même si la purge locale doit toujours réussir.
+- [ ] Vérifier qu'aucun token salarié n'est stocké dans `localStorage`, `sessionStorage` ou Zustand persisté.
+
+### H2 — CSP et en-têtes
+
+- [ ] Conserver la CSP générée par Vite comme défense locale.
+- [ ] Configurer les vrais en-têtes HTTP sur l'hébergeur : CSP, Referrer-Policy, X-Content-Type-Options et permissions utiles.
+- [ ] Vérifier `frame-ancestors` selon le besoin réel d'intégration.
+- [ ] Réduire `'unsafe-inline'` pour les styles si une stratégie nonce/hash devient possible.
+- [ ] Tester les URLs de logo distantes si elles doivent être autorisées par `img-src`.
+
+### H3 — Scope et anti-escalade
+
+- [ ] Tester chaque route et action avec permissions insuffisantes.
+- [ ] Ne pas se contenter de masquer un bouton : l'appel ne doit jamais être déclenché.
+- [ ] Vérifier les identifiants site/file transmis aux services.
+- [ ] Purger caches et abonnements lors d'un changement de scope.
+- [ ] Tester la manipulation directe des URLs et du stockage de site actif.
+
+### H4 — Surfaces publiques
+
+- [ ] Vérifier absence de PII dans DOM, source, attributs accessibles et messages d'erreur.
+- [ ] Consommer le token de tracking depuis l'URL puis nettoyer l'historique conformément à la stratégie existante.
+- [ ] Vérifier `Referrer-Policy: no-referrer`.
+- [ ] Effacer les données du kiosque après succès, timeout et déconnexion cachée.
+- [ ] Vérifier que l'écran salle n'affiche que ticket public et destination autorisée.
+
+### H5 — Configuration légale et production
+
+- [ ] Obtenir les valeurs réelles : entité, adresse, e-mail et immatriculation.
+- [ ] Faire valider les textes juridiques par locale.
+- [ ] Vérifier que `legalProductionGuard` bloque toutes les valeurs fictives usuelles.
+- [ ] Ajouter une vérification de configuration au pipeline de déploiement.
+- [ ] Ne pas considérer un build technique comme déployable tant que ces valeurs ne sont pas validées.
+
+### H6 — Dépendances et supply chain
+
+- [ ] Exécuter `npm audit --audit-level=high`.
+- [ ] Examiner chaque vulnérabilité avant mise à jour majeure.
+- [ ] Garder `package-lock.json` version 3 et utiliser une installation reproductible en CI.
+- [ ] Vérifier les licences des dépendances destinées à la production.
+- [ ] Documenter la politique de mise à jour React, Vite, Orval et Playwright.
+
+Critère de sortie de la phase : les exigences sécurité/confidentialité de la section 14 sont testées et documentées.
+
+---
+
+## Phase I — Documentation, déploiement et recette finale
+
+### I1 — README opérationnel
+
+- [ ] Décrire le rôle de DORI Web et les profils supportés.
+- [ ] Documenter Node/npm requis et installation reproductible.
+- [ ] Documenter `.env.local` et chaque variable.
+- [ ] Documenter démarrage avec API locale et comportement proxy/base URL.
+- [ ] Documenter génération et vérification du client API.
+- [ ] Documenter lint, typecheck, tests unitaires, E2E et build.
+- [ ] Documenter les erreurs courantes : port occupé, API absente, client généré manquant.
+
+### I2 — Documentation d'architecture
+
+- [ ] Décrire providers, router, session, scope et query client.
+- [ ] Décrire la couche métier/API après phase C.
+- [ ] Décrire i18n : namespace distant `translation`, fallback local et catégorie `ihm`.
+- [ ] Décrire thèmes, préférences et tokens.
+- [ ] Décrire erreurs globales, notifications et correlation IDs.
+- [ ] Décrire expériences publiques et différences réel/preview.
+- [ ] Ajouter un diagramme uniquement si les relations ne sont pas claires en texte.
+
+### I3 — Documentation de déploiement
+
+- [ ] Documenter le build et le contenu de `dist`.
+- [ ] Documenter la réécriture SPA.
+- [ ] Documenter URL API, CORS, cookies, HTTPS et domaines.
+- [ ] Documenter les en-têtes de sécurité côté hébergeur.
+- [ ] Documenter les variables légales de production.
+- [ ] Documenter rollback et vérifications après déploiement.
+- [ ] Clarifier si `vercel.json` reste la cible officielle ou seulement un exemple.
+
+### I4 — Runbooks appareils
+
+- [ ] Documenter création et permissions d'un compte kiosque.
+- [ ] Documenter le choix accueil/écran salle après connexion.
+- [ ] Documenter mode plein écran, orientation paysage et résolution recommandée.
+- [ ] Documenter `?deco=true` et la déconnexion explicite de `/device-mode`.
+- [ ] Documenter dépannage réseau, imprimante, son et QR code.
+- [ ] Documenter protection physique et renouvellement de session.
+
+### I5 — Recette finale
+
+- [ ] Construire une matrice route × profil × site × thème × viewport.
+- [ ] Vérifier chaque point de la définition de fini de `final_ihm_specification.md` section 14.
+- [ ] Vérifier chaque critère transverse de `spec_front.md` section 14.
+- [ ] Exécuter `npm run verify` dans un environnement propre.
+- [ ] Tester manuellement Chrome et au moins un second moteur si supporté.
+- [ ] Tester mobile réel ou émulation documentée, tablette paysage, TV 1080p et 4K.
+- [ ] Vérifier impression thermique/PDF.
+- [ ] Comparer les captures finales à la maquette et annexer les écarts justifiés.
+- [ ] Faire signer les mentions légales et les critères métier restant dépendants du backend.
+- [ ] Établir la liste des risques résiduels et éléments explicitement hors périmètre.
+
+Critère d'acceptation : toutes les cases de la définition de fini disposent d'une preuve et aucun bloqueur de production n'est masqué.
+
+---
+
+## 4. Contrôles transverses à appliquer à chaque changement
+
+### Fonctionnel
+
+- [ ] Le cas nominal fonctionne avec le service réel ou son mock contractuel.
+- [ ] Chargement, vide, erreur, succès et concurrence sont couverts.
+- [ ] Le changement de site ne conserve pas de données hors scope.
+- [ ] Les dates sont calculées depuis un timestamp fiable et affichées dans le fuseau du site.
+
+### UX
+
+- [ ] Les actions principales et secondaires sont hiérarchisées.
+- [ ] Les boutons partagent le design system.
+- [ ] Les modales ont un bouton Annuler et une progression claire lorsque nécessaire.
+- [ ] Le rafraîchissement produit un retour visible sans déplacer inutilement la page.
+- [ ] Les états vides expliquent la situation et proposent une action pertinente.
+
+### Accessibilité
+
+- [ ] Utilisable au clavier.
+- [ ] Focus visible et logique.
+- [ ] Nom accessible pour tout contrôle.
+- [ ] Contraste valide dans les quatre thèmes.
+- [ ] Cible tactile d'au moins 44 px lorsque nécessaire.
+- [ ] Animations réduites avec `prefers-reduced-motion`.
+
+### Sécurité
+
+- [ ] Aucune PII ou secret dans log, toast, erreur ou URL.
+- [ ] Permissions et scope contrôlés avant l'action.
+- [ ] Contenu non fiable rendu comme texte.
+- [ ] Mutation protégée contre double clic et répétition involontaire.
+
+### Qualité
+
+- [ ] Textes via i18n et priorité distante préservée.
+- [ ] DTO importé du client généré.
+- [ ] Test ajouté au niveau approprié.
+- [ ] `npm run audit:i18n` passe.
+- [ ] `npm run audit:phase11` passe.
+- [ ] `npm run typecheck` passe.
+- [ ] `npm run lint` passe.
+- [ ] Tests ciblés passent.
+- [ ] Build passe lorsque la modification touche l'intégration ou les imports.
+
+## 5. Commandes de validation
+
+Exécuter séquentiellement les commandes qui génèrent ou consomment le client API.
+
+```bash
+npm run api:check
+npm run audit:phase11
+npm run audit:i18n
+npm run audit:security
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run test:e2e
+```
+
+Validation complète :
+
+```bash
+npm run verify
+```
+
+Précaution : ne pas exécuter `npm run build` en parallèle de Playwright, car le build lance Orval et nettoie temporairement `src/api/generated`.
+
+## 6. Dépendances et blocages externes
+
+- [ ] Obtenir un contrat WebSocket versionné avant de remplacer le polling.
+- [ ] Confirmer la stratégie cookie/refresh avec le backend et l'infrastructure HTTPS.
+- [ ] Obtenir les mentions légales réelles et leur validation juridique.
+- [ ] Confirmer la cible officielle d'hébergement et ses en-têtes HTTP disponibles.
+- [ ] Confirmer le matériel kiosque, impression et écran salle réellement supporté.
+- [ ] Confirmer les navigateurs minimums supportés.
+
+Ces points ne doivent pas bloquer les améliorations indépendantes, mais ils bloquent la déclaration « prêt pour la production ».
+
+## 7. Journal de validation
+
+Ajouter une entrée datée après chaque lot terminé.
+
+Modèle :
+
+```md
+### AAAA-MM-JJ — Identifiant et titre du lot
+
+- Tâches cochées : A1, A2…
+- Fichiers principaux modifiés : …
+- Décisions prises : …
+- Tests exécutés : …
+- Résultats : …
+- Écarts ou risques restants : …
+- Prochaine tâche recommandée : …
+```
+
+## 8. Définition globale de terminé
+
+Le chantier de consolidation est terminé uniquement lorsque :
+
+- [ ] Le pipeline complet passe dans un environnement propre.
+- [ ] Les parcours E2E prioritaires sont stables.
+- [ ] Les pages n'importent plus directement les contrôleurs API générés.
+- [ ] Les composants volumineux ont des responsabilités explicites et testables.
+- [ ] Le CSS et le design system sont modulaires et validés dans les quatre thèmes.
+- [ ] L'audit WCAG 2.2 AA automatique et manuel est consigné.
+- [ ] Les captures finales ont été comparées à la maquette et les écarts justifiés.
+- [ ] La sécurité, les scopes, la session et l'absence de PII publique sont prouvés par des tests.
+- [ ] La documentation permet installation, développement, test, déploiement et exploitation sans transmission orale.
+- [ ] Les mentions légales et la configuration de production sont réelles et validées.
+- [ ] La recette finale des sections 14 des deux spécifications est signée ou explicitement acceptée avec risques résiduels.

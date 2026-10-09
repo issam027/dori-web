@@ -130,9 +130,10 @@ export function PersonPickerOrCreate({
           ) : null}
         </>
       ) : (
-        <>
+        <div className="person-create-grid">
           <FormField label={__t('ui.persons.person_picker_or_create.nom_15eqct1')} required>
             <input
+              autoComplete="family-name"
               value={draft.lastName}
               onChange={(e) => {
                 setDraft({ ...draft, lastName: e.target.value });
@@ -141,6 +142,7 @@ export function PersonPickerOrCreate({
           </FormField>
           <FormField label={__t('ui.persons.person_picker_or_create.prenom_h4ba4')}>
             <input
+              autoComplete="given-name"
               value={draft.firstName}
               onChange={(e) => {
                 setDraft({ ...draft, firstName: e.target.value });
@@ -158,7 +160,42 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <p className={draftIsValid ? 'form-valid-hint' : 'form-hint'} role="status">
+          <FormField label={__t('ui.persons.person_picker_or_create.email')}>
+            <input
+              type="email"
+              autoComplete="email"
+              value={draft.email ?? ''}
+              onChange={(e) => {
+                setDraft({ ...draft, email: e.target.value || undefined });
+              }}
+            />
+          </FormField>
+          <FormField label={__t('ui.persons.person_picker_or_create.birthDate')}>
+            <input
+              type="date"
+              autoComplete="bday"
+              value={draft.birthDate ?? ''}
+              onChange={(e) => {
+                setDraft({ ...draft, birthDate: e.target.value || undefined });
+              }}
+            />
+          </FormField>
+          <FormField label={__t('ui.persons.person_picker_or_create.languagePreference')}>
+            <select
+              value={draft.languagePreference ?? ''}
+              onChange={(e) => {
+                setDraft({ ...draft, languagePreference: e.target.value || undefined });
+              }}
+            >
+              <option value="fr">{__t('ui.persons.person_picker_or_create.language.fr')}</option>
+              <option value="en">{__t('ui.persons.person_picker_or_create.language.en')}</option>
+              <option value="ar">{__t('ui.persons.person_picker_or_create.language.ar')}</option>
+            </select>
+          </FormField>
+          <p
+            className={`person-create-status ${draftIsValid ? 'form-valid-hint' : 'form-hint'}`}
+            role="status"
+          >
             {draftIsValid
               ? __t(
                   'ui.expression.persons.person_picker_or_create.informations_valides_vous_pouvez_continuer_1myt7p9',
@@ -167,7 +204,7 @@ export function PersonPickerOrCreate({
                   'ui.expression.persons.person_picker_or_create.renseignez_un_nom_et_un_telephone_au_format__gar0el',
                 )}
           </p>
-        </>
+        </div>
       )}
     </div>
   );

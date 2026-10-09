@@ -285,6 +285,12 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.persons.person_picker_or_create.nouvelle_personne_1mo0xl': 'Nouvelle personne',
   'ui.persons.person_picker_or_create.personne_connue_10o7xp7': 'Personne connue',
   'ui.persons.person_picker_or_create.prenom_h4ba4': 'Prénom',
+  'ui.persons.person_picker_or_create.email': 'Adresse e-mail',
+  'ui.persons.person_picker_or_create.birthDate': 'Date de naissance',
+  'ui.persons.person_picker_or_create.languagePreference': 'Langue préférée',
+  'ui.persons.person_picker_or_create.language.fr': 'Français',
+  'ui.persons.person_picker_or_create.language.en': 'Anglais',
+  'ui.persons.person_picker_or_create.language.ar': 'Arabe',
   'ui.persons.person_picker_or_create.rechercher_une_personne_ger18e': 'Rechercher une personne',
   'ui.persons.person_picker_or_create.saisissez_au_moins_3_caracteres_1trlzeu':
     'Saisissez au moins 3 caractères.',

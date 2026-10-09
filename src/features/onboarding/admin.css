@@ -104,8 +104,9 @@ table td small {
 .admin-message {
   padding: 11px 14px;
   border-radius: 10px;
-  background: #eef8ff;
-  color: #155b78;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, var(--color-line));
+  background: var(--color-primary-soft);
+  color: var(--color-ink);
 }
 .tier-card-grid,
 .choice-grid {
@@ -210,13 +211,14 @@ table td small {
   padding: 25px 16px;
   border: 9px solid #183142;
   border-radius: 30px;
-  background: #f7fafc;
+  background: var(--color-surface-muted);
 }
 .phone-preview p {
   margin-top: 28px;
   padding: 13px;
   border-radius: 14px 14px 14px 3px;
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-surface);
   box-shadow: 0 5px 18px #1e3c501a;
 }
 .form-span {

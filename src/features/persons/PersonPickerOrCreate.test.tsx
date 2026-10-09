@@ -52,6 +52,9 @@ it('searches automatically from the third character with the active site and fiv
 it('enables the next action as soon as a new person is valid', async () => {
   renderPicker();
   await userEvent.click(screen.getByRole('button', { name: 'Nouvelle personne' }));
+  expect(screen.getByRole('textbox', { name: /adresse e-mail/i })).toBeInTheDocument();
+  expect(screen.getByLabelText(/date de naissance/i)).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: /langue préférée/i })).toHaveValue('fr');
   const next = screen.getByRole('button', { name: 'Suivant' });
   await userEvent.type(screen.getByRole('textbox', { name: /^nom/i }), 'Martin');
   expect(next).toBeDisabled();

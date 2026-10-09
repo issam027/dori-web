@@ -10,8 +10,21 @@
   --color-border: var(--color-line);
   --color-primary: var(--color-accent);
   --color-primary-contrast: #ffffff;
+  --color-primary-soft: #e5f4f2;
   --color-surface-muted: #f8fafc;
   --color-text-muted: var(--color-muted);
+  --color-success: #176b52;
+  --color-success-soft: #e7f7ef;
+  --color-warning: #8a510b;
+  --color-warning-soft: #fff3df;
+  --color-danger: #b42318;
+  --color-danger-soft: #fff0ee;
+  /* Compatibility aliases used by the administration screens. */
+  --teal: var(--color-primary);
+  --teal-soft: var(--color-primary-soft);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --surface: var(--color-surface);
   --shadow-lg: 0 30px 80px rgb(0 0 0 / 22%);
   --radius-xl: 24px;
   --space-1: 4px;
@@ -667,7 +680,17 @@
   --color-background: #172b3a;
   --color-surface: #203a4c;
   --color-accent: #37b9b5;
+  --color-primary-contrast: #071f29;
+  --color-primary-soft: #173f46;
+  --color-surface-muted: #1b3446;
+  --color-success: #7bdcaf;
+  --color-success-soft: #183e35;
+  --color-warning: #f2c66d;
+  --color-warning-soft: #443923;
+  --color-danger: #ff9e94;
+  --color-danger-soft: #482d31;
   --shadow-card: 0 12px 34px rgb(0 0 0 / 18%);
+  color-scheme: dark;
 }
 
 :root[data-theme='dark'] {
@@ -678,7 +701,17 @@
   --color-background: #0b1724;
   --color-surface: #132638;
   --color-accent: #24aaa8;
+  --color-primary-contrast: #061b24;
+  --color-primary-soft: #123941;
+  --color-surface-muted: #102c3f;
+  --color-success: #72d6a8;
+  --color-success-soft: #12372f;
+  --color-warning: #f2c66d;
+  --color-warning-soft: #3d321e;
+  --color-danger: #ff9e94;
+  --color-danger-soft: #40262b;
   --shadow-card: 0 12px 34px rgb(0 0 0 / 28%);
+  color-scheme: dark;
 }
 
 * {
@@ -695,6 +728,15 @@ input,
 select,
 textarea {
   font: inherit;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+select option {
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 input,
 select,
@@ -728,8 +770,9 @@ input:disabled,
 select:disabled,
 textarea:disabled {
   cursor: not-allowed;
-  opacity: 0.62;
-  background: color-mix(in srgb, var(--color-muted) 8%, var(--color-surface));
+  color: var(--color-muted);
+  opacity: 1;
+  background: color-mix(in srgb, var(--color-muted) 12%, var(--color-surface));
 }
 .bootstrap-page {
   display: grid;
@@ -1655,12 +1698,12 @@ select:focus-visible {
   box-shadow: none;
 }
 .button-primary:not(:disabled):hover {
-  color: white;
+  color: var(--color-primary-contrast);
   background: color-mix(in srgb, var(--color-accent) 86%, black);
 }
 .button-primary {
   border-color: var(--color-accent);
-  color: white;
+  color: var(--color-primary-contrast);
   background: var(--color-accent);
 }
 .refresh-icon,
@@ -1725,16 +1768,16 @@ select:focus-visible {
   background: color-mix(in srgb, var(--color-muted) 15%, transparent);
 }
 .status-success {
-  color: #18794e;
-  background: #e7f7ef;
+  color: var(--color-success);
+  background: var(--color-success-soft);
 }
 .status-warning {
-  color: #985c0d;
-  background: #fff3df;
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
 }
 .status-danger {
-  color: #b42318;
-  background: #fff0ee;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 .status-accent {
   color: var(--color-accent);
@@ -1769,7 +1812,7 @@ select:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 .feedback-icon.error {
-  color: #b42318;
+  color: var(--color-danger);
 }
 .table-scroll {
   overflow: auto;
@@ -1999,7 +2042,7 @@ select:focus-visible {
 }
 .required-mark,
 .field-error {
-  color: #b42318;
+  color: var(--color-danger);
 }
 .form-field input,
 .form-field select,
@@ -2015,6 +2058,14 @@ select:focus-visible {
 }
 .person-picker {
   min-width: 0;
+}
+.person-create-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+.person-create-status {
+  grid-column: 1 / -1;
 }
 .person-search {
   display: grid;
@@ -2051,7 +2102,12 @@ select:focus-visible {
   font-size: 0.85rem;
 }
 .form-valid-hint {
-  color: #18794e;
+  color: var(--color-success);
+}
+@media (max-width: 640px) {
+  .person-create-grid {
+    grid-template-columns: 1fr;
+  }
 }
 @keyframes search-pulse {
   to {

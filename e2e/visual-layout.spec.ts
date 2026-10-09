@@ -467,27 +467,36 @@ test('phase 7 supervision routes render API-backed views', async ({ page }) => {
 });
 
 test('WCAG 2.2 AA automated audit has no serious violations', async ({ page }) => {
-  await page.goto('/login');
-  const loginResults = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-    .analyze();
-  expect(
-    loginResults.violations.filter((violation) =>
+  test.setTimeout(90_000);
+  const themes = ['light', 'soft-light', 'soft-dark', 'dark'];
+  const seriousViolations = async () => {
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    return results.violations.filter((violation) =>
       ['critical', 'serious'].includes(violation.impact ?? ''),
-    ),
-  ).toEqual([]);
+    );
+  };
+
+  for (const theme of themes) {
+    await page.goto('/login');
+    await page.evaluate(
+      `document.documentElement.dataset.theme = ${JSON.stringify(theme)}`,
+    );
+    expect(await seriousViolations(), `login / ${theme}`).toEqual([]);
+  }
 
   await mockAuthenticatedApi(page);
   await activateFirstSite(page);
-  await page.goto('/desk');
-  const appResults = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-    .analyze();
-  expect(
-    appResults.violations.filter((violation) =>
-      ['critical', 'serious'].includes(violation.impact ?? ''),
-    ),
-  ).toEqual([]);
+  for (const path of ['/desk', '/onboarding']) {
+    for (const theme of themes) {
+      await page.goto(path);
+      await page.evaluate(
+        `document.documentElement.dataset.theme = ${JSON.stringify(theme)}`,
+      );
+      expect(await seriousViolations(), `${path} / ${theme}`).toEqual([]);
+    }
+  }
 });
 
 test('desktop, tablet, mobile and TV remain usable in all four themes', async ({ page }) => {
