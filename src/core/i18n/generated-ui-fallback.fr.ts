@@ -53,12 +53,12 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.auth.login_page.chaque_profil_utilise_le_parcours_normal_de_l_ap_17kz34e':
     "Chaque profil utilise le parcours normal de l'API.",
   'ui.auth.login_page.connectez_vous_avec_votre_identifiant_dori_xe5h0m':
-    'Connectez-vous avec votre identifiant DORI.',
+    'Connectez-vous avec votre identifiant DORIFY.',
   'ui.auth.login_page.connexion_1a0ztte': 'Connexion...',
   'ui.auth.login_page.connexion_rapide_1wyr4bt': 'Connexion rapide',
   'ui.auth.login_page.connexion_securisee_8ak5sk': 'Connexion securisee',
   'ui.auth.login_page.d_1hkaexf': 'D',
-  'ui.auth.login_page.dori_9y7skh': 'DORI',
+  'ui.auth.login_page.dori_9y7skh': 'DORIFY',
   'ui.auth.login_page.email_ou_nom_utilisateur_18xczuw': 'Email ou nom utilisateur',
   'ui.auth.login_page.memoriser_mon_identifiant_4tfz4b': 'Mémoriser mon identifiant',
   'ui.auth.login_page.mode_demonstration_17pdpyl': 'Mode demonstration',
@@ -203,7 +203,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.onboarding.settings_page.contenu_1hxusj9': 'Contenu',
   'ui.onboarding.settings_page.devise_1pl1r6r': 'Devise',
   'ui.onboarding.settings_page.devise_locale_ltzxp4': 'Devise / locale',
-  'ui.onboarding.settings_page.dori_9y7skh': 'DORI',
+  'ui.onboarding.settings_page.dori_9y7skh': 'DORIFY',
   'ui.onboarding.settings_page.email_inbfc7': 'Email',
   'ui.onboarding.settings_page.enregistrer_sywgdx': 'Enregistrer',
   'ui.onboarding.settings_page.error_9bb0pd': 'error',
@@ -213,7 +213,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.onboarding.settings_page.files_d_attente_162zjyu': 'Files d’attente',
   'ui.onboarding.settings_page.fuseau_djtg02': 'Fuseau',
   'ui.onboarding.settings_page.gerez_les_ressources_reellement_proposees_par_do_1l33rzi':
-    'Gérez les ressources réellement proposées par DORI.',
+    'Gérez les ressources réellement proposées par DORIFY.',
   'ui.onboarding.settings_page.guichets_j0id8z': 'Guichets',
   'ui.onboarding.settings_page.heritee_zqggrn': 'Héritée',
   'ui.onboarding.settings_page.herites_17zxgud': 'hérités',
@@ -428,7 +428,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.public-experiences.track_page.ce_champ_est_visible_uniquement_dans_l_apercu_in_1bkpujh':
     'Ce champ est visible uniquement dans l’aperçu interne.',
   'ui.public-experiences.track_page.dans_la_file_1up9yai': 'dans la file',
-  'ui.public-experiences.track_page.dori_9y7skh': 'DORI',
+  'ui.public-experiences.track_page.dori_9y7skh': 'DORIFY',
   'ui.public-experiences.track_page.en_direct_10riirr': 'En direct',
   'ui.public-experiences.track_page.guichet_15ztv8y': 'Guichet',
   'ui.public-experiences.track_page.lien_de_suivi_invalide_1p5x488': 'Lien de suivi invalide',
@@ -458,19 +458,19 @@ export const generatedUiFallbackFr: Record<string, string> = {
     'Aucune file n’est configurée ou active pour ce site.',
   'ui.queue-operations.desk_page.aucune_personne_en_cours_rsgt2z': 'Aucune personne en cours.',
   'ui.queue-operations.desk_page.ce_justificatif_est_imprime_a_la_demande_du_clie_16a2ra6':
-    'Ce justificatif est imprimé à la demande du client afin d’attester de son passage auprès du service indiqué. Il reprend les horaires enregistrés par le système DORI et ne constitue ni une facture ni une preuve d’identité.',
+    'Ce justificatif est imprimé à la demande du client afin d’attester de son passage auprès du service indiqué. Il reprend les horaires enregistrés par le système DORIFY et ne constitue ni une facture ni une preuve d’identité.',
   'ui.queue-operations.desk_page.cockpit_guichet_o7323f': 'Cockpit guichet',
   'ui.queue-operations.desk_page.consulter_les_notes_esjdmp': 'Consulter les notes',
   'ui.queue-operations.desk_page.date_d_arrivee_zmki1y': 'Date d’arrivée',
   'ui.queue-operations.desk_page.dori_justificatif_de_passage_13e6u9q':
-    'DORI · Justificatif de passage',
+    'DORIFY · Justificatif de passage',
   'ui.queue-operations.desk_page.en_attente_sla_estime_1k6oejn': 'en attente · SLA estimé',
   'ui.queue-operations.desk_page.guichet_15ztv8y': 'Guichet',
   'ui.queue-operations.desk_page.guichet_gvzfu7': '· Guichet',
   'ui.queue-operations.desk_page.imprime_le_wx6ut5': 'Imprimé le',
   'ui.queue-operations.desk_page.imprimer_le_justificatif_3rhfqy': 'Imprimer le justificatif',
   'ui.queue-operations.desk_page.justificatif_de_passage_dori_document_non_fiscal_1knp9yu':
-    'Justificatif de passage DORI · Document non fiscal',
+    'Justificatif de passage DORIFY · Document non fiscal',
   'ui.queue-operations.desk_page.liberer_icbzzg': 'Libérer',
   'ui.queue-operations.desk_page.min_1jxbmtz': 'min',
   'ui.queue-operations.desk_page.passage_s_1rhvk1p': 'passage(s)',
@@ -533,7 +533,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
     'Vous pouvez revenir à l’étape précédente pour modifier ce choix.',
   'ui.queue-operations.receipt80mm.document_non_fiscal_donnees_confirmees_par_le_se_evtkln':
     'Document non fiscal — données confirmées par le service.',
-  'ui.queue-operations.receipt80mm.dori_9y7skh': 'DORI',
+  'ui.queue-operations.receipt80mm.dori_9y7skh': 'DORIFY',
   'ui.queue-operations.receipt80mm.guichet_15ztv8y': 'Guichet',
   'ui.queue-operations.receipt80mm.heure_d_appel_j17a5x': "Heure d'appel",
   'ui.queue-operations.receipt80mm.imprimer_gwyilo': 'Imprimer',
@@ -576,7 +576,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
   'ui.shell.layouts.public_experience_layout.deconnexion_de_l_appareil_1tsww9p':
     'Déconnexion de l’appareil…',
   'ui.shell.layouts.sidebar_accordion.d_1hkaexf': 'D',
-  'ui.shell.layouts.sidebar_accordion.dori_9y7skh': 'DORI',
+  'ui.shell.layouts.sidebar_accordion.dori_9y7skh': 'DORIFY',
   'ui.shell.layouts.sidebar_accordion.fermer_le_menu_1fo6hqo': 'Fermer le menu',
   'ui.shell.layouts.sidebar_accordion.reduire_zrtdhr': 'Réduire',
   'ui.shell.layouts.site_context_switcher.site_actif_uvd9tt': 'Site actif',

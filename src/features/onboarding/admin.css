@@ -103,6 +103,12 @@ table td small {
 .resume-card p {
   margin: 4px 0 0;
 }
+.resume-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
 .setup-actions {
   display: flex;
   justify-content: space-between;
@@ -266,10 +272,95 @@ table td small {
 .admin-table-wrap td:first-child code {
   color: var(--color-ink);
 }
+
+.onboarding-queue-table {
+  margin-top: var(--space-4);
+}
+
+.onboarding-queue-table .table-action-column {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
+}
 .button-small {
   min-height: 32px;
   padding: 5px 9px;
   font-size: 12px;
+}
+
+.assignment-flow {
+  display: grid;
+  gap: 18px;
+}
+
+.assignment-flow > section {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-muted) 4%, var(--color-surface));
+}
+
+.assignment-flow label {
+  display: grid;
+  gap: 7px;
+  font-weight: 750;
+}
+
+.assignment-user-results {
+  display: grid;
+  gap: 7px;
+}
+
+.assignment-user-results > button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.assignment-user-results > button:hover,
+.assignment-user-results > button.selected {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+
+.assignment-user-results > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.assignment-user-results .profile-avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 0.78rem;
+}
+
+.assignment-user-results strong,
+.assignment-user-results small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignment-user-results small {
+  margin-top: 2px;
+  color: var(--color-muted);
+}
+
+.assignment-role-step {
+  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-line)) !important;
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface)) !important;
 }
 .sms-preview-grid {
   display: grid;
@@ -314,7 +405,8 @@ table td small {
 @media (max-width: 560px) {
   .setup-actions,
   .setup-actions > div,
-  .resume-card {
+  .resume-card,
+  .resume-card-actions {
     align-items: stretch;
     flex-direction: column;
   }

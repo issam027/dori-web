@@ -9,12 +9,12 @@ interface BrandState {
 }
 
 export const useBrandStore = create<BrandState>((set) => ({
-  name: 'DORI',
+  name: 'DORIFY',
   logoUrl: null,
   applySite: (site) => {
     set({ name: site.siteName, logoUrl: site.siteLogoUrl ?? null });
   },
   reset: () => {
-    set({ name: 'DORI', logoUrl: null });
+    set({ name: 'DORIFY', logoUrl: null });
   },
 }));

@@ -150,7 +150,7 @@ describe('hydrateSession', () => {
 
     expect(useSessionStore.getState().status).toBe('anonymous');
     expect(useScopeStore.getState().activeSiteId).toBeNull();
-    expect(useBrandStore.getState()).toMatchObject({ name: 'DORI', logoUrl: null });
+    expect(useBrandStore.getState()).toMatchObject({ name: 'DORIFY', logoUrl: null });
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 });

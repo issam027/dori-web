@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  clearOnboardingDraft,
   initialOnboardingDraft,
   loadOnboardingDraft,
   queueNeedsCreation,
@@ -29,5 +30,14 @@ describe('onboarding recovery', () => {
   });
   it('falls back when storage is corrupt', () => {
     expect(loadOnboardingDraft({ getItem: () => '{broken' })).toEqual(initialOnboardingDraft);
+  });
+  it('removes a saved draft without deleting any server resource', () => {
+    let removedKey = '';
+    clearOnboardingDraft({
+      removeItem: (key) => {
+        removedKey = key;
+      },
+    });
+    expect(removedKey).toBe('dori:onboarding:v1');
   });
 });

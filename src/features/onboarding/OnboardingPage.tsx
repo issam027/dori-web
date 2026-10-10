@@ -3,15 +3,21 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   queuesControllerCreateForSite,
+  queuesControllerRemove,
   queuesControllerUpdate,
 } from '@/api/generated/queues/queues';
-import { sitesControllerCreateSite, sitesControllerUpdateSite } from '@/api/generated/sites/sites';
+import {
+  sitesControllerCreateSite,
+  sitesControllerDeleteSite,
+  sitesControllerUpdateSite,
+} from '@/api/generated/sites/sites';
 import {
   serviceTiersControllerAssociateTier,
   serviceTiersControllerFindTiers,
 } from '@/api/generated/tiers/tiers';
 import type { CreateQueueDto } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
+import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import {
@@ -41,6 +47,8 @@ export function OnboardingPage() {
   const [editingQueueCode, setEditingQueueCode] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [discardOpen, setDiscardOpen] = useState(false);
+  const [discarding, setDiscarding] = useState(false);
   const tiers = useQuery({
     queryKey: ['tiers', 'onboarding'],
     queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
@@ -57,6 +65,48 @@ export function OnboardingPage() {
   const site = (key: keyof OnboardingDraft['site'], value: unknown) => {
     save({ ...draft, site: { ...draft.site, [key]: value } });
   };
+  async function discardDraft() {
+    if (!draft.confirmedSiteId || discarding) return;
+
+    setDiscarding(true);
+    setMessage('');
+    let remainingQueueIds = { ...draft.confirmedQueueIds };
+    try {
+      for (const queueId of new Set(Object.values(remainingQueueIds))) {
+        await queuesControllerRemove(queueId);
+        remainingQueueIds = Object.fromEntries(
+          Object.entries(remainingQueueIds).filter(([, id]) => id !== queueId),
+        );
+        saveOnboardingDraft({
+          ...draft,
+          confirmedQueueIds: remainingQueueIds,
+          associatedTierQueueIds: draft.associatedTierQueueIds.filter((id) => id !== queueId),
+        });
+      }
+
+      await sitesControllerDeleteSite(draft.confirmedSiteId);
+      clearOnboardingDraft();
+      setState(structuredClone(initialOnboardingDraft));
+      setEditingQueueCode(undefined);
+      setQueueOpen(false);
+      setDiscardOpen(false);
+      notify({ tone: 'info', title: __t('onboarding.draftDiscarded') });
+    } catch (error) {
+      const recoverableDraft = {
+        ...draft,
+        confirmedQueueIds: remainingQueueIds,
+        associatedTierQueueIds: draft.associatedTierQueueIds.filter((id) =>
+          Object.values(remainingQueueIds).includes(id),
+        ),
+      };
+      setState(recoverableDraft);
+      saveOnboardingDraft(recoverableDraft);
+      setMessage(__t('onboarding.discardDraftFailed'));
+      notifyError(error);
+    } finally {
+      setDiscarding(false);
+    }
+  }
   async function next() {
     setBusy(true);
     setMessage('');
@@ -156,9 +206,21 @@ export function OnboardingPage() {
               {__t('ui.onboarding.onboarding_page.file_s_confirmee_s_tysem1')}
             </p>
           </div>
-          <span className="status-badge status-success">
-            {__t('ui.onboarding.onboarding_page.brouillon_local_13vfu7e')}
-          </span>
+          <div className="resume-card-actions">
+            <span className="status-badge status-success">
+              {__t('ui.onboarding.onboarding_page.brouillon_local_13vfu7e')}
+            </span>
+            <button
+              className="button button-danger button-small"
+              type="button"
+              disabled={discarding}
+              onClick={() => {
+                setDiscardOpen(true);
+              }}
+            >
+              {__t('onboarding.discardDraft')}
+            </button>
+          </div>
         </Card>
       ) : null}
       <div className="onboarding-layout">
@@ -293,6 +355,40 @@ export function OnboardingPage() {
           });
         }}
       />
+      <Modal
+        open={discardOpen}
+        onOpenChange={(open) => {
+          if (!discarding) setDiscardOpen(open);
+        }}
+        title={__t('onboarding.discardDraftTitle')}
+        description={__t('onboarding.discardDraftDescription')}
+        actions={
+          <>
+            <button
+              className="button"
+              type="button"
+              disabled={discarding}
+              onClick={() => {
+                setDiscardOpen(false);
+              }}
+            >
+              {__t('common.cancel')}
+            </button>
+            <button
+              className="button button-danger"
+              type="button"
+              disabled={discarding}
+              onClick={() => void discardDraft()}
+            >
+              {discarding
+                ? __t('onboarding.discardingDraft')
+                : __t('onboarding.confirmDiscardDraft')}
+            </button>
+          </>
+        }
+      >
+        <p className="admin-message">{__t('onboarding.discardDraftServerNotice')}</p>
+      </Modal>
     </div>
   );
 }
@@ -561,7 +657,7 @@ function QueuesStep({
           )}
         </p>
       </div>
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap onboarding-queue-table">
         <table>
           <thead>
             <tr>

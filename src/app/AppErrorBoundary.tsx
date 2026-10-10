@@ -55,7 +55,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   }
 
   private captureRuntimeError = (error: Error) => {
-    logIncident('[DORI unhandled runtime incident]', error);
+    logIncident('[DORIFY unhandled runtime incident]', error);
     this.setState({
       error,
       componentStack: '',
@@ -87,7 +87,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, componentStack: info.componentStack ?? '' });
-    logIncident('[DORI UI incident]', error);
+    logIncident('[DORIFY UI incident]', error);
   }
 
   componentDidUpdate(previousProps: AppErrorBoundaryProps): void {

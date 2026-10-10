@@ -80,7 +80,7 @@ export const generatedUiExpressionFallbackFr: Record<string, string> = {
     'Déconnecter cet appareil',
   'ui.expression.public-experiences.device_mode_page.deconnexion_vv1fmt': 'Déconnexion…',
   'ui.expression.public-experiences.display_page.activer_le_son_s79v3m': 'Activer le son',
-  'ui.expression.public-experiences.display_page.dori_9y7skh': 'DORI',
+  'ui.expression.public-experiences.display_page.dori_9y7skh': 'DORIFY',
   'ui.expression.public-experiences.display_page.file_value0_jtr0pe': 'File {{value0}}',
   'ui.expression.public-experiences.display_page.son_active_sulxcn': 'Son activé',
   'ui.expression.public-experiences.kiosk_page.choisir_ce_service_1ymypmf': 'Choisir ce service',

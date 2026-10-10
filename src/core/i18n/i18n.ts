@@ -21,8 +21,8 @@ const fallbackResources = {
         'Nous ne pouvons pas actualiser votre position. Réessayez dans quelques instants.',
       ...generatedUiFallbackFr,
       ...generatedUiExpressionFallbackFr,
-      'app.name': 'DORI',
-      'bootstrap.eyebrow': 'DORI',
+      'app.name': 'DORIFY',
+      'bootstrap.eyebrow': 'DORIFY',
       'bootstrap.title': 'Socle de l’application initialisé',
       'bootstrap.description':
         'Les modules métier sont ajoutés dans l’ordre défini par le handover.',
@@ -59,8 +59,20 @@ const fallbackResources = {
       'onboarding.accountsHelp':
         'Comptes humains, kiosque et écran de salle avec leurs périmètres.',
       'onboarding.validationHelp': 'Validez le parcours avant l’ouverture au public.',
+      'onboarding.discardDraft': 'Abandonner la configuration',
+      'onboarding.discardDraftTitle': 'Abandonner cette configuration ?',
+      'onboarding.discardDraftDescription':
+        'Les files déjà créées, puis le site incomplet, seront supprimés définitivement.',
+      'onboarding.discardDraftServerNotice':
+        'Cette opération supprime les ressources créées sur le serveur et le brouillon enregistré dans ce navigateur.',
+      'onboarding.confirmDiscardDraft': 'Abandonner et supprimer',
+      'onboarding.discardingDraft': 'Suppression en cours…',
+      'onboarding.draftDiscarded': 'Configuration incomplète supprimée',
+      'onboarding.discardDraftFailed':
+        'La suppression est incomplète. Le brouillon a été conservé pour réessayer.',
       'settings.siteHelp':
         'Identité, valeurs opérationnelles par défaut, responsables et activation réelle.',
+      'settings.newSite': 'Nouveau site',
       'settings.queuesHelp': 'Paramètres effectifs, héritage, guichets et opérateurs.',
       'settings.usersHelp': 'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
       'settings.tiersHelp': 'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
@@ -74,6 +86,24 @@ const fallbackResources = {
       'settings.userDisconnected': 'Utilisateur déconnecté',
       'settings.disconnectUserHint':
         'L’utilisateur devra se reconnecter sur chacun de ses appareils pour continuer.',
+      'settings.assignUser': 'Affecter un utilisateur',
+      'settings.assignUserDescription': 'Ajoutez un utilisateur à {{resource}} avec un rôle compatible.',
+      'settings.assignmentStepUser': '1 · Rechercher un utilisateur',
+      'settings.assignmentStepRole': '2 · Choisir son rôle',
+      'settings.searchUser': 'Nom d’utilisateur ou email',
+      'settings.searchUserPlaceholder': 'Saisissez au moins 4 caractères',
+      'settings.searchUserMinimum': 'La recherche démarre à partir de 4 caractères.',
+      'settings.noUserFound': 'Aucun utilisateur ne correspond à cette recherche.',
+      'settings.noEmail': 'Sans adresse email',
+      'settings.active': 'Actif',
+      'settings.inactive': 'Inactif',
+      'settings.role': 'Rôle à affecter',
+      'settings.chooseRole': 'Choisir un rôle',
+      'settings.siteRoleContract': 'L’affectation à un site nécessite le rôle manager.',
+      'settings.queueRoleContract': 'L’affectation à une file nécessite le rôle hôtesse.',
+      'settings.confirmAssignment': 'Confirmer l’affectation',
+      'settings.assignmentDone': 'Affectation enregistrée',
+      'settings.assignmentDoneMessage': '{{username}} est maintenant affecté à {{resource}}.',
       'profile.changePasswordTitle': 'Changer mon mot de passe',
       'profile.changePasswordHelp':
         'Saisissez votre mot de passe actuel, puis choisissez un nouveau mot de passe sécurisé.',
@@ -198,7 +228,7 @@ const fallbackResources = {
       'legal.registration': 'Immatriculation',
       'legal.privacy': 'Données personnelles',
       'legal.privacyText':
-        'DORI traite uniquement les données nécessaires à la gestion de l’accueil, des rendez-vous et des files, selon les instructions de l’établissement responsable.',
+        'DORIFY traite uniquement les données nécessaires à la gestion de l’accueil, des rendez-vous et des files, selon les instructions de l’établissement responsable.',
       'legal.rights': 'Vos droits',
       'legal.rightsText':
         'Pour exercer vos droits d’accès, de rectification ou d’opposition, contactez {{email}}.',
@@ -211,14 +241,14 @@ const fallbackResources = {
       'legal.summarySecure': 'Données protégées',
       'legal.summarySaas': 'Service SaaS',
       'legal.introduction':
-        'Cette page présente les règles applicables à la plateforme DORI, à ses espaces opérateurs et à ses expériences publiques. Elle complète les engagements contractuels conclus avec chaque établissement client.',
+        'Cette page présente les règles applicables à la plateforme DORIFY, à ses espaces opérateurs et à ses expériences publiques. Elle complète les engagements contractuels conclus avec chaque établissement client.',
       'legal.contents': 'Sommaire des informations légales',
       'legal.service': 'Objet et disponibilité du service',
       'legal.serviceText':
-        'DORI fournit un service de gestion des files, rendez-vous et parcours d’accueil. Les fonctionnalités accessibles dépendent du niveau de service, de la configuration du site et des autorisations attribuées au compte.',
+        'DORIFY fournit un service de gestion des files, rendez-vous et parcours d’accueil. Les fonctionnalités accessibles dépendent du niveau de service, de la configuration du site et des autorisations attribuées au compte.',
       'legal.purposes': 'Finalités et responsabilités',
       'legal.purposesText':
-        'L’établissement client détermine les finalités et les durées applicables aux données des visiteurs. DORI agit comme fournisseur technique et limite le traitement aux opérations nécessaires au service, à sa sécurité et à son support.',
+        'L’établissement client détermine les finalités et les durées applicables aux données des visiteurs. DORIFY agit comme fournisseur technique et limite le traitement aux opérations nécessaires au service, à sa sécurité et à son support.',
       'legal.retention': 'Conservation et suppression',
       'legal.retentionText':
         'Les durées de conservation sont définies par l’établissement et sa politique applicable. Les journaux techniques sont limités aux données nécessaires au diagnostic et ne doivent contenir ni secret ni information personnelle en clair.',
@@ -229,8 +259,8 @@ const fallbackResources = {
   },
   en: {
     fallback: {
-      'app.name': 'DORI',
-      'bootstrap.eyebrow': 'DORI',
+      'app.name': 'DORIFY',
+      'bootstrap.eyebrow': 'DORIFY',
       'bootstrap.title': 'Application foundation initialized',
       'bootstrap.description': 'Business modules are added in the order defined by the handover.',
       'common.loading': 'Loading…',
@@ -264,7 +294,19 @@ const fallbackResources = {
         'Select at least one tier for each queue. The first selected tier will be offered by default.',
       'onboarding.accountsHelp': 'Human, kiosk and display accounts with their scopes.',
       'onboarding.validationHelp': 'Validate the journey before opening it to the public.',
+      'onboarding.discardDraft': 'Discard configuration',
+      'onboarding.discardDraftTitle': 'Discard this configuration?',
+      'onboarding.discardDraftDescription':
+        'Created queues, followed by the incomplete site, will be permanently deleted.',
+      'onboarding.discardDraftServerNotice':
+        'This operation removes server resources and the draft saved in this browser.',
+      'onboarding.confirmDiscardDraft': 'Discard and delete',
+      'onboarding.discardingDraft': 'Deleting…',
+      'onboarding.draftDiscarded': 'Incomplete configuration deleted',
+      'onboarding.discardDraftFailed':
+        'Deletion is incomplete. The draft was kept so you can try again.',
       'settings.siteHelp': 'Identity, operational defaults, owners and actual activation.',
+      'settings.newSite': 'New site',
       'settings.queuesHelp': 'Effective settings, inheritance, desks and operators.',
       'settings.usersHelp': 'Account, email, language, status, password, role and scope.',
       'settings.tiersHelp': 'Fixed Free, Standard and Premium catalog; availability by queue.',
@@ -278,6 +320,24 @@ const fallbackResources = {
       'settings.userDisconnected': 'User disconnected',
       'settings.disconnectUserHint':
         'The user will need to sign in again on each device to continue.',
+      'settings.assignUser': 'Assign user',
+      'settings.assignUserDescription': 'Add a user to {{resource}} with a compatible role.',
+      'settings.assignmentStepUser': '1 · Find a user',
+      'settings.assignmentStepRole': '2 · Choose a role',
+      'settings.searchUser': 'Username or email',
+      'settings.searchUserPlaceholder': 'Enter at least 4 characters',
+      'settings.searchUserMinimum': 'Search starts after 4 characters.',
+      'settings.noUserFound': 'No user matches this search.',
+      'settings.noEmail': 'No email address',
+      'settings.active': 'Active',
+      'settings.inactive': 'Inactive',
+      'settings.role': 'Role to assign',
+      'settings.chooseRole': 'Choose a role',
+      'settings.siteRoleContract': 'A site assignment requires the manager role.',
+      'settings.queueRoleContract': 'A queue assignment requires the hostess role.',
+      'settings.confirmAssignment': 'Confirm assignment',
+      'settings.assignmentDone': 'Assignment saved',
+      'settings.assignmentDoneMessage': '{{username}} is now assigned to {{resource}}.',
       'profile.changePasswordTitle': 'Change my password',
       'profile.changePasswordHelp':
         'Enter your current password, then choose a secure new password.',
@@ -399,7 +459,7 @@ const fallbackResources = {
       'legal.registration': 'Registration',
       'legal.privacy': 'Personal data',
       'legal.privacyText':
-        'DORI processes only the data required to manage reception, appointments and queues, under the instructions of the responsible establishment.',
+        'DORIFY processes only the data required to manage reception, appointments and queues, under the instructions of the responsible establishment.',
       'legal.rights': 'Your rights',
       'legal.rightsText':
         'To exercise your access, correction or objection rights, contact {{email}}.',
@@ -412,14 +472,14 @@ const fallbackResources = {
       'legal.summarySecure': 'Protected data',
       'legal.summarySaas': 'SaaS service',
       'legal.introduction':
-        'This page describes the rules applying to the DORI platform, operator workspaces and public experiences. It complements the contractual commitments agreed with each customer organisation.',
+        'This page describes the rules applying to the DORIFY platform, operator workspaces and public experiences. It complements the contractual commitments agreed with each customer organisation.',
       'legal.contents': 'Legal information contents',
       'legal.service': 'Service purpose and availability',
       'legal.serviceText':
-        'DORI provides queue, appointment and reception journey management. Available features depend on the service tier, site configuration and permissions assigned to the account.',
+        'DORIFY provides queue, appointment and reception journey management. Available features depend on the service tier, site configuration and permissions assigned to the account.',
       'legal.purposes': 'Purposes and responsibilities',
       'legal.purposesText':
-        'The customer organisation determines the purposes and retention periods applying to visitor data. DORI acts as a technical provider and limits processing to service delivery, security and support.',
+        'The customer organisation determines the purposes and retention periods applying to visitor data. DORIFY acts as a technical provider and limits processing to service delivery, security and support.',
       'legal.retention': 'Retention and deletion',
       'legal.retentionText':
         'Retention periods are defined by the organisation and its applicable policy. Technical logs are limited to diagnostic needs and must not contain secrets or personal information in plain text.',
@@ -507,7 +567,7 @@ const fallbackResources = {
       'legal.registration': 'التسجيل',
       'legal.privacy': 'البيانات الشخصية',
       'legal.privacyText':
-        'تعالج DORI فقط البيانات اللازمة لإدارة الاستقبال والمواعيد وقوائم الانتظار وفق تعليمات المؤسسة المسؤولة.',
+        'تعالج DORIFY فقط البيانات اللازمة لإدارة الاستقبال والمواعيد وقوائم الانتظار وفق تعليمات المؤسسة المسؤولة.',
       'legal.rights': 'حقوقك',
       'legal.rightsText': 'لممارسة حقوق الوصول أو التصحيح أو الاعتراض، تواصل عبر {{email}}.',
       'legal.cookies': 'التخزين المحلي وملفات الارتباط',
@@ -536,6 +596,12 @@ const bundleRequests = new Map<string, Promise<number>>();
 
 type TranslationCategory = 'ihm' | 'sms' | 'error';
 
+function applyCurrentProductName(entries: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(entries).map(([key, value]) => [key, value.replace(/\bDORI\b/g, 'DORIFY')]),
+  );
+}
+
 export async function loadTranslationBundle(
   locale: string,
   category: TranslationCategory = 'ihm',
@@ -554,7 +620,13 @@ export async function loadTranslationBundle(
       if (i18n.hasResourceBundle(bundle.locale, 'translation')) {
         i18n.removeResourceBundle(bundle.locale, 'translation');
       }
-      i18n.addResourceBundle(bundle.locale, 'translation', bundle.entries, true, true);
+      i18n.addResourceBundle(
+        bundle.locale,
+        'translation',
+        applyCurrentProductName(bundle.entries),
+        true,
+        true,
+      );
       loadedBundleVersions.set(cacheKey, bundle.version);
     }
     await i18n.changeLanguage(locale);

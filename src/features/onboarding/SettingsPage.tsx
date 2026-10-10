@@ -33,6 +33,10 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
+import {
+  type AssignmentTarget,
+  UserAssignmentModal,
+} from '@/features/users/UserAssignmentModal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 
@@ -84,7 +88,8 @@ export function SettingsPage() {
     [userOpen, setUserOpen] = useState(false),
     [tierOpen, setTierOpen] = useState(false),
     [ruleOpen, setRuleOpen] = useState(false),
-    [translationOpen, setTranslationOpen] = useState(false);
+    [translationOpen, setTranslationOpen] = useState(false),
+    [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null);
   const rank = Math.max(
     ...rs.filter((r) => current?.roles.includes(r.roleName)).map((r) => r.rank),
     0,
@@ -120,20 +125,6 @@ export function SettingsPage() {
           value={xs.length}
         />
       </div>
-      <Card>
-        <div className="config-chain">
-          {['Site', 'Files du site', 'Comptes', 'Affectations'].map((x, i) => (
-            <Link
-              className="role-card"
-              to={`/settings/${i === 0 ? 'sites' : i === 1 ? 'queues' : 'users'}`}
-              key={x}
-            >
-              <span className="ticket-chip">{i + 1}</span>
-              <b>{x}</b>
-            </Link>
-          ))}
-        </div>
-      </Card>
       <Card className="settings-card">
         <nav className="admin-tabs">
           {sections.map((x) => (
@@ -144,7 +135,9 @@ export function SettingsPage() {
             </Link>
           ))}
         </nav>
-        {section === 'sites' ? <SitesPanel items={ss} refresh={refresh} /> : null}
+        {section === 'sites' ? (
+          <SitesPanel items={ss} refresh={refresh} assign={setAssignmentTarget} />
+        ) : null}
         {section === 'queues' ? (
           <QueuesPanel
             items={qs}
@@ -157,6 +150,7 @@ export function SettingsPage() {
               setQueueOpen(true);
             }}
             refresh={refresh}
+            assign={setAssignmentTarget}
           />
         ) : null}
         {section === 'users' ? (
@@ -215,6 +209,14 @@ export function SettingsPage() {
       <TierModal open={tierOpen} close={setTierOpen} queues={qs} tiers={ts} refresh={refresh} />
       <RuleModal open={ruleOpen} close={setRuleOpen} queues={qs} tiers={ts} refresh={refresh} />
       <TranslationModal open={translationOpen} close={setTranslationOpen} refresh={refresh} />
+      <UserAssignmentModal
+        target={assignmentTarget}
+        roles={rs}
+        onOpenChange={(open) => {
+          if (!open) setAssignmentTarget(null);
+        }}
+        onAssigned={refresh}
+      />
     </div>
   );
 }
@@ -269,7 +271,15 @@ function useAdminPagination<T>(items: readonly T[]) {
   return { currentPage, pageItems, setPage, totalPages };
 }
 
-function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
+function SitesPanel({
+  items,
+  refresh,
+  assign,
+}: {
+  items: Sites;
+  refresh: () => void;
+  assign: (target: AssignmentTarget) => void;
+}) {
   const { t: __t } = useTranslation();
   const pagination = useAdminPagination(items);
   return (
@@ -278,7 +288,7 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
         title={__t('ui.onboarding.settings_page.sites_managers_1qepn57')}
         text={__t('settings.siteHelp')}
         to="/onboarding"
-        label={__t('ui.onboarding.settings_page.nouveau_site_complet_1r4hy6i')}
+        label={__t('settings.newSite')}
       />
       <div className="table-wrap admin-table-wrap">
         <table>
@@ -312,18 +322,29 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="button button-small"
-                    onClick={() =>
-                      void sitesControllerUpdateSite(s.siteId, { isActive: !s.isActive }).then(
-                        refresh,
-                      )
-                    }
-                  >
-                    {s.isActive
-                      ? __t('ui.expression.onboarding.settings_page.desactiver_1hfjss1')
-                      : __t('ui.expression.onboarding.settings_page.activer_1qnbdon')}
-                  </button>
+                  <div className="table-actions">
+                    <button
+                      className="button button-small"
+                      type="button"
+                      onClick={() => {
+                        assign({ kind: 'site', id: s.siteId, label: s.siteName });
+                      }}
+                    >
+                      {__t('settings.assignUser')}
+                    </button>
+                    <button
+                      className="button button-small"
+                      onClick={() =>
+                        void sitesControllerUpdateSite(s.siteId, { isActive: !s.isActive }).then(
+                          refresh,
+                        )
+                      }
+                    >
+                      {s.isActive
+                        ? __t('ui.expression.onboarding.settings_page.desactiver_1hfjss1')
+                        : __t('ui.expression.onboarding.settings_page.activer_1qnbdon')}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -345,11 +366,13 @@ function QueuesPanel({
   create,
   edit,
   refresh,
+  assign,
 }: {
   items: QueueResponseDto[];
   create: () => void;
   edit: (q: QueueResponseDto) => void;
   refresh: () => void;
+  assign: (target: AssignmentTarget) => void;
 }) {
   const { t: __t } = useTranslation();
   const pagination = useAdminPagination(items);
@@ -408,6 +431,15 @@ function QueuesPanel({
                       }}
                     >
                       {__t('ui.onboarding.settings_page.modifier_1s45w8g')}
+                    </button>
+                    <button
+                      className="button button-small"
+                      type="button"
+                      onClick={() => {
+                        assign({ kind: 'queue', id: q.queueId, label: q.queueName });
+                      }}
+                    >
+                      {__t('settings.assignUser')}
                     </button>
                     <button
                       className="button button-small"

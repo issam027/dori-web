@@ -250,12 +250,12 @@ Critère d'acceptation : les trois expériences publiques fonctionnent dans leur
 
 ### B8 — Supervision, rapports, notifications et santé
 
-- [ ] Tester les cartes de supervision, leurs états vides et leur rafraîchissement.
-- [ ] Tester les rapports avec période, file/site et absence de données.
-- [ ] Tester la création guidée d'une notification et la validation du destinataire.
-- [ ] Tester les erreurs d'envoi et les confirmations globales.
-- [ ] Tester l'accès à la santé uniquement avec `system_manage`.
-- [ ] Vérifier que les données techniques restent compréhensibles et qu'aucun secret n'est affiché.
+- [x] Tester les cartes de supervision, leurs états vides et leur rafraîchissement.
+- [x] Tester les rapports avec période, file/site et absence de données.
+- [x] Tester la création guidée d'une notification et la validation du destinataire.
+- [x] Tester les erreurs d'envoi et les confirmations globales.
+- [x] Tester l'accès à la santé uniquement avec `system_manage`.
+- [x] Vérifier que les données techniques restent compréhensibles et qu'aucun secret n'est affiché.
 
 Critère d'acceptation : chaque écran de pilotage possède au moins un parcours heureux et un parcours d'erreur automatisés.
 
@@ -818,6 +818,16 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : lint et typecheck réussis ; Vitest 60/60 ; nouvelle recette B7 7/7 ; suite Playwright 48/49 au premier passage avec un timeout de navigation hors B7, puis fichier `scope.spec.ts` réussi 9/9 au rejeu.
 - Prochaine tâche recommandée : B8, uniquement après validation explicite de reprise par l'utilisateur.
 
+### 2026-10-10 — Renommage DORIFY et clôture B8
+
+- Tâches cochées : B8 complet.
+- Marque : tous les libellés IHM locaux, le titre HTML, la marque par défaut, les documents imprimés et les textes légaux affichent désormais `DORIFY`. Les identifiants techniques, clés de stockage, noms de package et clés i18n historiques restent inchangés.
+- Traductions distantes : leur priorité reste inchangée ; l'ancien nom éventuellement encore présent dans un bundle `ihm` est normalisé vers `DORIFY` à son chargement.
+- Couverture B8 : supervision, états vides, rafraîchissement, rapports sur sept jours, notifications guidées, erreurs d'envoi, contrôle `system_manage`, santé et absence de secrets.
+- Correction de recette : suppression de l'assertion E2E obsolète exigeant le libellé de périmètre retiré précédemment de la page Rapports.
+- Tests : typecheck et lint réussis ; test session 6/6 ; recette Playwright `pilotage.spec.ts` 8/8.
+- Prochaine tâche recommandée : C1, convention d'architecture par feature.
+
 Modèle :
 
 ```md
@@ -925,3 +935,27 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv1ogd93_dxemc2" time="2026-10-10T00:50:03.159Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv1ot883_jotsys" time="2026-10-10T01:00:03.171Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1tp711_tp4u7e" time="2026-10-10T03:16:53.078Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1u21zz_5mmygg" time="2026-10-10T03:26:53.087Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1uewyn_m5xkfg" time="2026-10-10T03:36:53.087Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1urryq_sbgs4m" time="2026-10-10T03:46:53.138Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1x0do1_u5nvpy" time="2026-10-10T04:49:33.745Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv21kf4t_zyyk0q" time="2026-10-10T06:57:07.229Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv21xa33_g822te" time="2026-10-10T07:07:07.215Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv22a51y_59ak35" time="2026-10-10T07:17:07.222Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv22n00g_hxam82" time="2026-10-10T07:27:07.216Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv22zuzc_ba0k24" time="2026-10-10T07:37:07.224Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv23cpyf_6mxpkv" time="2026-10-10T07:47:07.239Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv23pkxl_ste9o4" time="2026-10-10T07:57:07.257Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

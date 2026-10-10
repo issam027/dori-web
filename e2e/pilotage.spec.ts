@@ -157,7 +157,7 @@ test('reports apply a period of at most seven days to every queue and render an 
       '11:2026-09-20',
     ]);
   await expect(endDate).toHaveAttribute('max', '2026-09-24');
-  await expect(page.getByText(/site 1/i)).toBeVisible();
+  await expect(page.getByRole('main').getByRole('heading', { name: /rapports/i })).toBeVisible();
 
   await page.route('**/api/v1/queues**', async (route) => {
     await route.fulfill({ json: apiEnvelope(paginated([])) });
