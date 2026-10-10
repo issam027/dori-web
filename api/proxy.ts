@@ -15,9 +15,12 @@ function upstreamUrl(requestUrl: string): URL {
   const configuredBase = apiBaseUrl();
   const basePath = configuredBase.pathname.replace(/\/$/, '');
 
-  // Le chemin d'origine arrive dans __path (ex: "v1/health")
+  // Le chemin d'origine arrive dans __path (ex: "v1/health").
   const originalPath = incomingUrl.searchParams.get('__path') ?? '';
+
+  // Supprime les paramètres ajoutés par le rewrite Vercel.
   incomingUrl.searchParams.delete('__path');
+  incomingUrl.searchParams.delete('path');
   const query = incomingUrl.searchParams.toString();
 
   const path = `${basePath}/api/${originalPath}`;
