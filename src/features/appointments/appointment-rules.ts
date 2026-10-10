@@ -1,5 +1,32 @@
 import type { RegistrationResponseDto } from '@/api/generated/models';
 
+export type AppointmentVisualStatus =
+  'scheduled' | 'confirmed' | 'present' | 'in-progress' | 'served' | 'no-show' | 'cancelled';
+
+export function appointmentVisualStatus(
+  registration: RegistrationResponseDto,
+): AppointmentVisualStatus {
+  if (registration.status === 'cancelled') return 'cancelled';
+  if (registration.status === 'served') return 'served';
+  if (registration.status === 'no_show') return 'no-show';
+  if (registration.status === 'in_progress') return 'in-progress';
+  if (
+    registration.status === 'waiting' &&
+    ['checked_in', 'present', 'arrived'].includes(registration.appointmentStatus ?? '')
+  )
+    return 'present';
+  if (registration.appointmentStatus === 'confirmed') return 'confirmed';
+  return 'scheduled';
+}
+
+export function appointmentStatusKey(registration: RegistrationResponseDto): string {
+  return `appointments.status.${appointmentVisualStatus(registration)}`;
+}
+
+export function canManageAppointment(registration: RegistrationResponseDto): boolean {
+  return !['served', 'no_show', 'cancelled'].includes(registration.status);
+}
+
 export function canCheckIn(registration: RegistrationResponseDto, today: string): boolean {
   return (
     registration.entryType === 'appointment' &&

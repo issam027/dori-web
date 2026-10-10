@@ -5,7 +5,13 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { AppointmentActionDialog } from './AppointmentActionDialog';
 import { AppointmentEditor } from './AppointmentEditor';
-import { appointmentLocalParts, isoDate, weekDates } from './appointment-rules';
+import {
+  appointmentLocalParts,
+  appointmentStatusKey,
+  appointmentVisualStatus,
+  isoDate,
+  weekDates,
+} from './appointment-rules';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { usePersonsByIds } from '@/features/persons/hooks/usePersons';
@@ -51,7 +57,10 @@ export function AppointmentsPage() {
   const appointmentPeople = usePersonsByIds(appointmentPersonIds);
   const personName = (personId: number) => {
     const person = appointmentPeople[appointmentPersonIds.indexOf(personId)]?.data?.data;
-    return person ? `${person.firstName} ${person.lastName}` : 'Réservation';
+    if (!person) return __t('appointments.calendar.unknownPerson');
+    return [person.firstName, person.lastName]
+      .filter((part) => part.trim().length > 0)
+      .join(' ');
   };
   const byDate = (date: string): RegistrationResponseDto[] =>
     daily[dates.indexOf(date)]?.data?.data.items ?? [];
@@ -214,7 +223,7 @@ export function AppointmentsPage() {
                         ) : appointments.length ? (
                           appointments.map((item) => (
                             <button
-                              className="calendar-event-button"
+                              className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
                               key={item.registrationId}
                               type="button"
                               onClick={(event) => {
@@ -229,6 +238,9 @@ export function AppointmentsPage() {
                                   : time}{' '}
                                 · {item.ticketNumber}
                               </small>
+                              <span className="appointment-event-status">
+                                {__t(appointmentStatusKey(item))}
+                              </span>
                             </button>
                           ))
                         ) : null}
@@ -264,7 +276,7 @@ export function AppointmentsPage() {
                   </button>
                   {byDate(date).map((item) => (
                     <button
-                      className="calendar-event-button"
+                      className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
                       key={item.registrationId}
                       type="button"
                       onClick={(event) => {
@@ -276,6 +288,9 @@ export function AppointmentsPage() {
                         ? appointmentLocalParts(item.scheduledTime, timeZone).time
                         : '—'}{' '}
                       · {personName(item.personId)}
+                      <span className="appointment-event-status">
+                        {__t(appointmentStatusKey(item))}
+                      </span>
                     </button>
                   ))}
                 </section>
@@ -300,6 +315,9 @@ export function AppointmentsPage() {
       {selected.data ? (
         <AppointmentActionDialog
           appointment={selected.data.data}
+          queueName={
+            availableQueues.find((queue) => queue.queueId === selected.data.data.queueId)?.queueName
+          }
           timeZone={timeZone}
           open
           onOpenChange={(open) => {

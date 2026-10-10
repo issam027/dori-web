@@ -120,7 +120,7 @@ test('a slot conflict keeps the wizard open and reloads availability', async ({ 
   await expect(page.getByRole('dialog')).toBeVisible();
 });
 
-test('an existing calendar appointment can be opened, rescheduled and cancelled', async ({
+test('an existing calendar appointment can be opened, checked in, rescheduled and cancelled', async ({
   page,
 }) => {
   const appointment = buildAppointment({
@@ -130,11 +130,22 @@ test('an existing calendar appointment can be opened, rescheduled and cancelled'
     createdAt: '2026-10-08T10:00:00Z',
     updatedAt: '2026-10-08T10:00:00Z',
     tierId: 1,
+    appointmentStatus: 'confirmed',
   });
   let rescheduleBody: Record<string, unknown> = {};
   let cancelCalls = 0;
+  let checkInCalls = 0;
+  let expectedListQuery = false;
+  const noteBodies: string[] = [];
   const existing: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/registrations') {
+      if (url.searchParams.get('businessDate') === '2026-10-09') {
+        expectedListQuery =
+          url.searchParams.get('page') === '1' &&
+          url.searchParams.get('pageSize') === '25' &&
+          url.searchParams.get('queueId') === '10' &&
+          url.searchParams.get('entryType') === 'appointment';
+      }
       const items = url.searchParams.get('businessDate') === '2026-10-09' ? [appointment] : [];
       await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
@@ -156,6 +167,17 @@ test('an existing calendar appointment can be opened, rescheduled and cancelled'
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
+    if (method === 'POST' && path === '/api/v1/registrations/501/check-in') {
+      checkInCalls += 1;
+      await route.fulfill({ json: apiEnvelope(appointment) });
+      return true;
+    }
+    if (method === 'POST' && path === '/api/v1/persons/100/notes') {
+      const body = route.request().postDataJSON() as { content: string };
+      noteBodies.push(body.content);
+      await route.fulfill({ json: apiEnvelope({ noteId: noteBodies.length, ...body }) });
+      return true;
+    }
     if (method === 'DELETE' && path === '/api/v1/registrations/501') {
       cancelCalls += 1;
       await route.fulfill({ json: apiEnvelope({ registrationId: 501, deleted: true }) });
@@ -171,17 +193,30 @@ test('an existing calendar appointment can be opened, rescheduled and cancelled'
     handlers: [existing],
   });
   await page.goto('/appointments');
+  await expect.poll(() => expectedListQuery).toBe(true);
   await page.getByRole('button', { name: /personne test.*R001/i }).click();
   await expect(page.getByRole('dialog', { name: /rendez-vous R001/i })).toBeVisible();
-  await page.getByLabel(/reprogrammer/i).fill('2026-10-10T10:00');
-  await page.getByRole('button', { name: /^reprogrammer$/i }).click();
-  await expect.poll(() => Object.keys(rescheduleBody).length).toBeGreaterThan(0);
-  expect(rescheduleBody).toEqual({ scheduledTime: '2026-10-10T08:00:00.000Z' });
+  await expect(page.getByRole('dialog')).toContainText(/personne test/i);
+  await page.getByRole('button', { name: /marquer comme présent/i }).click();
+  await expect.poll(() => checkInCalls).toBe(1);
 
   await page.getByRole('button', { name: /personne test.*R001/i }).click();
-  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByRole('button', { name: /^reprogrammer$/i }).click();
+  await page.getByLabel(/nouvelle date/i).fill('2026-10-10');
+  await page.getByRole('button', { name: /10:00.*1 place/i }).click();
+  await page.getByRole('button', { name: /confirmer la reprogrammation/i }).click();
+  await expect.poll(() => Object.keys(rescheduleBody).length).toBeGreaterThan(0);
+  expect(rescheduleBody).toEqual({ scheduledTime: '2026-10-10T08:00:00.000Z' });
+  await expect.poll(() => noteBodies.length).toBe(1);
+  expect(noteBodies[0]).toMatch(/reprogrammation.*R001.*2026-10-09.*2026-10-10/i);
+
+  await page.getByRole('button', { name: /personne test.*R001/i }).click();
   await page.getByRole('button', { name: /annuler le rendez-vous/i }).click();
+  await page.getByLabel(/motif de l’annulation/i).fill('Demande téléphonique du client');
+  await page.getByRole('button', { name: /confirmer l’annulation/i }).click();
   await expect.poll(() => cancelCalls).toBe(1);
+  await expect.poll(() => noteBodies.length).toBe(2);
+  expect(noteBodies[1]).toMatch(/annulation.*R001.*demande téléphonique du client/i);
 });
 
 test('a site without appointment-enabled queues explains that appointments are unavailable', async ({

@@ -8,7 +8,12 @@ import {
   rescheduleAppointment,
   updateAppointment,
 } from './appointment-actions';
-import { canCheckIn, weekDates } from './appointment-rules';
+import {
+  appointmentVisualStatus,
+  canCheckIn,
+  canManageAppointment,
+  weekDates,
+} from './appointment-rules';
 
 it('uses the dedicated API operations for the five appointment journeys', async () => {
   const calls: string[] = [];
@@ -70,4 +75,22 @@ it('builds a complete Monday-to-Sunday week', () => {
     '2026-10-10',
     '2026-10-11',
   ]);
+});
+
+it('maps appointment lifecycle states to stable visual states', () => {
+  const appointment = {
+    entryType: 'appointment',
+    businessDate: '2026-10-11',
+    appointmentStatus: 'confirmed',
+    status: 'waiting',
+  } as RegistrationResponseDto;
+
+  expect(appointmentVisualStatus(appointment)).toBe('confirmed');
+  expect(appointmentVisualStatus({ ...appointment, appointmentStatus: 'checked_in' })).toBe(
+    'present',
+  );
+  expect(appointmentVisualStatus({ ...appointment, status: 'in_progress' })).toBe('in-progress');
+  expect(appointmentVisualStatus({ ...appointment, status: 'cancelled' })).toBe('cancelled');
+  expect(canManageAppointment(appointment)).toBe(true);
+  expect(canManageAppointment({ ...appointment, status: 'served' })).toBe(false);
 });

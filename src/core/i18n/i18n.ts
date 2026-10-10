@@ -30,6 +30,63 @@ const fallbackResources = {
       'loading.slogan': 'Les files sont sous contrôle. Vous pouvez souffler.',
       'desk.activeSessionDescription':
         'Votre guichet est actif. Vous pouvez appeler la prochaine personne dès que vous êtes prêt.',
+      'appointments.calendar.unknownPerson': 'Réservation',
+      'appointments.status.scheduled': 'Planifié',
+      'appointments.status.confirmed': 'Confirmé',
+      'appointments.status.present': 'Présent',
+      'appointments.status.in-progress': 'En cours',
+      'appointments.status.served': 'Terminé',
+      'appointments.status.no-show': 'Absent',
+      'appointments.status.cancelled': 'Annulé',
+      'appointments.actions.title': 'Rendez-vous {{ticket}}',
+      'appointments.actions.description': 'Consultez le rendez-vous et choisissez l’action appropriée.',
+      'appointments.actions.cancelStepDescription':
+        'Étape 2 sur 2 · précisez le motif avant de confirmer l’annulation.',
+      'appointments.actions.rescheduleStepDescription':
+        'Étape 2 sur 2 · choisissez une nouvelle date puis un créneau disponible.',
+      'appointments.actions.person': 'Personne concernée',
+      'appointments.actions.noContact': 'Aucune coordonnée renseignée',
+      'appointments.actions.date': 'Date',
+      'appointments.actions.time': 'Heure',
+      'appointments.actions.service': 'Service',
+      'appointments.actions.ticket': 'Ticket',
+      'appointments.actions.markPresent': 'Marquer comme présent',
+      'appointments.actions.presentHint':
+        'La présence peut être enregistrée le jour du rendez-vous, tant que son état le permet.',
+      'appointments.actions.presentSuccess': 'La présence a bien été enregistrée.',
+      'appointments.actions.reschedule': 'Reprogrammer',
+      'appointments.actions.rescheduleEyebrow': 'Nouveau créneau',
+      'appointments.actions.chooseSlot': 'Choisissez une date et une disponibilité',
+      'appointments.actions.newDate': 'Nouvelle date',
+      'appointments.actions.noSlots': 'Aucun créneau disponible pour cette date.',
+      'appointments.actions.remaining': '{{count}} place(s)',
+      'appointments.actions.confirmReschedule': 'Confirmer la reprogrammation',
+      'appointments.actions.rescheduleSuccess': 'Le rendez-vous a bien été reprogrammé.',
+      'appointments.actions.cancelAppointment': 'Annuler le rendez-vous',
+      'appointments.actions.cancelConfirmTitle': 'Confirmer l’annulation',
+      'appointments.actions.cancelConfirmText':
+        'Le rendez-vous de {{name}}, prévu le {{date}} à {{time}}, sera annulé. Cette action ne peut pas être annulée depuis cet écran.',
+      'appointments.actions.cancellationReason': 'Motif de l’annulation',
+      'appointments.actions.cancellationReasonPlaceholder':
+        'Ex. indisponibilité de la personne, demande téléphonique…',
+      'appointments.actions.cancellationNoteHint':
+        'Le motif sera ajouté automatiquement aux notes de la personne.',
+      'appointments.actions.confirmCancellation': 'Confirmer l’annulation',
+      'appointments.actions.cancelSuccess': 'Le rendez-vous a bien été annulé.',
+      'appointments.actions.slotConflict':
+        'Ce créneau vient d’être réservé. Les disponibilités ont été actualisées.',
+      'appointments.actions.failed': 'L’action n’a pas pu être réalisée.',
+      'appointments.actions.rescheduleGuidance':
+        'Les horaires proposés proviennent des disponibilités réelles du service.',
+      'appointments.actions.rescheduleNoteHint':
+        'Le changement de créneau sera ajouté automatiquement aux notes de la personne.',
+      'appointments.actions.noteFailedTitle': 'Rendez-vous modifié, note non enregistrée',
+      'appointments.actions.noteFailedText':
+        'L’action sur le rendez-vous a réussi, mais sa note de suivi n’a pas pu être ajoutée.',
+      'appointments.notes.cancelled':
+        'Annulation du rendez-vous {{ticket}} prévu le {{date}} à {{time}}. Motif : {{reason}}',
+      'appointments.notes.rescheduled':
+        'Reprogrammation du rendez-vous {{ticket}} : initialement prévu le {{oldDate}} à {{oldTime}}, déplacé au {{newDate}} à {{newTime}}.',
       'common.retry': 'Réessayer',
       'states.empty': 'Aucune donnée disponible.',
       'states.error': 'Impossible de charger les données.',
@@ -291,6 +348,63 @@ const fallbackResources = {
       'loading.slogan': 'Queues under control. You can breathe again.',
       'desk.activeSessionDescription':
         'Your desk is active. You can call the next person whenever you are ready.',
+      'appointments.calendar.unknownPerson': 'Reservation',
+      'appointments.status.scheduled': 'Scheduled',
+      'appointments.status.confirmed': 'Confirmed',
+      'appointments.status.present': 'Present',
+      'appointments.status.in-progress': 'In progress',
+      'appointments.status.served': 'Completed',
+      'appointments.status.no-show': 'No-show',
+      'appointments.status.cancelled': 'Cancelled',
+      'appointments.actions.title': 'Appointment {{ticket}}',
+      'appointments.actions.description': 'Review the appointment and choose the appropriate action.',
+      'appointments.actions.cancelStepDescription':
+        'Step 2 of 2 · provide a reason before confirming cancellation.',
+      'appointments.actions.rescheduleStepDescription':
+        'Step 2 of 2 · choose a new date and an available time.',
+      'appointments.actions.person': 'Person',
+      'appointments.actions.noContact': 'No contact details provided',
+      'appointments.actions.date': 'Date',
+      'appointments.actions.time': 'Time',
+      'appointments.actions.service': 'Service',
+      'appointments.actions.ticket': 'Ticket',
+      'appointments.actions.markPresent': 'Mark as present',
+      'appointments.actions.presentHint':
+        'Attendance can be recorded on the appointment date while its status allows it.',
+      'appointments.actions.presentSuccess': 'Attendance was successfully recorded.',
+      'appointments.actions.reschedule': 'Reschedule',
+      'appointments.actions.rescheduleEyebrow': 'New time slot',
+      'appointments.actions.chooseSlot': 'Choose a date and an available time',
+      'appointments.actions.newDate': 'New date',
+      'appointments.actions.noSlots': 'No time slot is available on this date.',
+      'appointments.actions.remaining': '{{count}} place(s)',
+      'appointments.actions.confirmReschedule': 'Confirm rescheduling',
+      'appointments.actions.rescheduleSuccess': 'The appointment was successfully rescheduled.',
+      'appointments.actions.cancelAppointment': 'Cancel appointment',
+      'appointments.actions.cancelConfirmTitle': 'Confirm cancellation',
+      'appointments.actions.cancelConfirmText':
+        'The appointment for {{name}}, scheduled on {{date}} at {{time}}, will be cancelled. This action cannot be undone from this screen.',
+      'appointments.actions.cancellationReason': 'Cancellation reason',
+      'appointments.actions.cancellationReasonPlaceholder':
+        'E.g. person unavailable, request made by phone…',
+      'appointments.actions.cancellationNoteHint':
+        'The reason will automatically be added to the person’s notes.',
+      'appointments.actions.confirmCancellation': 'Confirm cancellation',
+      'appointments.actions.cancelSuccess': 'The appointment was successfully cancelled.',
+      'appointments.actions.slotConflict':
+        'This time slot was just booked. Availability has been refreshed.',
+      'appointments.actions.failed': 'The action could not be completed.',
+      'appointments.actions.rescheduleGuidance':
+        'The proposed times come from the service’s current availability.',
+      'appointments.actions.rescheduleNoteHint':
+        'The schedule change will automatically be added to the person’s notes.',
+      'appointments.actions.noteFailedTitle': 'Appointment updated, note not saved',
+      'appointments.actions.noteFailedText':
+        'The appointment action succeeded, but its follow-up note could not be added.',
+      'appointments.notes.cancelled':
+        'Appointment {{ticket}}, scheduled on {{date}} at {{time}}, was cancelled. Reason: {{reason}}',
+      'appointments.notes.rescheduled':
+        'Appointment {{ticket}} was rescheduled: originally on {{oldDate}} at {{oldTime}}, moved to {{newDate}} at {{newTime}}.',
       'common.retry': 'Try again',
       'states.empty': 'No data available.',
       'states.error': 'Unable to load data.',

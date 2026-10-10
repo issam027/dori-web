@@ -15,20 +15,44 @@ export function useAppointments(options: {
   return useQueries({
     queries: options.dates.map((businessDate) => ({
       queryKey: queryKeys.appointments.byQueueDate(options.queueId, businessDate),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        registrationsControllerFindRegistrations(
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const params = {
+          siteId: options.siteId ?? undefined,
+          queueId: options.queueId,
+          businessDate,
+          entryType: 'appointment' as const,
+          pageSize: 25,
+          sort: 'scheduledTime:asc' as const,
+        };
+        const first = await registrationsControllerFindRegistrations(
           {
-            siteId: options.siteId ?? undefined,
-            queueId: options.queueId,
-            businessDate,
-            entryType: 'appointment',
+            ...params,
             page: 1,
-            pageSize: 100,
-            sort: 'scheduledTime:asc',
           },
           undefined,
           signal,
-        ),
+        );
+        if (first.data.totalPages <= 1) return first;
+
+        const remaining = await Promise.all(
+          Array.from({ length: first.data.totalPages - 1 }, (_, index) =>
+            registrationsControllerFindRegistrations(
+              { ...params, page: index + 2 },
+              undefined,
+              signal,
+            ),
+          ),
+        );
+        return {
+          ...first,
+          data: {
+            ...first.data,
+            page: 1,
+            pageSize: 25,
+            items: [first, ...remaining].flatMap((response) => response.data.items),
+          },
+        };
+      },
       enabled: options.siteId !== null && options.queueId !== undefined,
     })),
   });
