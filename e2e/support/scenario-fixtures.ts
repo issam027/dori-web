@@ -9,9 +9,7 @@ export interface ApiScenarioRequest {
   route: Route;
 }
 
-export type ApiScenarioHandler = (
-  request: ApiScenarioRequest,
-) => Promise<boolean> | boolean;
+export type ApiScenarioHandler = (request: ApiScenarioRequest) => Promise<boolean> | boolean;
 
 const permissionsByProfile: Record<TestProfile, string[]> = {
   root: [
@@ -288,6 +286,19 @@ export async function installApiScenario(
           activeThreads: 0,
           estimatedWaitMinutes: 0,
           nextAppointments: [],
+        }),
+      });
+      return;
+    }
+    if (/^\/api\/v1\/queues\/\d+\/display$/.test(request.path)) {
+      const queueId = Number(request.path.split('/')[4]);
+      const queue = queues.find((candidate) => candidate.queueId === queueId);
+      await route.fulfill({
+        json: apiEnvelope({
+          queueId,
+          queueName: queue?.queueName ?? 'File E2E',
+          activeThreads: [],
+          nextTickets: [],
         }),
       });
       return;

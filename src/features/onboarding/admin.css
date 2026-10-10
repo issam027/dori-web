@@ -8,10 +8,25 @@
   gap: 18px;
   align-items: stretch;
 }
+.onboarding-layout > .card {
+  height: 100%;
+  min-width: 0;
+}
 .setup-navigation {
   position: sticky;
   top: 84px;
   height: 100%;
+}
+.setup-content {
+  min-width: 0;
+}
+.setup-content .table-wrap table {
+  min-width: 760px;
+}
+.setup-content .table-action-column {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
 }
 .setup-navigation h2,
 .setup-content h2,
@@ -195,6 +210,61 @@ table td small {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 28px rgb(20 42 58 / 6%);
+}
+
+.admin-table-wrap table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.admin-table-wrap th,
+.admin-table-wrap td {
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--color-line);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.admin-table-wrap th {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  color: var(--color-ink);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.admin-table-wrap tbody tr {
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.admin-table-wrap tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--color-muted) 4%, transparent);
+}
+
+.admin-table-wrap tbody tr:hover {
+  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.admin-table-wrap tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table-wrap td:first-child b,
+.admin-table-wrap td:first-child code {
+  color: var(--color-ink);
 }
 .button-small {
   min-height: 32px;

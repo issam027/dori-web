@@ -14,10 +14,7 @@ import {
 
 const site = buildSite();
 const primaryQueue = buildQueue({ queueId: 10, queueName: 'Accueil prioritaire' });
-const queues = [
-  primaryQueue,
-  buildQueue({ queueId: 11, queueName: 'Accueil secondaire' }),
-];
+const queues = [primaryQueue, buildQueue({ queueId: 11, queueName: 'Accueil secondaire' })];
 
 const session = (queueId = 10) => ({
   sessionId: queueId * 10,
@@ -105,6 +102,64 @@ test('the cockpit explains when no active queue is configured', async ({ page })
   await expect(page.getByRole('button', { name: /créer un ticket/i })).toHaveCount(0);
 });
 
+test('the cockpit restores the server-side current call when local state is missing', async ({
+  page,
+}) => {
+  const operational: ApiScenarioHandler = async ({ method, path, route }) => {
+    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+      await route.fulfill({ json: apiEnvelope(paginated([session()])) });
+      return true;
+    }
+    if (method === 'GET' && path === '/api/v1/queues/10/threads') {
+      await route.fulfill({
+        json: apiEnvelope(
+          paginated([
+            {
+              threadNumber: 1,
+              status: 'occupied',
+              session: {
+                ...session(),
+                currentRegistrationId: 500,
+                lastSeenAt: '2026-10-09T09:15:00Z',
+                inactiveMinutes: 0,
+              },
+            },
+          ]),
+        ),
+      });
+      return true;
+    }
+    if (method === 'GET' && path === '/api/v1/registrations/500') {
+      await route.fulfill({
+        json: apiEnvelope(
+          buildRegistration({
+            status: 'in_progress',
+            createdAt: '2026-10-09T09:00:00Z',
+            updatedAt: '2026-10-09T09:15:00Z',
+            businessDate: '2026-10-09',
+            registrationTrackingToken: 'desk-restore-e2e',
+            tierId: 1,
+          }),
+        ),
+      });
+      return true;
+    }
+    if (method === 'GET' && path === '/api/v1/persons/100') {
+      await route.fulfill({
+        json: apiEnvelope(buildPerson({ firstName: 'Lina', lastName: 'Martin' })),
+      });
+      return true;
+    }
+    return false;
+  };
+  await installDesk(page, [operational], [primaryQueue]);
+  await page.goto('/desk');
+  const active = page.locator('.active-call');
+  await expect(active).toContainText('E001');
+  await expect(active).toContainText('Lina Martin');
+  await expect(active.getByRole('button', { name: /^servi$/i })).toBeVisible();
+});
+
 test('calling and serving a person shows details, disables mutation and builds a printable card', async ({
   page,
 }) => {
@@ -169,10 +224,16 @@ test('calling and serving a person shows details, disables mutation and builds a
   await installDesk(page, [operational], [primaryQueue]);
   await page.goto('/desk');
   await page.getByRole('button', { name: /appeler le suivant/i }).click();
-  const active = page.locator('.active-call');
+  let active = page.locator('.active-call');
   await expect(active).toContainText('Martin');
   await expect(active).toContainText(/15 min/i);
   await expect(active.getByLabel(/3 note/i)).toBeVisible();
+  await page.getByRole('button', { name: /actualiser/i }).click();
+  await expect(active).toContainText('E001');
+  await page.reload();
+  active = page.locator('.active-call');
+  await expect(active).toContainText('Martin');
+  await expect(active).toContainText('E001');
   const served = active.getByRole('button', { name: /^servi$/i });
   await served.click();
   await expect(served).toBeDisabled();
@@ -182,9 +243,15 @@ test('calling and serving a person shows details, disables mutation and builds a
   await expect(summary).toContainText('E001');
   await expect(summary).toContainText(/document non fiscal/i);
   await expect(summary.locator('.passage-print-legal')).toContainText(/demande du client/i);
+  const cardWidths = await page.evaluate<number[]>(
+    "[document.querySelector('.queue-desk-card'), document.querySelector('.passage-summary-card')].map(card => Math.round(card.getBoundingClientRect().width))",
+  );
+  expect(Math.abs((cardWidths[0] ?? 0) - (cardWidths[1] ?? 0))).toBeLessThanOrEqual(1);
   expect(servedCalls).toBe(1);
+  await page.reload();
+  await expect(page.locator('.passage-summary-card')).toContainText('E001');
   await summary.getByRole('button', { name: /imprimer le justificatif/i }).click();
-  await expect.poll(() => page.evaluate("document.body.dataset.printCalled")).toBe('true');
+  await expect.poll(() => page.evaluate('document.body.dataset.printCalled')).toBe('true');
 });
 
 test('marking a called person absent also creates a discreet passage summary', async ({ page }) => {
@@ -230,14 +297,21 @@ test('marking a called person absent also creates a discreet passage summary', a
   expect(noShowCalls).toBe(1);
 });
 
-test('zero waiting returns an inline business error without losing the shell', async ({ page }) => {
+test('zero waiting is handled as a normal business outcome', async ({ page }) => {
   const empty: ApiScenarioHandler = async ({ method, path, route }) => {
     if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
     if (method === 'POST' && path === '/api/v1/queues/10/next') {
-      await route.fulfill(apiFailure(422, 'QUEUE_EMPTY'));
+      await route.fulfill({
+        json: {
+          code: 'QUEUE_EMPTY',
+          translationKey: 'queue.next.empty',
+          translationParams: {},
+          data: null,
+        },
+      });
       return true;
     }
     return false;
@@ -245,7 +319,9 @@ test('zero waiting returns an inline business error without losing the shell', a
   await installDesk(page, [empty], [primaryQueue]);
   await page.goto('/desk');
   await page.getByRole('button', { name: /appeler le suivant/i }).click();
-  await expect(page.getByRole('main').getByRole('alert')).toBeVisible();
+  await expect(page.getByRole('status')).toContainText(/aucun ticket en attente/i);
+  await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0);
+  await expect(page.locator('.active-call')).toHaveCount(0);
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page).toHaveURL(/\/desk$/);
   await expect(page.locator('body')).not.toContainText(/page blanche/i);
@@ -298,14 +374,17 @@ test('two operators competing for the same next ticket produce one call and one 
     second.getByRole('button', { name: /appeler le suivant/i }).click(),
   ]);
   await expect
-    .poll(async () =>
-      (await first.locator('.active-call').count()) + (await second.locator('.active-call').count()),
+    .poll(
+      async () =>
+        (await first.locator('.active-call').count()) +
+        (await second.locator('.active-call').count()),
     )
     .toBe(1);
   await expect
-    .poll(async () =>
-      (await first.getByRole('main').getByRole('alert').count()) +
-      (await second.getByRole('main').getByRole('alert').count()),
+    .poll(
+      async () =>
+        (await first.getByRole('main').getByRole('alert').count()) +
+        (await second.getByRole('main').getByRole('alert').count()),
     )
     .toBe(1);
   expect(attempts).toBe(2);

@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { queuesControllerCreateForSite } from '@/api/generated/queues/queues';
+import {
+  queuesControllerCreateForSite,
+  queuesControllerUpdate,
+} from '@/api/generated/queues/queues';
 import { sitesControllerCreateSite, sitesControllerUpdateSite } from '@/api/generated/sites/sites';
 import {
   serviceTiersControllerAssociateTier,
@@ -35,6 +38,7 @@ export function OnboardingPage() {
   const { t: __t } = useTranslation();
   const [draft, setState] = useState<OnboardingDraft>(() => loadOnboardingDraft());
   const [queueOpen, setQueueOpen] = useState(false);
+  const [editingQueueCode, setEditingQueueCode] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const tiers = useQuery({
@@ -193,6 +197,11 @@ export function OnboardingPage() {
             <QueuesStep
               draft={draft}
               open={() => {
+                setEditingQueueCode(undefined);
+                setQueueOpen(true);
+              }}
+              edit={(queueCode) => {
+                setEditingQueueCode(queueCode);
                 setQueueOpen(true);
               }}
             />
@@ -248,12 +257,39 @@ export function OnboardingPage() {
         </Card>
       </div>
       <QueueEditor
+        key={editingQueueCode ?? 'new-queue'}
         open={queueOpen}
-        onOpenChange={setQueueOpen}
-        onSave={(queue: CreateQueueDto) => {
+        initial={draft.queues.find((queue) => queue.queueCode === editingQueueCode)}
+        onOpenChange={(open) => {
+          setQueueOpen(open);
+          if (!open) setEditingQueueCode(undefined);
+        }}
+        onSave={async (queue: CreateQueueDto) => {
+          const originalCode = editingQueueCode;
+          const confirmedQueueId = originalCode
+            ? draft.confirmedQueueIds[originalCode.toUpperCase()]
+            : undefined;
+          if (confirmedQueueId) await queuesControllerUpdate(confirmedQueueId, queue);
+          const confirmedQueueIds =
+            confirmedQueueId && originalCode
+              ? {
+                  ...Object.fromEntries(
+                    Object.entries(draft.confirmedQueueIds).filter(
+                      ([code]) => code !== originalCode.toUpperCase(),
+                    ),
+                  ),
+                  [queue.queueCode.toUpperCase()]: confirmedQueueId,
+                }
+              : { ...draft.confirmedQueueIds };
           save({
             ...draft,
-            queues: [...draft.queues.filter((item) => item.queueCode !== queue.queueCode), queue],
+            confirmedQueueIds,
+            queues: [
+              ...draft.queues.filter((item) =>
+                originalCode ? item.queueCode !== originalCode : item.queueCode !== queue.queueCode,
+              ),
+              queue,
+            ],
           });
         }}
       />
@@ -496,7 +532,15 @@ function Defaults({
     </section>
   );
 }
-function QueuesStep({ draft, open }: { draft: OnboardingDraft; open: () => void }) {
+function QueuesStep({
+  draft,
+  open,
+  edit,
+}: {
+  draft: OnboardingDraft;
+  open: () => void;
+  edit: (queueCode: string) => void;
+}) {
   const { t: __t } = useTranslation();
   return (
     <section>
@@ -527,6 +571,7 @@ function QueuesStep({ draft, open }: { draft: OnboardingDraft; open: () => void 
               <th>{__t('ui.onboarding.onboarding_page.rdv_1f03hpr')}</th>
               <th>{__t('ui.onboarding.onboarding_page.devise_1pl1r6r')}</th>
               <th>{__t('ui.onboarding.onboarding_page.api_y14yjr')}</th>
+              <th className="table-action-column">{__t('onboarding.queueActions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -555,6 +600,20 @@ function QueuesStep({ draft, open }: { draft: OnboardingDraft; open: () => void 
                       ? __t('ui.expression.onboarding.onboarding_page.confirmee_b2ivxx')
                       : __t('ui.expression.onboarding.onboarding_page.brouillon_107uxdl')}
                   </span>
+                </td>
+                <td className="table-action-column">
+                  <button
+                    type="button"
+                    className="button button-small"
+                    aria-label={__t('onboarding.editQueueLabel', {
+                      queue: q.queueName || q.queueCode,
+                    })}
+                    onClick={() => {
+                      edit(q.queueCode);
+                    }}
+                  >
+                    {__t('onboarding.editQueue')}
+                  </button>
                 </td>
               </tr>
             ))}

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { authControllerLogout } from '@/api/generated/authentification/authentification';
 import { sitesControllerFindSites, sitesControllerUpdateSite } from '@/api/generated/sites/sites';
 import {
   queuesControllerCreateForSite,
@@ -29,8 +30,11 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Modal } from '@/design-system/components/Modal';
+import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
+import { notifyError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 const sections = ['sites', 'queues', 'users', 'tiers', 'notifications', 'translations'] as const;
 type Section = (typeof sections)[number];
@@ -81,9 +85,9 @@ export function SettingsPage() {
     [tierOpen, setTierOpen] = useState(false),
     [ruleOpen, setRuleOpen] = useState(false),
     [translationOpen, setTranslationOpen] = useState(false);
-  const rank = Math.min(
+  const rank = Math.max(
     ...rs.filter((r) => current?.roles.includes(r.roleName)).map((r) => r.rank),
-    999,
+    0,
   );
   return (
     <div className="page-stack admin-page">
@@ -220,11 +224,13 @@ function Header({
   text,
   action,
   label,
+  to,
 }: {
   title: string;
   text: string;
   action?: () => void;
   label?: string;
+  to?: string;
 }) {
   return (
     <div className="card-heading">
@@ -232,7 +238,11 @@ function Header({
         <h2>{title}</h2>
         <p>{text}</p>
       </div>
-      {action ? (
+      {to && label ? (
+        <Link className="button button-primary" to={to}>
+          + {label}
+        </Link>
+      ) : action ? (
         <button className="button button-primary" onClick={action}>
           + {label}
         </button>
@@ -246,15 +256,31 @@ type Tiers = Awaited<ReturnType<typeof serviceTiersControllerFindTiers>>['data']
 type Translations = Awaited<
   ReturnType<typeof translationsControllerFindTranslations>
 >['data']['items'];
+const ADMIN_PAGE_SIZE = 10;
+
+function useAdminPagination<T>(items: readonly T[]) {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(items.length / ADMIN_PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageItems = items.slice(
+    (currentPage - 1) * ADMIN_PAGE_SIZE,
+    currentPage * ADMIN_PAGE_SIZE,
+  );
+  return { currentPage, pageItems, setPage, totalPages };
+}
+
 function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
   const { t: __t } = useTranslation();
+  const pagination = useAdminPagination(items);
   return (
     <section>
       <Header
         title={__t('ui.onboarding.settings_page.sites_managers_1qepn57')}
         text={__t('settings.siteHelp')}
+        to="/onboarding"
+        label={__t('ui.onboarding.settings_page.nouveau_site_complet_1r4hy6i')}
       />
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
           <thead>
             <tr>
@@ -267,7 +293,7 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((s) => (
+            {pagination.pageItems.map((s) => (
               <tr key={s.siteId}>
                 <td>
                   <b>{s.siteName}</b>
@@ -304,9 +330,13 @@ function SitesPanel({ items, refresh }: { items: Sites; refresh: () => void }) {
           </tbody>
         </table>
       </div>
-      <Link className="button button-primary" to="/onboarding">
-        {__t('ui.onboarding.settings_page.nouveau_site_complet_1r4hy6i')}
-      </Link>
+      {items.length > ADMIN_PAGE_SIZE ? (
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+        />
+      ) : null}
     </section>
   );
 }
@@ -322,6 +352,7 @@ function QueuesPanel({
   refresh: () => void;
 }) {
   const { t: __t } = useTranslation();
+  const pagination = useAdminPagination(items);
   return (
     <section>
       <Header
@@ -330,7 +361,7 @@ function QueuesPanel({
         action={create}
         label={__t('ui.onboarding.settings_page.nouvelle_file_1sg2isf')}
       />
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
           <thead>
             <tr>
@@ -343,7 +374,7 @@ function QueuesPanel({
             </tr>
           </thead>
           <tbody>
-            {items.map((q) => (
+            {pagination.pageItems.map((q) => (
               <tr key={q.queueId}>
                 <td>
                   <b>
@@ -397,6 +428,13 @@ function QueuesPanel({
           </tbody>
         </table>
       </div>
+      {items.length > ADMIN_PAGE_SIZE ? (
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+        />
+      ) : null}
     </section>
   );
 }
@@ -410,6 +448,9 @@ function UsersPanel({
   refresh: () => void;
 }) {
   const { t: __t } = useTranslation();
+  const pagination = useAdminPagination(items);
+  const [disconnectUser, setDisconnectUser] = useState<Users[number] | null>(null);
+  const [disconnecting, setDisconnecting] = useState(false);
   return (
     <section>
       <Header
@@ -418,7 +459,7 @@ function UsersPanel({
         action={create}
         label={__t('ui.onboarding.settings_page.nouvel_utilisateur_137bxy3')}
       />
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
           <thead>
             <tr>
@@ -431,7 +472,7 @@ function UsersPanel({
             </tr>
           </thead>
           <tbody>
-            {items.map((u) => (
+            {pagination.pageItems.map((u) => (
               <tr key={u.userId}>
                 <td>
                   <b>{u.username}</b>
@@ -469,6 +510,15 @@ function UsersPanel({
                     >
                       {__t('ui.onboarding.settings_page.reinitialiser_mdp_1jj1i30')}
                     </button>
+                    <button
+                      className="button button-small button-danger"
+                      type="button"
+                      onClick={() => {
+                        setDisconnectUser(u);
+                      }}
+                    >
+                      {__t('settings.disconnectUser')}
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -476,6 +526,63 @@ function UsersPanel({
           </tbody>
         </table>
       </div>
+      {items.length > ADMIN_PAGE_SIZE ? (
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+        />
+      ) : null}
+      <Modal
+        open={disconnectUser !== null}
+        onOpenChange={(open) => {
+          if (!open && !disconnecting) setDisconnectUser(null);
+        }}
+        title={__t('settings.disconnectUserTitle')}
+        description={__t('settings.disconnectUserDescription', {
+          username: disconnectUser?.username ?? '',
+        })}
+        actions={
+          <>
+            <button
+              className="button"
+              type="button"
+              disabled={disconnecting}
+              onClick={() => {
+                setDisconnectUser(null);
+              }}
+            >
+              {__t('common.cancel')}
+            </button>
+            <button
+              className="button button-danger"
+              type="button"
+              disabled={!disconnectUser || disconnecting}
+              onClick={() => {
+                if (!disconnectUser) return;
+                setDisconnecting(true);
+                void authControllerLogout({ userId: disconnectUser.userId })
+                  .then(() => {
+                    notify({
+                      tone: 'success',
+                      title: __t('settings.userDisconnected'),
+                      message: disconnectUser.username,
+                    });
+                    setDisconnectUser(null);
+                  })
+                  .catch(notifyError)
+                  .finally(() => {
+                    setDisconnecting(false);
+                  });
+              }}
+            >
+              {__t('settings.disconnectAllSessions')}
+            </button>
+          </>
+        }
+      >
+        <p className="admin-message">{__t('settings.disconnectUserHint')}</p>
+      </Modal>
     </section>
   );
 }
@@ -544,6 +651,7 @@ function NotificationsPanel({ open }: { open: () => void }) {
 }
 function TranslationsPanel({ items, open }: { items: Translations; open: () => void }) {
   const { t: __t } = useTranslation();
+  const pagination = useAdminPagination(items);
   return (
     <section>
       <Header
@@ -552,7 +660,7 @@ function TranslationsPanel({ items, open }: { items: Translations; open: () => v
         action={open}
         label={__t('ui.onboarding.settings_page.nouvelle_cle_5he7jx')}
       />
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
           <thead>
             <tr>
@@ -564,7 +672,7 @@ function TranslationsPanel({ items, open }: { items: Translations; open: () => v
             </tr>
           </thead>
           <tbody>
-            {items.map((x) => (
+            {pagination.pageItems.map((x) => (
               <tr key={x.translationId}>
                 <td>
                   <code>{x.translationKey}</code>
@@ -578,6 +686,13 @@ function TranslationsPanel({ items, open }: { items: Translations; open: () => v
           </tbody>
         </table>
       </div>
+      {items.length > ADMIN_PAGE_SIZE ? (
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+        />
+      ) : null}
     </section>
   );
 }

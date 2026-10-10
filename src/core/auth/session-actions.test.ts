@@ -5,6 +5,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { getAccessToken } from './access-token';
 import {
   clearSession,
+  changeActiveSite,
   expireSession,
   getRememberedUsername,
   hydrateSession,
@@ -12,6 +13,7 @@ import {
 } from './session-actions';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
+import { useOperationStore } from '@/features/queue-operations/operation-store';
 
 describe('hydrateSession', () => {
   afterEach(() => {
@@ -150,5 +152,52 @@ describe('hydrateSession', () => {
     expect(useScopeStore.getState().activeSiteId).toBeNull();
     expect(useBrandStore.getState()).toMatchObject({ name: 'DORI', logoUrl: null });
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+  });
+});
+
+describe('changeActiveSite cockpit preservation', () => {
+  const scope = { isGlobal: false, siteIds: [12, 13], queueIds: [25] };
+  const activeCall = {
+    registrationId: 9,
+    ticketNumber: 'A009',
+    entryType: 'walkin' as const,
+    calledEarly: false,
+    tier: {},
+    status: 'called',
+    sessionId: 2,
+    threadNumber: 1,
+    priorityScore: 1,
+    calledAt: '2026-10-08T08:00:00Z',
+    person: {},
+  };
+
+  beforeEach(() => {
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/sites/:siteId', ({ params }) =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: { siteId: Number(params.siteId), siteName: 'Site test' },
+        }),
+      ),
+    );
+    useScopeStore.getState().setActiveSite(12, scope);
+    useOperationStore.getState().startCall(activeCall);
+  });
+
+  afterEach(() => {
+    useScopeStore.getState().clear();
+    useOperationStore.getState().reset();
+  });
+
+  it('keeps the active call when the same site context is reapplied', async () => {
+    await changeActiveSite(new QueryClient(), 12, scope);
+    expect(useOperationStore.getState().activeCall?.registrationId).toBe(9);
+  });
+
+  it('purges the active call when the operator really changes site', async () => {
+    await changeActiveSite(new QueryClient(), 13, scope);
+    expect(useOperationStore.getState().activeCall).toBeNull();
   });
 });

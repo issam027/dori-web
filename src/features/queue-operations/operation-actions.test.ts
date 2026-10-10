@@ -38,8 +38,24 @@ it('commits an irreversible call only after server confirmation', async () => {
   const request = callNextAndCommit(4);
   expect(useOperationStore.getState().activeCall).toBeNull();
   confirm();
-  await request;
+  await expect(request).resolves.toBe('called');
   expect(useOperationStore.getState().activeCall?.registrationId).toBe(9);
+});
+
+it('treats an empty queue as a normal outcome and keeps local state unchanged', async () => {
+  mockServer.use(
+    http.post('http://localhost:3000/api/v1/queues/4/next', () =>
+      HttpResponse.json({
+        code: 'QUEUE_EMPTY',
+        translationKey: 'queue.next.empty',
+        translationParams: {},
+        data: null,
+      }),
+    ),
+  );
+
+  await expect(callNextAndCommit(4)).resolves.toBe('empty');
+  expect(useOperationStore.getState().activeCall).toBeNull();
 });
 
 it('keeps local state unchanged on a 409 conflict', async () => {

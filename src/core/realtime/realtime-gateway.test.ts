@@ -19,4 +19,20 @@ describe('PollingRealtimeGateway', () => {
     expect(listener).toHaveBeenLastCalledWith({ waiting: 3 });
     gateway.disconnect();
   });
+
+  it('reports polling failures without producing an unhandled interval rejection', async () => {
+    const failure = new Error('network unavailable');
+    const getSnapshot = vi
+      .fn<() => Promise<{ waiting: number }>>()
+      .mockResolvedValueOnce({ waiting: 1 })
+      .mockRejectedValue(failure);
+    const onError = vi.fn();
+    const gateway = new PollingRealtimeGateway(getSnapshot, 1_000, onError);
+
+    await gateway.connect();
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(onError).toHaveBeenCalledWith(failure);
+    gateway.disconnect();
+  });
 });

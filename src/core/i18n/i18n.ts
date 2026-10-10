@@ -7,6 +7,18 @@ import { generatedUiExpressionFallbackFr } from './generated-ui-expressions.fr';
 const fallbackResources = {
   fr: {
     fallback: {
+      'onboarding.queueActions': 'Actions',
+      'onboarding.editQueue': 'Modifier',
+      'onboarding.editQueueLabel': 'Modifier la file {{queue}}',
+      'tracking.error.invalidTitle': 'Lien de suivi invalide',
+      'tracking.error.invalidText':
+        'Ce lien ne correspond à aucun ticket. Vérifiez le lien reçu avec votre ticket.',
+      'tracking.error.expiredTitle': 'Lien de suivi expiré',
+      'tracking.error.expiredText':
+        'Le suivi de ce ticket est terminé et ce lien n’est plus actif.',
+      'tracking.error.unavailableTitle': 'Suivi momentanément indisponible',
+      'tracking.error.unavailableText':
+        'Nous ne pouvons pas actualiser votre position. Réessayez dans quelques instants.',
       ...generatedUiFallbackFr,
       ...generatedUiExpressionFallbackFr,
       'app.name': 'DORI',
@@ -41,8 +53,7 @@ const fallbackResources = {
       'onboarding.siteIdentityHelp':
         'Le nom est requis ; les autres champs reçoivent les valeurs par défaut de l’API.',
       'onboarding.defaultsHelp': 'Ces valeurs deviennent les paramètres hérités des files.',
-      'onboarding.queueOverrideHelp':
-        'Choisissez l’héritage ou une surcharge propre à la file.',
+      'onboarding.queueOverrideHelp': 'Choisissez l’héritage ou une surcharge propre à la file.',
       'onboarding.tiersHelp':
         'Sélectionnez au moins un niveau pour chaque file. Le premier niveau sélectionné sera proposé par défaut.',
       'onboarding.accountsHelp':
@@ -51,14 +62,27 @@ const fallbackResources = {
       'settings.siteHelp':
         'Identité, valeurs opérationnelles par défaut, responsables et activation réelle.',
       'settings.queuesHelp': 'Paramètres effectifs, héritage, guichets et opérateurs.',
-      'settings.usersHelp':
-        'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
-      'settings.tiersHelp':
-        'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
-      'settings.rulesHelp':
-        'Règles persistantes par file et niveau, avec simulation locale.',
-      'settings.translationsHelp':
-        'Catégories IHM, SMS et erreurs, avec paramètres attendus.',
+      'settings.usersHelp': 'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
+      'settings.tiersHelp': 'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
+      'settings.rulesHelp': 'Règles persistantes par file et niveau, avec simulation locale.',
+      'settings.translationsHelp': 'Catégories IHM, SMS et erreurs, avec paramètres attendus.',
+      'settings.disconnectUser': 'Déconnecter',
+      'settings.disconnectUserTitle': 'Déconnecter toutes les sessions',
+      'settings.disconnectUserDescription':
+        'Toutes les sessions actives de {{username}} seront immédiatement révoquées.',
+      'settings.disconnectAllSessions': 'Déconnecter toutes les sessions',
+      'settings.userDisconnected': 'Utilisateur déconnecté',
+      'settings.disconnectUserHint':
+        'L’utilisateur devra se reconnecter sur chacun de ses appareils pour continuer.',
+      'profile.changePasswordTitle': 'Changer mon mot de passe',
+      'profile.changePasswordHelp':
+        'Saisissez votre mot de passe actuel, puis choisissez un nouveau mot de passe sécurisé.',
+      'profile.currentPassword': 'Mot de passe actuel',
+      'profile.newPassword': 'Nouveau mot de passe',
+      'profile.passwordConfirmation': 'Confirmation',
+      'profile.passwordLength': 'Le mot de passe doit contenir entre 10 et 20 caractères.',
+      'profile.updatePassword': 'Mettre à jour le mot de passe',
+      'profile.passwordUpdated': 'Mot de passe mis à jour',
       'errorBoundary.eyebrow': 'Incident interface',
       'errorBoundary.title': 'Cette page a rencontré une erreur',
       'errorBoundary.description':
@@ -87,6 +111,9 @@ const fallbackResources = {
       'notifications.profile.saved': 'Profil enregistré',
       'notifications.queue.reset': 'File réinitialisée',
       'notifications.queue.resetMessage': '{{queue}} a bien été réinitialisée.',
+      'notifications.queue.empty': 'Aucun ticket en attente',
+      'notifications.queue.emptyMessage':
+        'Aucune personne n’est disponible pour la file {{queue}}.',
       'notifications.delivery.queued': 'Notification mise en file',
       'notifications.delivery.queuedMessage':
         'Le journal a été actualisé. Vous pouvez suivre son statut d’envoi.',
@@ -101,6 +128,13 @@ const fallbackResources = {
       'notifications.desk.released': 'Guichet libéré',
       'notifications.desk.takenOver': 'Guichet repris',
       'notifications.desk.opened': 'Guichet occupé',
+      'reports.periodDescription':
+        'Analysez les indicateurs consolidés sur une période de sept jours maximum.',
+      'reports.startDate': 'Date de début',
+      'reports.endDate': 'Date de fin',
+      'reports.maximumPeriod': 'Période limitée à 7 jours, dates incluses',
+      'reports.noDataForPeriod': 'Aucune donnée pour cette période',
+      'reports.periodReportByQueue': 'Rapport consolidé par file sur la période',
       'profile.title': 'Mon profil',
       'routes.placeholder': 'Espace {{name}} prêt à être construit.',
       'common.close': 'Fermer',
@@ -223,24 +257,36 @@ const fallbackResources = {
       'demo.operatorDetail': 'Desk and queues',
       'demo.kiosk': 'Kiosk',
       'demo.kioskDetail': 'Kiosk and display',
-      'onboarding.siteIdentityHelp':
-        'The name is required; other fields use the API defaults.',
+      'onboarding.siteIdentityHelp': 'The name is required; other fields use the API defaults.',
       'onboarding.defaultsHelp': 'These values become the inherited queue settings.',
       'onboarding.queueOverrideHelp': 'Choose inheritance or a queue-specific override.',
       'onboarding.tiersHelp':
         'Select at least one tier for each queue. The first selected tier will be offered by default.',
       'onboarding.accountsHelp': 'Human, kiosk and display accounts with their scopes.',
       'onboarding.validationHelp': 'Validate the journey before opening it to the public.',
-      'settings.siteHelp':
-        'Identity, operational defaults, owners and actual activation.',
+      'settings.siteHelp': 'Identity, operational defaults, owners and actual activation.',
       'settings.queuesHelp': 'Effective settings, inheritance, desks and operators.',
-      'settings.usersHelp':
-        'Account, email, language, status, password, role and scope.',
-      'settings.tiersHelp':
-        'Fixed Free, Standard and Premium catalog; availability by queue.',
+      'settings.usersHelp': 'Account, email, language, status, password, role and scope.',
+      'settings.tiersHelp': 'Fixed Free, Standard and Premium catalog; availability by queue.',
       'settings.rulesHelp': 'Persistent rules by queue and tier, with local simulation.',
-      'settings.translationsHelp':
-        'UI, SMS and error categories, with their expected parameters.',
+      'settings.translationsHelp': 'UI, SMS and error categories, with their expected parameters.',
+      'settings.disconnectUser': 'Disconnect',
+      'settings.disconnectUserTitle': 'Disconnect all sessions',
+      'settings.disconnectUserDescription':
+        'All active sessions for {{username}} will be revoked immediately.',
+      'settings.disconnectAllSessions': 'Disconnect all sessions',
+      'settings.userDisconnected': 'User disconnected',
+      'settings.disconnectUserHint':
+        'The user will need to sign in again on each device to continue.',
+      'profile.changePasswordTitle': 'Change my password',
+      'profile.changePasswordHelp':
+        'Enter your current password, then choose a secure new password.',
+      'profile.currentPassword': 'Current password',
+      'profile.newPassword': 'New password',
+      'profile.passwordConfirmation': 'Confirmation',
+      'profile.passwordLength': 'The password must contain between 10 and 20 characters.',
+      'profile.updatePassword': 'Update password',
+      'profile.passwordUpdated': 'Password updated',
       'errorBoundary.eyebrow': 'Interface incident',
       'errorBoundary.title': 'This page encountered an error',
       'errorBoundary.description':
@@ -268,6 +314,8 @@ const fallbackResources = {
       'notifications.profile.saved': 'Profile saved',
       'notifications.queue.reset': 'Queue reset',
       'notifications.queue.resetMessage': '{{queue}} was successfully reset.',
+      'notifications.queue.empty': 'No ticket waiting',
+      'notifications.queue.emptyMessage': 'No one is currently available in the {{queue}} queue.',
       'notifications.delivery.queued': 'Notification queued',
       'notifications.delivery.queuedMessage':
         'The log was refreshed. You can follow its delivery status.',
@@ -282,6 +330,13 @@ const fallbackResources = {
       'notifications.desk.released': 'Desk released',
       'notifications.desk.takenOver': 'Desk taken over',
       'notifications.desk.opened': 'Desk opened',
+      'reports.periodDescription':
+        'Analyze consolidated indicators over a period of up to seven days.',
+      'reports.startDate': 'Start date',
+      'reports.endDate': 'End date',
+      'reports.maximumPeriod': 'Period limited to 7 days, inclusive',
+      'reports.noDataForPeriod': 'No data for this period',
+      'reports.periodReportByQueue': 'Consolidated report by queue for the period',
       'profile.title': 'My profile',
       'routes.placeholder': 'The {{name}} area is ready to be built.',
       'common.close': 'Close',

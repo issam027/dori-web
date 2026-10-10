@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
   reportsControllerGetDailyQueueReport,
   reportsControllerGetDashboardSummary,
@@ -11,7 +12,13 @@ import { Card } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
-import { aggregateReports, reportsToCsv } from './report-utils';
+import {
+  addDays,
+  aggregateReports,
+  aggregateReportsByQueue,
+  reportPeriodDates,
+  reportsToCsv,
+} from './report-utils';
 import { dateInTimeZone } from '@/features/appointments/appointment-rules';
 
 const fallbackTimeZone = 'UTC';
@@ -19,13 +26,17 @@ const fallbackTimeZone = 'UTC';
 export function ReportsPage() {
   const { t: __t } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
-  const [date, setDate] = React.useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const site = useQuery({
     queryKey: ['site', siteId],
     queryFn: () => sitesControllerFindSite(siteId ?? 0),
     enabled: Boolean(siteId),
   });
-  const effectiveDate = date || dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
+  const today = dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
+  const effectiveEndDate = endDate || today;
+  const effectiveStartDate = startDate || addDays(effectiveEndDate, -6);
+  const periodDates = reportPeriodDates(effectiveStartDate, effectiveEndDate);
   const queues = useQuery({
     queryKey: ['queues', 'reports', siteId],
     queryFn: () =>
@@ -45,20 +56,24 @@ export function ReportsPage() {
       'reports',
       'daily',
       siteId,
-      effectiveDate,
+      effectiveStartDate,
+      effectiveEndDate,
       queues.data?.data.items.map((queue) => queue.queueId),
     ],
-    enabled: Boolean(queues.data),
+    enabled: Boolean(queues.data && periodDates.length),
     queryFn: () =>
       Promise.all(
-        (queues.data?.data.items ?? []).map((queue) =>
-          reportsControllerGetDailyQueueReport(queue.queueId, { date: effectiveDate }).then(
-            (response) => response.data,
+        periodDates.flatMap((businessDate) =>
+          (queues.data?.data.items ?? []).map((queue) =>
+            reportsControllerGetDailyQueueReport(queue.queueId, { date: businessDate }).then(
+              (response) => response.data,
+            ),
           ),
         ),
       ),
   });
   const items = reports.data ?? [];
+  const queueItems = aggregateReportsByQueue(items);
   const totals = aggregateReports(items);
   const exportCsv = () => {
     const url = URL.createObjectURL(
@@ -66,7 +81,7 @@ export function ReportsPage() {
     );
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dori-rapport-${effectiveDate}.csv`;
+    link.download = `dori-rapport-${effectiveStartDate}-${effectiveEndDate}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -82,7 +97,7 @@ export function ReportsPage() {
         eyebrow="Pilotage"
         title={__t('ui.supervision.reports_page.rapports_14c3yxg')}
         description={__t(
-          'ui.supervision.reports_page.indicateurs_calcules_exclusivement_a_partir_des__m4wt8a',
+          'reports.periodDescription',
         )}
         actions={
           <button type="button" className="button" disabled={!items.length} onClick={exportCsv}>
@@ -91,25 +106,38 @@ export function ReportsPage() {
         }
       />
       <Card>
-        <div className="filter-row">
+        <div className="report-period-filter">
           <label>
-            {__t('ui.supervision.reports_page.date_ggjuyh')}
+            {__t('reports.startDate')}
             <input
               type="date"
-              value={effectiveDate}
+              value={effectiveStartDate}
+              max={effectiveEndDate}
               onChange={(event) => {
-                setDate(event.target.value);
+                const nextStart = event.target.value;
+                setStartDate(nextStart);
+                if (!nextStart) return;
+                if (effectiveEndDate < nextStart) setEndDate(nextStart);
+                else if (effectiveEndDate > addDays(nextStart, 6))
+                  setEndDate(addDays(nextStart, 6));
               }}
             />
           </label>
-          <span className="muted">
-            {__t('ui.supervision.reports_page.perimetre_7st5rt')}
-            {siteId
-              ? __t('ui.expression.supervision.reports_page.site_value0_1junx4d', {
-                  value0: String(siteId),
-                })
-              : __t('ui.expression.supervision.reports_page.tous_les_sites_autorises_26s89r')}
-          </span>
+          <label>
+            {__t('reports.endDate')}
+            <input
+              type="date"
+              value={effectiveEndDate}
+              min={effectiveStartDate}
+              max={addDays(effectiveStartDate, 6) < today ? addDays(effectiveStartDate, 6) : today}
+              onChange={(event) => {
+                setEndDate(event.target.value);
+              }}
+            />
+          </label>
+          <div className="report-period-context">
+            <strong>{__t('reports.maximumPeriod')}</strong>
+          </div>
         </div>
       </Card>
       <div className="metric-grid">
@@ -131,14 +159,14 @@ export function ReportsPage() {
       </div>
       {!reports.isLoading && !items.length ? (
         <EmptyState
-          title={__t('ui.supervision.reports_page.aucune_donnee_pour_cette_date_10z1svu')}
+          title={__t('reports.noDataForPeriod')}
         />
       ) : (
         <Card>
           <h2>{__t('ui.supervision.reports_page.performance_par_file_r9y7ow')}</h2>
           <DataTable
-            caption={__t('ui.supervision.reports_page.rapports_quotidiens_par_file_zpefzk')}
-            rows={items}
+            caption={__t('reports.periodReportByQueue')}
+            rows={queueItems}
             getRowKey={(row) => row.queueId}
             columns={[
               {
@@ -205,5 +233,3 @@ export function ReportsPage() {
     </div>
   );
 }
-
-import React from 'react';

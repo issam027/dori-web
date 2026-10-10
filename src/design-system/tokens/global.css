@@ -981,6 +981,56 @@ textarea:disabled {
   min-width: 0;
 }
 
+.report-period-filter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(11rem, 15rem)) minmax(16rem, 1fr);
+  align-items: end;
+  gap: var(--space-4);
+}
+
+.report-period-filter label,
+.report-period-context {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.report-period-context {
+  align-self: stretch;
+  align-content: center;
+  padding-inline-start: var(--space-4);
+  border-inline-start: 1px solid var(--color-border);
+}
+
+@media (max-width: 52rem) {
+  .report-period-filter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-period-context {
+    grid-column: 1 / -1;
+    padding-block-start: var(--space-3);
+    padding-inline-start: 0;
+    border-block-start: 1px solid var(--color-border);
+    border-inline-start: 0;
+  }
+}
+
+@media (max-width: 34rem) {
+  .report-period-filter {
+    grid-template-columns: 1fr;
+  }
+
+  .report-period-context {
+    grid-column: auto;
+  }
+}
+.metrics-grid > .card,
+.metric-grid > .card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
 .detail-list {
   display: grid;
   gap: var(--space-3);
@@ -1344,7 +1394,10 @@ textarea:disabled {
   display: grid;
   grid-template-columns: minmax(16rem, 0.75fr) minmax(0, 2fr);
   gap: var(--space-5);
-  align-items: start;
+  align-items: stretch;
+}
+.profile-layout > .card {
+  height: 100%;
 }
 .profile-portrait {
   display: grid;
@@ -1378,6 +1431,27 @@ textarea:disabled {
 }
 .profile-security-panel p {
   margin: 4px 0 0;
+}
+
+.profile-security-panel.is-editing {
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, var(--color-line));
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+}
+
+.profile-password-editor {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.profile-password-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-line);
 }
 .health-content-grid {
   display: grid;
@@ -3464,11 +3538,12 @@ select:focus-visible {
 }
 .passage-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 20rem));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
 }
 .passage-summary-card {
-  max-width: 20rem;
+  width: 100%;
+  max-width: none;
   padding: 0.85rem;
   border: 1px dashed color-mix(in srgb, var(--color-muted) 48%, var(--color-line));
   border-radius: 14px;
@@ -3686,7 +3761,10 @@ select:focus-visible {
   box-shadow: var(--shadow-card);
   color: var(--color-ink);
   text-decoration: none;
-  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 .device-mode-card:hover {
   transform: translateY(-4px);

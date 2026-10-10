@@ -234,17 +234,17 @@ Critère d'acceptation : les opérations de guichet restent cohérentes après m
 
 ### B7 — Kiosque, écran salle et tracking
 
-- [ ] Tester le parcours kiosque complet en paysage tablette sans scroll évitable sur l'écran final.
-- [ ] Vérifier le masque téléphonique et l'indicatif pays.
-- [ ] Vérifier la synthèse en deux colonnes et tous les choix client.
-- [ ] Vérifier la génération systématique du QR code `/track?token=...`.
-- [ ] Vérifier l'effacement des données après fin ou timeout kiosque.
-- [ ] Tester l'écran salle avec plusieurs files associées au compte technique.
-- [ ] Vérifier appels en cours, destination/file, prochains appels, plein écran 1080p et 4K.
-- [ ] Vérifier qu'aucune PII n'est rendue sur l'écran salle.
-- [ ] Tester tracking réel sans champ de saisie visible.
-- [ ] Tester tracking en preview humain avec champ de token hors du téléphone.
-- [ ] Tester token invalide, expiré et état indisponible.
+- [x] Tester le parcours kiosque complet en paysage tablette sans scroll évitable sur l'écran final.
+- [x] Vérifier le masque téléphonique et l'indicatif pays.
+- [x] Vérifier la synthèse en deux colonnes et tous les choix client.
+- [x] Vérifier la génération systématique du QR code `/track?token=...`.
+- [x] Vérifier l'effacement des données après fin ou timeout kiosque.
+- [x] Tester l'écran salle avec plusieurs files associées au compte technique.
+- [x] Vérifier appels en cours, destination/file, prochains appels, plein écran 1080p et 4K.
+- [x] Vérifier qu'aucune PII n'est rendue sur l'écran salle.
+- [x] Tester tracking réel sans champ de saisie visible.
+- [x] Tester tracking en preview humain avec champ de token hors du téléphone.
+- [x] Tester token invalide, expiré et état indisponible.
 
 Critère d'acceptation : les trois expériences publiques fonctionnent dans leurs modes réels et preview sans fuite de contexte privé.
 
@@ -808,6 +808,16 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : suite Playwright complète réussie avec 42/42 scénarios avant l'ajout des assertions légales finales ; typecheck réussi.
 - Prochaine tâche : B7, mes files et notes.
 
+### 2026-10-10 — B7, kiosque, écran salle et tracking
+
+- Tâches cochées : B7 complet ; aucune tâche B8 engagée.
+- Kiosque : parcours walk-in complet validé en paysage tablette, indicatif et normalisation du téléphone, avantages du forfait, synthèse client en deux colonnes, création du ticket, QR code de tracking, absence de scroll évitable sur le résultat et purge après fin ou timeout.
+- Écran salle : deux files du périmètre technique sont agrégées ; appels, guichets, noms des files et prochains tickets sont contrôlés en 1080p et 4K, sans donnée personnelle.
+- Tracking : le mode réel consomme puis retire le token de l'URL sans champ de test ; le mode preview humain conserve son champ hors du téléphone ; les tokens invalides, expirés et le service indisponible disposent maintenant d'états dédiés sans rejet de polling non géré.
+- Fichiers principaux : `e2e/public-experiences.spec.ts`, `src/features/public-experiences/TrackPage.tsx`, `src/core/realtime/realtime-gateway.ts`, `src/core/i18n/i18n.ts`.
+- Tests : lint et typecheck réussis ; Vitest 60/60 ; nouvelle recette B7 7/7 ; suite Playwright 48/49 au premier passage avec un timeout de navigation hors B7, puis fichier `scope.spec.ts` réussi 9/9 au rejeu.
+- Prochaine tâche recommandée : B8, uniquement après validation explicite de reprise par l'utilisateur.
+
 Modèle :
 
 ```md
@@ -861,3 +871,57 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv1ega1e_pdf7nx" time="2026-10-09T20:10:02.834Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv1et50h_i53p8m" time="2026-10-09T20:20:02.849Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1f5zze_pbqc5r" time="2026-10-09T20:30:02.858Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1fiuya_0kbcgj" time="2026-10-09T20:40:02.866Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1fvpxb_xahtwp" time="2026-10-09T20:50:02.879Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1g8kxs_xth41z" time="2026-10-09T21:00:02.944Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1glfwe_kbyz1u" time="2026-10-09T21:10:02.942Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1gyauz_t083r4" time="2026-10-09T21:20:02.939Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1hb5tw_02gmr9" time="2026-10-09T21:30:02.948Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ho0si_wa3iok" time="2026-10-09T21:40:02.946Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1i0vrr_gih54y" time="2026-10-09T21:50:02.967Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1idqqe_0c6hnv" time="2026-10-09T22:00:02.966Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1iqlpg_b8xuz0" time="2026-10-09T22:10:02.980Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1j3go8_6k0jp9" time="2026-10-09T22:20:02.984Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1jgbmv_zay27f" time="2026-10-09T22:30:02.983Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1k61kl_x9vb5q" time="2026-10-09T22:50:02.997Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1kiwm3_xjw1uq" time="2026-10-09T23:00:03.099Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1kvrkg_nohris" time="2026-10-09T23:10:03.088Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1l8mj9_na5mmc" time="2026-10-09T23:20:03.093Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1llhi5_9e0146" time="2026-10-09T23:30:03.101Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1lych8_z3af75" time="2026-10-09T23:40:03.116Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1mb7hy_jfzuiw" time="2026-10-09T23:50:03.190Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1mo2eu_b9wy6q" time="2026-10-10T00:00:03.126Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1n0xdx_e6guv1" time="2026-10-10T00:10:03.141Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ndscn_apyryl" time="2026-10-10T00:20:03.143Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1nqnbl_587jql" time="2026-10-10T00:30:03.153Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1o3ial_cj6rv0" time="2026-10-10T00:40:03.165Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ogd93_dxemc2" time="2026-10-10T00:50:03.159Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv1ot883_jotsys" time="2026-10-10T01:00:03.171Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

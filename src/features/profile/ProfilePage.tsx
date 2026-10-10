@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Link } from 'react-router-dom';
+import { authControllerChangePassword } from '@/api/generated/authentification/authentification';
 import { usersControllerUpdateUser } from '@/api/generated/users/users';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -19,11 +19,24 @@ const createSchema = (t: TFunction) => z.object({
   languagePreference: z.string().min(2),
 });
 type ProfileForm = z.infer<ReturnType<typeof createSchema>>;
+const createPasswordSchema = (t: TFunction) =>
+  z
+    .object({
+      currentPassword: z.string().min(1),
+      newPassword: z.string().min(10).max(20),
+      confirmation: z.string(),
+    })
+    .refine((value) => value.newPassword === value.confirmation, {
+      path: ['confirmation'],
+      message: t('validation.passwordsDiffer'),
+    });
+type PasswordForm = z.infer<ReturnType<typeof createPasswordSchema>>;
 
 export function ProfilePage() {
   const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
   const [saved, setSaved] = useState(false);
+  const [passwordEditing, setPasswordEditing] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,6 +45,12 @@ export function ProfilePage() {
     resolver: zodResolver(createSchema(__t)),
     values: { email: user?.email ?? '', languagePreference: user?.languagePreference ?? 'fr' },
   });
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+    formState: { errors: passwordErrors, isSubmitting: passwordSubmitting },
+  } = useForm<PasswordForm>({ resolver: zodResolver(createPasswordSchema(__t)) });
   if (!user) return null;
   const submit = handleSubmit(async (values) => {
     setSaved(false);
@@ -43,6 +62,17 @@ export function ProfilePage() {
       await hydrateSession();
       setSaved(true);
       notify({ tone: 'success', title: __t('notifications.profile.saved') });
+    } catch (error) {
+      notifyError(error);
+    }
+  });
+  const submitPassword = handlePasswordSubmit(async ({ currentPassword, newPassword }) => {
+    try {
+      await authControllerChangePassword({ currentPassword, newPassword });
+      await hydrateSession();
+      resetPassword();
+      setPasswordEditing(false);
+      notify({ tone: 'success', title: __t('profile.passwordUpdated') });
     } catch (error) {
       notifyError(error);
     }
@@ -136,18 +166,91 @@ export function ProfilePage() {
               {__t('ui.profile.profile_page.enregistrer_sywgdx')}
             </button>
           </form>
-          <div className="profile-security-panel">
-            <div>
-              <strong>{__t('ui.profile.profile_page.securite_du_compte_jw1voy')}</strong>
-              <p>
-                {__t(
-                  'ui.profile.profile_page.modifiez_votre_mot_de_passe_depuis_un_parcours_d_o6z9ng',
-                )}
-              </p>
-            </div>
-            <Link className="button" to="/change-password">
-              {__t('ui.profile.profile_page.changer_mon_mot_de_passe_1pun60i')}
-            </Link>
+          <div className={`profile-security-panel${passwordEditing ? ' is-editing' : ''}`}>
+            {!passwordEditing ? (
+              <>
+                <div>
+                  <strong>{__t('ui.profile.profile_page.securite_du_compte_jw1voy')}</strong>
+                  <p>
+                    {__t(
+                      'ui.profile.profile_page.modifiez_votre_mot_de_passe_depuis_un_parcours_d_o6z9ng',
+                    )}
+                  </p>
+                </div>
+                <button
+                  className="button button-primary"
+                  type="button"
+                  onClick={() => {
+                    setPasswordEditing(true);
+                  }}
+                >
+                  {__t('ui.profile.profile_page.changer_mon_mot_de_passe_1pun60i')}
+                </button>
+              </>
+            ) : (
+              <div className="profile-password-editor">
+                <div>
+                  <strong>{__t('profile.changePasswordTitle')}</strong>
+                  <p>{__t('profile.changePasswordHelp')}</p>
+                </div>
+                <form
+                  className="form-grid"
+                  onSubmit={(event) => {
+                    void submitPassword(event);
+                  }}
+                >
+                  <FormField label={__t('profile.currentPassword')} required>
+                    <input
+                      type="password"
+                      autoComplete="current-password"
+                      {...registerPassword('currentPassword')}
+                    />
+                  </FormField>
+                  <FormField
+                    label={__t('profile.newPassword')}
+                    required
+                    error={passwordErrors.newPassword ? __t('profile.passwordLength') : undefined}
+                  >
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      {...registerPassword('newPassword')}
+                    />
+                  </FormField>
+                  <FormField
+                    label={__t('profile.passwordConfirmation')}
+                    required
+                    error={passwordErrors.confirmation?.message}
+                  >
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      {...registerPassword('confirmation')}
+                    />
+                  </FormField>
+                  <div className="profile-password-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      disabled={passwordSubmitting}
+                      onClick={() => {
+                        resetPassword();
+                        setPasswordEditing(false);
+                      }}
+                    >
+                      {__t('common.cancel')}
+                    </button>
+                    <button
+                      className="button button-primary"
+                      type="submit"
+                      disabled={passwordSubmitting}
+                    >
+                      {__t('profile.updatePassword')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
         </Card>
       </div>

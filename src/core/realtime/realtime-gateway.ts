@@ -15,13 +15,14 @@ export class PollingRealtimeGateway<TSnapshot> implements RealtimeGateway<TSnaps
   constructor(
     private readonly getSnapshot: () => Promise<TSnapshot>,
     private readonly intervalMs = 15_000,
+    private readonly onError?: (error: unknown) => void,
   ) {}
 
   async connect(): Promise<void> {
     if (this.timer) return;
     await this.refresh();
     this.timer = setInterval(() => {
-      void this.refresh();
+      void this.refresh().catch(() => undefined);
     }, this.intervalMs);
   }
 
@@ -37,6 +38,10 @@ export class PollingRealtimeGateway<TSnapshot> implements RealtimeGateway<TSnaps
           this.listeners.forEach((listener) => {
             listener(snapshot);
           });
+        })
+        .catch((error: unknown) => {
+          this.onError?.(error);
+          throw error;
         })
         .finally(() => {
           this.refreshPromise = null;

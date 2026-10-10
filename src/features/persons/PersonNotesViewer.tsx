@@ -69,7 +69,7 @@ export function PersonNotesViewer({
       )}
       actions={
         <>
-          {adding && items.length ? (
+          {adding && items.length > 0 ? (
             <button
               className="button"
               type="button"
@@ -79,7 +79,17 @@ export function PersonNotesViewer({
             >
               {__t('ui.persons.person_notes_viewer.retour_aux_notes_1nkxpit')}
             </button>
-          ) : !adding ? (
+          ) : null}
+          {adding ? (
+            <button
+              className="button button-primary"
+              type="button"
+              disabled={!content.trim()}
+              onClick={() => void add()}
+            >
+              {__t('ui.persons.person_notes_viewer.enregistrer_la_note_w8aayc')}
+            </button>
+          ) : (
             <button
               className="button button-primary"
               type="button"
@@ -88,15 +98,6 @@ export function PersonNotesViewer({
               }}
             >
               {__t('ui.persons.person_notes_viewer.ajouter_17wnmfl')}
-            </button>
-          ) : (
-            <button
-              className="button button-primary"
-              type="button"
-              disabled={!content.trim()}
-              onClick={() => void add()}
-            >
-              {__t('ui.persons.person_notes_viewer.enregistrer_la_note_w8aayc')}
             </button>
           )}
         </>

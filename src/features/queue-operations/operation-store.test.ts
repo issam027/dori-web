@@ -37,4 +37,21 @@ describe('operator call lock', () => {
       5, 4, 3, 2,
     ]);
   });
+
+  it('keeps completed passages while clearing the active call', () => {
+    useOperationStore.getState().startCall(call(8));
+    useOperationStore.getState().addPassage({
+      registrationId: 8,
+      ticketNumber: 'A8',
+      personName: 'Lina Martin',
+      calledAt: '2026-10-08T08:00:00Z',
+      closedAt: '2026-10-08T08:10:00Z',
+      threadNumber: 1,
+      outcome: 'served',
+    });
+    useOperationStore.getState().closeCall();
+
+    expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(useOperationStore.getState().passages).toHaveLength(1);
+  });
 });

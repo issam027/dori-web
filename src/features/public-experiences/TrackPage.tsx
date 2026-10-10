@@ -4,6 +4,7 @@ import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import { registrationsControllerGetPublicPosition } from '@/api/generated/registrations/registrations';
 import { useSessionStore } from '@/core/auth/session-store';
 import { PollingRealtimeGateway } from '@/core/realtime/realtime-gateway';
+import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
 
@@ -14,6 +15,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const [trackingId, setTrackingId] = useState(initialToken);
   const [token, setToken] = useState(initialToken);
   const [position, setPosition] = useState<RegistrationPositionResponseDto>();
+  const [trackingError, setTrackingError] = useState<'invalid' | 'expired' | 'unavailable'>();
   const [consent, setConsent] = useState(false);
   const previousStatus = useRef('');
   const gateway = useMemo(
@@ -27,6 +29,20 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 })
               ).data,
             10000,
+            (error) => {
+              if (error instanceof NormalizedApiError) {
+                const code = error.code.toUpperCase();
+                if (error.status === 410 || code.includes('EXPIRED')) {
+                  setTrackingError('expired');
+                  return;
+                }
+                if (error.status === 404 || code.includes('INVALID')) {
+                  setTrackingError('invalid');
+                  return;
+                }
+              }
+              setTrackingError('unavailable');
+            },
           )
         : null,
     [token],
@@ -34,8 +50,11 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
 
   useEffect(() => {
     if (!gateway) return;
-    const unsubscribe = gateway.subscribe(setPosition);
-    void gateway.connect();
+    const unsubscribe = gateway.subscribe((snapshot) => {
+      setTrackingError(undefined);
+      setPosition(snapshot);
+    });
+    void gateway.connect().catch(() => undefined);
     return () => {
       unsubscribe();
       gateway.disconnect();
@@ -76,6 +95,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
             event.preventDefault();
             const nextToken = trackingId.trim();
             setPosition(undefined);
+            setTrackingError(undefined);
             previousStatus.current = '';
             setToken(nextToken);
           }}
@@ -129,6 +149,14 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 'ui.public-experiences.track_page.utilisez_le_champ_de_test_situe_au_dessus_du_tel_1s2i7dy',
               )}
             </p>
+          </div>
+        ) : trackingError ? (
+          <div className="tracking-placeholder tracking-error" role="alert">
+            <span className="tracking-brand">
+              {__t('ui.public-experiences.track_page.dori_9y7skh')}
+            </span>
+            <h1>{__t(`tracking.error.${trackingError}Title`)}</h1>
+            <p>{__t(`tracking.error.${trackingError}Text`)}</p>
           </div>
         ) : (
           <>
