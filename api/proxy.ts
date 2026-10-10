@@ -14,11 +14,14 @@ function upstreamUrl(requestUrl: string): URL {
   const incomingUrl = new URL(requestUrl);
   const configuredBase = apiBaseUrl();
   const basePath = configuredBase.pathname.replace(/\/$/, '');
-  const incomingPath = incomingUrl.pathname;
-  const path = basePath && incomingPath.startsWith(`${basePath}/`)
-    ? incomingPath
-    : `${basePath}${incomingPath}`;
-  return new URL(`${path}${incomingUrl.search}`, configuredBase.origin);
+
+  // Le chemin d'origine arrive dans __path (ex: "v1/health")
+  const originalPath = incomingUrl.searchParams.get('__path') ?? '';
+  incomingUrl.searchParams.delete('__path');
+  const query = incomingUrl.searchParams.toString();
+
+  const path = `${basePath}/api/${originalPath}`;
+  return new URL(`${path}${query ? `?${query}` : ''}`, configuredBase.origin);
 }
 
 async function proxy(request: Request): Promise<Response> {

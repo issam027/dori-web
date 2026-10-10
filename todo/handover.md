@@ -1076,3 +1076,13 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv2up8rj_nlhyag" time="2026-10-10T20:32:41.119Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv2v23sa_sbynpz" time="2026-10-10T20:42:41.194Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2veyt0_vvz3mm" time="2026-10-10T20:52:41.268Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2vrttm_pnr99h" time="2026-10-10T21:02:41.338Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2w4ot6_nm90ls" time="2026-10-10T21:12:41.370Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2whk74_5mddff" time="2026-10-10T21:22:41.920Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2wutyw_k9xuth" time="2026-10-10T21:33:01.112Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
