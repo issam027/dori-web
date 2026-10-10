@@ -31,13 +31,28 @@ describe('onboarding recovery', () => {
   it('falls back when storage is corrupt', () => {
     expect(loadOnboardingDraft({ getItem: () => '{broken' })).toEqual(initialOnboardingDraft);
   });
+  it('migrates a version 1 draft and fills newly introduced defaults', () => {
+    const legacy = JSON.stringify({
+      step: 2,
+      site: { siteName: 'Site repris' },
+      confirmedSiteId: 9,
+    });
+    const restored = loadOnboardingDraft({
+      getItem: (key) => (key === 'dori:onboarding:v1' ? legacy : null),
+    });
+    expect(restored.draftVersion).toBe(2);
+    expect(restored.confirmedSiteId).toBe(9);
+    expect(restored.site.siteName).toBe('Site repris');
+    expect(restored.site.timezone).toBe('Africa/Tunis');
+    expect(restored.confirmedQueueIds).toEqual({});
+  });
   it('removes a saved draft without deleting any server resource', () => {
-    let removedKey = '';
+    const removedKeys: string[] = [];
     clearOnboardingDraft({
       removeItem: (key) => {
-        removedKey = key;
+        removedKeys.push(key);
       },
     });
-    expect(removedKey).toBe('dori:onboarding:v1');
+    expect(removedKeys).toEqual(['dori:onboarding:v2', 'dori:onboarding:v1']);
   });
 });

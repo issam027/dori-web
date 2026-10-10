@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission, type Permission } from './permissions';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 interface ProtectedRouteProps {
   permissions?: readonly Permission[];
@@ -9,12 +9,11 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ permissions = [], userTypes }: ProtectedRouteProps) {
-  const { t } = useTranslation();
   const location = useLocation();
   const status = useSessionStore((state) => state.status);
   const user = useSessionStore((state) => state.user);
 
-  if (status === 'hydrating') return <p role="status">{t('common.loading')}</p>;
+  if (status === 'hydrating') return <DorifyLoader />;
   if (status !== 'authenticated' || !user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }

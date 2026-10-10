@@ -3743,6 +3743,9 @@ select:focus-visible {
 .passage-print-legal {
   display: none;
 }
+.passage-print-document {
+  display: none;
+}
 
 .device-mode-page {
   display: grid;
@@ -3847,8 +3850,7 @@ select:focus-visible {
 
 @media print {
   @page {
-    size: 80mm 145mm;
-    margin: 5mm;
+    margin: 14mm;
   }
   body[data-print-passage],
   body[data-print-passage] #root {
@@ -3925,6 +3927,99 @@ select:focus-visible {
   body[data-print-passage] .print-hidden,
   body[data-print-passage] .passage-summary-card > footer {
     display: none !important;
+  }
+  body[data-print-passage] > .passage-print-document,
+  body[data-print-passage] > .passage-print-document * {
+    visibility: visible !important;
+  }
+  body[data-print-passage] > .passage-print-document {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8mm;
+    color: #17212b;
+    background: #fff;
+    font:
+      11pt/1.5 system-ui,
+      sans-serif;
+  }
+  body[data-print-passage] > .passage-print-document * {
+    display: revert !important;
+  }
+  body[data-print-passage] > .passage-print-document header {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12mm;
+    padding-bottom: 6mm;
+    border-bottom: 2px solid #17212b;
+  }
+  .passage-print-document header strong,
+  .passage-print-document header span,
+  .passage-print-document header small {
+    display: block !important;
+  }
+  .passage-print-document header strong {
+    font-size: 18pt;
+    letter-spacing: 0.08em;
+  }
+  .passage-print-document h1 {
+    margin: 12mm 0 5mm;
+    font-size: 24pt;
+  }
+  .passage-print-document .passage-print-statement {
+    margin: 0 0 9mm;
+    padding: 5mm;
+    border-left: 4px solid #3867d6;
+    background: #f2f5fa;
+    font-size: 12pt;
+  }
+  .passage-print-document dl {
+    display: block !important;
+    margin: 0;
+  }
+  .passage-print-document dl > div {
+    display: flex !important;
+    gap: 2mm;
+    padding: 2.5mm 0;
+    border-bottom: 1px dotted #c8d0da;
+  }
+  .passage-print-document dt {
+    min-width: 42mm;
+    color: #53606d;
+    font-size: 9pt;
+  }
+  .passage-print-document dt::after {
+    content: ' :';
+  }
+  .passage-print-document dd {
+    margin: 0;
+    font-weight: 700;
+  }
+  .passage-print-document .passage-print-disclaimer {
+    margin-top: 10mm;
+    color: #53606d;
+    font-size: 9pt;
+  }
+  .passage-print-document footer {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 18mm;
+    margin-top: 18mm;
+  }
+  .passage-print-document footer div {
+    display: flex !important;
+    min-height: 28mm;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 1px solid #53606d;
+  }
+  .passage-print-document footer span {
+    transform: translateY(6mm);
+    color: #53606d;
+    font-size: 9pt;
   }
 }
 
@@ -4192,5 +4287,87 @@ select:focus-visible {
   }
   .experience-preview-display .experience-preview-stage {
     min-width: 680px;
+  }
+}
+.dorify-loader {
+  display: grid;
+  min-height: min(100dvh, 46rem);
+  place-content: center;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 2rem;
+  color: var(--color-ink);
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      color-mix(in srgb, var(--color-primary) 14%, transparent),
+      transparent 16rem
+    ),
+    var(--color-background);
+}
+.dorify-loader strong {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.12em;
+}
+.dorify-loader p,
+.dorify-loader small {
+  margin: 0;
+}
+.dorify-loader p {
+  color: var(--color-ink);
+  font-weight: 650;
+}
+.dorify-loader small {
+  color: var(--color-muted);
+}
+.dorify-loader-mark {
+  display: flex;
+  height: 2.5rem;
+  align-items: flex-end;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+.dorify-loader-mark span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  animation: dorify-queue 1.15s ease-in-out infinite;
+}
+.dorify-loader-mark span:nth-child(2) {
+  animation-delay: 140ms;
+}
+.dorify-loader-mark span:nth-child(3) {
+  animation-delay: 280ms;
+}
+.dorify-loader-compact {
+  min-height: 12rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.dorify-loader-compact strong {
+  font-size: 1.25rem;
+}
+.dorify-loader-compact p {
+  font-size: 0.9rem;
+}
+@keyframes dorify-queue {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translateY(0) scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-0.8rem) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dorify-loader-mark span {
+    animation: none;
+    opacity: 0.75;
   }
 }

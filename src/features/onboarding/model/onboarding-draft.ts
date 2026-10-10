@@ -1,8 +1,11 @@
 import type { CreateQueueDto, CreateSiteDto } from '@/api/generated/models';
 
-export const ONBOARDING_DRAFT_KEY = 'dori:onboarding:v1';
+export const ONBOARDING_DRAFT_VERSION = 2;
+export const ONBOARDING_DRAFT_KEY = 'dori:onboarding:v2';
+const LEGACY_ONBOARDING_DRAFT_KEY = 'dori:onboarding:v1';
 
 export interface OnboardingDraft {
+  draftVersion: number;
   step: number;
   site: CreateSiteDto;
   confirmedSiteId?: number;
@@ -15,6 +18,7 @@ export interface OnboardingDraft {
 }
 
 export const initialOnboardingDraft: OnboardingDraft = {
+  draftVersion: ONBOARDING_DRAFT_VERSION,
   step: 1,
   site: {
     siteName: '',
@@ -50,10 +54,20 @@ export function loadOnboardingDraft(
   storage: Pick<Storage, 'getItem'> = localStorage,
 ): OnboardingDraft {
   try {
-    const value = storage.getItem(ONBOARDING_DRAFT_KEY);
-    return value
-      ? { ...initialOnboardingDraft, ...(JSON.parse(value) as Partial<OnboardingDraft>) }
-      : structuredClone(initialOnboardingDraft);
+    const value =
+      storage.getItem(ONBOARDING_DRAFT_KEY) ?? storage.getItem(LEGACY_ONBOARDING_DRAFT_KEY);
+    if (!value) return structuredClone(initialOnboardingDraft);
+    const parsed = JSON.parse(value) as Partial<OnboardingDraft>;
+    return {
+      ...structuredClone(initialOnboardingDraft),
+      ...parsed,
+      draftVersion: ONBOARDING_DRAFT_VERSION,
+      site: { ...initialOnboardingDraft.site, ...parsed.site },
+      confirmedQueueIds: parsed.confirmedQueueIds ?? {},
+      selectedTierIds: parsed.selectedTierIds ?? {},
+      associatedTierQueueIds: parsed.associatedTierQueueIds ?? [],
+      completedUserIds: parsed.completedUserIds ?? [],
+    };
   } catch {
     return structuredClone(initialOnboardingDraft);
   }
@@ -68,6 +82,7 @@ export function saveOnboardingDraft(
 
 export function clearOnboardingDraft(storage: Pick<Storage, 'removeItem'> = localStorage) {
   storage.removeItem(ONBOARDING_DRAFT_KEY);
+  storage.removeItem(LEGACY_ONBOARDING_DRAFT_KEY);
 }
 
 export function queueNeedsCreation(draft: OnboardingDraft, queue: CreateQueueDto) {

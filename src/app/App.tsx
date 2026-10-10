@@ -1,4 +1,5 @@
 import { lazy, Suspense, type ComponentType } from 'react';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -264,16 +265,9 @@ function AppRoutes() {
 }
 
 export function App() {
-  const { t: __t } = useTranslation();
   return (
     <AppProviders>
-      <Suspense
-        fallback={
-          <div className="route-loading" role="status">
-            {__t('ui.shell.app.chargement_de_l_espace_1wuu7uy')}
-          </div>
-        }
-      >
+      <Suspense fallback={<DorifyLoader />}>
         <AppRoutes />
       </Suspense>
     </AppProviders>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 type NetworkStatus = 'loading' | 'success' | 'empty' | 'error' | 'forbidden' | 'conflict';
 
@@ -12,7 +13,7 @@ interface NetworkStateProps {
 export function NetworkState({ status, children, onRetry }: NetworkStateProps) {
   const { t } = useTranslation();
   if (status === 'success') return children;
-  if (status === 'loading') return <p role="status">{t('common.loading')}</p>;
+  if (status === 'loading') return <DorifyLoader compact />;
   if (status === 'empty') return <p>{t('states.empty')}</p>;
   if (status === 'forbidden') return <p role="alert">{t('states.forbidden')}</p>;
   if (status === 'conflict') return <p role="alert">{t('states.conflict')}</p>;

@@ -24,12 +24,15 @@ import {
   useOpenDeskSession,
   useRegistration,
 } from './hooks/useQueueOperations';
+import { PassagePrintDocument } from './PassagePrintDocument';
+import { useSite } from '@/features/portfolio/hooks/useSites';
 
 export function DeskPage() {
   const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
   const siteId = useScopeStore((state) => state.activeSiteId);
+  const site = useSite(siteId);
   const activeCall = useOperationStore((state) => state.activeCall);
   const passages = useOperationStore((state) => state.passages);
   const [pending, setPending] = useState(false);
@@ -44,6 +47,25 @@ export function DeskPage() {
     pageSize: 1,
     usage: 'count',
   });
+  const printingPassage = passages.find((passage) => passage.registrationId === printingPassageId);
+
+  useEffect(() => {
+    if (!printingPassage) return;
+    document.body.dataset.printPassage = String(printingPassage.registrationId);
+    const finishPrinting = () => {
+      delete document.body.dataset.printPassage;
+      setPrintingPassageId(null);
+    };
+    window.addEventListener('afterprint', finishPrinting, { once: true });
+    const timer = window.setTimeout(() => {
+      window.print();
+    }, 50);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('afterprint', finishPrinting);
+      delete document.body.dataset.printPassage;
+    };
+  }, [printingPassage]);
   const queues = useQueues({ siteId, isActive: true });
   const allowed =
     queues.data?.data.items.filter(
@@ -52,6 +74,15 @@ export function DeskPage() {
   const { previews, sessions, threads } = useDeskSession(
     siteId,
     allowed.map((queue) => queue.queueId),
+  );
+  const deskSessionsLoading = sessions.some((session) => session.isPending);
+  const hasActiveDeskSession = sessions.some((session) =>
+    session.data?.data.items.some(
+      (deskSession) =>
+        deskSession.userId === user?.userId &&
+        deskSession.mode === 'active' &&
+        deskSession.threadNumber != null,
+    ),
   );
   const statuses = useQueueStatuses(allowed.map((queue) => queue.queueId));
   const callNext = useCallNext();
@@ -164,9 +195,15 @@ export function DeskPage() {
       <PageHeader
         eyebrow="Opérations"
         title={__t('ui.queue-operations.desk_page.cockpit_guichet_o7323f')}
-        description={__t(
-          'ui.queue-operations.desk_page.une_session_active_est_requise_pour_appeler_le_p_3hwh4',
-        )}
+        description={
+          deskSessionsLoading
+            ? undefined
+            : hasActiveDeskSession
+              ? __t('desk.activeSessionDescription')
+              : __t(
+                  'ui.queue-operations.desk_page.une_session_active_est_requise_pour_appeler_le_p_3hwh4',
+                )
+        }
       />
       {queues.isSuccess && allowed.length === 0 ? (
         <EmptyState
@@ -223,8 +260,8 @@ export function DeskPage() {
                       <dt>{__t('ui.queue-operations.desk_page.arrivee_8ef051')}</dt>
                       <dd>
                         {new Intl.DateTimeFormat(undefined, {
-                          dateStyle: 'short',
-                          timeStyle: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
                         }).format(new Date(activeRegistration.data.data.createdAt))}
                       </dd>
                     </div>
@@ -442,7 +479,7 @@ export function DeskPage() {
               });
               return (
                 <article
-                  className={`passage-summary-card${printingPassageId === passage.registrationId ? ' is-printing' : ''}`}
+                  className="passage-summary-card"
                   key={`${String(passage.registrationId)}-${passage.closedAt}`}
                 >
                   <header>
@@ -506,14 +543,9 @@ export function DeskPage() {
                     <button
                       className="button print-hidden"
                       type="button"
+                      disabled={!site.data?.data.siteName}
                       onClick={() => {
                         setPrintingPassageId(passage.registrationId);
-                        document.body.dataset.printPassage = String(passage.registrationId);
-                        window.setTimeout(() => {
-                          window.print();
-                          delete document.body.dataset.printPassage;
-                          setPrintingPassageId(null);
-                        }, 0);
                       }}
                     >
                       {__t('ui.queue-operations.desk_page.imprimer_le_justificatif_3rhfqy')}
@@ -538,6 +570,9 @@ export function DeskPage() {
             })}
           </div>
         </section>
+      ) : null}
+      {printingPassage && site.data?.data.siteName ? (
+        <PassagePrintDocument passage={printingPassage} siteName={site.data.data.siteName} />
       ) : null}
     </div>
   );

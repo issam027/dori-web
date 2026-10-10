@@ -324,37 +324,37 @@ Critère d'acceptation : aucune page ne connaît une URL, Axios ou une fonction 
 
 ### D1 — Refactorer `SettingsPage`
 
-- [ ] Extraire le routage interne des sections.
-- [ ] Extraire les formulaires site, files, utilisateurs, niveaux de service et traductions.
-- [ ] Extraire les cartes/rangées répétées.
-- [ ] Déplacer les requêtes dans les hooks de la phase C.
-- [ ] Créer un schéma Zod par formulaire lorsque la validation dépasse de simples champs requis.
-- [ ] Ajouter des tests par section et un test d'intégration de navigation.
+- [x] Extraire le routage interne des sections.
+- [x] Extraire les formulaires site, files, utilisateurs, niveaux de service et traductions.
+- [x] Extraire les cartes/rangées répétées.
+- [x] Déplacer les requêtes dans les hooks de la phase C.
+- [x] Créer un schéma Zod par formulaire lorsque la validation dépasse de simples champs requis.
+- [x] Ajouter des tests par section et un test d'intégration de navigation.
 
 Critère d'acceptation : `SettingsPage` orchestre les sections sans contenir leur implémentation détaillée.
 
 ### D2 — Refactorer `OnboardingPage`
 
-- [ ] Extraire chaque étape du wizard.
-- [ ] Isoler le modèle de brouillon et sa migration de version.
-- [ ] Isoler la synthèse finale et l'activation du site.
-- [ ] Garantir que succès final réinitialise l'écran et affiche une situation compréhensible.
-- [ ] Conserver les deux cartes principales à hauteur cohérente.
-- [ ] Tester reprise du brouillon, abandon et création partiellement échouée.
+- [x] Extraire chaque étape du wizard.
+- [x] Isoler le modèle de brouillon et sa migration de version.
+- [x] Isoler la synthèse finale et l'activation du site.
+- [x] Garantir que succès final réinitialise l'écran et affiche une situation compréhensible.
+- [x] Conserver les deux cartes principales à hauteur cohérente.
+- [x] Tester reprise du brouillon, abandon et création partiellement échouée.
 
 Critère d'acceptation : chaque étape peut être testée indépendamment et la page ne porte plus les détails des formulaires.
 
 ### D3 — Refactorer `KioskPage`
 
-- [ ] Extraire `KioskWelcomeStep`.
-- [ ] Extraire `KioskIdentityStep`.
-- [ ] Extraire `KioskQueueStep`.
-- [ ] Extraire `KioskTierStep`.
-- [ ] Extraire `KioskReviewStep`.
-- [ ] Extraire `KioskTicketResult` et le QR code.
-- [ ] Centraliser l'état du wizard avec transitions explicites.
-- [ ] Garantir la remise à zéro après succès, annulation et watchdog.
-- [ ] Tester chaque transition et les retours arrière.
+- [x] Extraire `KioskWelcomeStep`.
+- [x] Extraire `KioskIdentityStep`.
+- [x] Extraire `KioskQueueStep`.
+- [x] Extraire `KioskTierStep`.
+- [x] Extraire `KioskReviewStep`.
+- [x] Extraire `KioskTicketResult` et le QR code.
+- [x] Centraliser l'état du wizard avec transitions explicites.
+- [x] Garantir la remise à zéro après succès, annulation et watchdog.
+- [x] Tester chaque transition et les retours arrière.
 
 Critère d'acceptation : aucune étape kiosque ne dépend de variables implicites appartenant à une autre étape.
 
@@ -860,6 +860,31 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : typecheck et lint réussis ; audit Phase 11 réussi sur 150 fichiers ; Vitest 32/32 fichiers et 72/72 tests.
 - Prochaine tâche recommandée : D1, décomposition de `SettingsPage`.
 
+### 2026-10-10 — D1 et D2, configuration et onboarding
+
+- Tâches cochées : D1 et D2 complets.
+- Settings : `SettingsPage` ne contient plus que la résolution de route et délègue l'espace de travail ; navigation, données React Query, panneaux, formulaires et éléments répétés ont des responsabilités séparées.
+- Données : `useSettingsData` centralise sites, files, utilisateurs, rôles, niveaux et traductions ainsi que leur invalidation.
+- Validation : schémas Zod dédiés aux associations de niveaux, règles de notification et traductions ; les formulaires simples conservent leurs contraintes natives.
+- Onboarding : `OnboardingPage` délègue le wizard et ses six étapes nommées ; modèle de brouillon, transitions, reprise partielle, synthèse et activation sont isolés du composant de route.
+- Migration : passage du brouillon local v1 au modèle v2 avec reprise automatique des anciennes données et remplissage des nouveaux defaults.
+- Fin de parcours : l'activation conserve le message de situation, purge les deux versions du brouillon et restitue un wizard initial complet.
+- Mise en page : les deux cartes principales restent alignées par la grille étirée existante, avec retour à une colonne sous 900 px.
+- Tests : navigation entre sections, résolution de route, schémas Zod, migration v1/v2, abandon local, reprise après création partielle, niveaux requis, retour arrière et reset après activation.
+- Résultats : typecheck et lint réussis ; audit Phase 11 réussi sur 161 fichiers ; Vitest 36/36 fichiers et 88/88 tests.
+- Prochaine tâche recommandée : D3, décomposition du kiosque.
+
+### 2026-10-10 — D3, décomposition du kiosque
+
+- Tâches cochées : D3 complet.
+- Route : `KioskPage` est désormais un point d'entrée fin qui délègue le parcours à `KioskWizard`.
+- Étapes : accueil, choix de file, identité, niveau de service, vérification et résultat disposent de composants nommés ; le QR reste isolé dans `TrackingQr`.
+- Navigation : un reducer décrit explicitement démarrage walk-in/rendez-vous, progression, retour, affichage du résultat et remise à zéro.
+- Nettoyage : la même commande `purge` réinitialise navigation, saisies et résultat après fin, annulation et expiration watchdog.
+- Tests : chaque composant d'étape est rendu isolément ; la progression 1→4, les retours, le rendez-vous, le résultat et les remises à zéro sont couverts.
+- Résultats : typecheck et lint réussis ; tests ciblés 11/11 ; suite Vitest complète 38/38 fichiers et 98/98 tests.
+- Prochaine tâche recommandée : D4, décomposition du cockpit guichet.
+
 Modèle :
 
 ```md
@@ -1033,3 +1058,21 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv2rhhuj_up6ew5" time="2026-10-10T19:02:40.795Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv2ruct5_azxdqg" time="2026-10-10T19:12:40.793Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2s77s2_teaf0m" time="2026-10-10T19:22:40.802Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2sk2r0_dpe3na" time="2026-10-10T19:32:40.812Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2swxpr_lwjmko" time="2026-10-10T19:42:40.816Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2t9sol_j12zdx" time="2026-10-10T19:52:40.821Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2tmno3_ybci1l" time="2026-10-10T20:02:40.851Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2tziof_3k2svt" time="2026-10-10T20:12:40.911Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2ucdqb_7s7thy" time="2026-10-10T20:22:41.027Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2up8rj_nlhyag" time="2026-10-10T20:32:41.119Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2v23sa_sbynpz" time="2026-10-10T20:42:41.194Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
