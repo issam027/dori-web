@@ -31,6 +31,8 @@ async function proxy(request: Request): Promise<Response> {
   // Let fetch generate headers appropriate for the upstream host and body.
   headers.delete('host');
   headers.delete('content-length');
+  // Demande une réponse non compressée à l'API.
+  headers.delete('accept-encoding');
 
   const init: RequestInit & { duplex?: 'half' } = {
     method: request.method,
@@ -40,7 +42,25 @@ async function proxy(request: Request): Promise<Response> {
     duplex: 'half',
   };
 
-  return fetch(targetUrl, init);
+  const upstream = await fetch(targetUrl, init);
+
+  // Le corps est déjà décodé par fetch : ces en-têtes ne sont plus valides.
+  const responseHeaders = new Headers(upstream.headers);
+  responseHeaders.delete('content-encoding');
+  responseHeaders.delete('content-length');
+  responseHeaders.delete('transfer-encoding');
+
+  // Conserve tous les cookies, y compris plusieurs Set-Cookie.
+  responseHeaders.delete('set-cookie');
+  for (const cookie of upstream.headers.getSetCookie()) {
+    responseHeaders.append('set-cookie', cookie);
+  }
+
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: responseHeaders,
+  });
 }
 
 export const GET = proxy;
