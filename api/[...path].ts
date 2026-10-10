@@ -30,12 +30,14 @@ export default {
     headers.delete('host');
     headers.delete('content-length');
 
-    return fetch(targetUrl, {
+    const init: RequestInit & { duplex?: 'half' } = {
       method: request.method,
       headers,
       body: request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body,
       redirect: 'manual',
       duplex: 'half',
-    });
+    };
+
+    return fetch(targetUrl, init);
   },
 };
