@@ -21,23 +21,29 @@ function upstreamUrl(requestUrl: string): URL {
   return new URL(`${path}${incomingUrl.search}`, configuredBase.origin);
 }
 
-export default {
-  async fetch(request: Request): Promise<Response> {
-    const targetUrl = upstreamUrl(request.url);
-    const headers = new Headers(request.headers);
+async function proxy(request: Request): Promise<Response> {
+  const targetUrl = upstreamUrl(request.url);
+  const headers = new Headers(request.headers);
 
-    // Let fetch generate headers appropriate for the upstream host and body.
-    headers.delete('host');
-    headers.delete('content-length');
+  // Let fetch generate headers appropriate for the upstream host and body.
+  headers.delete('host');
+  headers.delete('content-length');
 
-    const init: RequestInit & { duplex?: 'half' } = {
-      method: request.method,
-      headers,
-      body: request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body,
-      redirect: 'manual',
-      duplex: 'half',
-    };
+  const init: RequestInit & { duplex?: 'half' } = {
+    method: request.method,
+    headers,
+    body: request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body,
+    redirect: 'manual',
+    duplex: 'half',
+  };
 
-    return fetch(targetUrl, init);
-  },
-};
+  return fetch(targetUrl, init);
+}
+
+export const GET = proxy;
+export const POST = proxy;
+export const PUT = proxy;
+export const PATCH = proxy;
+export const DELETE = proxy;
+export const OPTIONS = proxy;
+export const HEAD = proxy;
