@@ -370,7 +370,7 @@ Critère de sortie : santé et obligations légales sont présentes sans invente
 
 - [x] Vérifier les parcours réels, les états vides, le responsive, l’accessibilité et l’absence de régression fonctionnelle.
 
-- [ ] Vérifier qu’aucun appel HTTP ne se trouve dans un composant de page.
+- [x] Vérifier qu’aucun appel HTTP ne se trouve dans un composant de page.
 
 - [x] Vérifier qu’aucun DTO Swagger n’est copié manuellement et qu’aucun `any` n’est présent.
 

@@ -300,21 +300,21 @@ Critère d'acceptation : les pages consomment des modèles métier et n'importen
 
 ### C4 — Encapsuler les mutations
 
-- [ ] Fournir un comportement commun contre le double clic.
-- [ ] Conserver et exposer le correlation ID des erreurs.
-- [ ] Gérer les erreurs attendues localement et les erreurs inattendues globalement.
-- [ ] Déclencher les notifications traduites depuis une clé stable.
-- [ ] Appliquer les invalidations après succès et après conflit si nécessaire.
-- [ ] Ne jamais faire de rollback optimiste sur une opération de file si le serveur reste la source de vérité.
+- [x] Fournir un comportement commun contre le double clic.
+- [x] Conserver et exposer le correlation ID des erreurs.
+- [x] Gérer les erreurs attendues localement et les erreurs inattendues globalement.
+- [x] Déclencher les notifications traduites depuis une clé stable.
+- [x] Appliquer les invalidations après succès et après conflit si nécessaire.
+- [x] Ne jamais faire de rollback optimiste sur une opération de file si le serveur reste la source de vérité.
 
 Critère d'acceptation : une mutation métier a le même comportement UX quel que soit l'écran qui la déclenche.
 
 ### C5 — Vérifier l'absence d'appels réseau dans les pages
 
-- [ ] Renforcer `tools/phase11-audit.mjs` pour détecter les imports directs de contrôleurs Orval dans les fichiers `*Page.tsx`.
-- [ ] Prévoir une liste d'exceptions temporaire, explicite et décroissante pendant la migration.
-- [ ] Faire échouer l'audit lorsqu'une nouvelle page réintroduit un contrôleur généré.
-- [ ] Cocher la tâche correspondante du handover historique une fois toutes les exceptions supprimées.
+- [x] Renforcer `tools/phase11-audit.mjs` pour détecter les imports directs de contrôleurs Orval dans les fichiers `*Page.tsx`.
+- [x] Prévoir une liste d'exceptions temporaire, explicite et décroissante pendant la migration.
+- [x] Faire échouer l'audit lorsqu'une nouvelle page réintroduit un contrôleur généré.
+- [x] Cocher la tâche correspondante du handover historique une fois toutes les exceptions supprimées.
 
 Critère d'acceptation : aucune page ne connaît une URL, Axios ou une fonction contrôleur Orval.
 
@@ -849,6 +849,17 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : typecheck et lint réussis ; tests ciblés clés, invalidations, session et rendez-vous 11/11 réussis ; audit sans clé littérale et `git diff --check` réussis.
 - Prochaine tâche recommandée : C3, hooks métier prioritaires.
 
+### 2026-10-10 — Clôture de la phase C
+
+- Tâches cochées : C3, C4 et C5 complets ; phase C entièrement terminée.
+- Hooks métier : personnes, notes, files, statuts, sessions, opérations guichet, rendez-vous, disponibilités, sites, rapports, notifications, santé et expériences publiques sont centralisés.
+- Mutations : `useBusinessMutation` partage une requête en cours contre le double clic, expose la présentation normalisée et le correlation ID, sépare les erreurs métier attendues des erreurs globales, centralise les notifications et les invalidations après succès ou conflit.
+- Opérations de file : le serveur reste la source de vérité ; aucune mise à jour optimiste ni rollback local n'est appliqué.
+- Pages : tous les appels Orval restants ont été déplacés vers des adaptateurs ou hooks métier ; aucune page ne connaît Axios, `fetch`, le client HTTP ou une fonction contrôleur générée.
+- Audit : `tools/phase11-audit.mjs` bloque désormais tout nouvel import Orval direct dans un fichier `*Page.tsx` ; la liste d'exceptions est explicite et vide.
+- Tests : typecheck et lint réussis ; audit Phase 11 réussi sur 150 fichiers ; Vitest 32/32 fichiers et 72/72 tests.
+- Prochaine tâche recommandée : D1, décomposition de `SettingsPage`.
+
 Modèle :
 
 ```md
@@ -869,7 +880,7 @@ Le chantier de consolidation est terminé uniquement lorsque :
 
 - [ ] Le pipeline complet passe dans un environnement propre.
 - [ ] Les parcours E2E prioritaires sont stables.
-- [ ] Les pages n'importent plus directement les contrôleurs API générés.
+- [x] Les pages n'importent plus directement les contrôleurs API générés.
 - [ ] Les composants volumineux ont des responsabilités explicites et testables.
 - [ ] Le CSS et le design system sont modulaires et validés dans les quatre thèmes.
 - [ ] L'audit WCAG 2.2 AA automatique et manuel est consigné.
@@ -1010,3 +1021,15 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv2pcbzw_d96w1v" time="2026-10-10T18:02:40.700Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv2pp70i_bfq9ly" time="2026-10-10T18:12:40.770Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2q21z5_b1uxhx" time="2026-10-10T18:22:40.769Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2qewya_wyevhk" time="2026-10-10T18:32:40.786Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2qrrwy_7x7j73" time="2026-10-10T18:42:40.786Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2r4mvs_cky56i" time="2026-10-10T18:52:40.792Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2rhhuj_up6ew5" time="2026-10-10T19:02:40.795Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2ruct5_azxdqg" time="2026-10-10T19:12:40.793Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

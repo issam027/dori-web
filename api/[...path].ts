@@ -1,18 +1,29 @@
-const productionApiOrigin = 'https://dori-api.vercel.app';
-const developmentApiOrigin = 'https://dori-api-dev.vercel.app';
+function apiBaseUrl(): URL {
+  const configuredUrl = globalThis.process.env.VITE_API_BASE_URL;
+  if (!configuredUrl) {
+    throw new Error('VITE_API_BASE_URL is required by the API proxy');
+  }
+  const url = new URL(configuredUrl);
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('VITE_API_BASE_URL must use HTTP or HTTPS');
+  }
+  return url;
+}
 
-function apiOrigin(): string {
-  const configuredOrigin = globalThis.process.env.API_PROXY_TARGET?.replace(/\/$/, '');
-  if (configuredOrigin) return configuredOrigin;
-  return globalThis.process.env.VERCEL_ENV === 'production'
-    ? productionApiOrigin
-    : developmentApiOrigin;
+function upstreamUrl(requestUrl: string): URL {
+  const incomingUrl = new URL(requestUrl);
+  const configuredBase = apiBaseUrl();
+  const basePath = configuredBase.pathname.replace(/\/$/, '');
+  const incomingPath = incomingUrl.pathname;
+  const path = basePath && incomingPath.startsWith(`${basePath}/`)
+    ? incomingPath
+    : `${basePath}${incomingPath}`;
+  return new URL(`${path}${incomingUrl.search}`, configuredBase.origin);
 }
 
 export default {
   async fetch(request: Request): Promise<Response> {
-    const incomingUrl = new URL(request.url);
-    const targetUrl = new URL(`${incomingUrl.pathname}${incomingUrl.search}`, apiOrigin());
+    const targetUrl = upstreamUrl(request.url);
     const headers = new Headers(request.headers);
 
     // Let fetch generate headers appropriate for the upstream host and body.

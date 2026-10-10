@@ -29,7 +29,7 @@ export function ControlRoomPage() {
   const statuses = useQueueStatuses(queueIds);
   const { threads, sessions } = useDeskSession(null, queueIds);
   const notifications = useRecentNotifications();
-  const reset = useResetQueue(async () => {
+  const reset = useResetQueue(() => {
       const queueName = resetQueue?.name;
       setResetQueue(undefined);
       notify({
