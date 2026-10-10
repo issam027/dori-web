@@ -8,6 +8,13 @@ export function createQueryClient(): QueryClient {
     mutationCache: new MutationCache({
       onError: (error, _variables, _context, mutation) => {
         if (mutation.meta?.suppressGlobalError === true) return;
+        const expectedStatuses = mutation.meta?.expectedErrorStatuses;
+        if (
+          error instanceof NormalizedApiError &&
+          Array.isArray(expectedStatuses) &&
+          expectedStatuses.includes(error.status)
+        )
+          return;
         notify({ tone: 'error', ...presentError(error) });
       },
     }),

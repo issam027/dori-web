@@ -1,12 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import {
-  reportsControllerGetDailyQueueReport,
-  reportsControllerGetDashboardSummary,
-} from '@/api/generated/reports/reports';
-import { queuesControllerFindAll } from '@/api/generated/queues/queues';
-import { sitesControllerFindSite } from '@/api/generated/sites/sites';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
@@ -20,6 +13,9 @@ import {
   reportsToCsv,
 } from './report-utils';
 import { dateInTimeZone } from '@/features/appointments/appointment-rules';
+import { useQueues } from '@/features/queues/hooks/useQueues';
+import { useSite } from '@/features/portfolio/hooks/useSites';
+import { useDashboardSummary, useReports } from './hooks/useReports';
 
 const fallbackTimeZone = 'UTC';
 
@@ -28,49 +24,20 @@ export function ReportsPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const site = useQuery({
-    queryKey: ['site', siteId],
-    queryFn: () => sitesControllerFindSite(siteId ?? 0),
-    enabled: Boolean(siteId),
-  });
+  const site = useSite(siteId);
   const today = dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
   const effectiveEndDate = endDate || today;
   const effectiveStartDate = startDate || addDays(effectiveEndDate, -6);
   const periodDates = reportPeriodDates(effectiveStartDate, effectiveEndDate);
-  const queues = useQuery({
-    queryKey: ['queues', 'reports', siteId],
-    queryFn: () =>
-      queuesControllerFindAll({
-        page: 1,
-        pageSize: 100,
-        siteId: siteId ?? undefined,
-        isActive: true,
-      }),
-  });
-  const summary = useQuery({
-    queryKey: ['reports', 'summary', siteId],
-    queryFn: () => reportsControllerGetDashboardSummary({ siteId: siteId ?? undefined }),
-  });
-  const reports = useQuery({
-    queryKey: [
-      'reports',
-      'daily',
-      siteId,
-      effectiveStartDate,
-      effectiveEndDate,
-      queues.data?.data.items.map((queue) => queue.queueId),
-    ],
+  const queues = useQueues({ siteId, isActive: true, usage: 'reports' });
+  const summary = useDashboardSummary(siteId);
+  const reports = useReports({
+    siteId,
+    startDate: effectiveStartDate,
+    endDate: effectiveEndDate,
+    dates: periodDates,
+    queueIds: queues.data?.data.items.map((queue) => queue.queueId) ?? [],
     enabled: Boolean(queues.data && periodDates.length),
-    queryFn: () =>
-      Promise.all(
-        periodDates.flatMap((businessDate) =>
-          (queues.data?.data.items ?? []).map((queue) =>
-            reportsControllerGetDailyQueueReport(queue.queueId, { date: businessDate }).then(
-              (response) => response.data,
-            ),
-          ),
-        ),
-      ),
   });
   const items = reports.data ?? [];
   const queueItems = aggregateReportsByQueue(items);

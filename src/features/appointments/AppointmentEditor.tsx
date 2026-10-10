@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
-import { registrationsControllerGetAvailability } from '@/api/generated/registrations/registrations';
-import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { createAppointment } from './appointment-actions';
 import { appointmentUtcIso } from './appointment-rules';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { invalidateAppointments } from '@/api/client/query-invalidations';
+import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
 
 const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
@@ -39,15 +39,8 @@ export function AppointmentEditor({
   const [date, setDate] = useState(initialDate);
   const [time, setTime] = useState(initialTime ?? '09:00');
   const [error, setError] = useState('');
-  const tiers = useQuery({
-    queryKey: ['tiers'],
-    queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
-  });
-  const availability = useQuery({
-    queryKey: ['availability', queueId, date],
-    queryFn: () => registrationsControllerGetAvailability(queueId, { date }),
-    enabled: queueId > 0 && Boolean(date),
-  });
+  const tiers = useAppointmentTiers('appointment-editor');
+  const availability = useAvailability(queueId, date);
   const submit = async () => {
     if (!person || !queueId || !tierId) return;
     setError('');
@@ -61,7 +54,7 @@ export function AppointmentEditor({
           ? { personId: person.person.personId }
           : { person: person.person }),
       });
-      await queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      await invalidateAppointments(queryClient);
       notify({
         tone: 'success',
         title: __t('notifications.appointment.created'),

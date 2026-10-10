@@ -197,7 +197,12 @@ describe('changeActiveSite cockpit preservation', () => {
   });
 
   it('purges the active call when the operator really changes site', async () => {
-    await changeActiveSite(new QueryClient(), 13, scope);
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(['queues', 'site', 12], { siteId: 12 });
+
+    await changeActiveSite(queryClient, 13, scope);
+
     expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 });

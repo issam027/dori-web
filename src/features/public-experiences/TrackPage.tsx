@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { RegistrationPositionResponseDto } from '@/api/generated/models';
-import { registrationsControllerGetPublicPosition } from '@/api/generated/registrations/registrations';
+import { useEffect, useRef, useState } from 'react';
 import { useSessionStore } from '@/core/auth/session-store';
-import { PollingRealtimeGateway } from '@/core/realtime/realtime-gateway';
-import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
+import { usePublicTracking } from './hooks/usePublicExperiences';
 
 export function TrackPage({ preview = false }: { preview?: boolean }) {
   const { t: __t } = useTranslation();
@@ -14,40 +11,15 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const [initialToken] = useState(() => consumeOrRestoreOpaqueToken(location.search, history));
   const [trackingId, setTrackingId] = useState(initialToken);
   const [token, setToken] = useState(initialToken);
-  const [position, setPosition] = useState<RegistrationPositionResponseDto>();
-  const [trackingError, setTrackingError] = useState<'invalid' | 'expired' | 'unavailable'>();
+  const {
+    gateway,
+    position,
+    setPosition,
+    error: trackingError,
+    setError: setTrackingError,
+  } = usePublicTracking(token);
   const [consent, setConsent] = useState(false);
   const previousStatus = useRef('');
-  const gateway = useMemo(
-    () =>
-      token
-        ? new PollingRealtimeGateway(
-            async () =>
-              (
-                await registrationsControllerGetPublicPosition({
-                  headers: { 'X-Registration-Token': token },
-                })
-              ).data,
-            10000,
-            (error) => {
-              if (error instanceof NormalizedApiError) {
-                const code = error.code.toUpperCase();
-                if (error.status === 410 || code.includes('EXPIRED')) {
-                  setTrackingError('expired');
-                  return;
-                }
-                if (error.status === 404 || code.includes('INVALID')) {
-                  setTrackingError('invalid');
-                  return;
-                }
-              }
-              setTrackingError('unavailable');
-            },
-          )
-        : null,
-    [token],
-  );
-
   useEffect(() => {
     if (!gateway) return;
     const unsubscribe = gateway.subscribe((snapshot) => {
@@ -59,7 +31,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
       unsubscribe();
       gateway.disconnect();
     };
-  }, [gateway]);
+  }, [gateway, setPosition, setTrackingError]);
 
   const called = position?.status === 'called' || position?.counterNumber !== undefined;
   useEffect(() => {

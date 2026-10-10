@@ -12,6 +12,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
+import { queryKeys } from '@/api/client/query-keys';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -64,7 +65,7 @@ export function UserAssignmentModal({
   };
 
   const users = useQuery({
-    queryKey: ['admin', 'assignment-users', debouncedSearch, page],
+    queryKey: queryKeys.admin.assignmentUsers(debouncedSearch, page),
     queryFn: () =>
       usersControllerFindUsers({
         search: debouncedSearch,

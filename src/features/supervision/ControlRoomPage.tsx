@@ -1,16 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { notificationsControllerFindNotifications } from '@/api/generated/notifications/notifications';
-import {
-  queueEngineControllerGetActiveSessions,
-  queueEngineControllerGetThreads,
-} from '@/api/generated/queue-engine/queue-engine';
-import { queuesControllerGetStatus, queuesControllerReset } from '@/api/generated/queues/queues';
-import {
-  reportsControllerGetDashboardQueueLoad,
-  reportsControllerGetDashboardSummary,
-} from '@/api/generated/reports/reports';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -22,62 +11,27 @@ import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { maskRecipient } from './notification-utils';
 import { slaTone } from './sla';
 import { notify } from '@/core/notifications/notification-store';
+import { useDashboardQueueLoad, useDashboardSummary } from './hooks/useReports';
+import { useRecentNotifications } from './hooks/useNotifications';
+import { useQueueStatuses } from '@/features/queues/hooks/useQueues';
+import { useDeskSession } from '@/features/queue-operations/hooks/useQueueOperations';
+import { useResetQueue } from './hooks/useControlRoom';
 
 export function ControlRoomPage() {
   const { t: __t } = useTranslation();
   const siteId = useScopeStore((s) => s.activeSiteId);
   const user = useSessionStore((s) => s.user);
-  const client = useQueryClient();
   const [resetQueue, setResetQueue] = useState<{ id: number; name: string }>();
-  const load = useQuery({
-    queryKey: ['reports', 'load', siteId],
-    queryFn: () =>
-      reportsControllerGetDashboardQueueLoad({ siteId: siteId ?? undefined, limit: 100 }),
-    enabled: siteId !== null,
-    refetchInterval: 15000,
-  });
-  const summary = useQuery({
-    queryKey: ['reports', 'summary', siteId],
-    queryFn: () => reportsControllerGetDashboardSummary({ siteId: siteId ?? undefined }),
-    enabled: siteId !== null,
-    refetchInterval: 15000,
-  });
+  const load = useDashboardQueueLoad(siteId);
+  const summary = useDashboardSummary(siteId);
   const items = load.data?.data ?? [];
-  const statuses = useQueries({
-    queries: items.map((queue) => ({
-      queryKey: ['queue-status', queue.queueId],
-      queryFn: () => queuesControllerGetStatus(queue.queueId),
-      refetchInterval: 15000,
-    })),
-  });
-  const threads = useQueries({
-    queries: items.map((queue) => ({
-      queryKey: ['threads', queue.queueId],
-      queryFn: () => queueEngineControllerGetThreads(queue.queueId, { page: 1, pageSize: 100 }),
-      refetchInterval: 15000,
-    })),
-  });
-  const sessions = useQueries({
-    queries: items.map((queue) => ({
-      queryKey: ['queue-sessions', queue.queueId],
-      queryFn: () =>
-        queueEngineControllerGetActiveSessions(queue.queueId, { page: 1, pageSize: 100 }),
-      refetchInterval: 15000,
-    })),
-  });
-  const notifications = useQuery({
-    queryKey: ['notifications', 'control-room'],
-    queryFn: () =>
-      notificationsControllerFindNotifications({ page: 1, pageSize: 5, sort: 'createdAt:desc' }),
-    refetchInterval: 15000,
-  });
-  const reset = useMutation({
-    mutationFn: (queueId: number) => queuesControllerReset(queueId),
-    onSuccess: async () => {
+  const queueIds = items.map((queue) => queue.queueId);
+  const statuses = useQueueStatuses(queueIds);
+  const { threads, sessions } = useDeskSession(null, queueIds);
+  const notifications = useRecentNotifications();
+  const reset = useResetQueue(async () => {
       const queueName = resetQueue?.name;
       setResetQueue(undefined);
-      await client.invalidateQueries({ queryKey: ['queue'] });
-      await client.invalidateQueries({ queryKey: ['reports'] });
       notify({
         tone: 'success',
         title: __t('notifications.queue.reset'),
@@ -85,7 +39,6 @@ export function ControlRoomPage() {
           ? __t('notifications.queue.resetMessage', { queue: queueName })
           : undefined,
       });
-    },
   });
   if (load.isError || summary.isError)
     return <ErrorState onRetry={() => void Promise.all([load.refetch(), summary.refetch()])} />;
@@ -235,7 +188,7 @@ export function ControlRoomPage() {
         confirmLabel={reset.isPending ? 'Réinitialisation…' : 'Confirmer la réinitialisation'}
         destructive
         onConfirm={() => {
-          if (resetQueue) reset.mutate(resetQueue.id);
+          if (resetQueue) reset.run(resetQueue.id);
         }}
       />
     </div>

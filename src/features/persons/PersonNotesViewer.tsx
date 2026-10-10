@@ -1,14 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import {
-  personsControllerCreateNote,
-  personsControllerFindOne,
-  personsControllerGetNotes,
-} from '@/api/generated/persons/persons';
 import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { useAddPersonNote, usePerson, usePersonNotes } from './hooks/usePersons';
 
 export function PersonNotesViewer({
   personId,
@@ -22,21 +17,12 @@ export function PersonNotesViewer({
   initialMode?: 'view' | 'add';
 }) {
   const { t: __t } = useTranslation();
-  const queryClient = useQueryClient();
   const [index, setIndex] = useState(0);
   const [adding, setAdding] = useState(initialMode === 'add');
   const [content, setContent] = useState('');
-  const notes = useQuery({
-    queryKey: ['persons', personId, 'notes'],
-    queryFn: () =>
-      personsControllerGetNotes(personId, { page: 1, pageSize: 100, sort: 'createdAt:desc' }),
-    enabled: open,
-  });
-  const person = useQuery({
-    queryKey: ['persons', personId],
-    queryFn: () => personsControllerFindOne(personId),
-    enabled: open,
-  });
+  const notes = usePersonNotes(personId, { enabled: open });
+  const person = usePerson(personId, open);
+  const addNote = useAddPersonNote(personId);
   const personName = person.data
     ? `${person.data.data.firstName} ${person.data.data.lastName}`
     : 'la personne';
@@ -45,11 +31,10 @@ export function PersonNotesViewer({
   const add = async () => {
     if (!content.trim()) return;
     try {
-      await personsControllerCreateNote(personId, { content: content.trim() });
+      await addNote.execute(content.trim());
       setContent('');
       setAdding(false);
       setIndex(0);
-      await queryClient.invalidateQueries({ queryKey: ['persons', personId, 'notes'] });
       notify({
         tone: 'success',
         title: __t('notifications.note.created'),

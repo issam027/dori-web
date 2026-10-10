@@ -2,18 +2,15 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
-import {
-  registrationsControllerGetAvailability,
-  registrationsControllerRegister,
-} from '@/api/generated/registrations/registrations';
-import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
-import { sitesControllerFindSite } from '@/api/generated/sites/sites';
+import { findSite, findTiers, getAvailability, registerPerson } from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { queryKeys } from '@/api/client/query-keys';
+import { invalidateQueueOperations } from '@/api/client/query-invalidations';
 import { appointmentUtcIso } from '@/features/appointments/appointment-rules';
 
 const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
@@ -39,16 +36,16 @@ export function QuickRegistration({
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const tiers = useQuery({
-    queryKey: ['tiers'],
-    queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
+    queryKey: queryKeys.tiers.catalog('quick-registration'),
+    queryFn: () => findTiers({ page: 1, pageSize: 100 }),
   });
   const site = useQuery({
-    queryKey: ['site', siteId],
-    queryFn: () => sitesControllerFindSite(siteId),
+    queryKey: queryKeys.sites.detail(siteId),
+    queryFn: () => findSite(siteId),
   });
   const availability = useQuery({
-    queryKey: ['availability', queueId, appointmentDate],
-    queryFn: () => registrationsControllerGetAvailability(queueId, { date: appointmentDate }),
+    queryKey: queryKeys.availability(queueId, appointmentDate),
+    queryFn: () => getAvailability(queueId, { date: appointmentDate }),
     enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
   });
   const availableSlots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
@@ -58,7 +55,7 @@ export function QuickRegistration({
     setPending(true);
     setTicket('');
     try {
-      const response = await registrationsControllerRegister({
+      const response = await registerPerson({
         queueId,
         tierId,
         entryType,
@@ -72,11 +69,7 @@ export function QuickRegistration({
       });
       setTicket(response.data.ticketNumber);
       setStep(3);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['registrations'] }),
-        queryClient.invalidateQueries({ queryKey: ['queue-status'] }),
-        queryClient.invalidateQueries({ queryKey: ['queue-preview'] }),
-      ]);
+      await invalidateQueueOperations(queryClient);
       notify({
         tone: 'success',
         title:

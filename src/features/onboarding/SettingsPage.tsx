@@ -2,28 +2,23 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { authControllerLogout } from '@/api/generated/authentification/authentification';
-import { sitesControllerFindSites, sitesControllerUpdateSite } from '@/api/generated/sites/sites';
 import {
-  queuesControllerCreateForSite,
-  queuesControllerFindAll,
-  queuesControllerUpdate,
-} from '@/api/generated/queues/queues';
-import {
-  usersControllerFindUsers,
-  usersControllerGetRoles,
-  usersControllerSetUserPassword,
-  usersControllerUpdateUserStatus,
-} from '@/api/generated/users/users';
-import {
-  serviceTiersControllerAssociateTier,
-  serviceTiersControllerCreateRule,
-  serviceTiersControllerFindTiers,
-} from '@/api/generated/tiers/tiers';
-import {
-  translationsControllerCreateTranslation,
-  translationsControllerFindTranslations,
-} from '@/api/generated/translations/translations';
+  associateTier,
+  createQueueForSite,
+  createTierRule,
+  createTranslation,
+  findQueues,
+  findRoles,
+  findSites,
+  findTiers,
+  findTranslations,
+  findUsers,
+  logoutUserSessions,
+  setUserPassword,
+  updateQueue,
+  updateSite,
+  updateUserStatus,
+} from './api/onboarding-api';
 import type { QueueResponseDto } from '@/api/generated/models';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -33,6 +28,8 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
+import { queryKeys } from '@/api/client/query-keys';
+import { invalidateAdmin } from '@/api/client/query-invalidations';
 import {
   type AssignmentTarget,
   UserAssignmentModal,
@@ -43,7 +40,7 @@ import { notify } from '@/core/notifications/notification-store';
 const sections = ['sites', 'queues', 'users', 'tiers', 'notifications', 'translations'] as const;
 type Section = (typeof sections)[number];
 export function SettingsPage() {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const location = useLocation(),
     qc = useQueryClient(),
     siteId = useScopeStore((s) => s.activeSiteId),
@@ -51,30 +48,30 @@ export function SettingsPage() {
   const suffix = location.pathname.split('/')[2] as Section;
   const section = sections.includes(suffix) ? suffix : 'sites';
   const sites = useQuery({
-      queryKey: ['admin', 'sites'],
-      queryFn: () => sitesControllerFindSites({ page: 1, pageSize: 100 }),
+      queryKey: queryKeys.admin.sites,
+      queryFn: () => findSites({ page: 1, pageSize: 100 }),
     }),
     queues = useQuery({
-      queryKey: ['admin', 'queues', siteId],
+      queryKey: queryKeys.admin.queues(siteId),
       queryFn: () =>
-        queuesControllerFindAll({ page: 1, pageSize: 100, siteId: siteId ?? undefined }),
+        findQueues({ page: 1, pageSize: 100, siteId: siteId ?? undefined }),
       enabled: Boolean(siteId),
     }),
     users = useQuery({
-      queryKey: ['admin', 'users'],
-      queryFn: () => usersControllerFindUsers({ page: 1, pageSize: 100 }),
+      queryKey: queryKeys.admin.users,
+      queryFn: () => findUsers({ page: 1, pageSize: 100 }),
     }),
     roles = useQuery({
-      queryKey: ['admin', 'roles'],
-      queryFn: () => usersControllerGetRoles({ page: 1, pageSize: 100 }),
+      queryKey: queryKeys.admin.roles,
+      queryFn: () => findRoles({ page: 1, pageSize: 100 }),
     }),
     tiers = useQuery({
-      queryKey: ['admin', 'tiers'],
-      queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
+      queryKey: queryKeys.admin.tiers,
+      queryFn: () => findTiers({ page: 1, pageSize: 100 }),
     }),
     translations = useQuery({
-      queryKey: ['admin', 'translations'],
-      queryFn: () => translationsControllerFindTranslations({ page: 1, pageSize: 100 }),
+      queryKey: queryKeys.admin.translations(i18n.resolvedLanguage ?? i18n.language),
+      queryFn: () => findTranslations({ page: 1, pageSize: 100 }),
     });
   const ss = sites.data?.data.items ?? [],
     qs = queues.data?.data.items ?? [],
@@ -82,7 +79,7 @@ export function SettingsPage() {
     rs = roles.data?.data.items ?? [],
     ts = tiers.data?.data.items ?? [],
     xs = translations.data?.data.items ?? [];
-  const refresh = () => void qc.invalidateQueries({ queryKey: ['admin'] });
+  const refresh = () => void invalidateAdmin(qc);
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
     [userOpen, setUserOpen] = useState(false),
@@ -192,8 +189,8 @@ export function SettingsPage() {
         onOpenChange={setQueueOpen}
         initial={editQueue}
         onSave={async (v) => {
-          if (editQueue) await queuesControllerUpdate(editQueue.queueId, v);
-          else if (siteId) await queuesControllerCreateForSite(siteId, v);
+          if (editQueue) await updateQueue(editQueue.queueId, v);
+          else if (siteId) await createQueueForSite(siteId, v);
           refresh();
         }}
       />
@@ -252,11 +249,11 @@ function Header({
     </div>
   );
 }
-type Sites = Awaited<ReturnType<typeof sitesControllerFindSites>>['data']['items'];
-type Users = Awaited<ReturnType<typeof usersControllerFindUsers>>['data']['items'];
-type Tiers = Awaited<ReturnType<typeof serviceTiersControllerFindTiers>>['data']['items'];
+type Sites = Awaited<ReturnType<typeof findSites>>['data']['items'];
+type Users = Awaited<ReturnType<typeof findUsers>>['data']['items'];
+type Tiers = Awaited<ReturnType<typeof findTiers>>['data']['items'];
 type Translations = Awaited<
-  ReturnType<typeof translationsControllerFindTranslations>
+  ReturnType<typeof findTranslations>
 >['data']['items'];
 const ADMIN_PAGE_SIZE = 10;
 
@@ -335,7 +332,7 @@ function SitesPanel({
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void sitesControllerUpdateSite(s.siteId, { isActive: !s.isActive }).then(
+                        void updateSite(s.siteId, { isActive: !s.isActive }).then(
                           refresh,
                         )
                       }
@@ -444,7 +441,7 @@ function QueuesPanel({
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void queuesControllerUpdate(q.queueId, { isActive: !q.isActive }).then(
+                        void updateQueue(q.queueId, { isActive: !q.isActive }).then(
                           refresh,
                         )
                       }
@@ -523,7 +520,7 @@ function UsersPanel({
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void usersControllerUpdateUserStatus(u.userId, {
+                        void updateUserStatus(u.userId, {
                           isActive: !u.isActive,
                         }).then(refresh)
                       }
@@ -535,7 +532,7 @@ function UsersPanel({
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void usersControllerSetUserPassword(u.userId, {
+                        void setUserPassword(u.userId, {
                           newPassword: 'Root@123456',
                         })
                       }
@@ -593,7 +590,7 @@ function UsersPanel({
               onClick={() => {
                 if (!disconnectUser) return;
                 setDisconnecting(true);
-                void authControllerLogout({ userId: disconnectUser.userId })
+                void logoutUserSessions({ userId: disconnectUser.userId })
                   .then(() => {
                     notify({
                       tone: 'success',
@@ -760,7 +757,7 @@ function TierModal({
           className="button button-primary"
           disabled={!f.queueId || !f.tierId}
           onClick={() =>
-            void serviceTiersControllerAssociateTier(f.queueId, {
+            void associateTier(f.queueId, {
               tierId: f.tierId,
               price: f.price,
               currency: f.currency || null,
@@ -873,7 +870,7 @@ function RuleModal({
           className="button button-primary"
           disabled={!f.queueId || !f.tierId}
           onClick={() =>
-            void serviceTiersControllerCreateRule(f.queueId, f.tierId, {
+            void createTierRule(f.queueId, f.tierId, {
               notificationType: f.type as 'welcome' | 'threshold',
               channel: f.channel as 'sms' | 'email',
               thresholdType:
@@ -985,7 +982,7 @@ function TranslationModal({
           className="button button-primary"
           disabled={!f.key || !f.content}
           onClick={() =>
-            void translationsControllerCreateTranslation({
+            void createTranslation({
               translationKey: f.key,
               category: f.category as 'ihm' | 'sms' | 'error',
               locale: f.locale,

@@ -4,8 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { authControllerChangePassword } from '@/api/generated/authentification/authentification';
-import { usersControllerUpdateUser } from '@/api/generated/users/users';
+import { changePassword, updateUser } from './api/profile-api';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { Card } from '@/design-system/components/Card';
@@ -55,7 +54,7 @@ export function ProfilePage() {
   const submit = handleSubmit(async (values) => {
     setSaved(false);
     try {
-      await usersControllerUpdateUser(user.userId, {
+      await updateUser(user.userId, {
         email: values.email || undefined,
         languagePreference: values.languagePreference,
       });
@@ -68,7 +67,7 @@ export function ProfilePage() {
   });
   const submitPassword = handlePasswordSubmit(async ({ currentPassword, newPassword }) => {
     try {
-      await authControllerChangePassword({ currentPassword, newPassword });
+      await changePassword({ currentPassword, newPassword });
       await hydrateSession();
       resetPassword();
       setPasswordEditing(false);

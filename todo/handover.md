@@ -265,36 +265,36 @@ Critère d'acceptation : chaque écran de pilotage possède au moins un parcours
 
 ### C1 — Définir la convention d'architecture
 
-- [ ] Choisir une convention unique par feature : `api/`, `hooks/`, `components/`, `model/`, `utils/` selon les besoins réels.
-- [ ] Ne pas créer de répertoires vides ou de couches sans responsabilité concrète.
-- [ ] Réserver les imports Orval aux adaptateurs/actions/hooks métier.
-- [ ] Garder les composants visuels indépendants du format d'enveloppe API.
-- [ ] Documenter les règles de nommage des clés React Query.
-- [ ] Définir quand employer un hook, une fonction d'action ou un store Zustand.
+- [x] Choisir une convention unique par feature : `api/`, `hooks/`, `components/`, `model/`, `utils/` selon les besoins réels.
+- [x] Ne pas créer de répertoires vides ou de couches sans responsabilité concrète.
+- [x] Réserver les imports Orval aux adaptateurs/actions/hooks métier.
+- [x] Garder les composants visuels indépendants du format d'enveloppe API.
+- [x] Documenter les règles de nommage des clés React Query.
+- [x] Définir quand employer un hook, une fonction d'action ou un store Zustand.
 
 Critère d'acceptation : la convention est courte, documentée et appliquée sur une feature pilote.
 
 ### C2 — Centraliser les clés et invalidations React Query
 
-- [ ] Étendre `src/api/client/query-keys.ts` pour couvrir sites, files, personnes, inscriptions, rendez-vous, rapports et notifications.
-- [ ] Encoder systématiquement `siteId`, `queueId`, filtres, page et langue dans les clés concernées.
-- [ ] Centraliser les invalidations après chaque mutation.
-- [ ] Vérifier qu'un changement de site annule puis supprime les caches hors scope.
-- [ ] Éviter les chaînes de clés dupliquées écrites directement dans les pages.
+- [x] Étendre `src/api/client/query-keys.ts` pour couvrir sites, files, personnes, inscriptions, rendez-vous, rapports et notifications.
+- [x] Encoder systématiquement `siteId`, `queueId`, filtres, page et langue dans les clés concernées.
+- [x] Centraliser les invalidations après chaque mutation.
+- [x] Vérifier qu'un changement de site annule puis supprime les caches hors scope.
+- [x] Éviter les chaînes de clés dupliquées écrites directement dans les pages.
 
 Critère d'acceptation : les invalidations sont prévisibles et aucun écran n'affiche les données du site précédent.
 
 ### C3 — Créer les hooks métier prioritaires
 
-- [ ] `usePersonsSearch` : seuil de trois caractères, pagination cinq éléments, scope site.
-- [ ] `usePersonNotes` : consultation, ajout et invalidation du compteur.
-- [ ] `useQueues` et `useQueueStatus` : files autorisées, actives et état temps réel.
-- [ ] `useDeskSession` : ouverture, fermeture, threads et session courante.
-- [ ] `useCallNext`, `useMarkServed`, `useMarkNoShow` : concurrence, pending et notifications.
-- [ ] `useAppointments` et `useAvailability` : dates, fuseau et conflits.
-- [ ] `useSites` et `useActiveSite` : activation contrôlée et marque.
-- [ ] `useReports`, `useNotifications`, `useHealth`.
-- [ ] `usePublicTracking`, `useDisplaySnapshot`, `useKioskRegistration`.
+- [x] `usePersonsSearch` : seuil de trois caractères, pagination cinq éléments, scope site.
+- [x] `usePersonNotes` : consultation, ajout et invalidation du compteur.
+- [x] `useQueues` et `useQueueStatus` : files autorisées, actives et état temps réel.
+- [x] `useDeskSession` : ouverture, fermeture, threads et session courante.
+- [x] `useCallNext`, `useMarkServed`, `useMarkNoShow` : concurrence, pending et notifications.
+- [x] `useAppointments` et `useAvailability` : dates, fuseau et conflits.
+- [x] `useSites` et `useActiveSite` : activation contrôlée et marque.
+- [x] `useReports`, `useNotifications`, `useHealth`.
+- [x] `usePublicTracking`, `useDisplaySnapshot`, `useKioskRegistration`.
 
 Critère d'acceptation : les pages consomment des modèles métier et n'importent plus directement les fonctions contrôleur concernées.
 
@@ -828,6 +828,27 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : typecheck et lint réussis ; test session 6/6 ; recette Playwright `pilotage.spec.ts` 8/8.
 - Prochaine tâche recommandée : C1, convention d'architecture par feature.
 
+### 2026-10-10 — C1, convention d'architecture
+
+- Tâches cochées : C1 complet.
+- Convention : `docs/frontend-architecture.md` définit les responsabilités optionnelles de `api/`, `hooks/`, `components/`, `model/` et `utils/`, sans imposer de couche ou de dossier vide.
+- Règles : imports Orval confinés aux adaptateurs, hooks et actions en transition ; pages indépendantes des enveloppes HTTP ; clés React Query hiérarchiques et exhaustives ; critères explicites pour choisir fonction, hook ou store Zustand.
+- Feature pilote : Santé utilise désormais `api/health-api.ts`, `hooks/useHealth.ts` et `queryKeys.health.all`. `HealthPage.tsx` ne connaît plus Orval ni de clé de cache littérale.
+- Contrôles : typecheck et lint réussis ; aucun dossier vide dans la feature pilote ; l'import Orval est limité à son adaptateur.
+- Limite de validation : le rejeu Playwright de `pilotage.spec.ts` n'a produit aucun résultat avant le timeout de 120 secondes de l'environnement Windows. La même recette avait réussi 8/8 immédiatement avant ce refactor sans changement du rendu ni du contrat de données.
+- Prochaine tâche recommandée : C2, centralisation des clés et invalidations React Query.
+
+### 2026-10-10 — C2, clés et invalidations React Query
+
+- Tâches cochées : C2 complet.
+- Clés : la fabrique centrale couvre sites, files, statuts, sessions, threads, personnes, notes, inscriptions, rendez-vous, disponibilités, rapports, notifications, administration et expériences publiques.
+- Dimensions : les clés concernées portent le site, la file, les filtres, la pagination, la période, l'usage et la langue ; les rapports multi-files incluent aussi les identifiants de files.
+- Migration : aucune page ou composant applicatif ne déclare désormais de tableau littéral `queryKey`.
+- Invalidations : politiques communes ajoutées pour rendez-vous, notifications, notes, opérations de file, cockpit de supervision et administration. La remise à zéro de supervision invalide maintenant réellement la racine `queues` au lieu de l'ancienne clé erronée `queue`.
+- Changement de site : le comportement existant annule les requêtes avant de retirer tout cache, puis recharge la marque du nouveau site ; un test vérifie désormais la purge du cache de l'ancien site.
+- Tests : typecheck et lint réussis ; tests ciblés clés, invalidations, session et rendez-vous 11/11 réussis ; audit sans clé littérale et `git diff --check` réussis.
+- Prochaine tâche recommandée : C3, hooks métier prioritaires.
+
 Modèle :
 
 ```md
@@ -959,3 +980,33 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv23cpyf_6mxpkv" time="2026-10-10T07:47:07.239Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv23pkxl_ste9o4" time="2026-10-10T07:57:07.257Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv24jf9j_qgyrdp" time="2026-10-10T08:20:19.591Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv29mfqc_7wb3i5" time="2026-10-10T10:42:38.244Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv29zap6_o15rub" time="2026-10-10T10:52:38.250Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2ac5o9_k70xhn" time="2026-10-10T11:02:38.265Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2ap0sb_jvme7t" time="2026-10-10T11:12:38.459Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2b1vsm_s42cys" time="2026-10-10T11:22:38.518Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2bsj92_6ga8xk" time="2026-10-10T11:43:21.974Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2cf88o_hvjnnt" time="2026-10-10T12:01:00.792Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2jkxwo_jdfex8" time="2026-10-10T15:21:24.648Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2niszu_nxlzqe" time="2026-10-10T17:11:43.434Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2o9r28_k85mxp" time="2026-10-10T17:32:40.640Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2omm23_s5o2kn" time="2026-10-10T17:42:40.683Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2ozh14_wirt8k" time="2026-10-10T17:52:40.696Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2pcbzw_d96w1v" time="2026-10-10T18:02:40.700Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv2pp70i_bfq9ly" time="2026-10-10T18:12:40.770Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

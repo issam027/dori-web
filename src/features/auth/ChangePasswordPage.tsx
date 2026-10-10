@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { authControllerChangePassword } from '@/api/generated/authentification/authentification';
+import { changePassword } from './api/password-api';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
@@ -37,7 +37,7 @@ export function ChangePasswordPage() {
   const submit = handleSubmit(async ({ currentPassword, newPassword }) => {
     setApiError('');
     try {
-      await authControllerChangePassword({ currentPassword, newPassword });
+      await changePassword({ currentPassword, newPassword });
       await hydrateSession();
       const user = useSessionStore.getState().user;
       if (user) void navigate(findFirstAuthorizedPath(user), { replace: true });

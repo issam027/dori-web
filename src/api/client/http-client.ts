@@ -6,14 +6,19 @@ import axios, {
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/core/auth/access-token';
 import { normalizeApiError } from '@/core/errors/normalized-api-error';
 
+// In deployed builds, API calls deliberately stay on the frontend origin.
+// The Vercel function selects the development or production API and keeps the
+// HttpOnly SameSite=Strict refresh cookie first-party after a page reload.
+const apiBaseUrl = import.meta.env.PROD ? undefined : import.meta.env.VITE_API_BASE_URL;
+
 export const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: { Accept: 'application/json' },
   withCredentials: true,
 });
 
 const refreshClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: { Accept: 'application/json' },
   withCredentials: true,
 });

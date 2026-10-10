@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { healthControllerCheck } from '@/api/generated/health/health';
 import { Card } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { useHealth } from './hooks/useHealth';
 
 const bytes = (value: number) => `${(value / 1024 / 1024).toFixed(1)} MiB`;
 const duration = (seconds: number) => {
@@ -16,12 +15,7 @@ const duration = (seconds: number) => {
 
 export function HealthPage() {
   const { t: __t } = useTranslation();
-  const health = useQuery({
-    queryKey: ['health'],
-    queryFn: healthControllerCheck,
-    refetchInterval: 30_000,
-    refetchIntervalInBackground: false,
-  });
+  const health = useHealth();
   if (health.isError && !health.data) return <ErrorState onRetry={() => void health.refetch()} />;
   const data = health.data;
   const healthy = data?.status === 'ok' && data.checks.database === 'up';

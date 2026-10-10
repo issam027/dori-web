@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
-import { registrationsControllerGetAvailability } from '@/api/generated/registrations/registrations';
-import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
 import { Modal } from '@/design-system/components/Modal';
 import {
   appointmentLocalParts,
@@ -19,6 +17,8 @@ import {
 } from './appointment-actions';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { invalidateAppointments } from '@/api/client/query-invalidations';
+import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
 
 export function AppointmentActionDialog({
   appointment,
@@ -41,19 +41,10 @@ export function AppointmentActionDialog({
   const [tierId, setTierId] = useState(appointment.tierId);
   const [languagePreference, setLanguagePreference] = useState('fr');
   const [error, setError] = useState('');
-  const tiers = useQuery({
-    queryKey: ['tiers'],
-    queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
-  });
-  const availability = useQuery({
-    queryKey: ['availability', appointment.queueId, scheduledTime.slice(0, 10)],
-    queryFn: () =>
-      registrationsControllerGetAvailability(appointment.queueId, {
-        date: scheduledTime.slice(0, 10),
-      }),
-  });
+  const tiers = useAppointmentTiers('appointment-action');
+  const availability = useAvailability(appointment.queueId, scheduledTime.slice(0, 10));
   const refresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    await invalidateAppointments(queryClient);
     onOpenChange(false);
   };
   const mutate = async (

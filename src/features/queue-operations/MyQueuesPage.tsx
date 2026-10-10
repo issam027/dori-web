@@ -1,12 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useQueries, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import {
-  personsControllerFindOne,
-  personsControllerGetNotes,
-} from '@/api/generated/persons/persons';
-import { queuesControllerFindAll } from '@/api/generated/queues/queues';
-import { registrationsControllerFindRegistrations } from '@/api/generated/registrations/registrations';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { DataTable } from '@/design-system/components/DataTable';
 import { Card } from '@/design-system/components/Card';
@@ -15,6 +8,9 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
+import { usePersonsByIds, usePersonNotesPresence } from '@/features/persons/hooks/usePersons';
+import { useQueues } from '@/features/queues/hooks/useQueues';
+import { useWaitingRegistrations } from './hooks/useQueueOperations';
 
 export function MyQueuesPage() {
   const { t: __t } = useTranslation();
@@ -23,38 +19,11 @@ export function MyQueuesPage() {
   const [queueId, setQueueId] = useState<number | undefined>();
   const [notesPersonId, setNotesPersonId] = useState<number | null>(null);
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
-  const queues = useQuery({
-    queryKey: ['queues', siteId],
-    queryFn: () => queuesControllerFindAll({ siteId: siteId ?? undefined, page: 1, pageSize: 100 }),
-    enabled: siteId !== null,
-  });
-  const registrations = useQuery({
-    queryKey: ['registrations', siteId, queueId, 'waiting', page],
-    queryFn: () =>
-      registrationsControllerFindRegistrations({
-        siteId: siteId ?? undefined,
-        queueId,
-        status: 'waiting',
-        page,
-        pageSize: 10,
-        sort: 'createdAt:asc',
-      }),
-    enabled: siteId !== null,
-  });
+  const queues = useQueues({ siteId });
+  const registrations = useWaitingRegistrations({ siteId, queueId, page });
   const items = registrations.data?.data.items ?? [];
-  const people = useQueries({
-    queries: items.map((item) => ({
-      queryKey: ['persons', item.personId],
-      queryFn: () => personsControllerFindOne(item.personId),
-    })),
-  });
-  const notes = useQueries({
-    queries: items.map((item) => ({
-      queryKey: ['persons', item.personId, 'notes', 'presence'],
-      queryFn: () =>
-        personsControllerGetNotes(item.personId, { page: 1, pageSize: 1, sort: 'createdAt:desc' }),
-    })),
-  });
+  const people = usePersonsByIds(items.map((item) => item.personId));
+  const notes = usePersonNotesPresence(items.map((item) => item.personId));
   return (
     <div className="page-stack">
       <PageHeader

@@ -1,21 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
-import { useMutation, useQueries, useQuery } from '@tanstack/react-query';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
   RegistrationResponseDto,
 } from '@/api/generated/models';
-import { queuesControllerFindAll, queuesControllerGetStatus } from '@/api/generated/queues/queues';
-import {
-  registrationsControllerCheckIn,
-  registrationsControllerLookup,
-  registrationsControllerRegister,
-} from '@/api/generated/registrations/registrations';
-import {
-  serviceTiersControllerGetQueueTiers,
-  serviceTiersControllerGetRules,
-} from '@/api/generated/tiers/tiers';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
@@ -23,6 +12,7 @@ import { TrackingQr } from './TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from './useKioskWatchdog';
 import { presentError } from '@/core/notifications/error-presentation';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
+import { useKioskCatalog, useKioskRegistration } from './hooks/usePublicExperiences';
 
 type Flow = 'home' | 'walkin' | 'appointment' | 'result';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber' | 'trackingUrl'> & {
@@ -78,48 +68,18 @@ export function KioskPage() {
       (user.userType !== 'kiosk' ||
         (!user.scope.isGlobal && scopeSites.length === 1 && activeSiteId === scopeSites[0])),
     );
-  const queues = useQuery({
-    queryKey: ['kiosk', 'queues', activeSiteId],
-    enabled: validScope,
-    queryFn: () =>
-      queuesControllerFindAll({
-        siteId: activeSiteId ?? undefined,
-        isActive: true,
-        page: 1,
-        pageSize: 100,
-      }),
-  });
-  const queueStatuses = useQueries({
-    queries: (queues.data?.data.items ?? []).map((queue) => ({
-      queryKey: ['kiosk', 'queue-status', queue.queueId],
-      queryFn: () => queuesControllerGetStatus(queue.queueId),
-    })),
-  });
-  const tiers = useQuery({
-    queryKey: ['kiosk', 'tiers', queueId],
-    enabled: Boolean(queueId),
-    queryFn: () =>
-      serviceTiersControllerGetQueueTiers(queueId ?? 0, {
-        page: 1,
-        pageSize: 100,
-        sort: 'displayOrder:asc',
-      }),
-  });
-  const tierRules = useQueries({
-    queries: (tiers.data?.data.items ?? []).map((item) => ({
-      queryKey: ['kiosk', 'tier-rules', item.queueId, item.tierId],
-      queryFn: () =>
-        serviceTiersControllerGetRules(item.queueId, item.tierId, { page: 1, pageSize: 100 }),
-      enabled: item.isActive,
-    })),
-  });
+  const { queues, queueStatuses, tiers, tierRules } = useKioskCatalog(
+    activeSiteId,
+    queueId,
+    validScope,
+  );
   const phone = `${phoneCountry}${phoneNational.replace(/\D/g, '').replace(/^0+/, '')}`;
   const phoneValid = /^\+[1-9]\d{6,14}$/.test(phone);
   const emailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const register = useMutation({
-    mutationFn: () => {
+  const { register, lookup, checkIn } = useKioskRegistration({
+    createDto: () => {
       if (!queueId || !tier) throw new Error('File et forfait requis');
-      return registrationsControllerRegister({
+      return {
         queueId,
         tierId: tier.tierId,
         entryType: 'walkin',
@@ -131,9 +91,9 @@ export function KioskPage() {
           ...(email.trim() ? { email: email.trim() } : {}),
           languagePreference: document.documentElement.lang || 'fr',
         },
-      });
+      };
     },
-    onSuccess: ({ data }) => {
+    onRegistered: (data) => {
       setResult({
         ticketNumber: data.ticketNumber,
         trackingUrl: trackingUrlOnCurrentHost(data.trackingUrl),
@@ -141,29 +101,15 @@ export function KioskPage() {
       });
       setFlow('result');
     },
-  });
-  const registrationError = register.error
-    ? register.error instanceof NormalizedApiError && register.error.status === 409
-      ? 'Ce numéro de téléphone est déjà associé à une personne. Adressez-vous à l’accueil pour retrouver votre dossier.'
-      : presentError(register.error).message
-    : '';
-  const lookup = useMutation({
-    mutationFn: () =>
-      registrationsControllerLookup(
-        ticket
-          ? { ticketNumber: ticket }
-          : { lastName, scheduledTime: new Date(scheduledTime).toISOString() },
-      ),
-    onSuccess: ({ data }) => {
+    lookupDto: () =>
+      ticket
+        ? { ticketNumber: ticket }
+        : { lastName, scheduledTime: new Date(scheduledTime).toISOString() },
+    onLookup: (data) => {
       setFound(data);
     },
-  });
-  const checkIn = useMutation({
-    mutationFn: () => {
-      if (!found) throw new Error('Rendez-vous requis');
-      return registrationsControllerCheckIn(found.registrationId);
-    },
-    onSuccess: ({ data }) => {
+    selectedRegistration: () => found,
+    onCheckedIn: (data) => {
       const trackingUrl = data.registrationTrackingToken
         ? `${window.location.origin}/track?token=${encodeURIComponent(data.registrationTrackingToken)}`
         : null;
@@ -175,6 +121,11 @@ export function KioskPage() {
       setFlow('result');
     },
   });
+  const registrationError = register.error
+    ? register.error instanceof NormalizedApiError && register.error.status === 409
+      ? 'Ce numéro de téléphone est déjà associé à une personne. Adressez-vous à l’accueil pour retrouver votre dossier.'
+      : presentError(register.error).message
+    : '';
   if (!validScope)
     return (
       <section className="kiosk-screen">

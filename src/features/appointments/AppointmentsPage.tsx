@@ -1,19 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { useQueries, useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
-import { queuesControllerFindAll } from '@/api/generated/queues/queues';
-import { sitesControllerFindSite } from '@/api/generated/sites/sites';
-import { personsControllerFindOne } from '@/api/generated/persons/persons';
-import {
-  registrationsControllerFindOne,
-  registrationsControllerFindRegistrations,
-} from '@/api/generated/registrations/registrations';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { AppointmentActionDialog } from './AppointmentActionDialog';
 import { AppointmentEditor } from './AppointmentEditor';
 import { appointmentLocalParts, isoDate, weekDates } from './appointment-rules';
+import { useQueues } from '@/features/queues/hooks/useQueues';
+import { useSite } from '@/features/portfolio/hooks/useSites';
+import { usePersonsByIds } from '@/features/persons/hooks/usePersons';
+import { useAppointment, useAppointments } from './hooks/useAppointments';
 
 function monthDates(anchor: Date): string[] {
   const first = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1));
@@ -34,22 +30,8 @@ export function AppointmentsPage() {
   const [queueId, setQueueId] = useState(0);
   const [editor, setEditor] = useState<{ date: string; time?: string } | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const queues = useQuery({
-    queryKey: ['queues', siteId, 'appointments'],
-    queryFn: () =>
-      queuesControllerFindAll({
-        siteId: siteId ?? undefined,
-        page: 1,
-        pageSize: 100,
-        isActive: true,
-      }),
-    enabled: siteId !== null,
-  });
-  const site = useQuery({
-    queryKey: ['sites', siteId],
-    queryFn: () => sitesControllerFindSite(siteId ?? 0),
-    enabled: siteId !== null,
-  });
+  const queues = useQueues({ siteId, isActive: true, usage: 'appointments' });
+  const site = useSite(siteId);
   const availableQueues =
     queues.data?.data.items.filter((queue) => queue.appointmentsEnabled) ?? [];
   const selectedQueue =
@@ -59,37 +41,14 @@ export function AppointmentsPage() {
     () => (view === 'week' ? weekDates(anchor) : monthDates(anchor)),
     [anchor, view],
   );
-  const daily = useQueries({
-    queries: dates.map((businessDate) => ({
-      queryKey: ['appointments', selectedQueue?.queueId, businessDate],
-      queryFn: () =>
-        registrationsControllerFindRegistrations({
-          queueId: selectedQueue?.queueId,
-          siteId: siteId ?? undefined,
-          businessDate,
-          entryType: 'appointment',
-          page: 1,
-          pageSize: 100,
-        }),
-      enabled: Boolean(selectedQueue),
-    })),
-  });
-  const selected = useQuery({
-    queryKey: ['appointments', 'detail', selectedId],
-    queryFn: () => registrationsControllerFindOne(selectedId ?? 0),
-    enabled: selectedId !== null,
-  });
+  const daily = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
+  const selected = useAppointment(selectedId);
   const appointmentPersonIds = [
     ...new Set(
       daily.flatMap((result) => result.data?.data.items.map((item) => item.personId) ?? []),
     ),
   ];
-  const appointmentPeople = useQueries({
-    queries: appointmentPersonIds.map((personId) => ({
-      queryKey: ['persons', personId],
-      queryFn: () => personsControllerFindOne(personId),
-    })),
-  });
+  const appointmentPeople = usePersonsByIds(appointmentPersonIds);
   const personName = (personId: number) => {
     const person = appointmentPeople[appointmentPersonIds.indexOf(personId)]?.data?.data;
     return person ? `${person.firstName} ${person.lastName}` : 'Réservation';

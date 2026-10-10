@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { PersonIdentityDto, PersonResponseDto } from '@/api/generated/models';
-import { personsControllerFindPersons } from '@/api/generated/persons/persons';
 import { EntityPicker } from '@/design-system/components/EntityPicker';
 import { FormField, PhoneInput } from '@/design-system/components/FormField';
 import { Pagination } from '@/design-system/components/Pagination';
 import { isValidPersonIdentity } from './person-validation';
+import { usePersonsSearch } from './hooks/usePersons';
 
 export type PersonChoice =
   { kind: 'existing'; person: PersonResponseDto } | { kind: 'new'; person: PersonIdentityDto };
@@ -31,16 +30,13 @@ export function PersonPickerOrCreate({
     firstName: '',
     languagePreference: 'fr',
   });
-  const people = useQuery({
-    queryKey: ['persons', siteId, search.trim(), page],
-    queryFn: () =>
-      personsControllerFindPersons({
-        siteId,
-        search: search.trim(),
-        page,
-        pageSize: 5,
-      }),
-    enabled: mode === 'existing' && search.trim().length >= 3,
+  const people = usePersonsSearch({
+    siteId,
+    search,
+    page,
+    pageSize: 5,
+    usage: 'picker',
+    enabled: mode === 'existing',
   });
   const draftIsValid = isValidPersonIdentity(draft);
   useEffect(() => {

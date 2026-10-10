@@ -1,36 +1,26 @@
 import { useTranslation } from 'react-i18next';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { reportsControllerGetDashboardSummary } from '@/api/generated/reports/reports';
-import { sitesControllerFindSites } from '@/api/generated/sites/sites';
-import { changeActiveSite } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
-import { useScopeStore } from '@/core/scope/scope-store';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { useActiveSite, useSites } from './hooks/useSites';
+import { useDashboardSummaries } from '@/features/supervision/hooks/useReports';
 
 export function PortfolioPage() {
   const { t: __t } = useTranslation();
-  const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
-  const activeSiteId = useScopeStore((state) => state.activeSiteId);
-  const sites = useQuery({
-    queryKey: ['sites', 'portfolio'],
-    queryFn: () => sitesControllerFindSites({ page: 1, pageSize: 100 }),
-  });
+  const { activeSiteId, activate } = useActiveSite();
+  const sites = useSites('portfolio');
   const allowed =
     sites.data?.data.items.filter(
       (site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId),
     ) ?? [];
   const canViewSummary = hasPermission(user, 'report_view');
-  const summaries = useQueries({
-    queries: allowed.map((site) => ({
-      queryKey: ['reports', 'dashboard-summary', site.siteId],
-      queryFn: () => reportsControllerGetDashboardSummary({ siteId: site.siteId }),
-      enabled: canViewSummary,
-    })),
-  });
+  const summaries = useDashboardSummaries(
+    allowed.map((site) => site.siteId),
+    canViewSummary,
+  );
   return (
     <div className="page-stack">
       <PageHeader
@@ -123,7 +113,7 @@ export function PortfolioPage() {
                 type="button"
                 onClick={() => {
                   if (site.siteId !== activeSiteId) {
-                    void changeActiveSite(queryClient, site.siteId, user.scope);
+                    void activate(site.siteId, user.scope);
                   }
                 }}
               >

@@ -2,19 +2,15 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  queuesControllerCreateForSite,
-  queuesControllerRemove,
-  queuesControllerUpdate,
-} from '@/api/generated/queues/queues';
-import {
-  sitesControllerCreateSite,
-  sitesControllerDeleteSite,
-  sitesControllerUpdateSite,
-} from '@/api/generated/sites/sites';
-import {
-  serviceTiersControllerAssociateTier,
-  serviceTiersControllerFindTiers,
-} from '@/api/generated/tiers/tiers';
+  associateTier,
+  createQueueForSite,
+  createSite,
+  deleteSite,
+  findTiers,
+  removeQueue,
+  updateQueue,
+  updateSite,
+} from './api/onboarding-api';
 import type { CreateQueueDto } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
@@ -30,6 +26,7 @@ import {
 } from './onboarding-draft';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { queryKeys } from '@/api/client/query-keys';
 
 const steps = [
   'Identité du site',
@@ -50,8 +47,8 @@ export function OnboardingPage() {
   const [discardOpen, setDiscardOpen] = useState(false);
   const [discarding, setDiscarding] = useState(false);
   const tiers = useQuery({
-    queryKey: ['tiers', 'onboarding'],
-    queryFn: () => serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }),
+    queryKey: queryKeys.tiers.catalog('onboarding'),
+    queryFn: () => findTiers({ page: 1, pageSize: 100 }),
     enabled: draft.step === 4,
   });
   const fixed = (tiers.data?.data.items ?? []).filter((tier) => {
@@ -73,7 +70,7 @@ export function OnboardingPage() {
     let remainingQueueIds = { ...draft.confirmedQueueIds };
     try {
       for (const queueId of new Set(Object.values(remainingQueueIds))) {
-        await queuesControllerRemove(queueId);
+        await removeQueue(queueId);
         remainingQueueIds = Object.fromEntries(
           Object.entries(remainingQueueIds).filter(([, id]) => id !== queueId),
         );
@@ -84,7 +81,7 @@ export function OnboardingPage() {
         });
       }
 
-      await sitesControllerDeleteSite(draft.confirmedSiteId);
+      await deleteSite(draft.confirmedSiteId);
       clearOnboardingDraft();
       setState(structuredClone(initialOnboardingDraft));
       setEditingQueueCode(undefined);
@@ -114,15 +111,15 @@ export function OnboardingPage() {
       let value = { ...draft };
       if (draft.step === 1 && !draft.confirmedSiteId) {
         if (!draft.site.siteName.trim()) throw new Error('Le nom du site est requis.');
-        const result = await sitesControllerCreateSite(draft.site);
+        const result = await createSite(draft.site);
         value = { ...value, confirmedSiteId: result.data.siteId };
       } else if (draft.step === 2 && draft.confirmedSiteId) {
-        await sitesControllerUpdateSite(draft.confirmedSiteId, draft.site);
+        await updateSite(draft.confirmedSiteId, draft.site);
       } else if (draft.step === 3 && draft.confirmedSiteId) {
         const ids = { ...draft.confirmedQueueIds };
         for (const queue of draft.queues) {
           if (!queueNeedsCreation({ ...draft, confirmedQueueIds: ids }, queue)) continue;
-          const result = await queuesControllerCreateForSite(draft.confirmedSiteId, queue);
+          const result = await createQueueForSite(draft.confirmedSiteId, queue);
           ids[queue.queueCode.toUpperCase()] = result.data.queueId;
           value = { ...value, confirmedQueueIds: ids };
           save(value);
@@ -137,7 +134,7 @@ export function OnboardingPage() {
           if (selected.length === 0)
             throw new Error('Sélectionnez au moins un niveau pour chaque file.');
           for (const [index, tier] of selected.entries())
-            await serviceTiersControllerAssociateTier(queueId, {
+            await associateTier(queueId, {
               tierId: tier.tierId,
               price: 0,
               displayOrder: index + 1,
@@ -148,7 +145,7 @@ export function OnboardingPage() {
           save(value);
         }
       } else if (draft.step === 6 && draft.confirmedSiteId) {
-        await sitesControllerUpdateSite(draft.confirmedSiteId, { isActive: true });
+        await updateSite(draft.confirmedSiteId, { isActive: true });
         const activatedSite = draft.site.siteName;
         clearOnboardingDraft();
         setState(structuredClone(initialOnboardingDraft));
@@ -331,7 +328,7 @@ export function OnboardingPage() {
           const confirmedQueueId = originalCode
             ? draft.confirmedQueueIds[originalCode.toUpperCase()]
             : undefined;
-          if (confirmedQueueId) await queuesControllerUpdate(confirmedQueueId, queue);
+          if (confirmedQueueId) await updateQueue(confirmedQueueId, queue);
           const confirmedQueueIds =
             confirmedQueueId && originalCode
               ? {

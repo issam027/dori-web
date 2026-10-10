@@ -25,10 +25,19 @@ function assertNoMatch(paths, pattern, message, ignore = () => false) {
 }
 
 const pageFiles = authoredFiles.filter((path) => /Page\.tsx$/.test(path));
+// Temporary exceptions must be explicit and can only shrink. Keep this set
+// empty once migration is complete so a new direct controller import fails CI.
+const generatedControllerImportExceptions = new Set([]);
 assertNoMatch(
   pageFiles,
   /\b(?:fetch|axios\.(?:get|post|put|patch|delete)|httpClient\.)\s*\(/,
   'Appel HTTP brut dans un composant de page',
+);
+assertNoMatch(
+  pageFiles,
+  /from\s+['"]@\/api\/generated\/(?!models(?:\/|['"]))[^'"]+['"]\s*;?/,
+  'Import direct du client Orval dans une page',
+  (path) => generatedControllerImportExceptions.has(relative(root, path).replaceAll('\\', '/')),
 );
 assertNoMatch(
   authoredFiles,

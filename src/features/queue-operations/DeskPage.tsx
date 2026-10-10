@@ -1,21 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import {
-  queueEngineControllerCloseSession,
-  queueEngineControllerGetActiveSessions,
-  queueEngineControllerGetThreads,
-  queueEngineControllerMarkNoShow,
-  queueEngineControllerMarkServed,
-  queueEngineControllerNextPreview,
-  queueEngineControllerOpenSession,
-} from '@/api/generated/queue-engine/queue-engine';
-import { queuesControllerFindAll, queuesControllerGetStatus } from '@/api/generated/queues/queues';
-import { registrationsControllerFindOne } from '@/api/generated/registrations/registrations';
-import {
-  personsControllerFindOne,
-  personsControllerGetNotes,
-} from '@/api/generated/persons/persons';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
@@ -23,11 +8,22 @@ import { EmptyState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { canCallNext, useOperationStore } from './operation-store';
-import { callNextAndCommit } from './operation-actions';
 import { QuickRegistration } from './QuickRegistration';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { invalidateQueueOperations } from '@/api/client/query-invalidations';
+import { usePerson, usePersonNotes } from '@/features/persons/hooks/usePersons';
+import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
+import {
+  useCallNext,
+  useCloseDeskSession,
+  useDeskSession,
+  useMarkNoShow,
+  useMarkServed,
+  useOpenDeskSession,
+  useRegistration,
+} from './hooks/useQueueOperations';
 
 export function DeskPage() {
   const { t: __t } = useTranslation();
@@ -40,68 +36,29 @@ export function DeskPage() {
   const [error, setError] = useState('');
   const [printingPassageId, setPrintingPassageId] = useState<number | null>(null);
   const [notesOpen, setNotesOpen] = useState(false);
-  const activeRegistration = useQuery({
-    queryKey: ['registrations', activeCall?.registrationId],
-    queryFn: () => registrationsControllerFindOne(activeCall?.registrationId ?? 0),
-    enabled: activeCall !== null,
-  });
+  const activeRegistration = useRegistration(activeCall?.registrationId, activeCall !== null);
   const activePersonId = activeRegistration.data?.data.personId;
-  const activePerson = useQuery({
-    queryKey: ['persons', activePersonId],
-    queryFn: () => personsControllerFindOne(activePersonId ?? 0),
+  const activePerson = usePerson(activePersonId);
+  const activePersonNotes = usePersonNotes(activePersonId ?? 0, {
     enabled: Boolean(activePersonId),
+    pageSize: 1,
+    usage: 'count',
   });
-  const activePersonNotes = useQuery({
-    queryKey: ['persons', activePersonId, 'notes', 'count'],
-    queryFn: () =>
-      personsControllerGetNotes(activePersonId ?? 0, {
-        page: 1,
-        pageSize: 1,
-        sort: 'createdAt:desc',
-      }),
-    enabled: Boolean(activePersonId),
-  });
-  const queues = useQuery({
-    queryKey: ['queues', siteId],
-    queryFn: () =>
-      queuesControllerFindAll({
-        siteId: siteId ?? undefined,
-        page: 1,
-        pageSize: 100,
-        isActive: true,
-      }),
-    enabled: siteId !== null,
-  });
+  const queues = useQueues({ siteId, isActive: true });
   const allowed =
     queues.data?.data.items.filter(
       (queue) => user?.scope.isGlobal || user?.scope.queueIds.includes(queue.queueId),
     ) ?? [];
-  const previews = useQuery({
-    queryKey: ['queue-preview', siteId],
-    queryFn: () => queueEngineControllerNextPreview(siteId ?? 0, { limit: 5 }),
-    enabled: siteId !== null,
-    refetchInterval: 15000,
-  });
-  const sessions = useQueries({
-    queries: allowed.map((queue) => ({
-      queryKey: ['queue-sessions', queue.queueId],
-      queryFn: () =>
-        queueEngineControllerGetActiveSessions(queue.queueId, { page: 1, pageSize: 100 }),
-    })),
-  });
-  const threads = useQueries({
-    queries: allowed.map((queue) => ({
-      queryKey: ['threads', queue.queueId],
-      queryFn: () => queueEngineControllerGetThreads(queue.queueId, { page: 1, pageSize: 100 }),
-    })),
-  });
-  const statuses = useQueries({
-    queries: allowed.map((queue) => ({
-      queryKey: ['queue-status', queue.queueId],
-      queryFn: () => queuesControllerGetStatus(queue.queueId),
-      refetchInterval: 15000,
-    })),
-  });
+  const { previews, sessions, threads } = useDeskSession(
+    siteId,
+    allowed.map((queue) => queue.queueId),
+  );
+  const statuses = useQueueStatuses(allowed.map((queue) => queue.queueId));
+  const callNext = useCallNext();
+  const markServed = useMarkServed();
+  const markNoShow = useMarkNoShow();
+  const openSession = useOpenDeskSession();
+  const closeSession = useCloseDeskSession();
   const rankedQueues = allowed
     .map((queue, index) => ({ queue, index }))
     .sort((left, right) => {
@@ -117,6 +74,7 @@ export function DeskPage() {
     );
   const serverCurrentSession = serverCurrent?.session;
   const serverCurrentRegistrationId = serverCurrentSession?.currentRegistrationId ?? null;
+  const serverCurrentRegistration = useRegistration(serverCurrentRegistrationId);
   const passageRegistrationIds = passages.map((passage) => passage.registrationId).join(',');
   useEffect(() => {
     if (
@@ -126,47 +84,32 @@ export function DeskPage() {
       passages.some((passage) => passage.registrationId === serverCurrentRegistrationId)
     )
       return;
-    let cancelled = false;
-    const session = serverCurrentSession;
-    const threadNumber = serverCurrent.threadNumber;
-    void registrationsControllerFindOne(serverCurrentRegistrationId).then(({ data }) => {
-      if (cancelled || !['called', 'in_progress'].includes(data.status)) return;
-      useOperationStore.getState().startCall({
-        registrationId: data.registrationId,
-        ticketNumber: data.ticketNumber,
-        entryType: data.entryType,
-        scheduledTime: data.scheduledTime,
-        calledEarly: false,
-        tier: { tierId: data.tierId },
-        status: data.status,
-        sessionId: session.sessionId,
-        threadNumber,
-        priorityScore: 0,
-        calledAt: data.updatedAt,
-        person: { personId: data.personId },
-      });
+    const data = serverCurrentRegistration.data?.data;
+    if (!data || !['called', 'in_progress'].includes(data.status)) return;
+    useOperationStore.getState().startCall({
+      registrationId: data.registrationId,
+      ticketNumber: data.ticketNumber,
+      entryType: data.entryType,
+      scheduledTime: data.scheduledTime,
+      calledEarly: false,
+      tier: { tierId: data.tierId },
+      status: data.status,
+      sessionId: serverCurrentSession.sessionId,
+      threadNumber: serverCurrent.threadNumber,
+      priorityScore: 0,
+      calledAt: data.updatedAt,
+      person: { personId: data.personId },
     });
-    return () => {
-      cancelled = true;
-    };
   }, [
     activeCall,
     passageRegistrationIds,
     passages,
     serverCurrent,
     serverCurrentRegistrationId,
+    serverCurrentRegistration.data,
     serverCurrentSession,
   ]);
-  const refresh = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['queues'] }),
-      queryClient.invalidateQueries({ queryKey: ['queue-sessions'] }),
-      queryClient.invalidateQueries({ queryKey: ['threads'] }),
-      queryClient.invalidateQueries({ queryKey: ['queue-status'] }),
-      queryClient.invalidateQueries({ queryKey: ['queue-preview'] }),
-      queryClient.invalidateQueries({ queryKey: ['registrations'] }),
-    ]);
-  };
+  const refresh = () => invalidateQueueOperations(queryClient);
   const run = async (action: () => Promise<void>) => {
     setPending(true);
     setError('');
@@ -192,8 +135,8 @@ export function DeskPage() {
       .filter((part): part is string => Boolean(part?.trim()))
       .join(' ');
     void run(async () => {
-      if (outcome === 'served') await queueEngineControllerMarkServed(call.registrationId);
-      else await queueEngineControllerMarkNoShow(call.registrationId);
+      if (outcome === 'served') await markServed.execute(call.registrationId);
+      else await markNoShow.execute(call.registrationId);
       useOperationStore.getState().closeCall();
       useOperationStore.getState().addPassage({
         registrationId: call.registrationId,
@@ -377,7 +320,10 @@ export function DeskPage() {
                       disabled={pending || Boolean(activeCall)}
                       onClick={() => {
                         void run(async () => {
-                          await queueEngineControllerCloseSession(queue.queueId, mine.sessionId);
+                          await closeSession.execute({
+                            queueId: queue.queueId,
+                            sessionId: mine.sessionId,
+                          });
                           notify({
                             tone: 'success',
                             title: __t('notifications.desk.released'),
@@ -405,10 +351,13 @@ export function DeskPage() {
                           );
                         if (occupied && !takeOver) return;
                         void run(async () => {
-                          await queueEngineControllerOpenSession(queue.queueId, {
-                            mode: 'active',
-                            threadNumber: occupied?.threadNumber ?? 1,
-                            takeOver,
+                          await openSession.execute({
+                            queueId: queue.queueId,
+                            dto: {
+                              mode: 'active',
+                              threadNumber: occupied?.threadNumber ?? 1,
+                              takeOver,
+                            },
                           });
                           notify({
                             tone: 'success',
@@ -434,7 +383,7 @@ export function DeskPage() {
                   disabled={!canCallNext(active, activeCall, pending)}
                   onClick={() => {
                     void run(async () => {
-                      const outcome = await callNextAndCommit(queue.queueId);
+                      const outcome = await callNext.execute(queue.queueId);
                       if (outcome === 'empty') {
                         notify({
                           tone: 'info',

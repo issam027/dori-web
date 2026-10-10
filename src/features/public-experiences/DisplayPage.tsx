@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
-import { useQueries, useQuery } from '@tanstack/react-query';
-import { queuesControllerFindAll, queuesControllerGetDisplay } from '@/api/generated/queues/queues';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { playChime, speakTicket } from './audio';
+import { useDisplaySnapshot } from './hooks/usePublicExperiences';
 
 export function DisplayPage() {
   const { t: __t } = useTranslation();
@@ -13,29 +12,11 @@ export function DisplayPage() {
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
   const queryQueue = Number(new URLSearchParams(location.search).get('queueId'));
-  const queues = useQuery({
-    queryKey: ['display', 'queues', activeSiteId],
-    enabled: Boolean(activeSiteId),
-    queryFn: () =>
-      queuesControllerFindAll({
-        siteId: activeSiteId ?? undefined,
-        isActive: true,
-        page: 1,
-        pageSize: 100,
-      }),
-  });
-  const allowedQueues =
-    queues.data?.data.items.filter(
-      (queue) =>
-        (user?.scope.isGlobal || user?.scope.queueIds.includes(queue.queueId)) &&
-        (!(Number.isInteger(queryQueue) && queryQueue > 0) || queue.queueId === queryQueue),
-    ) ?? [];
-  const displays = useQueries({
-    queries: allowedQueues.map((queue) => ({
-      queryKey: ['display', 'snapshot', queue.queueId],
-      queryFn: () => queuesControllerGetDisplay(queue.queueId),
-      refetchInterval: 5000,
-    })),
+  const { queues, allowedQueues, displays } = useDisplaySnapshot({
+    siteId: activeSiteId,
+    allowedQueueIds: user?.scope.queueIds ?? [],
+    isGlobal: user?.scope.isGlobal ?? false,
+    selectedQueueId: Number.isInteger(queryQueue) && queryQueue > 0 ? queryQueue : undefined,
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
   const activeCalls = snapshots

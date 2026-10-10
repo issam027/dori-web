@@ -1,20 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   NotificationResponseDto,
   PersonResponseDto,
   RegistrationResponseDto,
   SendManualNotificationDtoChannel,
 } from '@/api/generated/models';
-import {
-  notificationsControllerFindNotificationById,
-  notificationsControllerFindNotifications,
-  notificationsControllerResend,
-  notificationsControllerSendManual,
-} from '@/api/generated/notifications/notifications';
-import { personsControllerFindPersons } from '@/api/generated/persons/persons';
-import { registrationsControllerFindRegistrations } from '@/api/generated/registrations/registrations';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -27,6 +18,14 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { canResendNotification, maskRecipient } from './notification-utils';
 import { notify } from '@/core/notifications/notification-store';
+import { usePersonsSearch } from '@/features/persons/hooks/usePersons';
+import {
+  useNotification,
+  useNotifications,
+  usePersonRegistrations,
+  useResendNotification,
+  useSendNotification,
+} from './hooks/useNotifications';
 
 const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger' =>
   status === 'delivered'
@@ -45,7 +44,6 @@ function ManualNotificationWizard({
   onOpenChange: (open: boolean) => void;
 }) {
   const { t: __t } = useTranslation();
-  const client = useQueryClient();
   const siteId = useScopeStore((s) => s.activeSiteId);
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState('');
@@ -53,44 +51,16 @@ function ManualNotificationWizard({
   const [registration, setRegistration] = useState<RegistrationResponseDto>();
   const [channel, setChannel] = useState<SendManualNotificationDtoChannel>('sms');
   const [content, setContent] = useState('');
-  const persons = useQuery({
-    queryKey: ['persons', 'notification', siteId, search],
-    enabled: open && Boolean(siteId),
-    queryFn: () => {
-      if (siteId === null) throw new Error('Un site actif est requis');
-      return personsControllerFindPersons({
-        siteId,
-        search: search || undefined,
-        page: 1,
-        pageSize: 20,
-      });
-    },
+  const persons = usePersonsSearch({
+    siteId,
+    search,
+    page: 1,
+    pageSize: 20,
+    usage: 'notification',
+    enabled: open,
   });
-  const registrations = useQuery({
-    queryKey: ['registrations', 'notification', person?.personId],
-    enabled: Boolean(person),
-    queryFn: () => {
-      if (!person) throw new Error('Une personne est requise');
-      return registrationsControllerFindRegistrations({
-        personId: person.personId,
-        siteId: siteId ?? undefined,
-        page: 1,
-        pageSize: 20,
-        sort: 'createdAt:desc',
-      });
-    },
-  });
-  const send = useMutation({
-    mutationFn: () => {
-      if (!registration) throw new Error('Une inscription est requise');
-      return notificationsControllerSendManual({
-        registrationId: registration.registrationId,
-        channel,
-        content,
-      });
-    },
-    onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ['notifications'] });
+  const registrations = usePersonRegistrations(siteId, person?.personId);
+  const send = useSendNotification(() => {
       notify({
         tone: 'success',
         title: __t('notifications.delivery.queued'),
@@ -101,7 +71,6 @@ function ManualNotificationWizard({
       setPerson(undefined);
       setRegistration(undefined);
       setContent('');
-    },
   });
   return (
     <Modal
@@ -154,7 +123,8 @@ function ManualNotificationWizard({
                 (channel === 'sms' ? !person?.phoneNumber : !person?.email)
               }
               onClick={() => {
-                send.mutate();
+                if (registration)
+                  send.run({ registrationId: registration.registrationId, channel, content });
               }}
             >
               {send.isPending
@@ -380,7 +350,6 @@ function ManualNotificationWizard({
 
 export function NotificationsPage() {
   const { t: __t } = useTranslation();
-  const client = useQueryClient();
   const user = useSessionStore((s) => s.user);
   const canSend = hasPermission(user, 'notification_send');
   const [page, setPage] = useState(1);
@@ -389,38 +358,19 @@ export function NotificationsPage() {
   const [date, setDate] = useState('');
   const [wizard, setWizard] = useState(false);
   const [detailId, setDetailId] = useState<number>();
-  const journal = useQuery({
-    queryKey: ['notifications', page, channel, status, date],
-    queryFn: () =>
-      notificationsControllerFindNotifications({
-        page,
-        pageSize: 25,
-        sort: 'createdAt:desc',
-        channel: channel ? (channel as 'sms' | 'email') : undefined,
-        status: status
-          ? (status as 'pending' | 'processing' | 'sent' | 'delivered' | 'failed')
-          : undefined,
-        businessDate: date || undefined,
-      }),
+  const journal = useNotifications({
+    page,
+    channel: channel || undefined,
+    status: status || undefined,
+    date: date || undefined,
   });
-  const detail = useQuery({
-    queryKey: ['notifications', 'detail', detailId],
-    enabled: Boolean(detailId),
-    queryFn: () => {
-      if (detailId === undefined) throw new Error('Une notification est requise');
-      return notificationsControllerFindNotificationById(detailId);
-    },
-  });
-  const resend = useMutation({
-    mutationFn: (id: number) => notificationsControllerResend(id),
-    onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ['notifications'] });
+  const detail = useNotification(detailId);
+  const resend = useResendNotification(() => {
       notify({
         tone: 'success',
         title: __t('notifications.delivery.requeued'),
         message: __t('notifications.delivery.requeuedMessage'),
       });
-    },
   });
   const items = journal.data?.data.items ?? [];
   const activeFilters = Number(Boolean(channel)) + Number(Boolean(status)) + Number(Boolean(date));
@@ -557,7 +507,7 @@ export function NotificationsPage() {
                       className="button button-small"
                       disabled={resend.isPending}
                       onClick={() => {
-                        resend.mutate(row.notificationId);
+                        resend.run(row.notificationId);
                       }}
                     >
                       {__t('ui.supervision.notifications_page.reemettre_1d0q7c4')}
