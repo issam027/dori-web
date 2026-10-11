@@ -65,6 +65,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
     [userOpen, setUserOpen] = useState(false),
     [tierOpen, setTierOpen] = useState(false),
+    [tierQueue, setTierQueue] = useState<QueueResponseDto>(),
     [ruleOpen, setRuleOpen] = useState(false),
     [translationOpen, setTranslationOpen] = useState(false),
     [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null);
@@ -128,6 +129,10 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
             }}
             refresh={refresh}
             assign={setAssignmentTarget}
+            configureServices={(queue) => {
+              setTierQueue(queue);
+              setTierOpen(true);
+            }}
           />
         ) : null}
         {section === 'users' ? (
@@ -183,7 +188,15 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         currentRoleRank={rank}
         onCreated={refresh}
       />
-      <TierModal open={tierOpen} close={setTierOpen} queues={qs} tiers={ts} refresh={refresh} />
+      <TierModal
+        key={tierQueue?.queueId ?? 'tier'}
+        open={tierOpen}
+        close={setTierOpen}
+        queues={qs}
+        tiers={ts}
+        refresh={refresh}
+        initialQueueId={tierQueue?.queueId}
+      />
       <RuleModal open={ruleOpen} close={setRuleOpen} queues={qs} tiers={ts} refresh={refresh} />
       <TranslationModal open={translationOpen} close={setTranslationOpen} refresh={refresh} />
       <UserAssignmentModal
@@ -338,12 +351,14 @@ function QueuesPanel({
   edit,
   refresh,
   assign,
+  configureServices,
 }: {
   items: QueueResponseDto[];
   create: () => void;
   edit: (q: QueueResponseDto) => void;
   refresh: () => void;
   assign: (target: AssignmentTarget) => void;
+  configureServices: (queue: QueueResponseDto) => void;
 }) {
   const { t: __t } = useTranslation();
   const pagination = useAdminPagination(items);
@@ -403,6 +418,16 @@ function QueuesPanel({
                     >
                       <Pencil aria-hidden="true" />
                       {__t('ui.onboarding.settings_page.modifier_1s45w8g')}
+                    </button>
+                    <button
+                      className="button button-small"
+                      type="button"
+                      onClick={() => {
+                        configureServices(q);
+                      }}
+                    >
+                      <Layers3 aria-hidden="true" />
+                      {__t('onboarding.serviceOptions')}
                     </button>
                     <button
                       className="button button-small"
@@ -707,21 +732,28 @@ function TierModal({
   queues,
   tiers,
   refresh,
+  initialQueueId,
 }: {
   open: boolean;
   close: (v: boolean) => void;
   queues: QueueResponseDto[];
   tiers: Tiers;
   refresh: () => void;
+  initialQueueId?: number;
 }) {
   const { t: __t } = useTranslation();
   const [f, setF] = useState({
-    queueId: 0,
+    queueId: initialQueueId ?? 0,
     tierId: 0,
     price: 0,
     currency: '',
     order: 1,
     default: false,
+    welcomeSms: true,
+    welcomeEmail: false,
+    alertSms: false,
+    alertThreshold: 3,
+    tracking: true,
   });
   return (
     <Modal
@@ -739,7 +771,35 @@ function TierModal({
               currency: f.currency || null,
               displayOrder: f.order,
               isDefault: f.default,
-            }).then(() => {
+            }).then(async () => {
+              const rules = [];
+              if (f.welcomeSms)
+                rules.push(
+                  createTierRule(f.queueId, f.tierId, {
+                    notificationType: 'welcome',
+                    channel: 'sms',
+                    includeTrackingLink: f.tracking,
+                  }),
+                );
+              if (f.welcomeEmail)
+                rules.push(
+                  createTierRule(f.queueId, f.tierId, {
+                    notificationType: 'welcome',
+                    channel: 'email',
+                    includeTrackingLink: f.tracking,
+                  }),
+                );
+              if (f.alertSms)
+                rules.push(
+                  createTierRule(f.queueId, f.tierId, {
+                    notificationType: 'threshold',
+                    channel: 'sms',
+                    thresholdType: 'position',
+                    thresholdValue: f.alertThreshold,
+                    includeTrackingLink: f.tracking,
+                  }),
+                );
+              await Promise.all(rules);
               refresh();
               close(false);
             })
@@ -760,9 +820,7 @@ function TierModal({
         />
         <Select
           label={__t('ui.onboarding.settings_page.niveau_gl02r')}
-          items={tiers
-            .filter((t) => ['GRATUIT', 'STANDARD', 'PREMIUM'].includes(t.tierCode.toUpperCase()))
-            .map((t) => [t.tierId, t.tierName])}
+          items={tiers.filter((t) => t.isActive).map((t) => [t.tierId, t.tierName])}
           change={(id) => {
             setF({ ...f, tierId: id });
           }}
@@ -810,6 +868,62 @@ function TierModal({
             }}
           />
         </label>
+        <fieldset className="form-span tier-options-fieldset">
+          <legend>{__t('onboarding.serviceOptions')}</legend>
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={f.welcomeSms}
+              onChange={(e) => {
+                setF({ ...f, welcomeSms: e.target.checked });
+              }}
+            />{' '}
+            {__t('onboarding.welcomeSms')}
+          </label>
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={f.welcomeEmail}
+              onChange={(e) => {
+                setF({ ...f, welcomeEmail: e.target.checked });
+              }}
+            />{' '}
+            {__t('onboarding.welcomeEmail')}
+          </label>
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={f.alertSms}
+              onChange={(e) => {
+                setF({ ...f, alertSms: e.target.checked });
+              }}
+            />{' '}
+            {__t('onboarding.approachSms')}
+          </label>
+          {f.alertSms ? (
+            <label>
+              {__t('onboarding.alertPosition')}
+              <input
+                type="number"
+                min="1"
+                value={f.alertThreshold}
+                onChange={(e) => {
+                  setF({ ...f, alertThreshold: Math.max(1, Number(e.target.value)) });
+                }}
+              />
+            </label>
+          ) : null}
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={f.tracking}
+              onChange={(e) => {
+                setF({ ...f, tracking: e.target.checked });
+              }}
+            />{' '}
+            {__t('onboarding.trackingLink')}
+          </label>
+        </fieldset>
       </div>
     </Modal>
   );

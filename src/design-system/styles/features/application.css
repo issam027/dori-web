@@ -1296,6 +1296,24 @@
   min-height: 24rem;
   align-content: start;
 }
+.quick-registration-tier-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-primary-soft);
+}
+.quick-registration-tier-details span {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+.quick-registration-tier-details small {
+  grid-column: 1 / -1;
+  color: var(--color-text-muted);
+}
 .quick-registration-result {
   display: grid;
   min-height: 24rem;

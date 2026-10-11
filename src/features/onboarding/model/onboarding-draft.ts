@@ -1,8 +1,20 @@
 import type { CreateQueueDto, CreateSiteDto } from '@/api/generated/models';
 
-export const ONBOARDING_DRAFT_VERSION = 2;
-export const ONBOARDING_DRAFT_KEY = 'dori:onboarding:v2';
-const LEGACY_ONBOARDING_DRAFT_KEY = 'dori:onboarding:v1';
+export const ONBOARDING_DRAFT_VERSION = 3;
+export const ONBOARDING_DRAFT_KEY = 'dori:onboarding:v3';
+const LEGACY_ONBOARDING_DRAFT_KEYS = ['dori:onboarding:v2', 'dori:onboarding:v1'] as const;
+
+export interface OnboardingTierConfiguration {
+  price: number;
+  currency: string;
+  isDefault: boolean;
+  displayOrder: number;
+  welcomeSms: boolean;
+  welcomeEmail: boolean;
+  alertSms: boolean;
+  alertPosition: number;
+  includeTrackingLink: boolean;
+}
 
 export interface OnboardingDraft {
   draftVersion: number;
@@ -12,6 +24,7 @@ export interface OnboardingDraft {
   queues: CreateQueueDto[];
   confirmedQueueIds: Record<string, number>;
   selectedTierIds: Record<string, number[]>;
+  tierConfigurations: Record<string, Record<string, OnboardingTierConfiguration>>;
   associatedTierQueueIds: number[];
   completedUserIds: number[];
   testValidated: boolean;
@@ -45,6 +58,7 @@ export const initialOnboardingDraft: OnboardingDraft = {
   queues: [],
   confirmedQueueIds: {},
   selectedTierIds: {},
+  tierConfigurations: {},
   associatedTierQueueIds: [],
   completedUserIds: [],
   testValidated: false,
@@ -55,7 +69,8 @@ export function loadOnboardingDraft(
 ): OnboardingDraft {
   try {
     const value =
-      storage.getItem(ONBOARDING_DRAFT_KEY) ?? storage.getItem(LEGACY_ONBOARDING_DRAFT_KEY);
+      storage.getItem(ONBOARDING_DRAFT_KEY) ??
+      LEGACY_ONBOARDING_DRAFT_KEYS.map((key) => storage.getItem(key)).find(Boolean);
     if (!value) return structuredClone(initialOnboardingDraft);
     const parsed = JSON.parse(value) as Partial<OnboardingDraft>;
     return {
@@ -65,6 +80,7 @@ export function loadOnboardingDraft(
       site: { ...initialOnboardingDraft.site, ...parsed.site },
       confirmedQueueIds: parsed.confirmedQueueIds ?? {},
       selectedTierIds: parsed.selectedTierIds ?? {},
+      tierConfigurations: parsed.tierConfigurations ?? {},
       associatedTierQueueIds: parsed.associatedTierQueueIds ?? [],
       completedUserIds: parsed.completedUserIds ?? [],
     };
@@ -82,7 +98,9 @@ export function saveOnboardingDraft(
 
 export function clearOnboardingDraft(storage: Pick<Storage, 'removeItem'> = localStorage) {
   storage.removeItem(ONBOARDING_DRAFT_KEY);
-  storage.removeItem(LEGACY_ONBOARDING_DRAFT_KEY);
+  LEGACY_ONBOARDING_DRAFT_KEYS.forEach((key) => {
+    storage.removeItem(key);
+  });
 }
 
 export function queueNeedsCreation(draft: OnboardingDraft, queue: CreateQueueDto) {

@@ -1,9 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check, Plus, TicketCheck } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
-import { findSite, findTiers, getAvailability, registerPerson } from './api/quick-registration-api';
+import {
+  findSite,
+  getAvailability,
+  getQueueTiers,
+  getTierRules,
+  registerPerson,
+} from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { Modal } from '@/design-system/components/Modal';
@@ -23,7 +29,7 @@ export function QuickRegistration({
   siteId: number;
   queues: readonly QueueResponseDto[];
 }) {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [choice, setChoice] = useState<PersonChoice | null>(null);
   const [queueId, setQueueId] = useState(queues[0]?.queueId ?? 0);
@@ -37,9 +43,28 @@ export function QuickRegistration({
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const tiers = useQuery({
-    queryKey: queryKeys.tiers.catalog('quick-registration'),
-    queryFn: () => findTiers({ page: 1, pageSize: 100 }),
+    queryKey: queryKeys.tiers.byQueue(queueId || undefined),
+    queryFn: ({ signal }) =>
+      getQueueTiers(
+        queueId,
+        { page: 1, pageSize: 100, sort: 'displayOrder:asc' },
+        undefined,
+        signal,
+      ),
+    enabled: queueId > 0,
   });
+  const activeTiers = tiers.data?.data.items.filter((item) => item.isActive) ?? [];
+  const tierRules = useQueries({
+    queries: activeTiers.map((item) => ({
+      queryKey: queryKeys.tiers.rules(item.queueId, item.tierId),
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        getTierRules(item.queueId, item.tierId, { page: 1, pageSize: 100 }, undefined, signal),
+    })),
+  });
+  const selectedTierIndex = activeTiers.findIndex((item) => item.tierId === tierId);
+  const selectedTier = activeTiers[selectedTierIndex];
+  const selectedTierRules =
+    tierRules[selectedTierIndex]?.data?.data.items.filter((rule) => rule.isActive) ?? [];
   const site = useQuery({
     queryKey: queryKeys.sites.detail(siteId),
     queryFn: () => findSite(siteId),
@@ -276,6 +301,7 @@ export function QuickRegistration({
                     value={queueId}
                     onChange={(e) => {
                       setQueueId(Number(e.target.value));
+                      setTierId(0);
                       setAppointmentTime('');
                     }}
                   >
@@ -302,14 +328,39 @@ export function QuickRegistration({
                     <option value={0}>
                       {__t('ui.queue-operations.quick_registration.choisir_4zi3t4')}
                     </option>
-                    {tiers.data?.data.items
-                      .filter((tier) => tier.isActive)
-                      .map((tier) => (
-                        <option key={tier.tierId} value={tier.tierId}>
-                          {tier.tierName}
-                        </option>
-                      ))}
+                    {activeTiers.map((tier) => (
+                      <option key={tier.tierId} value={tier.tierId}>
+                        {tier.tier?.tierName ?? `Service ${String(tier.tierId)}`} �{' '}
+                        {new Intl.NumberFormat(i18n.language, {
+                          style: 'currency',
+                          currency: tier.currency,
+                        }).format(tier.price)}
+                      </option>
+                    ))}
                   </select>
+                  {selectedTier ? (
+                    <div className="quick-registration-tier-details">
+                      <strong>{selectedTier.tier?.tierName}</strong>
+                      <span>
+                        {new Intl.NumberFormat(i18n.language, {
+                          style: 'currency',
+                          currency: selectedTier.currency,
+                        }).format(selectedTier.price)}
+                      </span>
+                      <small>
+                        {selectedTierRules.some((rule) => rule.channel === 'sms') ? 'SMS � ' : ''}
+                        {selectedTierRules.some((rule) => rule.notificationType === 'welcome')
+                          ? 'Bienvenue � '
+                          : ''}
+                        {selectedTierRules.some((rule) => rule.notificationType === 'threshold')
+                          ? 'Alerte d�approche � '
+                          : ''}
+                        {selectedTierRules.some((rule) => rule.includeTrackingLink)
+                          ? 'Lien de suivi'
+                          : ''}
+                      </small>
+                    </div>
+                  ) : null}
                 </FormField>
                 <FormField label={__t('ui.queue-operations.quick_registration.type_1m2zofh')}>
                   <select

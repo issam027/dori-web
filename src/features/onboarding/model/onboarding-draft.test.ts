@@ -40,11 +40,27 @@ describe('onboarding recovery', () => {
     const restored = loadOnboardingDraft({
       getItem: (key) => (key === 'dori:onboarding:v1' ? legacy : null),
     });
-    expect(restored.draftVersion).toBe(2);
+    expect(restored.draftVersion).toBe(3);
     expect(restored.confirmedSiteId).toBe(9);
     expect(restored.site.siteName).toBe('Site repris');
     expect(restored.site.timezone).toBe('Africa/Tunis');
     expect(restored.confirmedQueueIds).toEqual({});
+  });
+  it('migrates a version 2 tier selection with empty service options', () => {
+    const restored = loadOnboardingDraft({
+      getItem: (key) =>
+        key === 'dori:onboarding:v2'
+          ? JSON.stringify({
+              draftVersion: 2,
+              step: 4,
+              confirmedQueueIds: { ACC: 41 },
+              selectedTierIds: { '41': [2] },
+            })
+          : null,
+    });
+    expect(restored.draftVersion).toBe(3);
+    expect(restored.selectedTierIds).toEqual({ '41': [2] });
+    expect(restored.tierConfigurations).toEqual({});
   });
   it('removes a saved draft without deleting any server resource', () => {
     const removedKeys: string[] = [];
@@ -53,6 +69,6 @@ describe('onboarding recovery', () => {
         removedKeys.push(key);
       },
     });
-    expect(removedKeys).toEqual(['dori:onboarding:v2', 'dori:onboarding:v1']);
+    expect(removedKeys).toEqual(['dori:onboarding:v3', 'dori:onboarding:v2', 'dori:onboarding:v1']);
   });
 });

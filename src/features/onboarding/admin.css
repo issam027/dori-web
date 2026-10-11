@@ -414,3 +414,124 @@ table td small {
     grid-template-columns: 1fr;
   }
 }
+
+.tier-config-card {
+  display: grid;
+  align-content: start;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.tier-config-card.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.tier-choice-toggle {
+  display: grid;
+  width: 100%;
+  min-height: 112px;
+  align-content: start;
+  gap: 12px;
+  border: 0;
+  border-radius: 0;
+  padding: 16px;
+  background: transparent;
+}
+
+.tier-choice-toggle > span:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.tier-choice-toggle strong {
+  color: var(--color-ink);
+  font-size: 1rem;
+}
+
+.tier-choice-toggle small {
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
+.tier-inline-config {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--color-accent) 24%, var(--color-line));
+  background: color-mix(in srgb, var(--color-primary-soft) 52%, var(--color-surface));
+}
+
+.tier-config-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, 0.7fr);
+  gap: 12px;
+}
+
+.tier-config-grid label,
+.tier-threshold-field {
+  display: grid;
+  gap: 6px;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.tier-default-option,
+.tier-options-fieldset > label:not(.tier-threshold-field) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+.tier-default-option input,
+.tier-options-fieldset input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+}
+
+.tier-default-option span {
+  display: grid;
+  gap: 2px;
+}
+
+.tier-default-option small {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.tier-options-fieldset {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 13px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.tier-options-fieldset legend {
+  padding-inline: 5px;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.tier-options-fieldset .is-disabled {
+  color: var(--color-muted);
+  opacity: 0.62;
+}
+
+@media (max-width: 560px) {
+  .tier-config-grid {
+    grid-template-columns: 1fr;
+  }
+}

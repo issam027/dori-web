@@ -5,6 +5,7 @@ import {
   associateTier,
   createQueueForSite,
   createSite,
+  createTierRule,
   deleteSite,
   findTiers,
   removeQueue,
@@ -57,10 +58,8 @@ export function OnboardingWizard() {
     queryFn: () => findTiers({ page: 1, pageSize: 100 }),
     enabled: draft.step === 4,
   });
-  const fixed = (tiers.data?.data.items ?? []).filter((tier) => {
-    const identity = `${tier.tierCode} ${tier.tierName}`.toUpperCase();
-    return ['GRATUIT', 'FREE', 'STANDARD', 'PREMIUM'].some((name) => identity.includes(name));
-  });
+  const fixed = (tiers.data?.data.items ?? []).filter((tier) => tier.isActive);
+
   const save = (next: OnboardingDraft) => {
     setState(next);
     saveOnboardingDraft(next);
@@ -139,13 +138,36 @@ export function OnboardingWizard() {
           );
           if (selected.length === 0)
             throw new Error('Sélectionnez au moins un niveau pour chaque file.');
-          for (const [index, tier] of selected.entries())
+          for (const [index, tier] of selected.entries()) {
+            const configuration = draft.tierConfigurations[String(queueId)]?.[String(tier.tierId)];
             await associateTier(queueId, {
               tierId: tier.tierId,
-              price: 0,
-              displayOrder: index + 1,
-              isDefault: index === 0,
+              price: configuration?.price ?? 0,
+              currency: configuration?.currency || null,
+              displayOrder: configuration?.displayOrder ?? index + 1,
+              isDefault: configuration?.isDefault ?? index === 0,
             });
+            if (configuration?.welcomeSms)
+              await createTierRule(queueId, tier.tierId, {
+                notificationType: 'welcome',
+                channel: 'sms',
+                includeTrackingLink: configuration.includeTrackingLink,
+              });
+            if (configuration?.welcomeEmail)
+              await createTierRule(queueId, tier.tierId, {
+                notificationType: 'welcome',
+                channel: 'email',
+                includeTrackingLink: configuration.includeTrackingLink,
+              });
+            if (configuration?.alertSms)
+              await createTierRule(queueId, tier.tierId, {
+                notificationType: 'threshold',
+                channel: 'sms',
+                thresholdType: 'position',
+                thresholdValue: configuration.alertPosition,
+                includeTrackingLink: configuration.includeTrackingLink,
+              });
+          }
           done.add(queueId);
           value = { ...value, associatedTierQueueIds: [...done] };
           save(value);
@@ -302,10 +324,7 @@ export function OnboardingWizard() {
               </button>
               <button
                 className="button button-primary"
-                disabled={
-                  busy ||
-                  !canAdvanceOnboarding(draft, fixed.length)
-                }
+                disabled={busy || !canAdvanceOnboarding(draft, fixed.length)}
                 onClick={() => void next()}
               >
                 {draft.step === 6
@@ -730,16 +749,87 @@ function TiersStep({
 }) {
   const { t: __t } = useTranslation();
   const queues = Object.entries(draft.confirmedQueueIds);
+  const defaultConfiguration = (displayOrder: number, isDefault: boolean) => ({
+    price: 0,
+    currency: '',
+    isDefault,
+    displayOrder,
+    welcomeSms: false,
+    welcomeEmail: false,
+    alertSms: false,
+    alertPosition: 3,
+    includeTrackingLink: true,
+  });
   const toggle = (queueId: number, tierId: number) => {
     const key = String(queueId);
+    const tierKey = String(tierId);
     const selected = draft.selectedTierIds[key] ?? [];
+    const removing = selected.includes(tierId);
+    const nextSelected = removing
+      ? selected.filter((current) => current !== tierId)
+      : [...selected, tierId];
+    const currentConfigurations = Object.fromEntries(
+      Object.entries(draft.tierConfigurations[key] ?? {}).filter(
+        ([configurationKey]) => !removing || configurationKey !== tierKey,
+      ),
+    );
+    if (!removing)
+      currentConfigurations[tierKey] = defaultConfiguration(
+        nextSelected.length,
+        selected.length === 0,
+      );
+
+    const hasDefault = nextSelected.some(
+      (current) => currentConfigurations[String(current)]?.isDefault,
+    );
+    const nextConfigurations = Object.fromEntries(
+      nextSelected.map((current, index) => {
+        const currentKey = String(current);
+        const configuration =
+          currentConfigurations[currentKey] ?? defaultConfiguration(index + 1, index === 0);
+        return [
+          currentKey,
+          {
+            ...configuration,
+            displayOrder: index + 1,
+            isDefault: hasDefault ? configuration.isDefault : index === 0,
+          },
+        ];
+      }),
+    );
     save({
       ...draft,
-      selectedTierIds: {
-        ...draft.selectedTierIds,
-        [key]: selected.includes(tierId)
-          ? selected.filter((current) => current !== tierId)
-          : [...selected, tierId],
+      selectedTierIds: { ...draft.selectedTierIds, [key]: nextSelected },
+      tierConfigurations: { ...draft.tierConfigurations, [key]: nextConfigurations },
+    });
+  };
+  const configure = (
+    queueId: number,
+    tierId: number,
+    patch: Partial<OnboardingDraft['tierConfigurations'][string][string]>,
+  ) => {
+    const queueKey = String(queueId);
+    const tierKey = String(tierId);
+    const selected = draft.selectedTierIds[queueKey] ?? [];
+    const currentConfigurations = { ...(draft.tierConfigurations[queueKey] ?? {}) };
+    const current =
+      currentConfigurations[tierKey] ??
+      defaultConfiguration(selected.indexOf(tierId) + 1, selected[0] === tierId);
+    if (patch.isDefault) {
+      selected.forEach((selectedTierId) => {
+        const selectedKey = String(selectedTierId);
+        const configuration =
+          currentConfigurations[selectedKey] ??
+          defaultConfiguration(selected.indexOf(selectedTierId) + 1, false);
+        currentConfigurations[selectedKey] = { ...configuration, isDefault: false };
+      });
+    }
+    currentConfigurations[tierKey] = { ...current, ...patch };
+    save({
+      ...draft,
+      tierConfigurations: {
+        ...draft.tierConfigurations,
+        [queueKey]: currentConfigurations,
       },
     });
   };
@@ -760,48 +850,183 @@ function TiersStep({
         </p>
       ) : null}
       {queues.map(([queueCode, queueId]) => {
-        const selected = draft.selectedTierIds[String(queueId)] ?? [];
+        const queueKey = String(queueId);
+        const selected = draft.selectedTierIds[queueKey] ?? [];
         return (
           <div className="tier-queue-section" key={queueId}>
             <div className="card-heading">
               <div>
                 <h3>{queueCode}</h3>
-                <p>
-                  {selected.length}{' '}
-                  {__t('ui.onboarding.onboarding_page.niveau_x_selectionne_s_1jjwnqj')}
-                </p>
+                <p>{__t('onboarding.selectedServices', { count: selected.length })}</p>
               </div>
-              {selected.length ? (
-                <span className="status-badge status-success">
-                  {__t('ui.onboarding.onboarding_page.configuration_prete_zm42va')}
-                </span>
-              ) : (
-                <span className="status-badge status-warning">
-                  {__t('ui.onboarding.onboarding_page.selection_requise_10mlh1n')}
-                </span>
-              )}
+              <span
+                className={`status-badge ${selected.length ? 'status-success' : 'status-warning'}`}
+              >
+                {selected.length
+                  ? __t('ui.onboarding.onboarding_page.configuration_prete_zm42va')
+                  : __t('ui.onboarding.onboarding_page.selection_requise_10mlh1n')}
+              </span>
             </div>
             <div className="tier-card-grid">
               {fixed.map((tier) => {
                 const isSelected = selected.includes(tier.tierId);
+                const configuration =
+                  draft.tierConfigurations[queueKey]?.[String(tier.tierId)] ??
+                  defaultConfiguration(
+                    selected.indexOf(tier.tierId) + 1,
+                    selected[0] === tier.tierId,
+                  );
+                const notificationsEnabled =
+                  configuration.welcomeSms || configuration.welcomeEmail || configuration.alertSms;
                 return (
-                  <button
-                    type="button"
-                    className={`station tier-choice ${isSelected ? 'selected' : ''}`}
-                    aria-pressed={isSelected}
+                  <article
+                    className={`station tier-config-card ${isSelected ? 'selected' : ''}`}
                     key={tier.tierId}
-                    onClick={() => {
-                      toggle(queueId, tier.tierId);
-                    }}
                   >
-                    <span className={`status-badge ${isSelected ? 'status-success' : ''}`}>
-                      {isSelected
-                        ? __t('ui.expression.onboarding.onboarding_page.selectionne_vsjazw')
-                        : __t('ui.expression.onboarding.onboarding_page.selectionner_xccxvi')}
-                    </span>
-                    <h3>{tier.tierName}</h3>
-                    <p>{tier.description || tier.tierCode}</p>
-                  </button>
+                    <button
+                      type="button"
+                      className="tier-choice tier-choice-toggle"
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        toggle(queueId, tier.tierId);
+                      }}
+                    >
+                      <span className={`status-badge ${isSelected ? 'status-success' : ''}`}>
+                        {isSelected
+                          ? __t('onboarding.serviceEnabled')
+                          : __t('onboarding.enableService')}
+                      </span>
+                      <span>
+                        <strong>{tier.tierName}</strong>
+                        <small>{tier.description || tier.tierCode}</small>
+                      </span>
+                    </button>
+                    {isSelected ? (
+                      <div className="tier-inline-config">
+                        <div className="tier-config-grid">
+                          <label>
+                            <span>{__t('onboarding.servicePrice')}</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={configuration.price}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, {
+                                  price: Math.max(0, Number(event.target.value) || 0),
+                                });
+                              }}
+                            />
+                          </label>
+                          <label>
+                            <span>{__t('onboarding.serviceCurrency')}</span>
+                            <select
+                              value={configuration.currency}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, { currency: event.target.value });
+                              }}
+                            >
+                              <option value="">
+                                {__t('onboarding.inheritedCurrency', {
+                                  currency: draft.site.defaultCurrency,
+                                })}
+                              </option>
+                              {[draft.site.defaultCurrency, 'TND', 'EUR', 'USD']
+                                .filter(
+                                  (currency, index, values) =>
+                                    currency && values.indexOf(currency) === index,
+                                )
+                                .map((currency) => (
+                                  <option value={currency} key={currency}>
+                                    {currency}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        </div>
+                        <label className="tier-default-option">
+                          <input
+                            type="radio"
+                            name={`default-tier-${String(queueId)}`}
+                            checked={configuration.isDefault}
+                            onChange={() => {
+                              configure(queueId, tier.tierId, { isDefault: true });
+                            }}
+                          />
+                          <span>
+                            <strong>{__t('onboarding.defaultService')}</strong>
+                            <small>{__t('onboarding.defaultServiceHint')}</small>
+                          </span>
+                        </label>
+                        <fieldset className="tier-options-fieldset">
+                          <legend>{__t('onboarding.serviceOptions')}</legend>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={configuration.welcomeSms}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, {
+                                  welcomeSms: event.target.checked,
+                                });
+                              }}
+                            />
+                            <span>{__t('onboarding.welcomeSms')}</span>
+                          </label>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={configuration.welcomeEmail}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, {
+                                  welcomeEmail: event.target.checked,
+                                });
+                              }}
+                            />
+                            <span>{__t('onboarding.welcomeEmail')}</span>
+                          </label>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={configuration.alertSms}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, { alertSms: event.target.checked });
+                              }}
+                            />
+                            <span>{__t('onboarding.approachSms')}</span>
+                          </label>
+                          {configuration.alertSms ? (
+                            <label className="tier-threshold-field">
+                              <span>{__t('onboarding.alertPosition')}</span>
+                              <input
+                                type="number"
+                                min="1"
+                                max="99"
+                                value={configuration.alertPosition}
+                                onChange={(event) => {
+                                  configure(queueId, tier.tierId, {
+                                    alertPosition: Math.max(1, Number(event.target.value) || 1),
+                                  });
+                                }}
+                              />
+                            </label>
+                          ) : null}
+                          <label className={!notificationsEnabled ? 'is-disabled' : ''}>
+                            <input
+                              type="checkbox"
+                              checked={configuration.includeTrackingLink}
+                              disabled={!notificationsEnabled}
+                              onChange={(event) => {
+                                configure(queueId, tier.tierId, {
+                                  includeTrackingLink: event.target.checked,
+                                });
+                              }}
+                            />
+                            <span>{__t('onboarding.trackingLink')}</span>
+                          </label>
+                        </fieldset>
+                      </div>
+                    ) : null}
+                  </article>
                 );
               })}
             </div>
