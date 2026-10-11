@@ -63,7 +63,6 @@ const OnboardingPage = lazyNamed(
 const SettingsPage = lazyNamed(() => import('@/features/onboarding/SettingsPage'), 'SettingsPage');
 
 function Page({ title }: { title: string }) {
-  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const brandName = useBrandStore((state) => state.name);
   const logoUrl = useBrandStore((state) => state.logoUrl);
@@ -74,7 +73,7 @@ function Page({ title }: { title: string }) {
           <img className="brand-logo" src={logoUrl} alt="" />
         ) : (
           <span className="brand-mark" aria-hidden="true">
-            {__t('ui.shell.app.d_1hkaexf')}
+            {t('ui.shell.app.d_1hkaexf')}
           </span>
         )}
         <div>
@@ -142,6 +141,47 @@ function LegalRoute() {
   );
 }
 
+type RouteView = {
+  component: ComponentType;
+  frame: 'shell' | 'public' | 'experience';
+  experienceMode?: 'kiosk' | 'display';
+};
+
+const protectedRouteViews: Record<string, RouteView> = {
+  '/device-mode': { component: DeviceModePage, frame: 'public' },
+  '/portfolio': { component: PortfolioPage, frame: 'shell' },
+  '/desk': { component: DeskPage, frame: 'shell' },
+  '/my-queues': { component: MyQueuesPage, frame: 'shell' },
+  '/appointments': { component: AppointmentsPage, frame: 'shell' },
+  '/control-room': { component: ControlRoomPage, frame: 'shell' },
+  '/reports': { component: ReportsPage, frame: 'shell' },
+  '/notifications': { component: NotificationsPage, frame: 'shell' },
+  '/kiosk': { component: KioskPage, frame: 'experience', experienceMode: 'kiosk' },
+  '/display': { component: DisplayPage, frame: 'experience', experienceMode: 'display' },
+  '/onboarding': { component: OnboardingPage, frame: 'shell' },
+  '/settings/*': { component: SettingsPage, frame: 'shell' },
+  '/health': { component: HealthPage, frame: 'shell' },
+};
+
+function ConfiguredProtectedPage({ path }: { path: string }) {
+  const view = protectedRouteViews[path];
+  if (!view) return <ProtectedPlaceholder name={path.replaceAll('/', '')} />;
+  const Component = view.component;
+  if (view.frame === 'experience' && view.experienceMode)
+    return <ExperienceRoute mode={view.experienceMode} />;
+  if (view.frame === 'public')
+    return (
+      <PublicExperienceLayout mode="public">
+        <Component />
+      </PublicExperienceLayout>
+    );
+  return (
+    <AppShell>
+      <Component />
+    </AppShell>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -186,62 +226,7 @@ function AppRoutes() {
             />
           }
         >
-          <Route
-            path={route.path}
-            element={
-              route.path === '/desk' ? (
-                <AppShell>
-                  <DeskPage />
-                </AppShell>
-              ) : route.path === '/my-queues' ? (
-                <AppShell>
-                  <MyQueuesPage />
-                </AppShell>
-              ) : route.path === '/appointments' ? (
-                <AppShell>
-                  <AppointmentsPage />
-                </AppShell>
-              ) : route.path === '/portfolio' ? (
-                <AppShell>
-                  <PortfolioPage />
-                </AppShell>
-              ) : route.path === '/control-room' ? (
-                <AppShell>
-                  <ControlRoomPage />
-                </AppShell>
-              ) : route.path === '/reports' ? (
-                <AppShell>
-                  <ReportsPage />
-                </AppShell>
-              ) : route.path === '/notifications' ? (
-                <AppShell>
-                  <NotificationsPage />
-                </AppShell>
-              ) : route.path === '/health' ? (
-                <AppShell>
-                  <HealthPage />
-                </AppShell>
-              ) : route.path === '/onboarding' ? (
-                <AppShell>
-                  <OnboardingPage />
-                </AppShell>
-              ) : route.path.startsWith('/settings') ? (
-                <AppShell>
-                  <SettingsPage />
-                </AppShell>
-              ) : route.path === '/device-mode' ? (
-                <PublicExperienceLayout mode="public">
-                  <DeviceModePage />
-                </PublicExperienceLayout>
-              ) : route.path === '/kiosk' || route.path === '/display' ? (
-                <ExperienceRoute mode={route.path === '/kiosk' ? 'kiosk' : 'display'} />
-              ) : (
-                <AppShell>
-                  <ProtectedPlaceholder name={route.path.slice(1)} />
-                </AppShell>
-              )
-            }
-          />
+          <Route path={route.path} element={<ConfiguredProtectedPage path={route.path} />} />
         </Route>
       ))}
       <Route

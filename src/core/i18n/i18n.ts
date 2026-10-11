@@ -27,6 +27,7 @@ const fallbackResources = {
       'bootstrap.description':
         'Les modules métier sont ajoutés dans l’ordre défini par le handover.',
       'common.loading': 'Chargement…',
+      'phone.countryCode': 'Indicatif pays',
       'loading.slogan': 'Les files sont sous contrôle. Vous pouvez souffler.',
       'desk.activeSessionDescription':
         'Votre guichet est actif. Vous pouvez appeler la prochaine personne dès que vous êtes prêt.',
@@ -303,6 +304,7 @@ const fallbackResources = {
       'nav.onboarding': 'Créer un site',
       'nav.settings': 'Paramètres du site',
       'nav.health': 'État de la plateforme',
+      'health.applicationVersion': 'Version {{version}}',
       'nav.legal': 'Mentions légales · Confidentialité',
       'pagination.label': 'Pagination',
       'pagination.previous': 'Précédent',
@@ -377,6 +379,7 @@ const fallbackResources = {
       'bootstrap.title': 'Application foundation initialized',
       'bootstrap.description': 'Business modules are added in the order defined by the handover.',
       'common.loading': 'Loading…',
+      'phone.countryCode': 'Country calling code',
       'loading.slogan': 'Queues under control. You can breathe again.',
       'desk.activeSessionDescription':
         'Your desk is active. You can call the next person whenever you are ready.',
@@ -647,6 +650,7 @@ const fallbackResources = {
       'nav.onboarding': 'New site',
       'nav.settings': 'Settings',
       'nav.health': 'Platform health',
+      'health.applicationVersion': 'Version {{version}}',
       'nav.legal': 'Legal · Privacy',
       'pagination.label': 'Pagination',
       'pagination.previous': 'Previous',
@@ -720,6 +724,7 @@ const fallbackResources = {
       'bootstrap.title': 'تم إعداد أساس التطبيق',
       'bootstrap.description': 'ستُضاف وحدات الأعمال حسب الترتيب المحدد في خطة التسليم.',
       'common.loading': 'جارٍ التحميل…',
+      'phone.countryCode': 'رمز الاتصال الدولي',
       'loading.slogan': 'قوائم الانتظار تحت السيطرة. يمكنك أن تتنفس الآن.',
       'desk.activeSessionDescription': 'شباكك نشط. يمكنك استدعاء الشخص التالي عندما تكون مستعدًا.',
       'common.retry': 'إعادة المحاولة',
@@ -787,6 +792,7 @@ const fallbackResources = {
       'nav.onboarding': 'موقع جديد',
       'nav.settings': 'الإعدادات',
       'nav.health': 'صحة المنصة',
+      'health.applicationVersion': 'الإصدار {{version}}',
       'nav.legal': 'الشروط القانونية · الخصوصية',
       'pagination.label': 'ترقيم الصفحات',
       'pagination.previous': 'السابق',

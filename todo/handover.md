@@ -360,34 +360,34 @@ Critère d'acceptation : aucune étape kiosque ne dépend de variables implicite
 
 ### D4 — Refactorer `DeskPage`
 
-- [ ] Extraire le bandeau accueil rapide.
-- [ ] Extraire les cartes de file.
-- [ ] Extraire la prochaine personne éligible.
-- [ ] Extraire la prise en charge courante.
-- [ ] Extraire la liste discrète des passages terminés.
-- [ ] Extraire les actions d'impression.
-- [ ] Réduire les callbacks imbriqués et centraliser les commandes métier.
-- [ ] Conserver tailles de cartes homogènes et priorité visuelle du guichet actif.
+- [x] Extraire le bandeau accueil rapide.
+- [x] Extraire les cartes de file.
+- [x] Extraire la prochaine personne éligible.
+- [x] Extraire la prise en charge courante.
+- [x] Extraire la liste discrète des passages terminés.
+- [x] Extraire les actions d'impression.
+- [x] Réduire les callbacks imbriqués et centraliser les commandes métier.
+- [x] Conserver tailles de cartes homogènes et priorité visuelle du guichet actif.
 
 Critère d'acceptation : les blocs du cockpit peuvent évoluer sans modifier une page monolithique.
 
 ### D5 — Refactorer `NotificationsPage`
 
-- [ ] Extraire le wizard « nouvel envoi ».
-- [ ] Séparer choix d'audience, contenu, aperçu et confirmation.
-- [ ] Extraire la recherche de personnes et inscriptions.
-- [ ] Centraliser la validation des canaux et destinataires.
-- [ ] Tester navigation, retour arrière, erreurs et résumé final.
+- [x] Extraire le wizard « nouvel envoi ».
+- [x] Séparer choix d'audience, contenu, aperçu et confirmation.
+- [x] Extraire la recherche de personnes et inscriptions.
+- [x] Centraliser la validation des canaux et destinataires.
+- [x] Tester navigation, retour arrière, erreurs et résumé final.
 
 Critère d'acceptation : la création d'une notification suit une machine d'états claire et testable.
 
 ### D6 — Simplifier le routage applicatif
 
-- [ ] Remplacer la grande chaîne conditionnelle de `App.tsx` par une configuration associant chemin, composant et layout.
-- [ ] Conserver le lazy loading par route.
-- [ ] Centraliser les règles « public », « shell humain », « preview expérience » et « appareil technique ».
-- [ ] Supprimer le double `useTranslation()` dans `Page`.
-- [ ] Tester 404, forbidden, login, legal et toutes les routes protégées.
+- [x] Remplacer la grande chaîne conditionnelle de `App.tsx` par une configuration associant chemin, composant et layout.
+- [x] Conserver le lazy loading par route.
+- [x] Centraliser les règles « public », « shell humain », « preview expérience » et « appareil technique ».
+- [x] Supprimer le double `useTranslation()` dans `Page`.
+- [x] Tester 404, forbidden, login, legal et toutes les routes protégées.
 
 Critère d'acceptation : l'ajout d'une route ne demande pas de modifier plusieurs conditions imbriquées.
 
@@ -885,6 +885,16 @@ Ajouter une entrée datée après chaque lot terminé.
 - Résultats : typecheck et lint réussis ; tests ciblés 11/11 ; suite Vitest complète 38/38 fichiers et 98/98 tests.
 - Prochaine tâche recommandée : D4, décomposition du cockpit guichet.
 
+### 2026-10-11 — D4 à D6, cockpit, notifications et routage
+
+- Tâches cochées : D4, D5 et D6 complets.
+- Cockpit : `DeskPage` coordonne les données et commandes ; `DeskCards` porte les prochaines personnes, la prise en charge et les cartes de file ; `DeskPassages` possède le récapitulatif et tout le cycle d'impression.
+- Commandes : appel, occupation, libération et clôture sont centralisés dans des fonctions métier courtes, avec une seule gestion pending/erreur/rafraîchissement.
+- Notifications : `ManualNotificationWizard` est autonome ; audience, passage et contenu/aperçu sont séparés ; la pagination recherche cinq personnes par page ; la validation canal/destinataire est pure et testée.
+- Routage : les composants protégés sont associés à un frame explicite (`shell`, `public`, `experience`) dans un registre ; la chaîne conditionnelle a été supprimée et le lazy loading conservé.
+- Tests : cartes cockpit, commandes/persistance, machine du wizard, validation destinataire, login, legal, 404, forbidden et routes protégées.
+- Prochaine tâche recommandée : E1, cartographie et modularisation du CSS.
+
 Modèle :
 
 ```md
@@ -1108,3 +1118,13 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv3155jj_3fvm0c" time="2026-10-10T23:33:01.135Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv31i0iu_kxe1lw" time="2026-10-10T23:43:01.158Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv3kjptj_c8e9vo" time="2026-10-11T08:36:13.303Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv3kwks3_g1b348" time="2026-10-11T08:46:13.299Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv3l9fs9_6hin3r" time="2026-10-11T08:56:13.353Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv3lmapw_fsfig7" time="2026-10-11T09:06:13.316Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv3lz5ow_c5pjki" time="2026-10-11T09:16:13.328Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

@@ -507,7 +507,7 @@ export const generatedUiFallbackFr: Record<string, string> = {
     'Comment préparer son passage ?',
   'ui.queue-operations.quick_registration.continuer_vers_le_ticket_ydsvdz':
     'Continuer vers le ticket →',
-  'ui.queue-operations.quick_registration.creer_un_ticket_2iit6s': '+ Créer un ticket',
+  'ui.queue-operations.quick_registration.creer_un_ticket_2iit6s': 'Créer un ticket',
   'ui.queue-operations.quick_registration.date_du_rendez_vous_160bcww': 'Date du rendez-vous',
   'ui.queue-operations.quick_registration.file_bygjtv': 'File',
   'ui.queue-operations.quick_registration.forfait_ke31ak': 'Forfait',

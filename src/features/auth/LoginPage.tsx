@@ -24,6 +24,11 @@ import { getRememberedUsername, login } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
 import { FormField } from '@/design-system/components/FormField';
+import {
+  loginShowcaseKey,
+  loginShowcaseSlides,
+  type LoginShowcaseSlide,
+} from '@/core/content/login-showcase';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -57,49 +62,13 @@ const demoProfiles = [
 ] as const;
 const demoPassword = 'Root@123456';
 
-const showcaseSlides = [
-  {
-    icon: ListChecks,
-    eyebrowKey: 'login.showcase.queues.eyebrow',
-    titleKey: 'login.showcase.queues.title',
-    descriptionKey: 'login.showcase.queues.description',
-    metricKey: 'login.showcase.queues.metric',
-  },
-  {
-    icon: CalendarDays,
-    eyebrowKey: 'login.showcase.appointments.eyebrow',
-    titleKey: 'login.showcase.appointments.title',
-    descriptionKey: 'login.showcase.appointments.description',
-    metricKey: 'login.showcase.appointments.metric',
-  },
-  {
-    icon: ChartNoAxesCombined,
-    eyebrowKey: 'login.showcase.supervision.eyebrow',
-    titleKey: 'login.showcase.supervision.title',
-    descriptionKey: 'login.showcase.supervision.description',
-    metricKey: 'login.showcase.supervision.metric',
-  },
-  {
-    icon: BellRing,
-    eyebrowKey: 'login.showcase.tracking.eyebrow',
-    titleKey: 'login.showcase.tracking.title',
-    descriptionKey: 'login.showcase.tracking.description',
-    metricKey: 'login.showcase.tracking.metric',
-  },
-  {
-    icon: Settings2,
-    eyebrowKey: 'login.showcase.management.eyebrow',
-    titleKey: 'login.showcase.management.title',
-    descriptionKey: 'login.showcase.management.description',
-    metricKey: 'login.showcase.management.metric',
-  },
-] as const satisfies readonly {
-  icon: LucideIcon;
-  eyebrowKey: string;
-  titleKey: string;
-  descriptionKey: string;
-  metricKey: string;
-}[];
+const showcaseIcons = {
+  queues: ListChecks,
+  appointments: CalendarDays,
+  supervision: ChartNoAxesCombined,
+  tracking: BellRing,
+  management: Settings2,
+} satisfies Record<LoginShowcaseSlide, LucideIcon>;
 
 function LoginShowcase() {
   const { t } = useTranslation();
@@ -109,15 +78,15 @@ function LoginShowcase() {
   useEffect(() => {
     if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % showcaseSlides.length);
+      setIndex((current) => (current + 1) % loginShowcaseSlides.length);
     }, 5500);
     return () => {
       window.clearInterval(timer);
     };
   }, [paused]);
 
-  const slide = showcaseSlides[index] ?? showcaseSlides[0];
-  const Icon = slide.icon;
+  const slide = loginShowcaseSlides[index] ?? loginShowcaseSlides[0];
+  const Icon = showcaseIcons[slide];
   return (
     <aside
       className="login-showcase"
@@ -154,22 +123,22 @@ function LoginShowcase() {
       </div>
       <div
         className="login-showcase-slide"
-        key={slide.titleKey}
+        key={slide}
         aria-live={paused ? 'polite' : 'off'}
         aria-atomic="true"
       >
         <span className="login-showcase-icon" aria-hidden="true">
           <Icon />
         </span>
-        <p className="eyebrow">{t(slide.eyebrowKey)}</p>
-        <h2>{t(slide.titleKey)}</h2>
-        <p>{t(slide.descriptionKey)}</p>
-        <strong className="login-showcase-metric">{t(slide.metricKey)}</strong>
+        <p className="eyebrow">{t(loginShowcaseKey(slide, 'eyebrow'))}</p>
+        <h2>{t(loginShowcaseKey(slide, 'title'))}</h2>
+        <p>{t(loginShowcaseKey(slide, 'description'))}</p>
+        <strong className="login-showcase-metric">{t(loginShowcaseKey(slide, 'metric'))}</strong>
       </div>
       <div className="login-showcase-dots" role="group" aria-label={t('login.showcase.navigation')}>
-        {showcaseSlides.map((item, itemIndex) => (
+        {loginShowcaseSlides.map((item, itemIndex) => (
           <button
-            key={item.titleKey}
+            key={item}
             type="button"
             aria-label={t('login.showcase.goto', { number: itemIndex + 1 })}
             aria-pressed={itemIndex === index}

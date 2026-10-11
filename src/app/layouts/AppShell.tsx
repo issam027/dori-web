@@ -10,6 +10,7 @@ import { Topbar } from './Topbar';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { AppErrorBoundary } from '@/app/AppErrorBoundary';
 import { useActiveSite, useSites } from '@/features/portfolio/hooks/useSites';
+import { routeRequiresActiveSite } from './site-context-rules';
 
 const sidebarPreferenceKey = 'dori.sidebar.collapsed';
 
@@ -68,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       mobileQuery.removeEventListener('change', synchronize);
     };
   }, []);
-  const requiresSite = !['/portfolio', '/profile', '/change-password'].includes(location.pathname);
+  const requiresSite = routeRequiresActiveSite(location.pathname);
   const effectiveSidebarCollapsed = mobileViewport ? false : mediumViewport || sidebarCollapsed;
 
   return (

@@ -8,6 +8,7 @@ import type {
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
+import { InternationalPhoneInput } from '@/design-system/components/InternationalPhoneInput';
 import { TrackingQr } from '../../TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from '../../useKioskWatchdog';
 import { presentError } from '@/core/notifications/error-presentation';
@@ -45,8 +46,7 @@ export function KioskWizard() {
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
-  const [phoneCountry, setPhoneCountry] = useState('+33');
-  const [phoneNational, setPhoneNational] = useState('');
+  const [phone, setPhone] = useState('');
   const [ticket, setTicket] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [found, setFound] = useState<RegistrationResponseDto>();
@@ -58,8 +58,7 @@ export function KioskWizard() {
     setLastName('');
     setFirstName('');
     setEmail('');
-    setPhoneCountry('+33');
-    setPhoneNational('');
+    setPhone('');
     setTicket('');
     setScheduledTime('');
     setFound(undefined);
@@ -79,7 +78,6 @@ export function KioskWizard() {
     queueId,
     validScope,
   );
-  const phone = `${phoneCountry}${phoneNational.replace(/\D/g, '').replace(/^0+/, '')}`;
   const phoneValid = /^\+[1-9]\d{6,14}$/.test(phone);
   const emailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const { register, lookup, checkIn } = useKioskRegistration({
@@ -339,31 +337,12 @@ export function KioskWizard() {
                 <label>
                   {__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
                   <span className="required-mark">*</span>
-                  <div className="kiosk-phone-input">
-                    <select
-                      aria-label={__t('ui.public-experiences.kiosk_page.indicatif_pays_1krknxf')}
-                      value={phoneCountry}
-                      onChange={(event) => {
-                        setPhoneCountry(event.target.value);
-                      }}
-                    >
-                      <option value="+33">🇫🇷 +33</option>
-                      <option value="+216">🇹🇳 +216</option>
-                      <option value="+32">🇧🇪 +32</option>
-                      <option value="+41">🇨🇭 +41</option>
-                      <option value="+212">🇲🇦 +212</option>
-                      <option value="+213">🇩🇿 +213</option>
-                    </select>
-                    <input
-                      autoComplete="tel-national"
-                      inputMode="numeric"
-                      placeholder="6 12 34 56 78"
-                      value={phoneNational}
-                      onChange={(event) => {
-                        setPhoneNational(event.target.value.replace(/[^0-9 ]/g, ''));
-                      }}
-                    />
-                  </div>
+                  <InternationalPhoneInput
+                    value={phone}
+                    onChange={setPhone}
+                    countryLabel={__t('ui.public-experiences.kiosk_page.indicatif_pays_1krknxf')}
+                    phoneLabel={__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                  />
                   <small>
                     {phoneValid
                       ? __t(

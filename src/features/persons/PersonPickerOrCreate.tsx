@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { PersonIdentityDto, PersonResponseDto } from '@/api/generated/models';
 import { EntityPicker } from '@/design-system/components/EntityPicker';
-import { FormField, PhoneInput } from '@/design-system/components/FormField';
+import { FormField } from '@/design-system/components/FormField';
+import { InternationalPhoneInput } from '@/design-system/components/InternationalPhoneInput';
 import { Pagination } from '@/design-system/components/Pagination';
 import { isValidPersonIdentity } from './person-validation';
 import { usePersonsSearch } from './hooks/usePersons';
@@ -149,10 +150,12 @@ export function PersonPickerOrCreate({
             label={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
             required
           >
-            <PhoneInput
+            <InternationalPhoneInput
               value={draft.phoneNumber}
-              onChange={(e) => {
-                setDraft({ ...draft, phoneNumber: e.target.value });
+              countryLabel={__t('phone.countryCode')}
+              phoneLabel={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
+              onChange={(phoneNumber) => {
+                setDraft({ ...draft, phoneNumber });
               }}
             />
           </FormField>

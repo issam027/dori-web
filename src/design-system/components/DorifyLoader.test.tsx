@@ -1,9 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DorifyLoader } from './DorifyLoader';
 
 describe('DorifyLoader', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('affiche la marque et le slogan dans un statut accessible', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
     render(<DorifyLoader />);
 
     expect(screen.getByRole('status')).toHaveTextContent('DORIFY');

@@ -2643,6 +2643,12 @@ select:focus-visible {
     background-color 0.15s ease,
     box-shadow 0.15s ease;
 }
+.locale-switcher-option svg {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 14%);
+}
 .locale-switcher-option:hover {
   border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-line));
   background: var(--color-primary-soft);
@@ -2655,6 +2661,75 @@ select:focus-visible {
 .locale-switcher-option:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   outline-offset: 2px;
+}
+.international-phone-input {
+  display: grid;
+  grid-template-columns: minmax(98px, auto) auto minmax(110px, 1fr);
+  align-items: center;
+  min-height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.international-phone-input:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+.phone-country-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  min-width: 0;
+  border-inline-end: 1px solid var(--color-line);
+}
+.phone-country-control .country-flag {
+  position: absolute;
+  inset-inline-start: 10px;
+  z-index: 1;
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 16%);
+  pointer-events: none;
+}
+.phone-country-control select {
+  width: 100%;
+  height: 100%;
+  min-height: 42px;
+  border: 0;
+  border-radius: 0;
+  padding-inline: 42px 24px;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.phone-dial-code {
+  padding-inline: 12px 4px;
+  color: var(--color-ink-muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.international-phone-input > input {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  border-radius: 0;
+  padding-inline-start: 6px;
+  background: transparent;
+  box-shadow: none;
+}
+.international-phone-input > input:focus,
+.phone-country-control select:focus {
+  outline: 0;
+  box-shadow: none;
+}
+.international-phone-input:has(:disabled) {
+  opacity: 0.65;
 }
 .person-picker {
   min-width: 0;
@@ -3634,14 +3709,14 @@ select:focus-visible {
   color: #627d98;
   font-weight: 500;
 }
-.kiosk-phone-input {
-  display: grid;
-  grid-template-columns: minmax(8rem, 0.7fr) minmax(0, 1.5fr);
-  gap: 0.6rem;
+.kiosk-screen .international-phone-input {
+  background: #fff;
+  border-color: #bcccdc;
+  color: #102a43;
 }
-.kiosk-phone-input select,
-.kiosk-phone-input input {
-  width: 100%;
+.kiosk-screen .international-phone-input select,
+.kiosk-screen .international-phone-input input {
+  color: #102a43;
 }
 .kiosk-tier-tiles {
   width: min(620px, 100%);

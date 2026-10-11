@@ -4,6 +4,7 @@ import { Card, MetricCard } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { APP_VERSION_LABEL } from '@/core/config/app-version';
 import { useHealth } from './hooks/useHealth';
 
 const bytes = (value: number) => `${(value / 1024 / 1024).toFixed(1)} MiB`;
@@ -29,11 +30,16 @@ export function HealthPage() {
           'ui.health.health_page.etat_declare_par_l_api_actualise_automatiquement_6yt1yk',
         )}
         actions={
-          <StatusBadge tone={healthy ? 'success' : 'danger'}>
-            {healthy
-              ? __t('ui.expression.health.health_page.operationnelle_up74kh')
-              : __t('ui.expression.health.health_page.degradee_12ojy1n')}
-          </StatusBadge>
+          <div className="cluster">
+            <StatusBadge>
+              {__t('health.applicationVersion', { version: APP_VERSION_LABEL })}
+            </StatusBadge>
+            <StatusBadge tone={healthy ? 'success' : 'danger'}>
+              {healthy
+                ? __t('ui.expression.health.health_page.operationnelle_up74kh')
+                : __t('ui.expression.health.health_page.degradee_12ojy1n')}
+            </StatusBadge>
+          </div>
         }
       />
       <div className="metric-grid">
