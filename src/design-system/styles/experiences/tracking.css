@@ -1,0 +1,70 @@
+/* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
+ * Keep rules in their owning family; the import order is defined in index.css. */
+.tracking-screen {
+  min-height: 70dvh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  text-align: center;
+}
+.tracking-screen header {
+  display: grid;
+  gap: var(--space-2);
+}
+.tracking-screen header > strong {
+  font-size: clamp(2.5rem, 14vw, 5rem);
+  color: var(--color-primary);
+}
+.experience-preview-tracking .tracking-screen {
+  width: min(100%, 26rem);
+  min-height: 42rem;
+  border: 10px solid #102a43;
+  border-radius: 2.5rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+.tracking-screen {
+  position: relative;
+  width: min(355px, calc(100vw - 2rem));
+  min-height: 625px;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.5rem 1.2rem;
+  border-radius: 29px;
+  background: linear-gradient(#f8fffe, #edf7f6);
+  color: #243b53;
+}
+.tracking-preview-layout .tracking-screen {
+  border: 11px solid #0f2536;
+  border-radius: 38px;
+  box-shadow: 0 25px 48px rgb(16 42 67 / 25%);
+}
+.tracking-screen header {
+  width: 100%;
+  gap: 0.35rem;
+}
+.tracking-screen header > span:not(.tracking-brand) {
+  color: #627d98;
+}
+.tracking-screen header > strong {
+  font-size: 2.3rem;
+  color: #102a43;
+}
+.tracking-screen.is-called {
+  color: #fff;
+  background: linear-gradient(155deg, #087276, #102a43);
+}
+.tracking-screen.is-called .tracking-brand,
+.tracking-screen.is-called header > strong,
+.tracking-screen.is-called .tracking-status {
+  color: #fff;
+}
+.tracking-screen.is-called .tracking-guidance {
+  border-color: rgb(255 255 255 / 20%);
+  background: rgb(255 255 255 / 12%);
+}
+.tracking-screen.is-called .tracking-guidance p {
+  color: rgb(255 255 255 / 75%);
+}

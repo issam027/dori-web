@@ -1,4 +1,4 @@
-# DORI Web — Handover de consolidation avant recette finale
+﻿# DORI Web — Handover de consolidation avant recette finale
 
 Dernière mise à jour : 2026-10-09  
 Portée : dépôt `dori-web` complet  
@@ -407,24 +407,24 @@ Critère d'acceptation : chaque bloc CSS possède une destination de module conn
 
 ### E2 — Séparer les tokens des composants
 
-- [ ] Garder dans `tokens` uniquement couleurs, espacements, typographie, rayons, ombres, transitions et thèmes.
-- [ ] Créer des feuilles dédiées aux boutons et contrôles de formulaire.
-- [ ] Créer des feuilles dédiées aux cartes, tableaux, badges et états.
-- [ ] Créer une feuille dédiée aux modales et wizards.
-- [ ] Créer des feuilles par expérience publique : kiosque, display, tracking.
-- [ ] Créer des feuilles par grande feature uniquement lorsque le style n'est pas réutilisable.
-- [ ] Importer les feuilles dans un ordre explicite et stable.
+- [x] Garder dans `tokens` uniquement couleurs, espacements, typographie, rayons, ombres, transitions et thèmes.
+- [x] Créer des feuilles dédiées aux boutons et contrôles de formulaire.
+- [x] Créer des feuilles dédiées aux cartes, tableaux, badges et états.
+- [x] Créer une feuille dédiée aux modales et wizards.
+- [x] Créer des feuilles par expérience publique : kiosque, display, tracking.
+- [x] Créer des feuilles par grande feature uniquement lorsque le style n'est pas réutilisable.
+- [x] Importer les feuilles dans un ordre explicite et stable.
 
 Critère d'acceptation : `global.css` n'est plus un fichier monolithique et les thèmes ne régressent pas.
 
 ### E3 — Consolider les composants de formulaire
 
-- [ ] Uniformiser label, marque obligatoire, aide, erreur et succès.
-- [ ] Uniformiser `input`, `select`, `textarea`, téléphone, date et recherche.
-- [ ] Vérifier placeholder, option native, autofill, disabled, readonly et erreur dans les quatre thèmes.
-- [ ] Ajouter une convention de grille deux colonnes/une colonne mobile.
-- [ ] Vérifier l'association `label`/champ et les descriptions accessibles.
-- [ ] Éviter les champs plus petits que 44 px sur surfaces tactiles.
+- [x] Uniformiser label, marque obligatoire, aide, erreur et succès.
+- [x] Uniformiser `input`, `select`, `textarea`, téléphone, date et recherche.
+- [x] Vérifier placeholder, option native, autofill, disabled, readonly et erreur dans les quatre thèmes.
+- [x] Ajouter une convention de grille deux colonnes/une colonne mobile.
+- [x] Vérifier l'association `label`/champ et les descriptions accessibles.
+- [x] Éviter les champs plus petits que 44 px sur surfaces tactiles.
 
 Critère d'acceptation : aucun formulaire métier ne recrée ses propres contrôles visuels.
 
@@ -895,6 +895,29 @@ Ajouter une entrée datée après chaque lot terminé.
 - Tests : cartes cockpit, commandes/persistance, machine du wizard, validation destinataire, login, legal, 404, forbidden et routes protégées.
 - Prochaine tâche recommandée : E1, cartographie et modularisation du CSS.
 
+### 2026-10-11 — E1, cartographie des styles
+
+- Tâches cochées : E1 complet.
+- Fichier produit : `docs/css-inventory.md`.
+- État relevé : `global.css` approche 6 000 lignes et mélange tokens, composants, shell, features, expériences publiques et impressions.
+- Cartographie : chaque famille possède désormais une destination de module explicite et un ordre d'import cible.
+- Dette identifiée : surcharges répétées kiosque/display, règles d'impression historiques, adaptations de thèmes et media queries dispersées.
+- Décisions : QR et papier conservent une palette fixe noir/blanc ; les expériences publiques consomment les tokens sans dépendre du shell privé ; les sélecteurs supposés inutilisés seront recherchés avant suppression.
+- Validation : inventaire confronté aux sélecteurs, media queries, couleurs et blocs d'impression présents dans `global.css` ; aucune règle déplacée pendant E1.
+- Risque restant : l'extraction E2 doit être mécanique par petits lots avec contrôle du CSS calculé et captures, car l'ordre de cascade porte encore plusieurs correctifs récents.
+- Prochaine tâche recommandée : E2, extraction des tokens puis des expériences publiques et impressions.
+
+### 2026-10-11 — E2 et E3, modularisation CSS et formulaires
+
+- Tâches cochées : E2 et E3 complets.
+- Architecture CSS : l’ancien `tokens/global.css` de près de 6 000 lignes est remplacé par un point d’entrée stable et 11 modules (`tokens`, base, contrôles, contenu, overlays, shell, features, kiosque, display, tracking et impression).
+- Cascade : `styles/index.css` documente l’ordre fondations → composants → layouts → features → expériences publiques → impression ; kiosque, display et tracking restent indépendants du shell privé.
+- Formulaires : `FormField` gère aide, erreur et succès, compose `aria-describedby`, positionne `aria-invalid`/`aria-required` et conserve les compositions avec contrôle imbriqué.
+- Contrôles : contrat visuel commun pour input, select, textarea, téléphone, date et recherche ; états placeholder, option native, autofill, disabled, readonly, erreur et succès basés sur les tokens des quatre thèmes.
+- Responsive : grille formulaire deux colonnes avec repli à une colonne sous 680 px ; hauteur tactile minimale de 44 px.
+- Tests : nouveau test unitaire `FormField` (3 scénarios), suite Vitest complète 47/47 fichiers et 129/129 tests, lint ciblé, typecheck et build réussis.
+- Contrôle public : le scénario Playwright QR a bien démarré et atteint son test, mais son exécution est restée bloquée jusqu’au timeout local ; il n’est pas compté comme validation réussie.
+- Prochaine tâche recommandée : E4, consolidation des modales et wizards.
 Modèle :
 
 ```md
@@ -1134,3 +1157,13 @@ Le chantier de consolidation est terminé uniquement lorsque :
 <!-- CHECKPOINT id="ckpt_mv3movmx_lbxjvv" time="2026-10-11T09:36:13.353Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mv3n1qlv_ndlq5s" time="2026-10-11T09:46:13.363Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv484dp1_2bs107" time="2026-10-11T19:36:08.533Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv48h8o8_mbwv3u" time="2026-10-11T19:46:08.552Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv48u3mu_ahpv7z" time="2026-10-11T19:56:08.550Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv496ylu_w9utn8" time="2026-10-11T20:06:08.562Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mv49jtkb_4bhuct" time="2026-10-11T20:16:08.555Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

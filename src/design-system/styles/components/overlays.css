@@ -1,0 +1,168 @@
+/* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
+ * Keep rules in their owning family; the import order is defined in index.css. */
+.appointment-wizard {
+  display: grid;
+  gap: var(--space-5);
+}
+.notification-wizard-step {
+  display: grid;
+  gap: var(--space-4);
+}
+.notification-wizard-step .wizard-track {
+  grid-template-columns: repeat(3, 1fr);
+}
+.wizard-track {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.wizard-track span {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-line);
+}
+.wizard-track span.done {
+  background: var(--color-accent);
+}
+.appointment-details-dialog {
+  display: grid;
+  gap: 1rem;
+}
+.dialog-content:has(.appointment-details-dialog) {
+  width: min(760px, calc(100vw - 32px));
+}
+.dialog-content:has(.appointment-details-dialog) .dialog-actions {
+  flex-wrap: wrap;
+  overflow: visible;
+  white-space: normal;
+}
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(5 15 25 / 60%);
+}
+.dialog-overlay[data-state='open'] {
+  animation: overlay-reveal 0.2s ease-out;
+}
+.dialog-content,
+.drawer-content,
+.command-palette {
+  position: fixed;
+  z-index: 51;
+  overflow: auto;
+  max-height: calc(100vh - 40px);
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+}
+.dialog-content {
+  inset: 50% auto auto 50%;
+  width: min(820px, calc(100vw - 32px));
+  transform: translate(-50%, -50%);
+  border-radius: 16px;
+}
+.dialog-content[data-state='open'] {
+  animation: dialog-reveal 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dialog-header,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+}
+.dialog-body {
+  padding: 0 22px 22px;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-line);
+  white-space: nowrap;
+}
+.wizard-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.wizard-progress span {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-line);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+.wizard-progress span.is-complete {
+  background: var(--color-primary);
+  transform: scaleY(1.25);
+}
+.wizard-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.wizard-step-heading > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+  font-weight: 900;
+}
+.wizard-step-heading h3,
+.wizard-step-heading p {
+  margin: 2px 0;
+}
+.wizard-step-heading p {
+  color: var(--color-text-muted);
+}
+.form-field input,
+.form-field select,
+.site-switcher select,
+.command-palette input {
+  min-height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  padding: 0 12px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.command-palette {
+  inset: 15% auto auto 50%;
+  width: min(620px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  border-radius: 16px;
+  padding: 20px;
+}
+.command-palette input {
+  width: 100%;
+  margin: 12px 0;
+}
+@media (max-width: 620px) {
+  .dialog-actions {
+    justify-content: flex-start;
+  }
+}
+.app-notification-center {
+  position: fixed;
+  z-index: 1200;
+  inset: 1rem 1rem auto auto;
+  display: grid;
+  width: min(25rem, calc(100vw - 2rem));
+  gap: 0.65rem;
+  pointer-events: none;
+}
+@media (max-width: 620px) {
+  .app-notification-center {
+    inset: 0.75rem 0.75rem auto;
+    width: auto;
+  }
+}

@@ -1,0 +1,31 @@
+/* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
+ * Keep rules in their owning family; the import order is defined in index.css. */
+* {
+  box-sizing: border-box;
+}
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-background);
+}
+h1 {
+  margin: 0;
+  color: var(--color-navy);
+  font-size: clamp(24px, 4vw, 36px);
+}
+p:last-child {
+  margin-bottom: 0;
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,397 @@
+/* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
+ * Keep rules in their owning family; the import order is defined in index.css. */
+.public-layout.public-public {
+  background: radial-gradient(circle at 15% 15%, #1a6670, #102a43 50%, #091d2f);
+}
+.public-public .public-header {
+  color: white;
+  background: transparent;
+}
+.public-public .public-header > strong {
+  visibility: hidden;
+}
+.public-public .public-header {
+  justify-content: flex-end;
+}
+.public-layout.public-device {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      color-mix(in srgb, var(--color-primary-soft) 72%, transparent),
+      transparent 38%
+    ),
+    var(--color-background);
+}
+.public-device .public-header {
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.app-shell {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 252px minmax(0, 1fr);
+  transition: grid-template-columns 180ms ease;
+}
+.app-shell.sidebar-collapsed {
+  grid-template-columns: 76px minmax(0, 1fr);
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding: 24px 18px;
+  color: #eef6f8;
+  background: linear-gradient(165deg, #0b2034 0%, #123752 58%, #0c5b63 130%);
+  transition:
+    width 180ms ease,
+    transform 180ms ease,
+    padding 180ms ease;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 25px;
+}
+.sidebar-brand .brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  color: #0d5960;
+  background: #c5f4ef;
+  font-size: 19px;
+}
+.sidebar-brand strong {
+  color: white;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+.sidebar-nav {
+  overflow-y: auto;
+}
+.nav-section-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  margin-top: 9px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #8fb1c4;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.nav-section-toggle:hover {
+  color: white;
+  background: rgb(255 255 255 / 6%);
+}
+.nav-links {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+.nav-links a,
+.legal-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 42px;
+  border-radius: 9px;
+  padding: 11px 12px;
+  color: #c7d9e5;
+  text-decoration: none;
+}
+.nav-links a svg,
+.legal-link svg,
+.sidebar-collapse svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.nav-links a {
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.16s ease;
+}
+.nav-links a.active {
+  color: white;
+  border-inline-start: 3px solid #58c8c4;
+  background: rgb(61 152 171 / 24%);
+}
+.sidebar-collapse {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  color: #c7d9e5;
+  background: rgb(255 255 255 / 5%);
+  cursor: pointer;
+}
+.sidebar-collapse:hover {
+  color: white;
+  background: rgb(255 255 255 / 10%);
+}
+.sidebar.is-collapsed {
+  padding-inline: 10px;
+}
+.sidebar.is-collapsed .sidebar-label,
+.sidebar.is-collapsed .nav-section-toggle {
+  display: none;
+}
+.sidebar.is-collapsed .sidebar-brand,
+.sidebar.is-collapsed .nav-links a,
+.sidebar.is-collapsed .legal-link {
+  justify-content: center;
+  padding-inline: 0;
+}
+.sidebar.is-collapsed .nav-links a.active {
+  border-inline-start: 0;
+  box-shadow: inset 3px 0 #58c8c4;
+}
+.sidebar-mobile-close,
+.topbar .mobile-menu-trigger,
+.sidebar-backdrop {
+  display: none;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  backdrop-filter: blur(12px);
+}
+.topbar-title h1 {
+  font-size: 18px;
+}
+.topbar-title {
+  min-width: 13rem;
+  flex: 0 0 auto;
+}
+.topbar-title .eyebrow {
+  display: block;
+  min-height: 1.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topbar-title .eyebrow {
+  font-size: 10px;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar-desktop-account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mobile-account {
+  position: relative;
+  display: none;
+}
+.mobile-account-menu {
+  position: absolute;
+  z-index: 70;
+  inset-block-start: calc(100% + 8px);
+  inset-inline-end: 0;
+  display: grid;
+  width: min(260px, calc(100vw - 24px));
+  gap: 4px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 7px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+.mobile-account-language {
+  justify-content: space-between;
+  border-block: 1px solid var(--color-line);
+  border-radius: 0;
+}
+.mobile-account-menu .avatar {
+  width: 32px;
+  height: 32px;
+}
+.public-layout {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: var(--color-background);
+}
+.public-header,
+.public-layout footer {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+}
+.public-layout main {
+  flex: 1;
+}
+.public-layout footer a {
+  color: var(--color-muted);
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  .topbar {
+    padding-inline: 12px;
+  }
+  .topbar-actions {
+    width: auto;
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 620px) {
+  .app-shell {
+    display: block;
+  }
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: min(19rem, 86vw);
+    height: 100dvh;
+    padding: 24px 18px;
+    transform: translateX(-105%);
+  }
+  .topbar {
+    min-height: 58px;
+    flex-wrap: nowrap;
+    gap: 7px;
+    padding: 7px 9px;
+  }
+  .topbar-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+  .topbar-title h1,
+  .topbar-title .eyebrow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .topbar-title h1 {
+    margin: 1px 0 0;
+    font-size: 15px;
+  }
+  .topbar-actions {
+    flex: 0 0 auto;
+    gap: 5px;
+  }
+  .topbar-desktop-account {
+    display: none;
+  }
+  .mobile-account {
+    display: block;
+  }
+  [dir='rtl'] .sidebar {
+    inset: 0 0 0 auto;
+    transform: translateX(105%);
+  }
+  .sidebar.is-mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar.is-mobile-open .sidebar-label,
+  .sidebar.is-mobile-open .nav-section-toggle {
+    display: initial;
+  }
+  .sidebar.is-mobile-open .nav-section-toggle,
+  .sidebar.is-mobile-open .nav-links a,
+  .sidebar.is-mobile-open .legal-link {
+    display: flex;
+  }
+  .sidebar.is-mobile-open .nav-links a,
+  .sidebar.is-mobile-open .legal-link {
+    justify-content: flex-start;
+    padding-inline: 12px;
+  }
+  .sidebar-mobile-close {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    margin-inline-start: auto;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 16%);
+    border-radius: 10px;
+    color: white;
+    background: transparent;
+  }
+  .sidebar-collapse {
+    display: none;
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: block;
+    border: 0;
+    background: rgb(7 24 39 / 58%);
+    backdrop-filter: blur(2px);
+  }
+  .topbar .mobile-menu-trigger {
+    display: grid;
+  }
+  .topbar {
+    flex-wrap: nowrap;
+  }
+  .topbar-actions {
+    width: auto;
+    justify-content: flex-end;
+  }
+  .topbar-title {
+    min-width: 0;
+    flex: 1;
+  }
+  .page-header {
+    flex-direction: column;
+  }
+}
+
+.tracking-preview-layout,
+.tracking-public-layout {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+}
+.tracking-public-layout {
+  min-height: 100dvh;
+  align-content: center;
+}
