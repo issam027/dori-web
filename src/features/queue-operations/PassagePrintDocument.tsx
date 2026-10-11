@@ -14,6 +14,9 @@ export function PassagePrintDocument({
   const passageDate = arrivedAt ?? new Date(passage.calledAt);
   const date = new Intl.DateTimeFormat(undefined, { dateStyle: 'long' });
   const time = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+  const fallbackNameParts = passage.personName.trim().split(/\s+/);
+  const firstName = passage.firstName ?? fallbackNameParts.shift() ?? '';
+  const lastName = passage.lastName ?? fallbackNameParts.join(' ');
 
   return createPortal(
     <article className="passage-print-document" aria-hidden="true">
@@ -32,24 +35,18 @@ export function PassagePrintDocument({
         </small>
       </header>
       <h1>{t('passageReceipt.title')}</h1>
-      <p className="passage-print-statement">
-        {t('passageReceipt.statement', {
-          name: passage.personName,
-          site: siteName,
-          date: date.format(passageDate),
-          arrival: arrivedAt ? time.format(arrivedAt) : t('passageReceipt.notRecorded'),
-          call: time.format(new Date(passage.calledAt)),
-          departure: time.format(new Date(passage.closedAt)),
-        })}
-      </p>
       <dl>
         <div>
           <dt>{t('passageReceipt.site')}</dt>
           <dd>{siteName}</dd>
         </div>
         <div>
-          <dt>{t('passageReceipt.person')}</dt>
-          <dd>{passage.personName}</dd>
+          <dt>{t('passageReceipt.lastName')}</dt>
+          <dd>{lastName || t('passageReceipt.notRecorded')}</dd>
+        </div>
+        <div>
+          <dt>{t('passageReceipt.firstName')}</dt>
+          <dd>{firstName || t('passageReceipt.notRecorded')}</dd>
         </div>
         <div>
           <dt>{t('passageReceipt.ticket')}</dt>

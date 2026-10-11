@@ -39,8 +39,16 @@ export function DisplayPage() {
   const [audio, setAudio] = useState(false);
   const [attention, setAttention] = useState(false);
   const [clock, setClock] = useState(new Date());
+  const [activePage, setActivePage] = useState(0);
+  const [nextPage, setNextPage] = useState(0);
   const previousCall = useRef('');
   const current = activeCalls[0];
+  const activePageCount = Math.max(1, Math.ceil(activeCalls.length / 4));
+  const nextPageCount = Math.max(1, Math.ceil(nextTickets.length / 5));
+  const currentActivePage = activePage % activePageCount;
+  const currentNextPage = nextPage % nextPageCount;
+  const visibleActiveCalls = activeCalls.slice(currentActivePage * 4, currentActivePage * 4 + 4);
+  const visibleNextTickets = nextTickets.slice(currentNextPage * 5, currentNextPage * 5 + 5);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -50,6 +58,16 @@ export function DisplayPage() {
       window.clearInterval(timer);
     };
   }, []);
+  useEffect(() => {
+    if (activePageCount === 1 && nextPageCount === 1) return;
+    const timer = window.setInterval(() => {
+      setActivePage((page) => (page + 1) % activePageCount);
+      setNextPage((page) => (page + 1) % nextPageCount);
+    }, 8_000);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [activePageCount, nextPageCount]);
   useEffect(() => {
     const key = current?.currentTicket
       ? `${current.currentTicket}:${String(current.threadNumber)}:${String(current.queueId)}`
@@ -132,13 +150,20 @@ export function DisplayPage() {
               <span>{__t('ui.public-experiences.display_page.en_direct_10riirr')}</span>
               <h2>{__t('ui.public-experiences.display_page.prises_en_charge_en_cours_1ycwyl7')}</h2>
             </div>
-            <strong>{activeCalls.length}</strong>
+            <div className="display-section-count">
+              <strong>{activeCalls.length}</strong>
+              {activePageCount > 1 ? (
+                <small>
+                  {currentActivePage + 1}/{activePageCount}
+                </small>
+              ) : null}
+            </div>
           </div>
           {activeCalls.length ? (
-            <div className="display-active-grid">
-              {activeCalls.map((call, index) => (
+            <div className="display-active-grid" key={`active-${String(currentActivePage)}`}>
+              {visibleActiveCalls.map((call) => (
                 <article
-                  className={`display-active-ticket${attention && index === 0 ? ' is-calling' : ''}`}
+                  className={`display-active-ticket${attention && call.currentTicket === current?.currentTicket ? ' is-calling' : ''}`}
                   key={`${call.currentTicket ?? ''}-${String(call.queueId)}-${String(call.threadNumber)}`}
                 >
                   <div className="display-ticket-number">
@@ -182,10 +207,15 @@ export function DisplayPage() {
               <span>{__t('ui.public-experiences.display_page.a_venir_1kyl18d')}</span>
               <h2>{__t('ui.public-experiences.display_page.prochains_tickets_130baxr')}</h2>
             </div>
+            {nextPageCount > 1 ? (
+              <small className="display-page-indicator">
+                {currentNextPage + 1}/{nextPageCount}
+              </small>
+            ) : null}
           </div>
           {nextTickets.length ? (
-            <ol>
-              {nextTickets.slice(0, 8).map((item, index) => (
+            <ol key={`next-${String(currentNextPage)}`}>
+              {visibleNextTickets.map((item, index) => (
                 <li key={`${item.ticket}-${String(item.queueId)}-${String(index)}`}>
                   <span>{String(index + 1).padStart(2, '0')}</span>
                   <div>

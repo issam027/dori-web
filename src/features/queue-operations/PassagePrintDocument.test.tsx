@@ -23,10 +23,10 @@ describe('PassagePrintDocument', () => {
     const document = screen.getByRole('article', { hidden: true });
     expect(document).toHaveClass('passage-print-document');
     expect(document.parentElement).toBe(globalThis.document.body);
-    expect(screen.getAllByText('Marie Dupont', { selector: '*' }).length).toBeGreaterThan(0);
+    expect(screen.getByText('Marie')).toBeInTheDocument();
+    expect(screen.getByText('Dupont')).toBeInTheDocument();
     expect(screen.getByText('A0042')).toBeInTheDocument();
     expect(screen.getByText('Centre DORIFY Lyon')).toBeInTheDocument();
-    expect(screen.getByText(/site Centre DORIFY Lyon/i)).toBeInTheDocument();
     expect(screen.getByText(/Signature du responsable/i)).toBeInTheDocument();
     expect(screen.getByText(/Cachet de l’établissement/i)).toBeInTheDocument();
   });

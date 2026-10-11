@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ClipboardPenLine, Monitor } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearSession } from '@/core/auth/session-actions';
+import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
 
 export function DeviceModePage() {
   const { t: __t } = useTranslation();
@@ -14,6 +15,9 @@ export function DeviceModePage() {
   return (
     <section className="device-mode-page" aria-labelledby="device-mode-title">
       <div className="device-mode-heading">
+        <div className="device-mode-theme">
+          <ThemeSwitcher />
+        </div>
         <p className="eyebrow">
           {__t('ui.public-experiences.device_mode_page.configuration_de_l_appareil_12mejpd')}
         </p>

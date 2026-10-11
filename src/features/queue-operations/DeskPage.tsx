@@ -143,6 +143,8 @@ export function DeskPage() {
         personName:
           personName ||
           t('ui.expression.queue-operations.desk_page.personne_non_renseignee_1306yk1'),
+        firstName: activePerson.data?.data.firstName ?? undefined,
+        lastName: activePerson.data?.data.lastName ?? undefined,
         arrivedAt: registration?.createdAt,
         calledAt: call.calledAt,
         closedAt: new Date().toISOString(),

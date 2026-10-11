@@ -8,6 +8,9 @@ const envelope = (data: unknown) => ({
 });
 
 test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) => {
+  await page.context().addInitScript(() => {
+    (globalThis as unknown as { print: () => void }).print = () => undefined;
+  });
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
@@ -146,11 +149,23 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
   await page.locator('.kiosk-actions .primary').click();
   await page.locator('.kiosk-actions .primary').click();
 
-  const qr = page.locator('.kiosk-ticket-result .tracking-qr img');
+  const qr = page.locator('.kiosk-ticket-result img.tracking-qr-image');
   await expect(qr).toBeVisible();
+  expect((await qr.boundingBox())?.width).toBeGreaterThan(100);
   await expect(qr).toHaveJSProperty('complete', true);
-  expect(await qr.evaluate((image) => (image as { naturalWidth: number }).naturalWidth)).toBeGreaterThan(
-    100,
-  );
+  expect(
+    await qr.evaluate((image) => (image as { naturalWidth: number }).naturalWidth),
+  ).toBeGreaterThan(100);
+  await expect(page.locator('.kiosk-ticket-result .tracking-qr-logo')).toContainText('DORIFY');
   await page.screenshot({ path: testInfo.outputPath('kiosk-ticket-with-qr.png'), fullPage: true });
+
+  await page.getByRole('button', { name: /imprimer mon ticket/i }).click();
+  await expect(page.locator('body')).toHaveAttribute('data-print-kiosk-ticket', 'true');
+  await page.emulateMedia({ media: 'print' });
+  const printable = page.locator('body > .kiosk-ticket-print-document');
+  await expect(printable).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath('kiosk-ticket-print.png'),
+    fullPage: true,
+  });
 });

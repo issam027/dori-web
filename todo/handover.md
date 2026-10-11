@@ -397,11 +397,11 @@ Critère d'acceptation : l'ajout d'une route ne demande pas de modifier plusieur
 
 ### E1 — Cartographier les styles
 
-- [ ] Lister les sélecteurs de `global.css` par famille fonctionnelle.
-- [ ] Repérer les règles dupliquées, surchargées ou devenues inutilisées.
-- [ ] Repérer les couleurs, espacements, rayons et ombres codés en dur.
-- [ ] Identifier les règles spécifiques à l'impression.
-- [ ] Identifier les règles publiques qui doivent rester indépendantes du shell privé.
+- [x] Lister les sélecteurs de `global.css` par famille fonctionnelle.
+- [x] Repérer les règles dupliquées, surchargées ou devenues inutilisées.
+- [x] Repérer les couleurs, espacements, rayons et ombres codés en dur.
+- [x] Identifier les règles spécifiques à l'impression.
+- [x] Identifier les règles publiques qui doivent rester indépendantes du shell privé.
 
 Critère d'acceptation : chaque bloc CSS possède une destination de module connue avant déplacement.
 

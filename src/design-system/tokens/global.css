@@ -53,6 +53,44 @@
   text-rendering: optimizeLegibility;
 }
 
+/* Enter print mode synchronously so tablet browsers cannot capture an empty root. */
+body[data-print-kiosk-ticket] > #root {
+  display: none !important;
+}
+body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
+  position: static;
+  display: grid !important;
+  width: min(80mm, 100%);
+  margin: 0 auto;
+  align-content: start;
+  gap: 7mm;
+  border: 1px solid #1f2937;
+  border-radius: 4mm;
+  padding: 7mm;
+  color: #111827 !important;
+  background: #fff !important;
+  box-shadow: none;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  visibility: visible !important;
+}
+body[data-print-kiosk-ticket] > .kiosk-ticket-print-document * {
+  visibility: visible !important;
+}
+html body[data-print-kiosk-ticket] {
+  display: block !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%);
+}
+
 .health-grid {
   display: grid;
   grid-template-columns: minmax(10rem, 1fr) 2fr;
@@ -377,9 +415,136 @@
   gap: var(--space-2);
   margin: 0;
 }
-.tracking-qr img {
+.tracking-qr-image {
+  display: block;
   width: min(220px, 45vw);
+  height: auto;
   aspect-ratio: 1;
+  background: #fff;
+  object-fit: contain;
+}
+.tracking-qr-code {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+.tracking-qr-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  min-width: 27%;
+  aspect-ratio: 1;
+  place-content: center;
+  border: 3px solid #fff;
+  border-radius: 5px;
+  padding: 3%;
+  color: #102a43;
+  background: #fff;
+  font-size: clamp(0.55rem, 2vw, 0.78rem);
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.tracking-qr-logo b:last-child {
+  color: #0f8b8d;
+}
+
+/* Public experiences inherit the selected application theme. */
+.public-kiosk,
+.public-display {
+  color: var(--color-ink);
+  background: var(--color-background);
+}
+.public-kiosk .public-header,
+.public-kiosk > footer {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+}
+.public-kiosk .kiosk-screen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 82% 8%,
+      color-mix(in srgb, var(--color-primary-soft) 78%, transparent),
+      transparent 38%
+    ),
+    var(--color-background);
+}
+.public-kiosk .kiosk-brand,
+.public-kiosk .kiosk-form-grid label,
+.public-kiosk .kiosk-panel h1,
+.public-kiosk .kiosk-stage-title h1 {
+  color: var(--color-ink);
+}
+.public-kiosk .kiosk-brand small,
+.public-kiosk .kiosk-welcome p,
+.public-kiosk .kiosk-privacy,
+.public-kiosk .kiosk-stage-title p,
+.public-kiosk .kiosk-form-grid small {
+  color: var(--color-muted);
+}
+.public-kiosk .kiosk-choices button,
+.public-kiosk .kiosk-panel,
+.public-kiosk .kiosk-ticket-result {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.public-kiosk .kiosk-session > span {
+  border-color: var(--color-line);
+  color: var(--color-muted);
+  background: var(--color-surface);
+}
+.public-display .display-screen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 80% 0%,
+      color-mix(in srgb, var(--color-primary) 22%, transparent),
+      transparent 48%
+    ),
+    var(--color-background);
+}
+.public-display .display-active-zone,
+.public-display .display-next-zone,
+.public-display .display-active-ticket,
+.public-display .display-next-zone li {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+}
+.public-display .display-active-ticket > div > strong,
+.public-display .display-screen .display-next-zone {
+  color: var(--color-ink);
+}
+.public-display .display-active-ticket small,
+.public-display .display-active-ticket span,
+.public-display .display-next-zone li small,
+.public-display .display-no-call p,
+.public-display .display-next-empty {
+  color: var(--color-muted);
+}
+.public-display .display-section-heading span,
+.public-display .display-next-zone li span {
+  color: var(--color-primary);
+}
+.public-display .display-destination,
+.public-display .display-section-heading > strong {
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+}
+.public-display .display-destination small,
+.public-display .display-destination span {
+  color: var(--color-primary-contrast);
+  opacity: 0.78;
+}
+.public-display .display-audio {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 
 .public-display {
@@ -656,6 +821,95 @@
   .tracking-called {
     animation: none;
   }
+}
+
+/* Keep kiosk and waiting-room screens aligned with the active theme. */
+.public-kiosk,
+.public-display {
+  color: var(--color-ink);
+  background: var(--color-background);
+}
+.public-kiosk .public-header,
+.public-kiosk > footer,
+.public-kiosk .kiosk-session > span,
+.public-kiosk .kiosk-choices button,
+.public-kiosk .kiosk-panel,
+.public-kiosk .kiosk-ticket-result {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.public-kiosk .kiosk-screen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 82% 8%,
+      color-mix(in srgb, var(--color-primary-soft) 78%, transparent),
+      transparent 38%
+    ),
+    var(--color-background);
+}
+.public-kiosk .kiosk-brand,
+.public-kiosk .kiosk-form-grid label,
+.public-kiosk .kiosk-panel h1,
+.public-kiosk .kiosk-stage-title h1 {
+  color: var(--color-ink);
+}
+.public-kiosk .kiosk-brand small,
+.public-kiosk .kiosk-welcome p,
+.public-kiosk .kiosk-privacy,
+.public-kiosk .kiosk-stage-title p,
+.public-kiosk .kiosk-form-grid small,
+.public-kiosk .kiosk-session > span {
+  color: var(--color-muted);
+}
+.public-display .display-screen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 80% 0%,
+      color-mix(in srgb, var(--color-primary) 22%, transparent),
+      transparent 48%
+    ),
+    var(--color-background);
+}
+.public-display .display-active-zone,
+.public-display .display-next-zone,
+.public-display .display-active-ticket,
+.public-display .display-next-zone li {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+}
+.public-display .display-active-ticket > div > strong,
+.public-display .display-screen .display-next-zone {
+  color: var(--color-ink);
+}
+.public-display .display-active-ticket small,
+.public-display .display-active-ticket span,
+.public-display .display-next-zone li small,
+.public-display .display-no-call p,
+.public-display .display-next-empty {
+  color: var(--color-muted);
+}
+.public-display .display-section-heading span,
+.public-display .display-next-zone li span {
+  color: var(--color-primary);
+}
+.public-display .display-destination,
+.public-display .display-section-heading > strong {
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+}
+.public-display .display-destination small,
+.public-display .display-destination span {
+  color: var(--color-primary-contrast);
+  opacity: 0.78;
+}
+.public-display .display-audio {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 @media print {
   .public-header,
@@ -4065,7 +4319,7 @@ select:focus-visible {
   color: #102a43;
   letter-spacing: 0.08em;
 }
-.kiosk-ticket-result .tracking-qr img {
+.kiosk-ticket-result .tracking-qr-image {
   width: 118px;
 }
 .kiosk-ticket-result .tracking-qr figcaption {
@@ -4168,7 +4422,7 @@ select:focus-visible {
     gap: 2mm;
     margin: 2mm 0;
   }
-  .kiosk-ticket-print-document .tracking-qr img {
+  .kiosk-ticket-print-document .tracking-qr-image {
     display: block;
     width: 38mm;
     height: 38mm;
@@ -5259,5 +5513,486 @@ select:focus-visible {
   .dorify-loader-mark span {
     animation: none;
     opacity: 0.75;
+  }
+}
+
+.device-mode-theme {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+}
+.device-mode-theme .icon-button {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.kiosk-inline-print-header,
+.kiosk-inline-print-footer {
+  display: none;
+}
+
+@media print {
+  body[data-print-kiosk-ticket] > #root {
+    display: block !important;
+  }
+  body[data-print-kiosk-ticket] > #root * {
+    visibility: hidden !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result,
+  body[data-print-kiosk-ticket] .kiosk-result * {
+    visibility: visible !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result {
+    position: absolute;
+    inset: 0 auto auto 50%;
+    display: block;
+    width: min(80mm, 100%);
+    margin: 0;
+    border: 1px solid #1f2937;
+    border-radius: 4mm;
+    padding: 7mm;
+    color: #111827 !important;
+    background: #fff !important;
+    box-shadow: none;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    transform: translateX(-50%);
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header {
+    display: grid;
+    gap: 1mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px dashed #6b7280;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
+    font-size: 20pt;
+    letter-spacing: 0.08em;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
+    color: #4b5563 !important;
+    font-size: 9pt;
+    text-transform: uppercase;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result-heading,
+  body[data-print-kiosk-ticket] .kiosk-result-guidance,
+  body[data-print-kiosk-ticket] .kiosk-result-actions {
+    display: none !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result {
+    display: grid;
+    justify-items: center;
+    gap: 3mm;
+    margin: 5mm 0;
+    border: 0;
+    padding: 0;
+    background: #fff;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
+    margin: 3mm 0 1mm;
+    color: #111827 !important;
+    font-size: 38pt;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
+    width: 38mm;
+    height: 38mm;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
+    display: block;
+    padding-top: 4mm;
+    border-top: 1px dashed #6b7280;
+    color: #4b5563 !important;
+    font-size: 8pt;
+  }
+
+  body[data-print-passage] > .passage-print-document .passage-print-statement {
+    display: none !important;
+  }
+  body[data-print-passage] > .passage-print-document dl > div {
+    display: block !important;
+    padding: 1.5mm 0;
+    border: 0;
+  }
+  body[data-print-passage] > .passage-print-document dt,
+  body[data-print-passage] > .passage-print-document dd {
+    display: inline !important;
+    min-width: 0;
+    margin: 0;
+    color: #17212b;
+    font-size: 11pt;
+  }
+  body[data-print-passage] > .passage-print-document dd {
+    font-weight: 700;
+  }
+}
+
+.device-mode-heading .device-mode-theme {
+  position: static;
+  display: flex;
+  justify-content: center;
+  margin: 0 0 var(--space-3);
+}
+
+.display-board,
+.display-active-zone,
+.display-next-zone {
+  overflow: hidden;
+}
+.display-active-grid {
+  min-height: 0;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  animation: display-page-enter 360ms ease both;
+}
+.display-active-ticket {
+  min-width: 0;
+  min-height: 0;
+}
+.display-next-zone ol {
+  min-height: 0;
+  overflow: hidden;
+  animation: display-page-enter 360ms ease both;
+}
+.display-section-count {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+}
+.display-section-count > strong {
+  display: grid;
+  width: clamp(2.5rem, 4vw, 4.25rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+  font-size: clamp(1.1rem, 2vw, 2rem);
+}
+.display-section-count small,
+.display-page-indicator {
+  color: var(--color-muted);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+@keyframes display-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.kiosk-appointment-panel {
+  width: min(850px, 100%);
+  gap: 1.1rem;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.kiosk-appointment-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 0.35rem;
+  place-items: center;
+  border-radius: 17px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.kiosk-appointment-searches {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.2fr);
+  align-items: stretch;
+  gap: 0.9rem;
+}
+.kiosk-appointment-searches > section {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: 17px;
+  background: var(--color-surface-muted);
+}
+.kiosk-appointment-option-title,
+.kiosk-appointment-time {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-ink);
+}
+.kiosk-appointment-option-title svg,
+.kiosk-appointment-time svg {
+  width: 19px;
+  color: var(--color-primary);
+}
+.kiosk-appointment-time {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.kiosk-appointment-time input {
+  grid-column: 1 / -1;
+}
+.kiosk-appointment-or {
+  align-self: center;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.kiosk-appointment-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: 0.75rem;
+}
+.kiosk-appointment-actions button {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 2px solid var(--color-line);
+  border-radius: 15px;
+  color: var(--color-ink);
+  background: var(--color-surface-muted);
+  font-weight: 850;
+}
+.kiosk-appointment-found {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  border-color: color-mix(in srgb, var(--color-success) 45%, var(--color-line));
+  background: var(--color-success-soft);
+}
+.kiosk-appointment-found h2,
+.kiosk-appointment-found p {
+  margin: 0.15rem 0;
+}
+@media (max-width: 700px) {
+  .kiosk-appointment-searches {
+    grid-template-columns: 1fr;
+  }
+  .kiosk-appointment-or {
+    justify-self: center;
+  }
+  .kiosk-appointment-found {
+    grid-template-columns: auto 1fr;
+  }
+  .kiosk-appointment-found > button {
+    grid-column: 1 / -1;
+  }
+}
+
+:root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-screen button {
+  border-color: color-mix(in srgb, var(--color-ink) 28%, var(--color-line));
+  color: var(--color-ink);
+  background: var(--color-surface-muted);
+  box-shadow: 0 7px 20px rgb(0 0 0 / 18%);
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark'])
+  .public-kiosk
+  .kiosk-screen
+  button:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface));
+  box-shadow: 0 10px 25px rgb(0 0 0 / 28%);
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark'])
+  .public-kiosk
+  .kiosk-screen
+  button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 70%, white);
+  outline-offset: 3px;
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-screen button.primary,
+:root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-choices button {
+  border-color: var(--color-accent);
+  color: #061b24;
+  background: #55d6ce;
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark'])
+  .public-kiosk
+  .kiosk-screen
+  button.primary:hover:not(:disabled),
+:root:is([data-theme='dark'], [data-theme='soft-dark'])
+  .public-kiosk
+  .kiosk-choices
+  button:hover:not(:disabled) {
+  border-color: #8cf0e9;
+  color: #04171f;
+  background: #78e4dd;
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-tiles button.selected {
+  border-color: #78e4dd;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-accent) 24%, var(--color-surface));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+:root:is([data-theme='dark'], [data-theme='soft-dark'])
+  .public-kiosk
+  .kiosk-screen
+  button:disabled {
+  border-color: var(--color-line);
+  color: color-mix(in srgb, var(--color-muted) 78%, transparent);
+  background: color-mix(in srgb, var(--color-surface-muted) 72%, transparent);
+  opacity: 0.72;
+}
+
+.public-layout.public-display .display-screen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      circle at 80% 0%,
+      color-mix(in srgb, var(--color-primary) 22%, transparent),
+      transparent 48%
+    ),
+    var(--color-background);
+}
+.public-layout.public-display .display-active-zone,
+.public-layout.public-display .display-next-zone,
+.public-layout.public-display .display-active-ticket,
+.public-layout.public-display .display-next-zone li {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+}
+.public-layout.public-display .display-active-ticket > div > strong,
+.public-layout.public-display .display-screen .display-next-zone {
+  color: var(--color-ink);
+}
+.public-layout.public-display .display-active-ticket small,
+.public-layout.public-display .display-active-ticket span,
+.public-layout.public-display .display-next-zone li small,
+.public-layout.public-display .display-no-call p,
+.public-layout.public-display .display-next-empty {
+  color: var(--color-muted);
+}
+.public-layout.public-display .display-section-heading span,
+.public-layout.public-display .display-next-zone li span {
+  color: var(--color-primary);
+}
+.public-layout.public-display .display-destination,
+.public-layout.public-display .display-section-heading > strong {
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+}
+.public-layout.public-display .display-destination small,
+.public-layout.public-display .display-destination span {
+  color: var(--color-primary-contrast);
+  opacity: 0.78;
+}
+.public-layout.public-display .display-audio {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.device-mode-theme {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+}
+.device-mode-theme .icon-button {
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.kiosk-inline-print-header,
+.kiosk-inline-print-footer {
+  display: none;
+}
+
+@media print {
+  body[data-print-kiosk-ticket] > #root {
+    display: block !important;
+  }
+  body[data-print-kiosk-ticket] > #root * {
+    visibility: hidden !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result,
+  body[data-print-kiosk-ticket] .kiosk-result * {
+    visibility: visible !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result {
+    position: absolute;
+    inset: 0 auto auto 50%;
+    display: block;
+    width: min(80mm, 100%);
+    margin: 0;
+    border: 1px solid #1f2937;
+    border-radius: 4mm;
+    padding: 7mm;
+    color: #111827 !important;
+    background: #fff !important;
+    box-shadow: none;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    transform: translateX(-50%);
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header {
+    display: grid;
+    gap: 1mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px dashed #6b7280;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
+    font-size: 20pt;
+    letter-spacing: 0.08em;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
+    color: #4b5563 !important;
+    font-size: 9pt;
+    text-transform: uppercase;
+  }
+  body[data-print-kiosk-ticket] .kiosk-result-heading,
+  body[data-print-kiosk-ticket] .kiosk-result-guidance,
+  body[data-print-kiosk-ticket] .kiosk-result-actions {
+    display: none !important;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result {
+    display: grid;
+    justify-items: center;
+    gap: 3mm;
+    margin: 5mm 0;
+    border: 0;
+    padding: 0;
+    background: #fff;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
+    margin: 3mm 0 1mm;
+    color: #111827 !important;
+    font-size: 38pt;
+  }
+  body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
+    width: 38mm;
+    height: 38mm;
+  }
+  body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
+    display: block;
+    padding-top: 4mm;
+    border-top: 1px dashed #6b7280;
+    color: #4b5563 !important;
+    font-size: 8pt;
+  }
+
+  body[data-print-passage] > .passage-print-document .passage-print-statement {
+    display: none !important;
+  }
+  body[data-print-passage] > .passage-print-document dl > div {
+    display: block !important;
+    padding: 1.5mm 0;
+    border: 0;
+  }
+  body[data-print-passage] > .passage-print-document dt,
+  body[data-print-passage] > .passage-print-document dd {
+    display: inline !important;
+    min-width: 0;
+    margin: 0;
+    color: #17212b;
+    font-size: 11pt;
+  }
+  body[data-print-passage] > .passage-print-document dd {
+    font-weight: 700;
   }
 }

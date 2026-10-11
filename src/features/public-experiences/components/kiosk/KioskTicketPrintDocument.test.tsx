@@ -4,7 +4,7 @@ import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 
 vi.mock('qrcode', () => ({
   default: {
-    toDataURL: vi.fn().mockResolvedValue('data:image/png;base64,cXI='),
+    toString: vi.fn().mockResolvedValue('<svg viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>'),
   },
 }));
 
@@ -23,20 +23,20 @@ describe('KioskTicketPrintDocument', () => {
     expect(document.body.querySelector('.kiosk-ticket-print-document')).toBeInTheDocument();
     expect(screen.getByText('A042')).toBeInTheDocument();
     expect(screen.getByText('Accueil général')).toBeInTheDocument();
-    expect(await screen.findByRole('img', { hidden: true })).toHaveAttribute(
-      'src',
-      'data:image/png;base64,cXI=',
+    expect(await screen.findByRole('img', { hidden: true })).toHaveAccessibleName(
+      'QR code de test DORIFY',
     );
     await waitFor(() => {
       expect(onReady).toHaveBeenCalled();
     });
   });
 
-  it('is immediately ready when no tracking link exists', async () => {
+  it('still renders the test QR when no tracking link exists', async () => {
     const onReady = vi.fn();
     render(<KioskTicketPrintDocument ticketNumber="A043" onReady={onReady} />);
     await waitFor(() => {
       expect(onReady).toHaveBeenCalledOnce();
     });
+    expect(await screen.findByRole('img', { hidden: true })).toBeInTheDocument();
   });
 });

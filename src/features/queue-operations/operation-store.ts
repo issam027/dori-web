@@ -6,6 +6,8 @@ export interface PassageSummary {
   registrationId: number;
   ticketNumber: string;
   personName: string;
+  firstName?: string;
+  lastName?: string;
   arrivedAt?: string;
   calledAt: string;
   closedAt: string;

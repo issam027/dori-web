@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useReducer, useState } from 'react';
+import { CalendarCheck2, Clock3, Search, Ticket, UserRound } from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
@@ -61,7 +62,6 @@ export function KioskWizard() {
   const [scheduledTime, setScheduledTime] = useState('');
   const [found, setFound] = useState<RegistrationResponseDto>();
   const [result, setResult] = useState<Result>();
-  const [printing, setPrinting] = useState(false);
   const [printReady, setPrintReady] = useState(false);
   const handlePrintReady = useCallback(() => {
     setPrintReady(true);
@@ -78,32 +78,8 @@ export function KioskWizard() {
     setScheduledTime('');
     setFound(undefined);
     setResult(undefined);
-    setPrinting(false);
     setPrintReady(false);
   }, []);
-  useEffect(() => {
-    if (!printing) return;
-    document.body.dataset.printKioskTicket = 'true';
-    const finish = () => {
-      delete document.body.dataset.printKioskTicket;
-      setPrinting(false);
-      setPrintReady(false);
-    };
-    window.addEventListener('afterprint', finish, { once: true });
-    return () => {
-      window.removeEventListener('afterprint', finish);
-      delete document.body.dataset.printKioskTicket;
-    };
-  }, [printing]);
-  useEffect(() => {
-    if (!printing || !printReady) return;
-    const timer = window.setTimeout(() => {
-      window.print();
-    }, 50);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [printReady, printing]);
   const watchdog = useKioskWatchdog(purge, kioskIdleMs(import.meta.env.VITE_KIOSK_IDLE_MS));
   const scopeSites = user?.scope.siteIds ?? [];
   const validScope =
@@ -627,65 +603,94 @@ export function KioskWizard() {
         </div>
       ) : null}
       {flow === 'appointment' ? (
-        <div className="kiosk-panel">
-          <h1>{__t('ui.public-experiences.kiosk_page.retrouver_mon_rendez_vous_1w6p9nd')}</h1>
-          <label>
-            {__t('ui.public-experiences.kiosk_page.numero_de_ticket_17ymtl0')}
-            <input
-              autoComplete="off"
-              value={ticket}
-              onChange={(event) => {
-                setTicket(event.target.value);
+        <div className="kiosk-panel kiosk-appointment-panel">
+          <div className="kiosk-stage-title">
+            <span className="kiosk-appointment-icon" aria-hidden="true">
+              <CalendarCheck2 />
+            </span>
+            <h1>{__t('ui.public-experiences.kiosk_page.retrouver_mon_rendez_vous_1w6p9nd')}</h1>
+          </div>
+          <div className="kiosk-appointment-searches">
+            <section>
+              <div className="kiosk-appointment-option-title">
+                <Ticket aria-hidden="true" />
+                <strong>{__t('ui.public-experiences.kiosk_page.numero_de_ticket_17ymtl0')}</strong>
+              </div>
+              <input
+                autoComplete="off"
+                value={ticket}
+                onChange={(event) => {
+                  setTicket(event.target.value);
+                }}
+              />
+            </section>
+            <span className="kiosk-appointment-or">
+              {__t('ui.public-experiences.kiosk_page.ou_pkzwmp')}
+            </span>
+            <section>
+              <div className="kiosk-appointment-option-title">
+                <UserRound aria-hidden="true" />
+                <strong>{__t('ui.public-experiences.kiosk_page.nom_15eqct1')}</strong>
+              </div>
+              <input
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(event) => {
+                  setLastName(event.target.value);
+                }}
+              />
+              <label className="kiosk-appointment-time">
+                <Clock3 aria-hidden="true" />
+                <span>{__t('ui.public-experiences.kiosk_page.heure_prevue_m6637b')}</span>
+                <input
+                  type="datetime-local"
+                  value={scheduledTime}
+                  onChange={(event) => {
+                    setScheduledTime(event.target.value);
+                  }}
+                />
+              </label>
+            </section>
+          </div>
+          <div className="kiosk-appointment-actions">
+            <button type="button" onClick={purge}>
+              {__t('ui.public-experiences.kiosk_page.retour_a_l_accueil_48kqql')}
+            </button>
+            <button
+              type="button"
+              className="primary"
+              disabled={
+                (!ticket.trim() && (!lastName.trim() || !scheduledTime)) || lookup.isPending
+              }
+              onClick={() => {
+                lookup.mutate();
               }}
-            />
-          </label>
-          <p className="separator">{__t('ui.public-experiences.kiosk_page.ou_pkzwmp')}</p>
-          <label>
-            {__t('ui.public-experiences.kiosk_page.nom_15eqct1')}
-            <input
-              autoComplete="off"
-              value={lastName}
-              onChange={(event) => {
-                setLastName(event.target.value);
-              }}
-            />
-          </label>
-          <label>
-            {__t('ui.public-experiences.kiosk_page.heure_prevue_m6637b')}
-            <input
-              type="datetime-local"
-              value={scheduledTime}
-              onChange={(event) => {
-                setScheduledTime(event.target.value);
-              }}
-            />
-          </label>
-          <button
-            type="button"
-            className="primary"
-            disabled={(!ticket.trim() && (!lastName.trim() || !scheduledTime)) || lookup.isPending}
-            onClick={() => {
-              lookup.mutate();
-            }}
-          >
-            {__t('ui.public-experiences.kiosk_page.rechercher_1jzbmpc')}
-          </button>
+            >
+              <Search aria-hidden="true" />
+              {__t('ui.public-experiences.kiosk_page.rechercher_1jzbmpc')}
+            </button>
+          </div>
           {found ? (
-            <Card>
-              <h2>{__t('ui.public-experiences.kiosk_page.rendez_vous_trouve_u0yq2a')}</h2>
-              <p>
-                {__t('ui.public-experiences.kiosk_page.ticket_1nrpxxh')}
-                <strong>{found.ticketNumber}</strong>
-              </p>
-              <p>
-                {found.businessDate} ·{' '}
-                {found.scheduledTime
-                  ? new Date(found.scheduledTime).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : __t('ui.expression.public-experiences.kiosk_page.heure_non_fournie_cgiv4n')}
-              </p>
+            <Card className="kiosk-appointment-found">
+              <span className="kiosk-result-check" aria-hidden="true">
+                ✓
+              </span>
+              <div>
+                <h2>{__t('ui.public-experiences.kiosk_page.rendez_vous_trouve_u0yq2a')}</h2>
+                <p>
+                  {__t('ui.public-experiences.kiosk_page.ticket_1nrpxxh')}{' '}
+                  <strong>{found.ticketNumber}</strong>
+                </p>
+                <p>
+                  {found.businessDate} ·{' '}
+                  {found.scheduledTime
+                    ? new Date(found.scheduledTime).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : __t('ui.expression.public-experiences.kiosk_page.heure_non_fournie_cgiv4n')}
+                </p>
+              </div>
               <button
                 type="button"
                 className="button button-primary"
@@ -698,9 +703,6 @@ export function KioskWizard() {
               </button>
             </Card>
           ) : null}
-          <button type="button" onClick={purge}>
-            {__t('ui.public-experiences.kiosk_page.retour_a_l_accueil_48kqql')}
-          </button>
         </div>
       ) : null}
       {flow === 'result' && result ? (
@@ -732,9 +734,15 @@ export function KioskWizard() {
           <div className="kiosk-result-actions">
             <button
               type="button"
+              disabled={!printReady}
               onClick={() => {
-                setPrintReady(false);
-                setPrinting(true);
+                document.body.dataset.printKioskTicket = 'true';
+                const cleanup = () => {
+                  delete document.body.dataset.printKioskTicket;
+                };
+                window.addEventListener('afterprint', cleanup, { once: true });
+                window.print();
+                window.setTimeout(cleanup, 30_000);
               }}
             >
               {__t('ui.public-experiences.kiosk_page.imprimer_mon_ticket_xbrafa')}
@@ -743,14 +751,12 @@ export function KioskWizard() {
               {__t('ui.public-experiences.kiosk_page.terminer_19zht57')}
             </button>
           </div>
-          {printing ? (
-            <KioskTicketPrintDocument
-              ticketNumber={result.ticketNumber}
-              queueName={result.queueName}
-              trackingUrl={result.trackingUrl}
-              onReady={handlePrintReady}
-            />
-          ) : null}
+          <KioskTicketPrintDocument
+            ticketNumber={result.ticketNumber}
+            queueName={result.queueName}
+            trackingUrl={result.trackingUrl}
+            onReady={handlePrintReady}
+          />
         </KioskTicketResult>
       ) : null}
     </section>

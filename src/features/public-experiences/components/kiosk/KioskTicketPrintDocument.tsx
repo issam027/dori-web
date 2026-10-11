@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { TrackingQr } from '../../TrackingQr';
@@ -15,10 +14,6 @@ export function KioskTicketPrintDocument({
   onReady: () => void;
 }) {
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!trackingUrl) onReady();
-  }, [onReady, trackingUrl]);
 
   return createPortal(
     <article className="kiosk-ticket-print-document" aria-hidden="true">
