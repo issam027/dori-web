@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, Check, Plus, TicketCheck } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -128,6 +129,7 @@ export function QuickRegistration({
             setOpen(true);
           }}
         >
+          <Plus aria-hidden="true" />
           {__t('ui.queue-operations.quick_registration.creer_un_ticket_2iit6s')}
         </button>
       </Card>
@@ -154,6 +156,7 @@ export function QuickRegistration({
                 }}
               >
                 {__t('ui.queue-operations.quick_registration.continuer_vers_le_ticket_ydsvdz')}
+                <ArrowRight aria-hidden="true" />
               </button>
             ) : null}
             {step === 2 ? (
@@ -173,6 +176,7 @@ export function QuickRegistration({
                   disabled={!canSubmit}
                   onClick={() => void submit()}
                 >
+                  <TicketCheck aria-hidden="true" />
                   {pending
                     ? __t('ui.expression.queue-operations.quick_registration.creation_uqudte')
                     : __t(
@@ -189,6 +193,7 @@ export function QuickRegistration({
                   handleOpenChange(false);
                 }}
               >
+                <Check aria-hidden="true" />
                 {__t('ui.queue-operations.quick_registration.terminer_19zht57')}
               </button>
             ) : null}

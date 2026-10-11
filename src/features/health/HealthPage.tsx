@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Card } from '@/design-system/components/Card';
+import { CalendarClock, Clock3, Database, HeartPulse } from 'lucide-react';
+import { Card, MetricCard } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
@@ -36,30 +37,34 @@ export function HealthPage() {
         }
       />
       <div className="metric-grid">
-        <Card>
-          <span className="metric-label">{__t('ui.health.health_page.etat_global_1kkjvdg')}</span>
-          <StatusBadge tone={healthy ? 'success' : 'danger'}>
-            {data?.status ?? __t('ui.expression.health.health_page.indisponible_hivkzn')}
-          </StatusBadge>
-        </Card>
-        <Card>
-          <span className="metric-label">
-            {__t('ui.health.health_page.base_de_donnees_uwc5u7')}
-          </span>
-          <StatusBadge tone={data?.checks.database === 'up' ? 'success' : 'danger'}>
-            {data?.checks.database ?? __t('ui.expression.health.health_page.indisponible_hivkzn')}
-          </StatusBadge>
-        </Card>
-        <Card>
-          <span className="metric-label">{__t('ui.health.health_page.uptime_ijqnzt')}</span>
-          <strong className="metric-value">{data ? duration(data.uptime) : '—'}</strong>
-        </Card>
-        <Card>
-          <span className="metric-label">
-            {__t('ui.health.health_page.horodatage_api_1xb5lwz')}
-          </span>
-          <strong>{data ? new Date(data.timestamp).toLocaleString() : '—'}</strong>
-        </Card>
+        <MetricCard
+          label={__t('ui.health.health_page.etat_global_1kkjvdg')}
+          value={
+            <StatusBadge tone={healthy ? 'success' : 'danger'}>
+              {data?.status ?? __t('ui.expression.health.health_page.indisponible_hivkzn')}
+            </StatusBadge>
+          }
+          icon={<HeartPulse />}
+        />
+        <MetricCard
+          label={__t('ui.health.health_page.base_de_donnees_uwc5u7')}
+          value={
+            <StatusBadge tone={data?.checks.database === 'up' ? 'success' : 'danger'}>
+              {data?.checks.database ?? __t('ui.expression.health.health_page.indisponible_hivkzn')}
+            </StatusBadge>
+          }
+          icon={<Database />}
+        />
+        <MetricCard
+          label={__t('ui.health.health_page.uptime_ijqnzt')}
+          value={data ? duration(data.uptime) : '—'}
+          icon={<Clock3 />}
+        />
+        <MetricCard
+          label={__t('ui.health.health_page.horodatage_api_1xb5lwz')}
+          value={data ? new Date(data.timestamp).toLocaleString() : '—'}
+          icon={<CalendarClock />}
+        />
       </div>
       <div className="health-content-grid">
         <Card>

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { Save } from 'lucide-react';
 import type { CreateQueueDto, QueueResponseDto } from '@/api/generated/models';
 import { Modal } from '@/design-system/components/Modal';
 
@@ -55,6 +56,7 @@ export function QueueEditor({
             })();
           }}
         >
+          <Save aria-hidden="true" />
           {__t('ui.queues.queue_editor.enregistrer_sywgdx')}
         </button>
       }

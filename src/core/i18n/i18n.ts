@@ -39,7 +39,8 @@ const fallbackResources = {
       'appointments.status.no-show': 'Absent',
       'appointments.status.cancelled': 'Annulé',
       'appointments.actions.title': 'Rendez-vous {{ticket}}',
-      'appointments.actions.description': 'Consultez le rendez-vous et choisissez l’action appropriée.',
+      'appointments.actions.description':
+        'Consultez le rendez-vous et choisissez l’action appropriée.',
       'appointments.actions.cancelStepDescription':
         'Étape 2 sur 2 · précisez le motif avant de confirmer l’annulation.',
       'appointments.actions.rescheduleStepDescription':
@@ -147,7 +148,8 @@ const fallbackResources = {
       'settings.disconnectUserHint':
         'L’utilisateur devra se reconnecter sur chacun de ses appareils pour continuer.',
       'settings.assignUser': 'Affecter un utilisateur',
-      'settings.assignUserDescription': 'Ajoutez un utilisateur à {{resource}} avec un rôle compatible.',
+      'settings.assignUserDescription':
+        'Ajoutez un utilisateur à {{resource}} avec un rôle compatible.',
       'settings.assignmentStepUser': '1 · Rechercher un utilisateur',
       'settings.assignmentStepRole': '2 · Choisir son rôle',
       'settings.searchUser': 'Nom d’utilisateur ou email',
@@ -191,6 +193,36 @@ const fallbackResources = {
         'Les jetons d’authentification et les paramètres d’URL ne sont pas inclus.',
       'auth.login': 'Connexion',
       'auth.logout': 'Déconnexion',
+      'login.showcase.label': 'Découvrir les avantages de DORIFY',
+      'login.showcase.navigation': 'Choisir une présentation',
+      'login.showcase.goto': 'Afficher la présentation {{number}}',
+      'login.showcase.pause': 'Mettre le carrousel en pause',
+      'login.showcase.play': 'Relancer le carrousel',
+      'login.showcase.queues.eyebrow': 'Gestion des flux',
+      'login.showcase.queues.title': 'Des files fluides, enfin sous contrôle',
+      'login.showcase.queues.description':
+        'Orchestrez les arrivées, les priorités et les guichets depuis un cockpit clair, pensé pour les équipes terrain.',
+      'login.showcase.queues.metric': 'Temps d’attente visible en temps réel',
+      'login.showcase.appointments.eyebrow': 'Rendez-vous intelligents',
+      'login.showcase.appointments.title': 'Planifiez sans créer de nouvelles files',
+      'login.showcase.appointments.description':
+        'Proposez les bons créneaux, retrouvez chaque personne et gérez présence, annulation ou reprogrammation en quelques gestes.',
+      'login.showcase.appointments.metric': 'Planning et files réunis',
+      'login.showcase.supervision.eyebrow': 'Pilotage en direct',
+      'login.showcase.supervision.title': 'Décidez avec une vision complète du service',
+      'login.showcase.supervision.description':
+        'Suivez la charge, les délais et la performance de chaque site grâce à des indicateurs lisibles et immédiatement actionnables.',
+      'login.showcase.supervision.metric': 'Supervision multi-sites',
+      'login.showcase.tracking.eyebrow': 'Expérience visiteur',
+      'login.showcase.tracking.title': 'Informez au bon moment, sur le bon canal',
+      'login.showcase.tracking.description':
+        'Borne, écran de salle, suivi mobile et notifications accompagnent chaque visiteur sans alourdir le travail des équipes.',
+      'login.showcase.tracking.metric': 'Une expérience continue',
+      'login.showcase.management.eyebrow': 'Administration centralisée',
+      'login.showcase.management.title': 'Configurez aujourd’hui, faites évoluer demain',
+      'login.showcase.management.description':
+        'Sites, files, utilisateurs, rôles, niveaux de service et traductions sont administrés depuis un espace unique et sécurisé.',
+      'login.showcase.management.metric': 'Une plateforme adaptable',
       'notifications.appointment.updated': 'Rendez-vous mis à jour',
       'notifications.appointment.created': 'Rendez-vous créé',
       'notifications.appointment.createdMessage': 'Le rendez-vous a bien été enregistré.',
@@ -357,7 +389,8 @@ const fallbackResources = {
       'appointments.status.no-show': 'No-show',
       'appointments.status.cancelled': 'Cancelled',
       'appointments.actions.title': 'Appointment {{ticket}}',
-      'appointments.actions.description': 'Review the appointment and choose the appropriate action.',
+      'appointments.actions.description':
+        'Review the appointment and choose the appropriate action.',
       'appointments.actions.cancelStepDescription':
         'Step 2 of 2 · provide a reason before confirming cancellation.',
       'appointments.actions.rescheduleStepDescription':
@@ -505,6 +538,36 @@ const fallbackResources = {
       'errorBoundary.privacy': 'Authentication tokens and URL parameters are not included.',
       'auth.login': 'Sign in',
       'auth.logout': 'Sign out',
+      'login.showcase.label': 'Discover the benefits of DORIFY',
+      'login.showcase.navigation': 'Choose a presentation',
+      'login.showcase.goto': 'Show presentation {{number}}',
+      'login.showcase.pause': 'Pause carousel',
+      'login.showcase.play': 'Resume carousel',
+      'login.showcase.queues.eyebrow': 'Flow management',
+      'login.showcase.queues.title': 'Smooth queues, finally under control',
+      'login.showcase.queues.description':
+        'Orchestrate arrivals, priorities and counters from a clear cockpit designed for frontline teams.',
+      'login.showcase.queues.metric': 'Real-time waiting information',
+      'login.showcase.appointments.eyebrow': 'Smart appointments',
+      'login.showcase.appointments.title': 'Schedule without creating new queues',
+      'login.showcase.appointments.description':
+        'Offer the right slots, find every visitor and manage check-in, cancellation or rescheduling in a few steps.',
+      'login.showcase.appointments.metric': 'Planning and queues together',
+      'login.showcase.supervision.eyebrow': 'Live operations',
+      'login.showcase.supervision.title': 'Make decisions with a complete service view',
+      'login.showcase.supervision.description':
+        'Track workload, delays and site performance through clear, immediately actionable indicators.',
+      'login.showcase.supervision.metric': 'Multi-site supervision',
+      'login.showcase.tracking.eyebrow': 'Visitor experience',
+      'login.showcase.tracking.title': 'Inform people at the right time and place',
+      'login.showcase.tracking.description':
+        'Kiosks, waiting-room displays, mobile tracking and notifications guide visitors without burdening staff.',
+      'login.showcase.tracking.metric': 'One continuous experience',
+      'login.showcase.management.eyebrow': 'Central administration',
+      'login.showcase.management.title': 'Configure today, scale tomorrow',
+      'login.showcase.management.description':
+        'Sites, queues, users, roles, service levels and translations are managed from one secure workspace.',
+      'login.showcase.management.metric': 'A platform that adapts',
       'notifications.appointment.updated': 'Appointment updated',
       'notifications.appointment.created': 'Appointment created',
       'notifications.appointment.createdMessage': 'The appointment was successfully saved.',
@@ -658,8 +721,7 @@ const fallbackResources = {
       'bootstrap.description': 'ستُضاف وحدات الأعمال حسب الترتيب المحدد في خطة التسليم.',
       'common.loading': 'جارٍ التحميل…',
       'loading.slogan': 'قوائم الانتظار تحت السيطرة. يمكنك أن تتنفس الآن.',
-      'desk.activeSessionDescription':
-        'شباكك نشط. يمكنك استدعاء الشخص التالي عندما تكون مستعدًا.',
+      'desk.activeSessionDescription': 'شباكك نشط. يمكنك استدعاء الشخص التالي عندما تكون مستعدًا.',
       'common.retry': 'إعادة المحاولة',
       'states.empty': 'لا توجد بيانات متاحة.',
       'states.error': 'تعذر تحميل البيانات.',
@@ -670,6 +732,36 @@ const fallbackResources = {
       'errors.unexpected': 'حدث خطأ غير متوقع.',
       'auth.login': 'تسجيل الدخول',
       'auth.logout': 'تسجيل الخروج',
+      'login.showcase.label': 'اكتشف مزايا DORIFY',
+      'login.showcase.navigation': 'اختر عرضاً',
+      'login.showcase.goto': 'عرض الشريحة {{number}}',
+      'login.showcase.pause': 'إيقاف العرض مؤقتاً',
+      'login.showcase.play': 'استئناف العرض',
+      'login.showcase.queues.eyebrow': 'إدارة التدفقات',
+      'login.showcase.queues.title': 'طوابير سلسة وتحت السيطرة',
+      'login.showcase.queues.description':
+        'نظّم الوصول والأولويات والشبابيك من لوحة واضحة مصممة لفرق الاستقبال.',
+      'login.showcase.queues.metric': 'وقت الانتظار في الوقت الفعلي',
+      'login.showcase.appointments.eyebrow': 'مواعيد ذكية',
+      'login.showcase.appointments.title': 'خطط للمواعيد دون إنشاء طوابير جديدة',
+      'login.showcase.appointments.description':
+        'اقترح المواعيد المناسبة وأدر الحضور والإلغاء وإعادة الجدولة بسهولة.',
+      'login.showcase.appointments.metric': 'المواعيد والطوابير معاً',
+      'login.showcase.supervision.eyebrow': 'إشراف مباشر',
+      'login.showcase.supervision.title': 'قرارات أفضل برؤية شاملة للخدمة',
+      'login.showcase.supervision.description':
+        'تابع الضغط والآجال وأداء كل موقع من خلال مؤشرات واضحة وقابلة للتنفيذ.',
+      'login.showcase.supervision.metric': 'إشراف متعدد المواقع',
+      'login.showcase.tracking.eyebrow': 'تجربة الزائر',
+      'login.showcase.tracking.title': 'المعلومة المناسبة في الوقت المناسب',
+      'login.showcase.tracking.description':
+        'ترافق الشاشات والتتبع عبر الهاتف والإشعارات كل زائر دون زيادة عبء الفرق.',
+      'login.showcase.tracking.metric': 'تجربة متواصلة',
+      'login.showcase.management.eyebrow': 'إدارة مركزية',
+      'login.showcase.management.title': 'إعداد اليوم وتطوير الغد',
+      'login.showcase.management.description':
+        'أدر المواقع والطوابير والمستخدمين والأدوار ومستويات الخدمة والترجمات من مساحة آمنة واحدة.',
+      'login.showcase.management.metric': 'منصة قابلة للتطوير',
       'profile.title': 'ملفي الشخصي',
       'routes.placeholder': 'مساحة {{name}} جاهزة للبناء.',
       'common.close': 'إغلاق',

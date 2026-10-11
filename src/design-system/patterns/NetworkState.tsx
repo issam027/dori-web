@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RotateCcw } from 'lucide-react';
 import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 type NetworkStatus = 'loading' | 'success' | 'empty' | 'error' | 'forbidden' | 'conflict';
@@ -21,7 +22,8 @@ export function NetworkState({ status, children, onRetry }: NetworkStateProps) {
     <section role="alert">
       <p>{t('states.error')}</p>
       {onRetry ? (
-        <button type="button" onClick={onRetry}>
+        <button className="button button-primary" type="button" onClick={onRetry}>
+          <RotateCcw aria-hidden="true" />
           {t('common.retry')}
         </button>
       ) : null}

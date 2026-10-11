@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { Check, PhoneCall, Printer, StickyNote, UserX } from 'lucide-react';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
@@ -289,6 +290,7 @@ export function DeskPage() {
                       close('served');
                     }}
                   >
+                    <Check aria-hidden="true" />
                     {__t('ui.queue-operations.desk_page.servi_1bextlc')}
                   </button>
                   <button
@@ -298,6 +300,7 @@ export function DeskPage() {
                       close('no_show');
                     }}
                   >
+                    <UserX aria-hidden="true" />
                     {__t('ui.queue-operations.desk_page.absent_meu720')}
                   </button>
                 </div>
@@ -309,6 +312,7 @@ export function DeskPage() {
                       setNotesOpen(true);
                     }}
                   >
+                    <StickyNote aria-hidden="true" />
                     {__t('ui.queue-operations.desk_page.consulter_les_notes_esjdmp')}
                     <span
                       className="note-count"
@@ -441,6 +445,7 @@ export function DeskPage() {
                     });
                   }}
                 >
+                  <PhoneCall aria-hidden="true" />
                   {__t('ui.queue-operations.desk_page.appeler_le_suivant_1q7561l')}
                 </button>
               </Card>
@@ -548,6 +553,7 @@ export function DeskPage() {
                         setPrintingPassageId(passage.registrationId);
                       }}
                     >
+                      <Printer aria-hidden="true" />
                       {__t('ui.queue-operations.desk_page.imprimer_le_justificatif_3rhfqy')}
                     </button>
                   </footer>

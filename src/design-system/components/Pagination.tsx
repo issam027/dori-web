@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function Pagination({
   page,
@@ -20,6 +21,7 @@ export function Pagination({
           onPageChange(page - 1);
         }}
       >
+        <ChevronLeft aria-hidden="true" />
         {t('pagination.previous')}
       </button>
       <span>{t('pagination.position', { page, totalPages })}</span>
@@ -32,6 +34,7 @@ export function Pagination({
         }}
       >
         {t('pagination.next')}
+        <ChevronRight aria-hidden="true" />
       </button>
     </nav>
   );

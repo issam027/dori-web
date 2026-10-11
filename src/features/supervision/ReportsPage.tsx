@@ -1,7 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import {
+  Building2,
+  CircleCheck,
+  Download,
+  Gauge,
+  ListChecks,
+  Timer,
+  UserPlus,
+  UsersRound,
+  UserX,
+} from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
-import { Card } from '@/design-system/components/Card';
+import { Card, MetricCard } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -63,11 +74,10 @@ export function ReportsPage() {
       <PageHeader
         eyebrow="Pilotage"
         title={__t('ui.supervision.reports_page.rapports_14c3yxg')}
-        description={__t(
-          'reports.periodDescription',
-        )}
+        description={__t('reports.periodDescription')}
         actions={
           <button type="button" className="button" disabled={!items.length} onClick={exportCsv}>
+            <Download aria-hidden="true" />
             {__t('ui.supervision.reports_page.exporter_csv_local_17y7htf')}
           </button>
         }
@@ -109,25 +119,20 @@ export function ReportsPage() {
       </Card>
       <div className="metric-grid">
         {[
-          ['Sites actifs', summary.data?.data.activeSites],
-          ['Files actives', summary.data?.data.activeQueues],
-          ['En attente', summary.data?.data.waitingTotal],
-          ['Inscrits', totals.registered],
-          ['Servis', totals.served],
-          ['TMA', `${totals.averageWaitMinutes.toFixed(1)} min`],
-          ['TMT', `${totals.averageServiceMinutes.toFixed(1)} min`],
-          ['No-show', `${(totals.noShowRate * 100).toFixed(1)} %`],
-        ].map(([label, value]) => (
-          <Card key={label}>
-            <span className="metric-label">{label}</span>
-            <strong className="metric-value">{value ?? '—'}</strong>
-          </Card>
+          { label: 'Sites actifs', value: summary.data?.data.activeSites, icon: Building2 },
+          { label: 'Files actives', value: summary.data?.data.activeQueues, icon: ListChecks },
+          { label: 'En attente', value: summary.data?.data.waitingTotal, icon: UsersRound },
+          { label: 'Inscrits', value: totals.registered, icon: UserPlus },
+          { label: 'Servis', value: totals.served, icon: CircleCheck },
+          { label: 'TMA', value: `${totals.averageWaitMinutes.toFixed(1)} min`, icon: Timer },
+          { label: 'TMT', value: `${totals.averageServiceMinutes.toFixed(1)} min`, icon: Gauge },
+          { label: 'No-show', value: `${(totals.noShowRate * 100).toFixed(1)} %`, icon: UserX },
+        ].map(({ label, value, icon: Icon }) => (
+          <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
       </div>
       {!reports.isLoading && !items.length ? (
-        <EmptyState
-          title={__t('reports.noDataForPeriod')}
-        />
+        <EmptyState title={__t('reports.noDataForPeriod')} />
       ) : (
         <Card>
           <h2>{__t('ui.supervision.reports_page.performance_par_file_r9y7ow')}</h2>

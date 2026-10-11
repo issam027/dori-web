@@ -2,21 +2,23 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { Globe2, KeyRound, Languages, ListChecks, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { changePassword, updateUser } from './api/profile-api';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
-import { Card } from '@/design-system/components/Card';
+import { Card, MetricCard } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 
-const createSchema = (t: TFunction) => z.object({
-  email: z.union([z.literal(''), z.email(t('validation.emailInvalid'))]),
-  languagePreference: z.string().min(2),
-});
+const createSchema = (t: TFunction) =>
+  z.object({
+    email: z.union([z.literal(''), z.email(t('validation.emailInvalid'))]),
+    languagePreference: z.string().min(2),
+  });
 type ProfileForm = z.infer<ReturnType<typeof createSchema>>;
 const createPasswordSchema = (t: TFunction) =>
   z
@@ -153,15 +155,22 @@ export function ProfilePage() {
             </FormField>
             <FormField label={__t('ui.profile.profile_page.langue_4vkz5r')}>
               <select {...register('languagePreference')}>
-                <option value="fr">{__t('ui.profile.profile_page.francais_1x2mspi')}</option>
-                <option value="en">{__t('ui.profile.profile_page.english_7nql6j')}</option>
-                <option value="ar">العربية</option>
+                <option value="fr" aria-label={__t('ui.profile.profile_page.francais_1x2mspi')}>
+                  {String.fromCodePoint(0x1f1eb, 0x1f1f7)}
+                </option>
+                <option value="en" aria-label={__t('ui.profile.profile_page.english_7nql6j')}>
+                  {String.fromCodePoint(0x1f1ec, 0x1f1e7)}
+                </option>
+                <option value="ar" aria-label="العربية">
+                  {String.fromCodePoint(0x1f1f9, 0x1f1f3)}
+                </option>
               </select>
             </FormField>
             {saved ? (
               <p role="status">{__t('ui.profile.profile_page.profil_enregistre_1kk86qt')}</p>
             ) : null}
             <button className="button button-primary" disabled={isSubmitting} type="submit">
+              <Save aria-hidden="true" />
               {__t('ui.profile.profile_page.enregistrer_sywgdx')}
             </button>
           </form>
@@ -183,6 +192,7 @@ export function ProfilePage() {
                     setPasswordEditing(true);
                   }}
                 >
+                  <KeyRound aria-hidden="true" />
                   {__t('ui.profile.profile_page.changer_mon_mot_de_passe_1pun60i')}
                 </button>
               </>
@@ -244,6 +254,7 @@ export function ProfilePage() {
                       type="submit"
                       disabled={passwordSubmitting}
                     >
+                      <Save aria-hidden="true" />
                       {__t('profile.updatePassword')}
                     </button>
                   </div>
@@ -254,32 +265,31 @@ export function ProfilePage() {
         </Card>
       </div>
       <div className="metrics-grid profile-scope-metrics">
-        <Card>
-          <span className="metric-label">{__t('ui.profile.profile_page.perimetre_ai7per')}</span>
-          <strong className="metric-value">
-            {user.scope.isGlobal
+        <MetricCard
+          label={__t('ui.profile.profile_page.perimetre_ai7per')}
+          value={
+            user.scope.isGlobal
               ? __t('ui.expression.profile.profile_page.global_rrldxq')
               : __t('ui.expression.profile.profile_page.value0_site_s_a2wlej', {
                   value0: String(user.scope.siteIds.length),
-                })}
-          </strong>
-        </Card>
-        <Card>
-          <span className="metric-label">
-            {__t('ui.profile.profile_page.files_autorisees_z62lee')}
-          </span>
-          <strong className="metric-value">
-            {user.scope.isGlobal
+                })
+          }
+          icon={<Globe2 />}
+        />
+        <MetricCard
+          label={__t('ui.profile.profile_page.files_autorisees_z62lee')}
+          value={
+            user.scope.isGlobal
               ? __t('ui.expression.profile.profile_page.toutes_1krg1dl')
-              : user.scope.queueIds.length}
-          </strong>
-        </Card>
-        <Card>
-          <span className="metric-label">{__t('ui.profile.profile_page.langue_4vkz5r')}</span>
-          <strong className="metric-value">
-            {user.languagePreference ?? __t('ui.expression.profile.profile_page.fr_o6dm29')}
-          </strong>
-        </Card>
+              : user.scope.queueIds.length
+          }
+          icon={<ListChecks />}
+        />
+        <MetricCard
+          label={__t('ui.profile.profile_page.langue_4vkz5r')}
+          value={user.languagePreference ?? __t('ui.expression.profile.profile_page.fr_o6dm29')}
+          icon={<Languages />}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Ban, CalendarClock, Save, UserCheck } from 'lucide-react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { notifyError } from '@/core/notifications/error-presentation';
@@ -130,6 +131,7 @@ export function AppointmentActionDialog({
             });
           }}
         >
+          <UserCheck aria-hidden="true" />
           {t('appointments.actions.markPresent')}
         </button>
         <button
@@ -140,6 +142,7 @@ export function AppointmentActionDialog({
             setMode('reschedule');
           }}
         >
+          <CalendarClock aria-hidden="true" />
           {t('appointments.actions.reschedule')}
         </button>
         <button
@@ -150,12 +153,14 @@ export function AppointmentActionDialog({
             setMode('cancel');
           }}
         >
+          <Ban aria-hidden="true" />
           {t('appointments.actions.cancelAppointment')}
         </button>
       </>
     ) : mode === 'cancel' ? (
       <>
         <button className="button" type="button" disabled={pending} onClick={goBack}>
+          <ArrowLeft aria-hidden="true" />
           {t('common.previous')}
         </button>
         <button
@@ -175,12 +180,14 @@ export function AppointmentActionDialog({
             });
           }}
         >
+          <Ban aria-hidden="true" />
           {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
         </button>
       </>
     ) : (
       <>
         <button className="button" type="button" disabled={pending} onClick={goBack}>
+          <ArrowLeft aria-hidden="true" />
           {t('common.previous')}
         </button>
         <button
@@ -205,6 +212,7 @@ export function AppointmentActionDialog({
             });
           }}
         >
+          <Save aria-hidden="true" />
           {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
         </button>
       </>

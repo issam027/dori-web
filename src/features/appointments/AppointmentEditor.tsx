@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, CalendarPlus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -113,6 +114,7 @@ export function AppointmentEditor({
               }}
             >
               {__t('ui.appointments.appointment_editor.continuer_5vzly4')}
+              <ArrowRight aria-hidden="true" />
             </button>
           ) : (
             <button
@@ -121,6 +123,7 @@ export function AppointmentEditor({
               disabled={!person || !queueId || !tierId}
               onClick={() => void submit()}
             >
+              <CalendarPlus aria-hidden="true" />
               {__t('ui.appointments.appointment_editor.creer_le_rendez_vous_1xjfxor')}
             </button>
           )}

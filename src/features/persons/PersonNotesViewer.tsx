@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Save, StickyNote } from 'lucide-react';
 import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
@@ -62,6 +63,7 @@ export function PersonNotesViewer({
                 setAdding(false);
               }}
             >
+              <ArrowLeft aria-hidden="true" />
               {__t('ui.persons.person_notes_viewer.retour_aux_notes_1nkxpit')}
             </button>
           ) : null}
@@ -72,6 +74,7 @@ export function PersonNotesViewer({
               disabled={!content.trim()}
               onClick={() => void add()}
             >
+              <Save aria-hidden="true" />
               {__t('ui.persons.person_notes_viewer.enregistrer_la_note_w8aayc')}
             </button>
           ) : (
@@ -82,6 +85,7 @@ export function PersonNotesViewer({
                 setAdding(true);
               }}
             >
+              <Plus aria-hidden="true" />
               {__t('ui.persons.person_notes_viewer.ajouter_17wnmfl')}
             </button>
           )}
@@ -92,7 +96,7 @@ export function PersonNotesViewer({
         <div className="note-editor-panel">
           <div className="note-mode-heading">
             <span className="note-icon" aria-hidden="true">
-              ✎
+              <StickyNote />
             </span>
             <div>
               <h3>{__t('ui.persons.person_notes_viewer.nouvelle_note_ot3to1')}</h3>
@@ -138,6 +142,7 @@ export function PersonNotesViewer({
                   setIndex(index + 1);
                 }}
               >
+                <ChevronLeft aria-hidden="true" />
                 {__t('ui.persons.person_notes_viewer.precedente_j6o8ea')}
               </button>
               <span>
@@ -152,6 +157,7 @@ export function PersonNotesViewer({
                 }}
               >
                 {__t('ui.persons.person_notes_viewer.suivante_1og87ce')}
+                <ChevronRight aria-hidden="true" />
               </button>
             </div>
           ) : null}
@@ -159,7 +165,7 @@ export function PersonNotesViewer({
       ) : (
         <div className="note-empty-state">
           <span className="note-icon" aria-hidden="true">
-            ✎
+            <StickyNote />
           </span>
           <h3>{__t('ui.persons.person_notes_viewer.aucune_note_x1ege2')}</h3>
           <p>

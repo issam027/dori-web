@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Building2, MapPin } from 'lucide-react';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { Card, MetricCard } from '@/design-system/components/Card';
@@ -34,9 +35,11 @@ export function PortfolioPage() {
         <MetricCard
           label={__t('ui.portfolio.portfolio_page.sites_autorises_kxxnqk')}
           value={allowed.length}
+          icon={<Building2 />}
         />
         <MetricCard
           label={__t('ui.portfolio.portfolio_page.contexte_actif_1hf5mac')}
+          icon={<MapPin />}
           value={allowed.find((site) => site.siteId === activeSiteId)?.siteName ?? '—'}
         />
       </div>

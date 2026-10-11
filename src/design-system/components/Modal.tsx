@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
+import { Check, CircleAlert } from 'lucide-react';
 
 interface ModalProps {
   open: boolean;
@@ -65,6 +66,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
           >
+            {destructive ? <CircleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}
             {confirmLabel}
           </button>
         </>

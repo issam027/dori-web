@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { LocaleSwitcher } from '@/design-system/components/LocaleSwitcher';
 import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
-import { Menu, RefreshCw } from 'lucide-react';
+import { LogOut, Menu, RefreshCw } from 'lucide-react';
 
 export function Topbar({
   sites,
@@ -80,6 +80,7 @@ export function Topbar({
           {initials}
         </Link>
         <button className="button" type="button" onClick={onLogout}>
+          <LogOut aria-hidden="true" />
           {t('auth.logout')}
         </button>
       </div>

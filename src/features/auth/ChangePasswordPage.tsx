@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Save } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -13,16 +14,17 @@ import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
 
-const createSchema = (t: TFunction) => z
-  .object({
-    currentPassword: z.string().min(1),
-    newPassword: z.string().min(10).max(20),
-    confirmation: z.string(),
-  })
-  .refine((v) => v.newPassword === v.confirmation, {
-    path: ['confirmation'],
-    message: t('validation.passwordsDiffer'),
-  });
+const createSchema = (t: TFunction) =>
+  z
+    .object({
+      currentPassword: z.string().min(1),
+      newPassword: z.string().min(10).max(20),
+      confirmation: z.string(),
+    })
+    .refine((v) => v.newPassword === v.confirmation, {
+      path: ['confirmation'],
+      message: t('validation.passwordsDiffer'),
+    });
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export function ChangePasswordPage() {
@@ -94,6 +96,7 @@ export function ChangePasswordPage() {
             </p>
           ) : null}
           <button className="button button-primary" disabled={isSubmitting} type="submit">
+            <Save aria-hidden="true" />
             {__t('ui.auth.change_password_page.enregistrer_sywgdx')}
           </button>
         </form>

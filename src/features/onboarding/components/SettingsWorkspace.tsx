@@ -2,6 +2,18 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  KeyRound,
+  Languages,
+  Layers3,
+  ListTree,
+  LogOut,
+  Pencil,
+  Plus,
+  Save,
+  UserPlus,
+  Users,
+} from 'lucide-react';
+import {
   associateTier,
   createQueueForSite,
   createTierRule,
@@ -22,10 +34,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
-import {
-  type AssignmentTarget,
-  UserAssignmentModal,
-} from '@/features/users/UserAssignmentModal';
+import { type AssignmentTarget, UserAssignmentModal } from '@/features/users/UserAssignmentModal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 
@@ -83,15 +92,22 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         <MetricCard
           label={__t('ui.onboarding.settings_page.files_configurees_j0ags4')}
           value={qs.length}
+          icon={<ListTree />}
         />
         <MetricCard
           label={__t('ui.onboarding.settings_page.utilisateurs_actifs_gbz8z7')}
           value={us.filter((u) => u.isActive).length}
+          icon={<Users />}
         />
-        <MetricCard label={__t('ui.onboarding.settings_page.niveaux_xbb935')} value={ts.length} />
+        <MetricCard
+          label={__t('ui.onboarding.settings_page.niveaux_xbb935')}
+          value={ts.length}
+          icon={<Layers3 />}
+        />
         <MetricCard
           label={__t('ui.onboarding.settings_page.traductions_t3vhxl')}
           value={xs.length}
+          icon={<Languages />}
         />
       </div>
       <Card className="settings-card">
@@ -203,11 +219,11 @@ function Header({
       </div>
       {to && label ? (
         <Link className="button button-primary" to={to}>
-          + {label}
+          <Plus aria-hidden="true" /> {label}
         </Link>
       ) : action ? (
         <button className="button button-primary" onClick={action}>
-          + {label}
+          <Plus aria-hidden="true" /> {label}
         </button>
       ) : null}
     </div>
@@ -216,19 +232,14 @@ function Header({
 type Sites = Awaited<ReturnType<typeof findSites>>['data']['items'];
 type Users = Awaited<ReturnType<typeof findUsers>>['data']['items'];
 type Tiers = Awaited<ReturnType<typeof findTiers>>['data']['items'];
-type Translations = Awaited<
-  ReturnType<typeof findTranslations>
->['data']['items'];
+type Translations = Awaited<ReturnType<typeof findTranslations>>['data']['items'];
 const ADMIN_PAGE_SIZE = 10;
 
 function useAdminPagination<T>(items: readonly T[]) {
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(items.length / ADMIN_PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
-  const pageItems = items.slice(
-    (currentPage - 1) * ADMIN_PAGE_SIZE,
-    currentPage * ADMIN_PAGE_SIZE,
-  );
+  const pageItems = items.slice((currentPage - 1) * ADMIN_PAGE_SIZE, currentPage * ADMIN_PAGE_SIZE);
   return { currentPage, pageItems, setPage, totalPages };
 }
 
@@ -291,14 +302,13 @@ function SitesPanel({
                         assign({ kind: 'site', id: s.siteId, label: s.siteName });
                       }}
                     >
+                      <UserPlus aria-hidden="true" />
                       {__t('settings.assignUser')}
                     </button>
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void updateSite(s.siteId, { isActive: !s.isActive }).then(
-                          refresh,
-                        )
+                        void updateSite(s.siteId, { isActive: !s.isActive }).then(refresh)
                       }
                     >
                       {s.isActive
@@ -391,6 +401,7 @@ function QueuesPanel({
                         edit(q);
                       }}
                     >
+                      <Pencil aria-hidden="true" />
                       {__t('ui.onboarding.settings_page.modifier_1s45w8g')}
                     </button>
                     <button
@@ -400,14 +411,13 @@ function QueuesPanel({
                         assign({ kind: 'queue', id: q.queueId, label: q.queueName });
                       }}
                     >
+                      <UserPlus aria-hidden="true" />
                       {__t('settings.assignUser')}
                     </button>
                     <button
                       className="button button-small"
                       onClick={() =>
-                        void updateQueue(q.queueId, { isActive: !q.isActive }).then(
-                          refresh,
-                        )
+                        void updateQueue(q.queueId, { isActive: !q.isActive }).then(refresh)
                       }
                     >
                       {q.isActive
@@ -501,6 +511,7 @@ function UsersPanel({
                         })
                       }
                     >
+                      <KeyRound aria-hidden="true" />
                       {__t('ui.onboarding.settings_page.reinitialiser_mdp_1jj1i30')}
                     </button>
                     <button
@@ -510,6 +521,7 @@ function UsersPanel({
                         setDisconnectUser(u);
                       }}
                     >
+                      <LogOut aria-hidden="true" />
                       {__t('settings.disconnectUser')}
                     </button>
                   </div>
@@ -733,6 +745,7 @@ function TierModal({
             })
           }
         >
+          <Save aria-hidden="true" />
           {__t('ui.onboarding.settings_page.associer_1akns98')}
         </button>
       }
@@ -847,6 +860,7 @@ function RuleModal({
             })
           }
         >
+          <Save aria-hidden="true" />
           {__t('ui.onboarding.settings_page.enregistrer_sywgdx')}
         </button>
       }
@@ -961,6 +975,7 @@ function TranslationModal({
             })
           }
         >
+          <Save aria-hidden="true" />
           {__t('ui.onboarding.settings_page.enregistrer_sywgdx')}
         </button>
       }

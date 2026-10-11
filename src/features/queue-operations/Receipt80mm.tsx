@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Printer } from 'lucide-react';
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
 
 export function Receipt80mm({
@@ -44,6 +45,7 @@ export function Receipt80mm({
           window.print();
         }}
       >
+        <Printer aria-hidden="true" />
         {__t('ui.queue-operations.receipt80mm.imprimer_gwyilo')}
       </button>
     </article>

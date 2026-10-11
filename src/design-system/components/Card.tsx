@@ -8,15 +8,22 @@ export function MetricCard({
   label,
   value,
   detail,
+  icon,
 }: {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <Card className="metric-card">
       <span className="metric-label">{label}</span>
-      <strong>{value}</strong>
+      {icon ? (
+        <span className="metric-icon" aria-hidden="true">
+          {icon}
+        </span>
+      ) : null}
+      <strong className="metric-value">{value}</strong>
       {detail ? <small>{detail}</small> : null}
     </Card>
   );

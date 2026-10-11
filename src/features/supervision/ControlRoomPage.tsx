@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { CalendarDays, ListChecks, MonitorUp, UsersRound } from 'lucide-react';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useScopeStore } from '@/core/scope/scope-store';
-import { Card } from '@/design-system/components/Card';
+import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { ConfirmDialog } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -30,15 +31,15 @@ export function ControlRoomPage() {
   const { threads, sessions } = useDeskSession(null, queueIds);
   const notifications = useRecentNotifications();
   const reset = useResetQueue(() => {
-      const queueName = resetQueue?.name;
-      setResetQueue(undefined);
-      notify({
-        tone: 'success',
-        title: __t('notifications.queue.reset'),
-        message: queueName
-          ? __t('notifications.queue.resetMessage', { queue: queueName })
-          : undefined,
-      });
+    const queueName = resetQueue?.name;
+    setResetQueue(undefined);
+    notify({
+      tone: 'success',
+      title: __t('notifications.queue.reset'),
+      message: queueName
+        ? __t('notifications.queue.resetMessage', { queue: queueName })
+        : undefined,
+    });
   });
   if (load.isError || summary.isError)
     return <ErrorState onRetry={() => void Promise.all([load.refetch(), summary.refetch()])} />;
@@ -58,18 +59,20 @@ export function ControlRoomPage() {
       />
       <div className="metric-grid">
         {[
-          ['Files actives', summary.data?.data.activeQueues],
-          ['En attente', summary.data?.data.waitingTotal],
-          [
-            'Guichets actifs',
-            `${String(activeCounters)}/${totalCounters ? String(totalCounters) : '—'}`,
-          ],
-          ['Rendez-vous du jour', summary.data?.data.appointmentsToday],
-        ].map(([label, value]) => (
-          <Card key={label}>
-            <span className="metric-label">{label}</span>
-            <strong className="metric-value">{value ?? '—'}</strong>
-          </Card>
+          { label: 'Files actives', value: summary.data?.data.activeQueues, icon: ListChecks },
+          { label: 'En attente', value: summary.data?.data.waitingTotal, icon: UsersRound },
+          {
+            label: 'Guichets actifs',
+            value: `${String(activeCounters)}/${totalCounters ? String(totalCounters) : '—'}`,
+            icon: MonitorUp,
+          },
+          {
+            label: 'Rendez-vous du jour',
+            value: summary.data?.data.appointmentsToday,
+            icon: CalendarDays,
+          },
+        ].map(({ label, value, icon: Icon }) => (
+          <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
       </div>
       {!load.isLoading && !items.length ? (
