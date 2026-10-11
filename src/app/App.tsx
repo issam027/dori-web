@@ -145,10 +145,11 @@ type RouteView = {
   component: ComponentType;
   frame: 'shell' | 'public' | 'experience';
   experienceMode?: 'kiosk' | 'display';
+  publicMode?: 'public' | 'device';
 };
 
 const protectedRouteViews: Record<string, RouteView> = {
-  '/device-mode': { component: DeviceModePage, frame: 'public' },
+  '/device-mode': { component: DeviceModePage, frame: 'public', publicMode: 'device' },
   '/portfolio': { component: PortfolioPage, frame: 'shell' },
   '/desk': { component: DeskPage, frame: 'shell' },
   '/my-queues': { component: MyQueuesPage, frame: 'shell' },
@@ -171,7 +172,7 @@ function ConfiguredProtectedPage({ path }: { path: string }) {
     return <ExperienceRoute mode={view.experienceMode} />;
   if (view.frame === 'public')
     return (
-      <PublicExperienceLayout mode="public">
+      <PublicExperienceLayout mode={view.publicMode ?? 'public'}>
         <Component />
       </PublicExperienceLayout>
     );

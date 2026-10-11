@@ -9,7 +9,7 @@ export function PublicExperienceLayout({
   mode,
   children,
 }: {
-  mode: 'public' | 'kiosk' | 'display' | 'tracking';
+  mode: 'public' | 'device' | 'kiosk' | 'display' | 'tracking';
   children: ReactNode;
 }) {
   const { t: __t } = useTranslation();
