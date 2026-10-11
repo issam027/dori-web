@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 
 const locales = ['fr', 'en', 'ar'] as const;
@@ -42,23 +44,60 @@ export function LocaleSwitcher() {
   const { t } = useTranslation();
   const locale = usePreferencesStore((state) => state.locale);
   const setLocale = usePreferencesStore((state) => state.setLocale);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const activeLocale = locales.includes(locale as (typeof locales)[number])
+    ? (locale as (typeof locales)[number])
+    : 'fr';
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+    };
+  }, [open]);
+
   return (
-    <div className="locale-switcher" role="group" aria-label={t('locale.label')}>
-      {locales.map((code) => (
-        <button
-          key={code}
-          className="locale-switcher-option"
-          type="button"
-          aria-label={t(`locale.${code}`)}
-          aria-pressed={locale === code}
-          title={t(`locale.${code}`)}
-          onClick={() => {
-            setLocale(code);
-          }}
-        >
-          <CountryFlag locale={code} />
-        </button>
-      ))}
+    <div className="locale-switcher" ref={rootRef}>
+      <button
+        className="locale-switcher-trigger"
+        type="button"
+        aria-label={`${t('locale.label')}: ${t(`locale.${activeLocale}`)}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        title={t(`locale.${activeLocale}`)}
+        onClick={() => {
+          setOpen((current) => !current);
+        }}
+      >
+        <CountryFlag locale={activeLocale} />
+        <ChevronDown aria-hidden="true" />
+      </button>
+      {open ? (
+        <div className="locale-switcher-menu" role="listbox" aria-label={t('locale.label')}>
+          {locales.map((code) => (
+            <button
+              key={code}
+              className="locale-switcher-option"
+              type="button"
+              role="option"
+              aria-label={t(`locale.${code}`)}
+              aria-selected={activeLocale === code}
+              title={t(`locale.${code}`)}
+              onClick={() => {
+                setLocale(code);
+                setOpen(false);
+              }}
+            >
+              <CountryFlag locale={code} />
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

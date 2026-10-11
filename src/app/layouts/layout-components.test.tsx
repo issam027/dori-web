@@ -6,6 +6,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { Modal } from '@/design-system/components/Modal';
 import { SidebarAccordion } from './SidebarAccordion';
 import { SiteContextSwitcher } from './SiteContextSwitcher';
+import { Topbar } from './Topbar';
 
 const operator: CurrentUserResponseDto = {
   userId: 1,
@@ -73,5 +74,32 @@ describe('application layout', () => {
     expect(screen.getByRole('dialog', { name: 'Confirmation' })).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: /annuler|cancel|common.cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('groups profile, language and logout in the compact account menu', async () => {
+    useSessionStore.getState().authenticate(operator);
+    const logout = vi.fn();
+    render(
+      <MemoryRouter initialEntries={['/desk']}>
+        <Topbar
+          sites={[{ id: 1, name: 'Paris' }]}
+          activeSiteId={1}
+          onLogout={logout}
+          onOpenCommands={vi.fn()}
+          onRefresh={vi.fn()}
+          refreshing={false}
+          onOpenNavigation={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    const compactAccount = document.querySelector('.mobile-account-trigger');
+    expect(compactAccount).toBeInTheDocument();
+    await userEvent.click(compactAccount as HTMLElement);
+    const menu = screen.getByRole('menu');
+    expect(menu).toHaveTextContent(/mon profil/i);
+    expect(menu).toHaveTextContent(/langue/i);
+    await userEvent.click(screen.getByRole('menuitem', { name: /déconnexion/i }));
+    expect(logout).toHaveBeenCalledOnce();
   });
 });

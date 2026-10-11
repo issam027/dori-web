@@ -1,0 +1,156 @@
+import { expect, test } from '@playwright/test';
+
+const envelope = (data: unknown) => ({
+  code: 'OK',
+  translationKey: null,
+  translationParams: {},
+  data,
+});
+
+test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) => {
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.endsWith('/auth/me')) {
+      await route.fulfill({
+        json: envelope({
+          userId: 7,
+          username: 'kiosk',
+          userType: 'kiosk',
+          roles: ['kiosk'],
+          permissions: [],
+          mustChangePassword: false,
+          languagePreference: 'fr',
+          scope: { isGlobal: false, siteIds: [1], queueIds: [1] },
+        }),
+      });
+      return;
+    }
+    if (pathname.endsWith('/queues/1/status')) {
+      await route.fulfill({
+        json: envelope({
+          queueId: 1,
+          waitingCount: 2,
+          activeThreads: 1,
+          estimatedWaitMinutes: 8,
+          nextAppointments: [],
+        }),
+      });
+      return;
+    }
+    if (pathname.endsWith('/queues/1/tiers/1/notification-rules')) {
+      await route.fulfill({
+        json: envelope({ page: 1, pageSize: 100, total: 0, totalPages: 0, items: [] }),
+      });
+      return;
+    }
+    if (pathname.endsWith('/queues/1/tiers')) {
+      await route.fulfill({
+        json: envelope({
+          page: 1,
+          pageSize: 100,
+          total: 1,
+          totalPages: 1,
+          items: [
+            {
+              queueId: 1,
+              tierId: 1,
+              price: 0,
+              currency: 'EUR',
+              currencyOverride: null,
+              currencyOrigin: 'site',
+              isActive: true,
+              isDefault: true,
+              displayOrder: 0,
+              tier: {
+                tierId: 1,
+                tierCode: 'standard',
+                tierName: 'Standard',
+                isSystem: false,
+                description: 'Accueil standard',
+                isActive: true,
+              },
+            },
+          ],
+        }),
+      });
+      return;
+    }
+    if (pathname.endsWith('/queues')) {
+      await route.fulfill({
+        json: envelope({
+          page: 1,
+          pageSize: 100,
+          total: 1,
+          totalPages: 1,
+          items: [
+            {
+              queueId: 1,
+              queueCode: 'ACCUEIL',
+              siteId: 1,
+              queueName: 'Accueil général',
+              averageWaitTime: 8,
+              threadCount: 1,
+              currency: 'EUR',
+              locale: 'fr',
+              appointmentsEnabled: true,
+              appointmentSlotDuration: 15,
+              slotCapacity: 1,
+              workingHoursStart: '08:00:00',
+              workingHoursEnd: '17:00:00',
+              lateToleranceMinutes: 15,
+              baseWeightWalkin: 0,
+              baseWeightAppointment: 60,
+              escalationRateWalkin: 1,
+              escalationRateAppointment: 1,
+              carryOverWaiting: false,
+              dailyResetMode: 'close_all',
+              dailyResetTime: '03:00:00',
+              configOrigins: {},
+              isActive: true,
+              createdAt: '2026-10-11T08:00:00Z',
+              updatedAt: '2026-10-11T08:00:00Z',
+            },
+          ],
+        }),
+      });
+      return;
+    }
+    if (pathname.endsWith('/registrations') && request.method() === 'POST') {
+      await route.fulfill({
+        status: 201,
+        json: envelope({
+          registrationId: 81,
+          ticketNumber: 'AG081',
+          businessDate: '2026-10-11',
+          entryType: 'walkin',
+          status: 'waiting',
+          tier: {},
+          priorityReferenceTime: '2026-10-11T08:00:00Z',
+          trackingUrl: 'https://api.example/track?token=visual-qr-token',
+        }),
+      });
+      return;
+    }
+    await route.fulfill({ status: 404, json: envelope(null) });
+  });
+
+  await page.goto('/kiosk');
+  await page.locator('.kiosk-choices button').first().click();
+  await page.locator('.kiosk-tiles button').first().click();
+  await page.locator('.kiosk-actions .primary').click();
+  await page.locator('input[autocomplete="family-name"]').fill('Martin');
+  await page.getByRole('textbox', { name: /téléphone/i }).fill('612345678');
+  await page.locator('.kiosk-actions .primary').click();
+  await page.locator('.kiosk-tier-tiles button').first().click();
+  await page.locator('.kiosk-actions .primary').click();
+  await page.locator('.kiosk-actions .primary').click();
+
+  const qr = page.locator('.kiosk-ticket-result .tracking-qr img');
+  await expect(qr).toBeVisible();
+  await expect(qr).toHaveJSProperty('complete', true);
+  expect(await qr.evaluate((image) => (image as { naturalWidth: number }).naturalWidth)).toBeGreaterThan(
+    100,
+  );
+  await page.screenshot({ path: testInfo.outputPath('kiosk-ticket-with-qr.png'), fullPage: true });
+});
