@@ -8,10 +8,15 @@ import type {
   RegistrationPositionResponseDto,
   RegistrationResponseDto,
 } from '@/api/generated/models';
-import { queuesControllerFindAll, queuesControllerGetDisplay, queuesControllerGetStatus } from '@/api/generated/queues/queues';
+import {
+  queuesControllerFindAll,
+  queuesControllerGetDisplay,
+  queuesControllerGetStatus,
+} from '@/api/generated/queues/queues';
 import {
   registrationsControllerCheckIn,
   registrationsControllerGetPublicPosition,
+  registrationsControllerFindRegistrations,
   registrationsControllerLookup,
   registrationsControllerRegister,
 } from '@/api/generated/registrations/registrations';
@@ -91,7 +96,11 @@ export function useDisplaySnapshot(options: {
   return { queues, allowedQueues, displays };
 }
 
-export function useKioskCatalog(siteId: number | null, queueId: number | undefined, enabled: boolean) {
+export function useKioskCatalog(
+  siteId: number | null,
+  queueId: number | undefined,
+  enabled: boolean,
+) {
   const queues = useQuery({
     queryKey: queryKeys.publicExperience.kioskQueues(siteId),
     enabled,
@@ -141,14 +150,14 @@ export function useKioskRegistration(options: {
   createDto: () => CreateRegistrationDto;
   lookupDto: () => RegistrationsControllerLookupParams;
   selectedRegistration: () => RegistrationResponseDto | undefined;
-  onRegistered: (data: CreateRegistrationResponseDto) => void;
+  onRegistered: (data: CreateRegistrationResponseDto) => void | Promise<void>;
   onLookup: (data: RegistrationResponseDto) => void;
   onCheckedIn: (data: RegistrationResponseDto) => void;
 }) {
   const register = useMutation({
     mutationFn: () => registrationsControllerRegister(options.createDto()),
-    onSuccess: ({ data }) => {
-      options.onRegistered(data);
+    onSuccess: async ({ data }) => {
+      await options.onRegistered(data);
     },
   });
   const lookup = useMutation({
@@ -168,6 +177,22 @@ export function useKioskRegistration(options: {
     },
   });
   return { register, lookup, checkIn };
+}
+
+export async function findCreatedRegistrationTrackingToken(
+  queueId: number,
+  registration: CreateRegistrationResponseDto,
+): Promise<string | null> {
+  const response = await registrationsControllerFindRegistrations({
+    page: 1,
+    pageSize: 100,
+    queueId,
+    businessDate: registration.businessDate,
+  });
+  return (
+    response.data.items.find((item) => item.registrationId === registration.registrationId)
+      ?.registrationTrackingToken ?? null
+  );
 }
 
 export type KioskTier = QueueTierResponseDto;

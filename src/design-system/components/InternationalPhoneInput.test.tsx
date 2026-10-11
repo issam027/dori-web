@@ -27,9 +27,12 @@ describe('InternationalPhoneInput', () => {
 
   it('changes the prefix and visible flag with the selected country', async () => {
     render(<Harness />);
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Indicatif pays' }), 'TN');
+    await userEvent.click(screen.getByRole('button', { name: 'Indicatif pays: +33' }));
+    await userEvent.click(screen.getByRole('option', { name: '+216' }));
+    expect(screen.getByRole('textbox')).toHaveAttribute('placeholder', '20 123 456');
     await userEvent.type(screen.getByRole('textbox'), '20 123 456');
     expect(screen.getByRole('status')).toHaveTextContent('+21620123456');
+    expect(screen.getByRole('textbox')).toHaveValue('20 123 456');
     expect(document.querySelector('use')).toHaveAttribute('href', '#phone-flag-tn');
   });
 });

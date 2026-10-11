@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useCallback, useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
@@ -13,7 +13,11 @@ import { TrackingQr } from '../../TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from '../../useKioskWatchdog';
 import { presentError } from '@/core/notifications/error-presentation';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
-import { useKioskCatalog, useKioskRegistration } from '../../hooks/usePublicExperiences';
+import {
+  findCreatedRegistrationTrackingToken,
+  useKioskCatalog,
+  useKioskRegistration,
+} from '../../hooks/usePublicExperiences';
 
 import { initialKioskWizardState, kioskWizardReducer } from '../../model/kiosk-wizard-state';
 import {
@@ -24,6 +28,7 @@ import {
   KioskTierStep,
   KioskWelcomeStep,
 } from './KioskSteps';
+import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber' | 'trackingUrl'> & {
   queueName?: string;
 };
@@ -31,9 +36,14 @@ type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber' | 'trackingUrl'
 function trackingUrlOnCurrentHost(value?: string | null): string | null {
   if (!value) return null;
   const source = new URL(value, window.location.origin);
-  const token = source.searchParams.get('token');
+  const token =
+    source.searchParams.get('token') ?? source.pathname.match(/\/track\/([^/]+)\/?$/)?.[1];
   if (!token) return null;
   return `${window.location.origin}/track?token=${encodeURIComponent(token)}`;
+}
+
+function trackingUrlFromToken(token?: string | null): string | null {
+  return token ? `${window.location.origin}/track?token=${encodeURIComponent(token)}` : null;
 }
 
 export function KioskWizard() {
@@ -51,6 +61,11 @@ export function KioskWizard() {
   const [scheduledTime, setScheduledTime] = useState('');
   const [found, setFound] = useState<RegistrationResponseDto>();
   const [result, setResult] = useState<Result>();
+  const [printing, setPrinting] = useState(false);
+  const [printReady, setPrintReady] = useState(false);
+  const handlePrintReady = useCallback(() => {
+    setPrintReady(true);
+  }, []);
   const purge = useCallback(() => {
     dispatch({ type: 'RESET' });
     setQueueId(undefined);
@@ -63,7 +78,32 @@ export function KioskWizard() {
     setScheduledTime('');
     setFound(undefined);
     setResult(undefined);
+    setPrinting(false);
+    setPrintReady(false);
   }, []);
+  useEffect(() => {
+    if (!printing) return;
+    document.body.dataset.printKioskTicket = 'true';
+    const finish = () => {
+      delete document.body.dataset.printKioskTicket;
+      setPrinting(false);
+      setPrintReady(false);
+    };
+    window.addEventListener('afterprint', finish, { once: true });
+    return () => {
+      window.removeEventListener('afterprint', finish);
+      delete document.body.dataset.printKioskTicket;
+    };
+  }, [printing]);
+  useEffect(() => {
+    if (!printing || !printReady) return;
+    const timer = window.setTimeout(() => {
+      window.print();
+    }, 50);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [printReady, printing]);
   const watchdog = useKioskWatchdog(purge, kioskIdleMs(import.meta.env.VITE_KIOSK_IDLE_MS));
   const scopeSites = user?.scope.siteIds ?? [];
   const validScope =
@@ -97,10 +137,20 @@ export function KioskWizard() {
         },
       };
     },
-    onRegistered: (data) => {
+    onRegistered: async (data) => {
+      let trackingUrl = trackingUrlOnCurrentHost(data.trackingUrl);
+      if (!trackingUrl && queueId) {
+        try {
+          trackingUrl = trackingUrlFromToken(
+            await findCreatedRegistrationTrackingToken(queueId, data),
+          );
+        } catch {
+          trackingUrl = null;
+        }
+      }
       setResult({
         ticketNumber: data.ticketNumber,
-        trackingUrl: trackingUrlOnCurrentHost(data.trackingUrl),
+        trackingUrl,
         queueName: queues.data?.data.items.find((item) => item.queueId === queueId)?.queueName,
       });
       dispatch({ type: 'SHOW_RESULT' });
@@ -287,9 +337,14 @@ export function KioskWizard() {
             <KioskIdentityStep>
               <div className="kiosk-form-grid">
                 <label>
-                  {__t('ui.public-experiences.kiosk_page.nom_de_famille_pi8khu')}
-                  <span className="required-mark">*</span>
+                  <span className="kiosk-field-label">
+                    {__t('ui.public-experiences.kiosk_page.nom_de_famille_pi8khu')}
+                    <span className="required-mark" aria-hidden="true">
+                      *
+                    </span>
+                  </span>
                   <input
+                    required
                     autoComplete="family-name"
                     value={lastName}
                     onChange={(event) => {
@@ -299,9 +354,6 @@ export function KioskWizard() {
                 </label>
                 <label>
                   {__t('ui.public-experiences.kiosk_page.prenom_h4ba4')}
-                  <span className="optional">
-                    {__t('ui.public-experiences.kiosk_page.optionnel_aqr9af')}
-                  </span>
                   <input
                     autoComplete="given-name"
                     value={firstName}
@@ -312,9 +364,6 @@ export function KioskWizard() {
                 </label>
                 <label>
                   {__t('ui.public-experiences.kiosk_page.email_inbfc7')}
-                  <span className="optional">
-                    {__t('ui.public-experiences.kiosk_page.optionnel_aqr9af')}
-                  </span>
                   <input
                     autoComplete="email"
                     type="email"
@@ -335,13 +384,18 @@ export function KioskWizard() {
                   </small>
                 </label>
                 <label>
-                  {__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
-                  <span className="required-mark">*</span>
+                  <span className="kiosk-field-label">
+                    {__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                    <span className="required-mark" aria-hidden="true">
+                      *
+                    </span>
+                  </span>
                   <InternationalPhoneInput
                     value={phone}
                     onChange={setPhone}
                     countryLabel={__t('ui.public-experiences.kiosk_page.indicatif_pays_1krknxf')}
                     phoneLabel={__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                    required
                   />
                   <small>
                     {phoneValid
@@ -679,7 +733,8 @@ export function KioskWizard() {
             <button
               type="button"
               onClick={() => {
-                window.print();
+                setPrintReady(false);
+                setPrinting(true);
               }}
             >
               {__t('ui.public-experiences.kiosk_page.imprimer_mon_ticket_xbrafa')}
@@ -688,6 +743,14 @@ export function KioskWizard() {
               {__t('ui.public-experiences.kiosk_page.terminer_19zht57')}
             </button>
           </div>
+          {printing ? (
+            <KioskTicketPrintDocument
+              ticketNumber={result.ticketNumber}
+              queueName={result.queueName}
+              trackingUrl={result.trackingUrl}
+              onReady={handlePrintReady}
+            />
+          ) : null}
         </KioskTicketResult>
       ) : null}
     </section>

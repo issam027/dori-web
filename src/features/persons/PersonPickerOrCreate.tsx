@@ -154,6 +154,7 @@ export function PersonPickerOrCreate({
               value={draft.phoneNumber}
               countryLabel={__t('phone.countryCode')}
               phoneLabel={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
+              required
               onChange={(phoneNumber) => {
                 setDraft({ ...draft, phoneNumber });
               }}

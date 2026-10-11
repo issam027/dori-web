@@ -6,8 +6,57 @@ import {
   registrationsControllerRegister,
 } from '@/api/generated/registrations/registrations';
 import { mockServer } from '@/shared/testing/mock-server';
+import { findCreatedRegistrationTrackingToken } from './hooks/usePublicExperiences';
 
 describe('specialized public flows', () => {
+  it('recovers the tracking token of a newly created kiosk registration', async () => {
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/registrations', ({ request }) => {
+        const url = new URL(request.url);
+        expect(url.searchParams.get('queueId')).toBe('4');
+        expect(url.searchParams.get('businessDate')).toBe('2026-10-11');
+        return HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: {
+            page: 1,
+            pageSize: 100,
+            total: 1,
+            totalPages: 1,
+            items: [
+              {
+                registrationId: 81,
+                queueId: 4,
+                personId: 9,
+                ticketNumber: 'A081',
+                entryType: 'walkin',
+                status: 'waiting',
+                businessDate: '2026-10-11',
+                registrationTrackingToken: 'tracking-81',
+                tierId: 2,
+                createdAt: '2026-10-11T08:00:00Z',
+                updatedAt: '2026-10-11T08:00:00Z',
+              },
+            ],
+          },
+        });
+      }),
+    );
+
+    await expect(
+      findCreatedRegistrationTrackingToken(4, {
+        registrationId: 81,
+        ticketNumber: 'A081',
+        businessDate: '2026-10-11',
+        entryType: 'walkin',
+        status: 'waiting',
+        tier: {},
+        priorityReferenceTime: '2026-10-11T08:00:00Z',
+      }),
+    ).resolves.toBe('tracking-81');
+  });
+
   it('registers a kiosk walk-in with API-confirmed identity, queue and tier', async () => {
     let body: unknown;
     mockServer.use(

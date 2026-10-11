@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const countries = [
-  { code: 'FR', dialCode: '+33', label: 'France' },
-  { code: 'TN', dialCode: '+216', label: 'Tunisie' },
-  { code: 'BE', dialCode: '+32', label: 'Belgique' },
-  { code: 'CH', dialCode: '+41', label: 'Suisse' },
-  { code: 'MA', dialCode: '+212', label: 'Maroc' },
-  { code: 'DZ', dialCode: '+213', label: 'Algérie' },
+  { code: 'FR', dialCode: '+33', groups: [1, 2, 2, 2, 2], placeholder: '6 12 34 56 78' },
+  { code: 'TN', dialCode: '+216', groups: [2, 3, 3], placeholder: '20 123 456' },
+  { code: 'BE', dialCode: '+32', groups: [3, 2, 2, 2], placeholder: '470 12 34 56' },
+  { code: 'CH', dialCode: '+41', groups: [2, 3, 2, 2], placeholder: '79 123 45 67' },
+  { code: 'MA', dialCode: '+212', groups: [1, 2, 2, 2, 2], placeholder: '6 12 34 56 78' },
+  { code: 'DZ', dialCode: '+213', groups: [1, 2, 2, 2, 2], placeholder: '5 12 34 56 78' },
 ] as const;
 
 type Country = (typeof countries)[number];
@@ -17,6 +18,18 @@ function findCountry(value: string): Country {
       .sort((a, b) => b.dialCode.length - a.dialCode.length)
       .find((country) => value.startsWith(country.dialCode)) ?? countries[0]
   );
+}
+
+function formatNationalNumber(value: string, groups: readonly number[]): string {
+  let offset = 0;
+  return groups
+    .map((size) => {
+      const group = value.slice(offset, offset + size);
+      offset += size;
+      return group;
+    })
+    .filter(Boolean)
+    .join(' ');
 }
 
 function CountryFlag({ code }: { code: Country['code'] }) {
@@ -77,55 +90,95 @@ export function InternationalPhoneInput({
   onChange,
   countryLabel,
   phoneLabel,
+  required = false,
   disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   countryLabel: string;
   phoneLabel: string;
+  required?: boolean;
   disabled?: boolean;
 }) {
   const detectedCountry = findCountry(value);
   const [selectedCode, setSelectedCode] = useState<Country['code']>(detectedCountry.code);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const country = countries.find((item) => item.code === selectedCode) ?? detectedCountry;
   const nationalNumber = value.startsWith(country.dialCode)
     ? value.slice(country.dialCode.length)
     : value.replace(/^\+/, '');
+  const maxLength = country.groups.reduce((total, size) => total + size, 0);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+    };
+  }, [menuOpen]);
 
   return (
-    <div className="international-phone-input">
+    <div className="international-phone-input" ref={rootRef}>
       <div className="phone-country-control">
-        <CountryFlag code={country.code} />
-        <select
-          aria-label={countryLabel}
-          value={country.code}
+        <button
+          type="button"
+          className="phone-country-trigger"
+          aria-label={`${countryLabel}: ${country.dialCode}`}
+          aria-haspopup="listbox"
+          aria-expanded={menuOpen}
           disabled={disabled}
-          onChange={(event) => {
-            const next = countries.find((item) => item.code === event.target.value) ?? countries[0];
-            setSelectedCode(next.code);
-            onChange(nationalNumber ? `${next.dialCode}${nationalNumber}` : '');
+          onClick={() => {
+            setMenuOpen((current) => !current);
           }}
         >
-          {countries.map((item) => (
-            <option key={item.code} value={item.code}>
-              {item.label} {item.dialCode}
-            </option>
-          ))}
-        </select>
+          <CountryFlag code={country.code} />
+          <span>{country.dialCode}</span>
+          <ChevronDown aria-hidden="true" />
+        </button>
+        {menuOpen ? (
+          <div className="phone-country-menu" role="listbox" aria-label={countryLabel}>
+            {countries.map((item) => (
+              <button
+                type="button"
+                role="option"
+                aria-label={item.dialCode}
+                aria-selected={item.code === country.code}
+                key={item.code}
+                onClick={() => {
+                  const digits = nationalNumber.slice(
+                    0,
+                    item.groups.reduce((total, size) => total + size, 0),
+                  );
+                  setSelectedCode(item.code);
+                  setMenuOpen(false);
+                  onChange(digits ? `${item.dialCode}${digits}` : '');
+                }}
+              >
+                <CountryFlag code={item.code} />
+                <span>{item.dialCode}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
-      <span className="phone-dial-code" aria-hidden="true">
-        {country.dialCode}
-      </span>
       <input
         aria-label={phoneLabel}
         type="tel"
         inputMode="numeric"
         autoComplete="tel-national"
-        placeholder="6 12 34 56 78"
-        value={nationalNumber}
+        placeholder={country.placeholder}
+        value={formatNationalNumber(nationalNumber, country.groups)}
+        required={required}
         disabled={disabled}
         onChange={(event) => {
-          const digits = event.target.value.replace(/\D/g, '').replace(/^0+/, '');
+          const digits = event.target.value
+            .replace(/\D/g, '')
+            .replace(/^0+/, '')
+            .slice(0, maxLength);
           onChange(digits ? `${country.dialCode}${digits}` : '');
         }}
       />

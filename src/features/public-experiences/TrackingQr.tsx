@@ -2,25 +2,28 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 
-export function TrackingQr({ value }: { value?: string | null }) {
+export function TrackingQr({ value, onReady }: { value?: string | null; onReady?: () => void }) {
   if (!value) return null;
-  return <GeneratedQr value={value} />;
+  return <GeneratedQr value={value} onReady={onReady} />;
 }
 
-function GeneratedQr({ value }: { value: string }) {
+function GeneratedQr({ value, onReady }: { value: string; onReady?: () => void }) {
   const { t: __t } = useTranslation();
   const [source, setSource] = useState('');
   useEffect(() => {
     let active = true;
     void QRCode.toDataURL(value, { margin: 1, width: 220, errorCorrectionLevel: 'M' }).then(
       (url) => {
-        if (active) setSource(url);
+        if (active) {
+          setSource(url);
+          onReady?.();
+        }
       },
     );
     return () => {
       active = false;
     };
-  }, [value]);
+  }, [onReady, value]);
   if (!source) return null;
   return (
     <figure className="tracking-qr">
