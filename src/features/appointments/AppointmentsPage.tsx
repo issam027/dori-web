@@ -83,13 +83,13 @@ export function AppointmentsPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Planning"
+        eyebrow={__t('nav.appointments')}
         title={__t('appointments.title')}
         description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
         actions={
           <div className="segmented">
             <button
-              className="button"
+              className={`button${view === 'week' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'week'}
               onClick={() => {
@@ -99,7 +99,7 @@ export function AppointmentsPage() {
               {__t('appointments.appointments.semaine')}
             </button>
             <button
-              className="button"
+              className={`button${view === 'month' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'month'}
               onClick={() => {
@@ -122,7 +122,7 @@ export function AppointmentsPage() {
               {__t('appointments.appointments.leSite')}
               <strong>
                 {site.data?.data.siteName ??
-                  __t('common.value0', {
+                  __t('common.hashIdentifier', {
                     value0: String(siteId),
                   })}
               </strong>{' '}

@@ -35,7 +35,7 @@ export function QueueEditor({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={initial ? 'Modifier la file' : 'Nouvelle file'}
+      title={initial ? __t('onboarding.editQueue') : __t('onboarding.settings.nouvelleFile')}
       description={__t('queues.queueEditor.lesChampsLaissesSurHeriterUtilisentLesPar')}
       actions={
         <button
@@ -137,7 +137,7 @@ export function QueueEditor({
           setAdvanced(!advanced);
         }}
       >
-        {advanced ? __t('queues.queueEditor.masquer') : __t('queues.queueEditor.afficherPem1r')}{' '}
+        {advanced ? __t('queues.queueEditor.masquer') : __t('common.show')}{' '}
         {__t('queues.queueEditor.lesSurchargesAvancees')}
       </button>
       {advanced ? (

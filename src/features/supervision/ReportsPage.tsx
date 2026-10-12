@@ -72,7 +72,7 @@ export function ReportsPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Pilotage"
+        eyebrow={__t('common.pilotage')}
         title={__t('supervision.reports.rapports')}
         description={__t('reports.periodDescription')}
         actions={
@@ -119,14 +119,38 @@ export function ReportsPage() {
       </Card>
       <div className="metric-grid">
         {[
-          { label: 'Sites actifs', value: summary.data?.data.activeSites, icon: Building2 },
-          { label: 'Files actives', value: summary.data?.data.activeQueues, icon: ListChecks },
-          { label: 'En attente', value: summary.data?.data.waitingTotal, icon: UsersRound },
-          { label: 'Inscrits', value: totals.registered, icon: UserPlus },
-          { label: 'Servis', value: totals.served, icon: CircleCheck },
-          { label: 'TMA', value: `${totals.averageWaitMinutes.toFixed(1)} min`, icon: Timer },
-          { label: 'TMT', value: `${totals.averageServiceMinutes.toFixed(1)} min`, icon: Gauge },
-          { label: 'No-show', value: `${(totals.noShowRate * 100).toFixed(1)} %`, icon: UserX },
+          {
+            label: __t('common.activeSites'),
+            value: summary.data?.data.activeSites,
+            icon: Building2,
+          },
+          {
+            label: __t('common.activeQueues'),
+            value: summary.data?.data.activeQueues,
+            icon: ListChecks,
+          },
+          {
+            label: __t('common.waiting'),
+            value: summary.data?.data.waitingTotal,
+            icon: UsersRound,
+          },
+          { label: __t('common.registered'), value: totals.registered, icon: UserPlus },
+          { label: __t('common.servedPlural'), value: totals.served, icon: CircleCheck },
+          {
+            label: __t('reports.averageWaitAbbreviation'),
+            value: `${totals.averageWaitMinutes.toFixed(1)} min`,
+            icon: Timer,
+          },
+          {
+            label: __t('reports.averageServiceAbbreviation'),
+            value: `${totals.averageServiceMinutes.toFixed(1)} min`,
+            icon: Gauge,
+          },
+          {
+            label: __t('common.noShow'),
+            value: `${(totals.noShowRate * 100).toFixed(1)} %`,
+            icon: UserX,
+          },
         ].map(({ label, value, icon: Icon }) => (
           <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
@@ -143,7 +167,7 @@ export function ReportsPage() {
             columns={[
               {
                 key: 'queue',
-                header: 'File',
+                header: __t('queues.singular'),
                 render: (row) => (
                   <>
                     <strong>{row.queueName}</strong>
@@ -154,41 +178,44 @@ export function ReportsPage() {
               },
               {
                 key: 'registered',
-                header: 'Inscrits',
+                header: __t('common.registered'),
                 align: 'end',
                 render: (row) => row.volume.totalRegistered,
               },
               {
                 key: 'served',
-                header: 'Servis',
+                header: __t('common.servedPlural'),
                 align: 'end',
                 render: (row) => row.volume.totalServed,
               },
               {
                 key: 'wait',
-                header: 'TMA',
+                header: __t('reports.averageWaitAbbreviation'),
                 align: 'end',
                 render: (row) => `${row.kpis.averageWaitMinutes.toFixed(1)} min`,
               },
               {
                 key: 'service',
-                header: 'TMT',
+                header: __t('reports.averageServiceAbbreviation'),
                 align: 'end',
                 render: (row) => `${row.kpis.averageServiceMinutes.toFixed(1)} min`,
               },
               {
                 key: 'noShow',
-                header: 'No-show',
+                header: __t('common.noShow'),
                 align: 'end',
                 render: (row) => `${(row.kpis.noShowRate * 100).toFixed(1)} %`,
               },
               {
                 key: 'chart',
-                header: 'Flux servi',
+                header: __t('reports.servedFlow'),
                 render: (row) => (
                   <div
                     className="report-bar"
-                    aria-label={`${String(row.volume.totalServed)} servis sur ${String(row.volume.totalRegistered)}`}
+                    aria-label={__t('reports.servedRatio', {
+                      served: String(row.volume.totalServed),
+                      registered: String(row.volume.totalRegistered),
+                    })}
                   >
                     <span
                       style={{

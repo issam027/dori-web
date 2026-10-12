@@ -51,7 +51,7 @@ export function ChangePasswordPage() {
     <div className="page-stack">
       <PageHeader
         title={__t('auth.changePassword.changerLeMotDePasse')}
-        description={__t('auth.changePassword.choisissezUnMotDePasseDe10A20Caracteres')}
+        description={__t('auth.changePassword.passwordHint')}
       />
       <Card>
         <form
@@ -70,7 +70,7 @@ export function ChangePasswordPage() {
           <FormField
             label={__t('auth.changePassword.nouveauMotDePasse')}
             required
-            error={errors.newPassword ? 'Entre 10 et 20 caractères.' : undefined}
+            error={errors.newPassword ? __t('profile.passwordLength') : undefined}
           >
             <input type="password" autoComplete="new-password" {...register('newPassword')} />
           </FormField>

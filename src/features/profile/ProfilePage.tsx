@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { Globe2, KeyRound, Languages, ListChecks, Save } from 'lucide-react';
+import { Check, Globe2, KeyRound, Languages, ListChecks, Palette, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { changePassword, updateUser } from './api/profile-api';
@@ -13,6 +13,8 @@ import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { usePreferencesStore } from '@/core/theme/preferences-store';
+import { accentColors } from '@/core/theme/theme';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -36,6 +38,8 @@ type PasswordForm = z.infer<ReturnType<typeof createPasswordSchema>>;
 export function ProfilePage() {
   const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
+  const accentColor = usePreferencesStore((state) => state.accentColor);
+  const setAccentColor = usePreferencesStore((state) => state.setAccentColor);
   const [saved, setSaved] = useState(false);
   const [passwordEditing, setPasswordEditing] = useState(false);
   const {
@@ -81,7 +85,7 @@ export function ProfilePage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Compte"
+        eyebrow={__t('profile.title')}
         title={__t('profile.profile.monProfil')}
         description={__t('profile.profile.votreIdentiteVosHabilitationsEtVosPreferen')}
       />
@@ -117,7 +121,7 @@ export function ProfilePage() {
               <dd>
                 {user.scope.isGlobal
                   ? __t('profile.profile.global')
-                  : __t('profile.profile.value0SiteSValue1FileSL4y6h', {
+                  : __t('profile.scope.sitesAndQueues', {
                       value0: String(user.scope.siteIds.length),
                       value1: String(user.scope.queueIds.length),
                     })}
@@ -143,7 +147,7 @@ export function ProfilePage() {
             </FormField>
             <FormField label={__t('common.language')}>
               <select {...register('languagePreference')}>
-                <option value="fr" aria-label={__t('common.francais')}>
+                <option value="fr" aria-label={__t('locale.fr')}>
                   {String.fromCodePoint(0x1f1eb, 0x1f1f7)}
                 </option>
                 <option value="en" aria-label={__t('common.english')}>
@@ -160,6 +164,53 @@ export function ProfilePage() {
               {__t('common.save')}
             </button>
           </form>
+          <section className="profile-appearance-panel" aria-labelledby="profile-appearance-title">
+            <div className="profile-appearance-heading">
+              <span className="profile-appearance-icon" aria-hidden="true">
+                <Palette />
+              </span>
+              <div>
+                <strong id="profile-appearance-title">{__t('profile.appearance.title')}</strong>
+                <p>{__t('profile.appearance.description')}</p>
+              </div>
+            </div>
+            <div
+              className="profile-color-palette"
+              role="radiogroup"
+              aria-label={__t('profile.appearance.dominantColor')}
+            >
+              {accentColors.map((color) => {
+                const selected = color.id === accentColor;
+                const label = __t(color.labelKey);
+                return (
+                  <button
+                    key={color.id}
+                    className={'profile-color-swatch' + (selected ? ' is-selected' : '')}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    aria-label={label}
+                    title={label}
+                    style={{ backgroundColor: color.value }}
+                    onClick={() => {
+                      setAccentColor(color.id);
+                    }}
+                  >
+                    {selected ? <Check aria-hidden="true" /> : null}
+                  </button>
+                );
+              })}
+            </div>
+            <small className="profile-color-selection">
+              {__t('profile.appearance.selectedColor')} ?{' '}
+              <strong>
+                {__t(
+                  accentColors.find((color) => color.id === accentColor)?.labelKey ??
+                    accentColors[0].labelKey,
+                )}
+              </strong>
+            </small>
+          </section>
           <div className={`profile-security-panel${passwordEditing ? ' is-editing' : ''}`}>
             {!passwordEditing ? (
               <>
@@ -252,7 +303,7 @@ export function ProfilePage() {
           value={
             user.scope.isGlobal
               ? __t('profile.profile.global')
-              : __t('profile.profile.value0SiteS', {
+              : __t('profile.scope.sites', {
                   value0: String(user.scope.siteIds.length),
                 })
           }

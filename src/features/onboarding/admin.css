@@ -218,6 +218,27 @@ table td small {
   gap: 6px;
 }
 
+.responsive-table-actions {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 1500px) {
+  .responsive-table-actions .button {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+    font-size: 0;
+  }
+
+  .responsive-table-actions .button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .admin-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--color-line);
@@ -842,6 +863,28 @@ table td small {
     align-items: flex-start;
   }
   .translation-language-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-filter-grid-single {
+  grid-template-columns: minmax(240px, 1fr) auto;
+}
+
+.person-detail-list dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.person-detail-list dt svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+@media (max-width: 720px) {
+  .admin-filter-grid-single {
     grid-template-columns: 1fr;
   }
 }

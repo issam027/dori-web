@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { i18n, loadTranslationBundle } from '@/core/i18n/i18n';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
+import { accentColors } from '@/core/theme/theme';
 
 export function PreferenceSynchronizer() {
   const locale = usePreferencesStore((state) => state.locale);
   const theme = usePreferencesStore((state) => state.theme);
+  const accentColor = usePreferencesStore((state) => state.accentColor);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -15,8 +17,19 @@ export function PreferenceSynchronizer() {
   }, [locale]);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    const root = document.documentElement;
+    const accent = accentColors.find((item) => item.id === accentColor) ?? accentColors[0];
+    const dark = theme === 'dark' || theme === 'soft-dark';
+    const color = dark ? accent.darkValue : accent.value;
+
+    root.dataset.theme = theme;
+    root.style.setProperty('--color-accent', color);
+    root.style.setProperty(
+      '--color-primary-soft',
+      `color-mix(in srgb, ${color} 16%, var(--color-surface))`,
+    );
+    root.style.setProperty('--color-primary-contrast', dark ? '#07151f' : '#ffffff');
+  }, [accentColor, theme]);
 
   return null;
 }

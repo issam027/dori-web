@@ -203,14 +203,14 @@ export function DeskPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Opérations"
+        eyebrow={t('nav.operations')}
         title={t('queue-operations.desk.cockpitGuichet')}
         description={
           deskSessionsLoading
             ? undefined
             : hasActiveDeskSession
               ? t('desk.activeSessionDescription')
-              : t('queue-operations.desk.uneSessionActiveEstRequisePourAppelerLeP3hwh4')
+              : t('desk.sessionRequired')
         }
       />
       {queues.isSuccess && allowed.length === 0 ? (

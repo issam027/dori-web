@@ -35,6 +35,7 @@ export function Topbar({
       {
         '/desk': 'nav.desk',
         '/my-queues': 'nav.myQueues',
+        '/persons': 'nav.persons',
         '/appointments': 'nav.appointments',
         '/control-room': 'nav.controlRoom',
         '/portfolio': 'nav.portfolio',
@@ -68,8 +69,7 @@ export function Topbar({
       </button>
       <div className="topbar-title">
         <span className="eyebrow">
-          {sites.find((site) => site.id === activeSiteId)?.name ??
-            __t('common.aucunSiteActifHmb19')}
+          {sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite')}
         </span>
         <h1>{t(routeLabel)}</h1>
       </div>
@@ -79,8 +79,8 @@ export function Topbar({
           type="button"
           onClick={onRefresh}
           disabled={refreshing}
-          aria-label={refreshing ? 'Actualisation en cours' : 'Actualiser la page'}
-          title={refreshing ? 'Actualisation en cours' : 'Actualiser la page'}
+          aria-label={refreshing ? t('common.refreshing') : t('common.refreshPage')}
+          title={refreshing ? t('common.refreshing') : t('common.refreshPage')}
         >
           <RefreshCw aria-hidden="true" className={refreshing ? 'is-spinning' : undefined} />
         </button>

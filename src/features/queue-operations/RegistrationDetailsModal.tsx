@@ -41,7 +41,7 @@ export function RegistrationDetailsModal({
       open={open}
       onOpenChange={onOpenChange}
       title={t('queues.registrationDetails.detailDeLInscription')}
-      description="Consultation uniquement · aucune information ne peut être modifiée ici."
+      description={t('queues.registrationDetails.readOnlyDescription')}
     >
       {registration.isLoading ? (
         <p className="registration-detail-loading" role="status">
@@ -56,7 +56,10 @@ export function RegistrationDetailsModal({
             <div>
               <small>{t('common.ticket')}</small>
               <strong>{item.ticketNumber}</strong>
-              <span>{queueName ?? 'File #' + String(item.queueId)}</span>
+              <span>
+                {queueName ??
+                  t('queues.registrationDetails.queueFallback', { id: String(item.queueId) })}
+              </span>
             </div>
             <StatusBadge tone={tone}>{item.status}</StatusBadge>
           </header>
@@ -67,18 +70,22 @@ export function RegistrationDetailsModal({
             <div className="registration-detail-grid">
               <Detail
                 icon={<UserRound />}
-                label="Nom complet"
+                label={t('common.fullName')}
                 value={
                   customer
                     ? ((customer.firstName || '') + ' ' + (customer.lastName || '')).trim()
                     : '…'
                 }
               />
-              <Detail icon={<Phone />} label="Téléphone" value={customer?.phoneNumber ?? '—'} />
-              <Detail icon={<Mail />} label="E-mail" value={customer?.email ?? '—'} />
+              <Detail
+                icon={<Phone />}
+                label={t('common.phone')}
+                value={customer?.phoneNumber ?? '—'}
+              />
+              <Detail icon={<Mail />} label={t('common.email')} value={customer?.email ?? '—'} />
               <Detail
                 icon={<MapPin />}
-                label="Langue"
+                label={t('common.language')}
                 value={customer?.preferredLanguage.toUpperCase() ?? '—'}
               />
             </div>
@@ -88,31 +95,39 @@ export function RegistrationDetailsModal({
               <CalendarDays aria-hidden="true" /> {t('supervision.notifications.inscription')}
             </h3>
             <div className="registration-detail-grid">
-              <Detail icon={<Hash />} label="Identifiant" value={String(item.registrationId)} />
+              <Detail
+                icon={<Hash />}
+                label={t('common.identifier')}
+                value={String(item.registrationId)}
+              />
               <Detail
                 icon={<CalendarDays />}
-                label="Date métier"
+                label={t('common.businessDate')}
                 value={formatDate(item.businessDate, true)}
               />
-              <Detail icon={<Clock3 />} label="Créée le" value={formatDate(item.createdAt)} />
               <Detail
                 icon={<Clock3 />}
-                label="Dernière mise à jour"
+                label={t('common.createdAt')}
+                value={formatDate(item.createdAt)}
+              />
+              <Detail
+                icon={<Clock3 />}
+                label={t('common.updatedAt')}
                 value={formatDate(item.updatedAt)}
               />
-              <Detail icon={<Ticket />} label="Type d’entrée" value={item.entryType} />
-              <Detail icon={<Hash />} label="Forfait" value={'#' + String(item.tierId)} />
+              <Detail icon={<Ticket />} label={t('common.entryType')} value={item.entryType} />
+              <Detail icon={<Hash />} label={t('common.tier')} value={'#' + String(item.tierId)} />
               {item.scheduledTime ? (
                 <Detail
                   icon={<CalendarDays />}
-                  label="Rendez-vous"
+                  label={t('appointments.title')}
                   value={formatDate(item.scheduledTime)}
                 />
               ) : null}
               {item.appointmentStatus ? (
                 <Detail
                   icon={<Clock3 />}
-                  label="Statut du rendez-vous"
+                  label={t('queues.registrationDetails.appointmentStatus')}
                   value={item.appointmentStatus}
                 />
               ) : null}

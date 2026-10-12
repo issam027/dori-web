@@ -13,6 +13,7 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
   { path: '/portfolio', permissions: ['site_view'] },
   { path: '/desk', permissions: ['registration_call', 'session_operate'] },
   { path: '/my-queues', permissions: ['registration_view', 'queue_view'] },
+  { path: '/persons', permissions: ['registration_view'] },
   { path: '/appointments', permissions: ['appointment_manage', 'appointment_checkin'] },
   { path: '/control-room', permissions: ['report_view', 'queue_view'] },
   { path: '/reports', permissions: ['report_view'] },

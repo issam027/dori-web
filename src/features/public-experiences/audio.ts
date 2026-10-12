@@ -1,3 +1,5 @@
+import { i18n } from '@/core/i18n/i18n';
+
 export function playChime() {
   const context = new AudioContext();
   const now = context.currentTime;
@@ -24,7 +26,7 @@ export function speakTicket(ticket: string, counter: number, locale: string) {
   if (!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(
-    `Ticket ${ticket}, guichet numéro ${String(counter)}`,
+    i18n.t('publicExperiences.audio.ticketCalled', { ticket, counter: String(counter) }),
   );
   utterance.lang = locale;
   speechSynthesis.speak(utterance);

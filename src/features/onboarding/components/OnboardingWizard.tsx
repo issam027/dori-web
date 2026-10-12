@@ -37,14 +37,14 @@ import {
   recordCreatedQueue,
 } from '../model/onboarding-workflow';
 
-const steps = [
-  'Identité du site',
-  'Paramètres',
-  'Files & guichets',
-  'Niveaux de service',
-  'Équipe & appareils',
-  'Recette & activation',
-];
+const stepKeys = [
+  'onboarding.steps.identity',
+  'onboarding.steps.defaults',
+  'onboarding.steps.queues',
+  'onboarding.steps.tiers',
+  'onboarding.steps.team',
+  'onboarding.steps.review',
+] as const;
 
 export function OnboardingWizard() {
   const { t: __t } = useTranslation();
@@ -117,7 +117,7 @@ export function OnboardingWizard() {
     try {
       let value = { ...draft };
       if (draft.step === 1 && !draft.confirmedSiteId) {
-        if (!draft.site.siteName.trim()) throw new Error('Le nom du site est requis.');
+        if (!draft.site.siteName.trim()) throw new Error(__t('onboarding.errors.siteNameRequired'));
         const result = await createSite(draft.site);
         value = { ...value, confirmedSiteId: result.data.siteId };
       } else if (draft.step === 2 && draft.confirmedSiteId) {
@@ -138,8 +138,7 @@ export function OnboardingWizard() {
           const selected = fixed.filter((tier) =>
             (draft.selectedTierIds[String(queueId)] ?? []).includes(tier.tierId),
           );
-          if (selected.length === 0)
-            throw new Error('Sélectionnez au moins un niveau pour chaque file.');
+          if (selected.length === 0) throw new Error(__t('onboarding.errors.tierRequiredPerQueue'));
           for (const [index, tier] of selected.entries()) {
             const configuration = draft.tierConfigurations[String(queueId)]?.[String(tier.tierId)];
             await associateTier(queueId, {
@@ -186,7 +185,7 @@ export function OnboardingWizard() {
           duration: 8_000,
         });
         setMessage(
-          __t('onboarding.onboarding.leSiteValue0EstMaintenantActifLaConfi', {
+          __t('onboarding.activation.successMessage', {
             value0: activatedSite,
           }),
         );
@@ -197,7 +196,7 @@ export function OnboardingWizard() {
       setMessage(__t('common.etapeEnregistreeAvecSucces'));
     } catch (error) {
       notifyError(error);
-      setMessage(error instanceof Error ? error.message : 'Erreur. Relancez cette étape.');
+      setMessage(error instanceof Error ? error.message : __t('onboarding.errors.retryStep'));
     } finally {
       setBusy(false);
     }
@@ -205,13 +204,13 @@ export function OnboardingWizard() {
   return (
     <div className="page-stack admin-page">
       <PageHeader
-        eyebrow="Administration guidée"
+        eyebrow={__t('onboarding.guidedAdministration')}
         title={__t('onboarding.onboarding.configurerUnNouveauSite')}
         description={__t('onboarding.onboarding.uneConfigurationProgressiveEnregistreeAChaq')}
         actions={
           <span className="status-badge status-info">
             {__t('common.etape')}
-            {draft.step} {__t('onboarding.onboarding.sur6')}
+            {draft.step} {__t('onboarding.totalSteps')}
           </span>
         }
       />
@@ -246,9 +245,9 @@ export function OnboardingWizard() {
       <div className="onboarding-layout">
         <Card className="setup-navigation">
           <h2>{__t('onboarding.onboarding.parcoursDeConfiguration')}</h2>
-          {steps.map((label, index) => (
+          {stepKeys.map((key, index) => (
             <button
-              key={label}
+              key={key}
               className={`setup-nav-row ${draft.step === index + 1 ? 'active' : ''}`}
               disabled={index + 1 > draft.step}
               onClick={() => {
@@ -257,7 +256,7 @@ export function OnboardingWizard() {
             >
               <span className="ticket-chip">{index + 1}</span>
               <span>
-                <b>{label}</b>
+                <b>{__t(key)}</b>
               </span>
               {index + 1 < draft.step ? (
                 <span className="status-badge status-success">
@@ -269,7 +268,7 @@ export function OnboardingWizard() {
         </Card>
         <Card className="setup-content">
           <div className="setup-progress">
-            {steps.map((_, index) => (
+            {stepKeys.map((_, index) => (
               <span key={index} className={index < draft.step ? 'done' : ''} />
             ))}
           </div>
@@ -1059,9 +1058,9 @@ function ReviewStep({
 }) {
   const { t: __t } = useTranslation();
   const checks = [
-    ['Site et paramètres', Boolean(draft.confirmedSiteId)],
-    ['Files et guichets', Object.keys(draft.confirmedQueueIds).length > 0],
-    ['Niveaux associés', draft.associatedTierQueueIds.length > 0],
+    ['onboarding.review.siteAndDefaults', Boolean(draft.confirmedSiteId)],
+    ['onboarding.review.queuesAndCounters', Object.keys(draft.confirmedQueueIds).length > 0],
+    ['onboarding.review.tiersAssociated', draft.associatedTierQueueIds.length > 0],
   ] as const;
   return (
     <section>
@@ -1071,7 +1070,7 @@ function ReviewStep({
       />
       {checks.map(([label, done]) => (
         <div className="check-row" key={label}>
-          <b>{label}</b>
+          <b>{__t(label)}</b>
           <span className={`status-badge ${done ? 'status-success' : 'status-warning'}`}>
             {done ? __t('common.valide') : __t('onboarding.onboarding.aFaire')}
           </span>

@@ -25,7 +25,7 @@ export function PortfolioPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Organisation"
+        eyebrow={__t('nav.portfolio')}
         title={__t('portfolio.portfolio.portefeuilleDeSites')}
         description={__t('portfolio.portfolio.selectionnezLeSiteSurLequelVousSouhaitezT')}
       />
@@ -85,7 +85,10 @@ export function PortfolioPage() {
               </div>
             </dl>
             {canViewSummary && summaries[index]?.data ? (
-              <div className="site-summary" aria-label={`Synthese ${site.siteName}`}>
+              <div
+                className="site-summary"
+                aria-label={__t('portfolio.siteSummary', { site: site.siteName })}
+              >
                 <span>
                   {summaries[index].data.data.waitingTotal} {__t('common.enAttente')}
                 </span>

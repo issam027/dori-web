@@ -54,15 +54,19 @@ export function LegalPage() {
         <h2>{t('legal.publisher')}</h2>
         <dl className="detail-list">
           <dt>{t('legal.entity')}</dt>
-          <dd>{legalConfig.entityName}</dd>
+          <dd>{legalConfig.entityName || t('legal.notConfigured')}</dd>
           <dt>{t('legal.address')}</dt>
-          <dd>{legalConfig.address}</dd>
+          <dd>{legalConfig.address || t('legal.notConfigured')}</dd>
           <dt>{t('legal.email')}</dt>
           <dd>
-            <a href={`mailto:${legalConfig.email}`}>{legalConfig.email}</a>
+            {legalConfig.email ? (
+              <a href={`mailto:${legalConfig.email}`}>{legalConfig.email}</a>
+            ) : (
+              t('legal.notConfigured')
+            )}
           </dd>
           <dt>{t('legal.registration')}</dt>
-          <dd>{legalConfig.registration}</dd>
+          <dd>{legalConfig.registration || t('legal.notConfigured')}</dd>
         </dl>
       </section>
       <section id="service">
@@ -95,7 +99,7 @@ export function LegalPage() {
         <strong>{t('legal.contactTitle')}</strong>
         <p>{t('legal.contactText', { email: legalConfig.email })}</p>
         <a className="button button-primary" href={`mailto:${legalConfig.email}`}>
-          {legalConfig.email}
+          {legalConfig.email || t('legal.notConfigured')}
         </a>
       </footer>
     </article>

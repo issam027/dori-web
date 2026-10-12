@@ -24,7 +24,7 @@ export function HealthPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Infrastructure"
+        eyebrow={__t('nav.health')}
         title={__t('health.health.santeDeLaPlateforme')}
         description={__t('health.health.etatDeclareParLApiActualiseAutomatiquement')}
         actions={
@@ -58,7 +58,7 @@ export function HealthPage() {
           icon={<Database />}
         />
         <MetricCard
-          label={__t('health.health.uptimeVariant2')}
+          label={__t('health.uptime')}
           value={data ? duration(data.uptime) : '—'}
           icon={<Clock3 />}
         />
@@ -105,7 +105,7 @@ export function HealthPage() {
                 <small>{__t('health.health.uptimeHorodatageEtMemoire')}</small>
               </div>
               <StatusBadge tone={data ? 'success' : 'danger'}>
-                {data ? __t('health.health.mesure') : __t('health.health.indisponibleVariant2')}
+                {data ? __t('health.health.mesure') : __t('health.unavailable')}
               </StatusBadge>
             </div>
             <div>
@@ -163,7 +163,7 @@ export function HealthPage() {
                 </td>
                 <td>
                   {data
-                    ? __t('health.health.value0S', {
+                    ? __t('health.durationSeconds', {
                         value0: String(data.uptime),
                       })
                     : '—'}
@@ -174,7 +174,7 @@ export function HealthPage() {
                 <td>
                   <code>{__t('health.health.checksMemoryusage')}</code>
                 </td>
-                <td>{data ? __t('health.health.5Compteurs') : '—'}</td>
+                <td>{data ? __t('health.counterCount') : '—'}</td>
                 <td>{__t('health.health.memoireNodeJsBrute')}</td>
               </tr>
             </tbody>

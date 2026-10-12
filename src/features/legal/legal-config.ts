@@ -1,3 +1,5 @@
+import { i18n } from '@/core/i18n/i18n';
+
 export interface LegalConfig {
   entityName: string;
   address: string;
@@ -17,13 +19,13 @@ export function validateProductionLegalConfig(config: LegalConfig) {
   const invalid = entries.filter(([, value]) => suspicious.test(value.trim()));
   if (invalid.length)
     throw new Error(
-      `Configuration légale de production invalide : ${invalid.map(([key]) => key).join(', ')}`,
+      i18n.t('legal.invalidProductionConfig', { fields: invalid.map(([key]) => key).join(', ') }),
     );
 }
 
 export const legalConfig: LegalConfig = {
-  entityName: import.meta.env.VITE_LEGAL_ENTITY_NAME || 'Non configuré',
-  address: import.meta.env.VITE_LEGAL_ADDRESS || 'Non configuré',
-  email: import.meta.env.VITE_LEGAL_EMAIL || 'Non configuré',
-  registration: import.meta.env.VITE_LEGAL_REGISTRATION || 'Non configuré',
+  entityName: import.meta.env.VITE_LEGAL_ENTITY_NAME || '',
+  address: import.meta.env.VITE_LEGAL_ADDRESS || '',
+  email: import.meta.env.VITE_LEGAL_EMAIL || '',
+  registration: import.meta.env.VITE_LEGAL_REGISTRATION || '',
 };

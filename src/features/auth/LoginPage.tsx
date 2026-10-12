@@ -255,7 +255,7 @@ export function LoginPage() {
             ) : null}
             <button className="button button-primary" disabled={isSubmitting} type="submit">
               <LogIn aria-hidden="true" />
-              {isSubmitting ? __t('auth.login.connexionVariant2') : __t('auth.login.seConnecter')}
+              {isSubmitting ? __t('auth.login.signingIn') : __t('auth.login.seConnecter')}
             </button>
           </form>
         </div>

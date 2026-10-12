@@ -114,7 +114,10 @@ export function ActiveCallCard({
             <button className="button active-call-notes" type="button" onClick={onNotes}>
               <StickyNote aria-hidden="true" />
               {t('queue-operations.desk.consulterLesNotes')}
-              <span className="note-count" aria-label={`${String(noteCount)} note(s)`}>
+              <span
+                className="note-count"
+                aria-label={t('persons.notes.count', { count: noteCount })}
+              >
                 {noteCount}
               </span>
             </button>
@@ -166,7 +169,7 @@ export function QueueDeskCard({
         <>
           <StatusBadge tone={active ? 'success' : 'neutral'}>
             {active
-              ? t('common.guichetValue0', {
+              ? t('common.counterNumber', {
                   value0: String(session.threadNumber),
                 })
               : t('queue-operations.desk.consultation')}

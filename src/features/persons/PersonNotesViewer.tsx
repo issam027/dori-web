@@ -5,6 +5,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useAddPersonNote, usePerson, usePersonNotes } from './hooks/usePersons';
+import { normalizePersonText } from './person-display';
 
 export function PersonNotesViewer({
   personId,
@@ -25,8 +26,13 @@ export function PersonNotesViewer({
   const person = usePerson(personId, open);
   const addNote = useAddPersonNote(personId);
   const personName = person.data
-    ? `${person.data.data.firstName} ${person.data.data.lastName}`
-    : 'la personne';
+    ? [
+        normalizePersonText(person.data.data.firstName),
+        normalizePersonText(person.data.data.lastName),
+      ]
+        .filter(Boolean)
+        .join(' ') || __t('persons.admin.unknownPerson')
+    : __t('persons.admin.unknownPerson');
   const items = notes.data?.data.items ?? [];
   const current = items[index];
   const add = async () => {
@@ -49,7 +55,7 @@ export function PersonNotesViewer({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={`Notes de ${personName}`}
+      title={__t('persons.notes.title', { name: personName })}
       description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
       actions={
         <>
@@ -119,7 +125,7 @@ export function PersonNotesViewer({
           <blockquote>{current.content}</blockquote>
           <small className="note-meta">
             {current.authorUsername ??
-              __t('persons.personNotesViewer.utilisateurValue0', {
+              __t('persons.notes.userReference', {
                 value0: String(current.createdByUserId),
               })}{' '}
             · {new Date(current.createdAt).toLocaleString()}

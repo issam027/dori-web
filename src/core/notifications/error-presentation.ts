@@ -8,18 +8,18 @@ export interface ErrorPresentation {
   correlationId?: string;
 }
 
-const statusMessages: Record<number, string> = {
-  400: 'Les informations envoyées ne sont pas valides. Vérifiez votre saisie.',
-  401: 'Votre session a expiré. Reconnectez-vous pour continuer.',
-  403: 'Vous n’avez pas l’autorisation nécessaire pour cette action.',
-  404: 'La ressource demandée est introuvable ou n’est plus disponible.',
-  409: 'Cette action entre en conflit avec des données qui viennent de changer.',
-  422: 'Cette action ne peut pas être réalisée dans la situation actuelle.',
-  429: 'Trop de demandes ont été envoyées. Patientez quelques instants.',
-  500: 'Le service a rencontré une erreur interne.',
-  502: 'Le service est momentanément indisponible.',
-  503: 'Le service est momentanément indisponible.',
-  504: 'Le service met trop de temps à répondre.',
+const statusMessageKeys: Record<number, string> = {
+  400: 'errors.http.badRequest',
+  401: 'errors.http.unauthorized',
+  403: 'errors.http.forbidden',
+  404: 'errors.http.notFound',
+  409: 'errors.http.conflict',
+  422: 'errors.http.unprocessable',
+  429: 'errors.http.tooManyRequests',
+  500: 'errors.http.internal',
+  502: 'errors.http.unavailable',
+  503: 'errors.http.unavailable',
+  504: 'errors.http.timeout',
 };
 
 function translatedMessage(error: NormalizedApiError): string | undefined {
@@ -30,25 +30,26 @@ function translatedMessage(error: NormalizedApiError): string | undefined {
 
 export function presentError(error: unknown): ErrorPresentation {
   if (error instanceof NormalizedApiError) {
+    const statusMessageKey = error.status ? statusMessageKeys[error.status] : undefined;
     const message =
       translatedMessage(error) ??
-      (error.status ? statusMessages[error.status] : undefined) ??
+      (statusMessageKey ? i18n.t(statusMessageKey) : undefined) ??
       (typeof navigator !== 'undefined' && !navigator.onLine
-        ? 'La connexion réseau semble interrompue. Vérifiez votre accès à Internet.'
-        : 'L’action n’a pas pu être réalisée. Réessayez ou transmettez la référence au support.');
+        ? i18n.t('errors.networkOffline')
+        : i18n.t('errors.actionFailedWithSupport'));
     return {
-      title: error.status === 409 ? 'Données à actualiser' : 'Action impossible',
+      title: i18n.t(error.status === 409 ? 'errors.staleData' : 'errors.actionImpossible'),
       message,
       correlationId: error.correlationId,
     };
   }
 
   return {
-    title: 'Erreur inattendue',
+    title: i18n.t('errors.unexpectedTitle'),
     message:
       typeof navigator !== 'undefined' && !navigator.onLine
-        ? 'La connexion réseau semble interrompue. Vérifiez votre accès à Internet.'
-        : 'Une erreur inattendue est survenue. Réessayez dans quelques instants.',
+        ? i18n.t('errors.networkOffline')
+        : i18n.t('errors.unexpectedRetry'),
   };
 }
 

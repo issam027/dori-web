@@ -152,7 +152,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 </div>
                 <h1 className="tracking-estimate">
                   {position?.estimatedWaitMinutes !== undefined
-                    ? __t('public-experiences.track.environValue0Minutes', {
+                    ? __t('tracking.estimatedMinutes', {
                         value0: String(position.estimatedWaitMinutes),
                       })
                     : __t('public-experiences.track.estimationEnCours')}

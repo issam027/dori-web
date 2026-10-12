@@ -73,7 +73,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
     const error =
       event.reason instanceof Error
         ? event.reason
-        : new Error(String(event.reason ?? 'Promise rejetée'));
+        : new Error(String(event.reason ?? i18n.t('errors.rejectedPromise')));
     this.captureRuntimeError(error);
   };
 

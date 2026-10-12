@@ -35,7 +35,7 @@ export function MyQueuesPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Opérations"
+        eyebrow={__t('nav.operations')}
         title={__t('queue-operations.myQueues.mesFiles')}
         description={__t('queue-operations.myQueues.vueConsolideeDesPersonnesEnAttenteDansVos')}
       />
@@ -57,7 +57,7 @@ export function MyQueuesPage() {
             aria-label={__t('queue-operations.myQueues.filtrerParFile')}
           >
             <button
-              className="button"
+              className={`button${queueId === undefined ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={queueId === undefined}
               onClick={() => {
@@ -70,7 +70,7 @@ export function MyQueuesPage() {
             </button>
             {queues.data.data.items.map((queue) => (
               <button
-                className="button"
+                className={`button${queueId === queue.queueId ? ' button-primary' : ''}`}
                 type="button"
                 aria-pressed={queueId === queue.queueId}
                 key={queue.queueId}
@@ -107,7 +107,7 @@ export function MyQueuesPage() {
                 <input
                   type="search"
                   value={searchDraft}
-                  placeholder={__t('queues.myQueues.exNadiaBenAliOuA042')}
+                  placeholder={__t('queues.search.example')}
                   onChange={(event) => {
                     setSearchDraft(event.target.value);
                   }}
@@ -141,41 +141,45 @@ export function MyQueuesPage() {
           columns={[
             {
               key: 'position',
-              header: 'Position',
+              header: __t('common.position'),
               render: (item) => (page - 1) * 10 + items.indexOf(item) + 1,
             },
             {
               key: 'queue',
-              header: 'Site / file',
+              header: __t('queues.myQueues.siteAndQueue'),
               render: (item) =>
                 queues.data.data.items.find((queue) => queue.queueId === item.queueId)?.queueName ??
                 String(item.queueId),
             },
             {
               key: 'ticket',
-              header: 'Ticket',
+              header: __t('common.ticket'),
               render: (item) => <strong>{item.ticketNumber}</strong>,
             },
             {
               key: 'person',
-              header: 'Personne',
+              header: __t('common.person'),
               render: (item) => {
                 const person = people[items.indexOf(item)]?.data?.data;
                 return person ? `${person.firstName} ${person.lastName}` : '…';
               },
             },
-            { key: 'type', header: 'Type', render: (item) => item.entryType },
+            { key: 'type', header: __t('common.type'), render: (item) => item.entryType },
             {
               key: 'age',
-              header: 'Ancienneté / SLA',
+              header: __t('queues.myQueues.ageAndSla'),
               render: (item) => {
                 return <StatusBadge tone="neutral">{item.status}</StatusBadge>;
               },
             },
-            { key: 'tier', header: 'Forfait', render: (item) => `#${String(item.tierId)}` },
+            {
+              key: 'tier',
+              header: __t('common.tier'),
+              render: (item) => `#${String(item.tierId)}`,
+            },
             {
               key: 'actions',
-              header: 'Actions',
+              header: __t('common.actions'),
               render: (item) => {
                 const index = items.indexOf(item);
                 const noteCount = notes[index]?.data?.data.total ?? 0;
@@ -183,10 +187,11 @@ export function MyQueuesPage() {
                   queues.data.data.items.find((queue) => queue.queueId === item.queueId)
                     ?.queueName ?? 'File #' + String(item.queueId);
                 return (
-                  <div className="table-actions">
+                  <div className="table-actions responsive-table-actions">
                     <button
                       className="button button-small"
                       type="button"
+                      title={__t('queues.myQueues.consulter')}
                       onClick={() => {
                         setRegistrationDetails({ id: item.registrationId, queueName });
                       }}
@@ -196,13 +201,20 @@ export function MyQueuesPage() {
                     <button
                       className="button button-small"
                       type="button"
+                      title={
+                        noteCount
+                          ? __t('queues.myQueues.viewNotes', { count: noteCount })
+                          : __t('queues.myQueues.addNote')
+                      }
                       onClick={() => {
                         setNotesMode(noteCount ? 'view' : 'add');
                         setNotesPersonId(item.personId);
                       }}
                     >
                       {noteCount ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
-                      {noteCount ? 'Consulter notes (' + String(noteCount) + ')' : 'Ajouter note'}
+                      {noteCount
+                        ? __t('queues.myQueues.viewNotes', { count: noteCount })
+                        : __t('queues.myQueues.addNote')}
                     </button>
                   </div>
                 );

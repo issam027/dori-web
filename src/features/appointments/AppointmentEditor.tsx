@@ -85,7 +85,11 @@ export function AppointmentEditor({
       open={open}
       onOpenChange={onOpenChange}
       title={__t('appointments.appointmentEditor.nouveauRendezVous')}
-      description={`Étape ${String(step)} sur 2 · ${step === 1 ? 'Personne' : 'Service et créneau'}`}
+      description={__t('appointments.appointmentEditor.stepDescription', {
+        step: String(step),
+        label:
+          step === 1 ? __t('common.person') : __t('appointments.appointmentEditor.serviceAndSlot'),
+      })}
       actions={
         <>
           {step === 2 ? (
@@ -126,7 +130,10 @@ export function AppointmentEditor({
       }
     >
       <div className="appointment-wizard">
-        <div className="wizard-track" aria-label={`Étape ${String(step)} sur 2`}>
+        <div
+          className="wizard-track"
+          aria-label={__t('wizard.progress', { step: String(step), stepCount: '2' })}
+        >
           <span className="done" />
           <span className={step === 2 ? 'done' : ''} />
         </div>
@@ -136,9 +143,7 @@ export function AppointmentEditor({
               <span className="ticket-chip">1</span>
               <div>
                 <h3>{__t('appointments.appointmentEditor.quiSouhaitezVousRecevoir')}</h3>
-                <p>
-                  {__t('appointments.appointmentEditor.recherchezUnePersonneExistanteOuSaisissezS')}
-                </p>
+                <p>{__t('appointments.editor.personSearchHint')}</p>
               </div>
             </div>
             <PersonPickerOrCreate siteId={siteId} value={person} onChange={setPerson} />
@@ -197,7 +202,7 @@ export function AppointmentEditor({
                 </select>
               </label>
               <label>
-                {__t('tiers.singular')}
+                {__t('common.tier')}
                 <select
                   value={tierId}
                   onChange={(e) => {

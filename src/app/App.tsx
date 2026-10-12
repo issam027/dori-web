@@ -31,6 +31,7 @@ const MyQueuesPage = lazyNamed(
   () => import('@/features/queue-operations/MyQueuesPage'),
   'MyQueuesPage',
 );
+const PersonsPage = lazyNamed(() => import('@/features/persons/PersonsPage'), 'PersonsPage');
 const AppointmentsPage = lazyNamed(
   () => import('@/features/appointments/AppointmentsPage'),
   'AppointmentsPage',
@@ -161,6 +162,7 @@ const protectedRouteViews: Record<string, RouteView> = {
   '/portfolio': { component: PortfolioPage, frame: 'shell' },
   '/desk': { component: DeskPage, frame: 'shell' },
   '/my-queues': { component: MyQueuesPage, frame: 'shell' },
+  '/persons': { component: PersonsPage, frame: 'shell' },
   '/appointments': { component: AppointmentsPage, frame: 'shell' },
   '/control-room': { component: ControlRoomPage, frame: 'shell' },
   '/reports': { component: ReportsPage, frame: 'shell' },

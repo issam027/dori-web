@@ -379,7 +379,7 @@ function NotificationContentStep({
           maxLength={480}
         />
         <small className="field-hint">
-          {content.length} {t('supervision.notifications.480Caracteres')}
+          {content.length} {t('notifications.characterLimit')}
         </small>
       </label>
       <div className="notification-preview">

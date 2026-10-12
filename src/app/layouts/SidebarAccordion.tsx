@@ -21,6 +21,7 @@ import {
   Smartphone,
   Store,
   UserCog,
+  UsersRound,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -53,6 +54,12 @@ const sections: readonly NavSection[] = [
         labelKey: 'nav.myQueues',
         permissions: ['registration_view', 'queue_view'],
         icon: ClipboardList,
+      },
+      {
+        path: '/persons',
+        labelKey: 'nav.persons',
+        permissions: ['registration_view'],
+        icon: UsersRound,
       },
       {
         path: '/appointments',
@@ -250,7 +257,7 @@ export function SidebarAccordion({
         className="sidebar-collapse"
         type="button"
         onClick={onToggleCollapsed}
-        aria-label={collapsed ? 'Agrandir le menu' : 'Réduire le menu'}
+        aria-label={collapsed ? t('nav.expandMenu') : t('nav.collapseMenu')}
       >
         {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
         <span className="sidebar-label">{__t('shell.layouts.sidebarAccordion.reduire')}</span>

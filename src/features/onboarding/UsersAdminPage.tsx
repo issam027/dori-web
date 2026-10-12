@@ -82,7 +82,7 @@ export function UsersAdminPage() {
         languagePreference: editForm.language,
       });
       await refresh();
-      notify({ tone: 'success', title: 'Utilisateur modifié', message: editing.username });
+      notify({ tone: 'success', title: t('admin.users.updateSuccess'), message: editing.username });
       setEditing(undefined);
     } catch (error) {
       notifyError(error);
@@ -93,9 +93,9 @@ export function UsersAdminPage() {
   return (
     <div className="page-stack admin-page users-admin-page">
       <PageHeader
-        eyebrow="Administration"
+        eyebrow={t('common.administration')}
         title={t('admin.users.utilisateurs')}
-        description="Recherchez, créez et administrez les comptes et leurs accès."
+        description={t('admin.users.pageDescription')}
         actions={
           <button
             className="button button-primary"
@@ -174,9 +174,7 @@ export function UsersAdminPage() {
               <Users />
             </span>
             <h2>{t('admin.users.comptesUtilisateurs')}</h2>
-            <p>
-              {t('admin.users.lesActionsSensiblesSontImmediatementAppliqueesAToutesLesSessions')}
-            </p>
+            <p>{t('admin.users.sensitiveActionsNotice')}</p>
           </div>
         </div>
         <div className="table-wrap admin-table-wrap">
@@ -196,7 +194,7 @@ export function UsersAdminPage() {
                 <tr key={user.userId}>
                   <td>
                     <b>{user.username}</b>
-                    <small>{user.email ?? 'Sans email'}</small>
+                    <small>{user.email ?? t('settings.noEmail')}</small>
                   </td>
                   <td>
                     <span className="status-badge status-info">{user.userType}</span>
@@ -205,10 +203,11 @@ export function UsersAdminPage() {
                   <td>{t('onboarding.settings.affectationsGereesParLAssistant')}</td>
                   <td>{user.languagePreference.toUpperCase()}</td>
                   <td>
-                    <div className="table-actions">
+                    <div className="table-actions responsive-table-actions">
                       <button
                         className="button button-small"
                         type="button"
+                        title={t('common.edit')}
                         onClick={() => {
                           edit(user);
                         }}
@@ -218,6 +217,7 @@ export function UsersAdminPage() {
                       <button
                         className="button button-small"
                         type="button"
+                        title={user.isActive ? t('admin.users.suspend') : t('common.activate')}
                         onClick={() =>
                           void usersControllerUpdateUserStatus(user.userId, {
                             isActive: !user.isActive,
@@ -231,11 +231,12 @@ export function UsersAdminPage() {
                         ) : (
                           <UserCheck aria-hidden="true" />
                         )}
-                        {user.isActive ? 'Suspendre' : 'Activer'}
+                        {user.isActive ? t('admin.users.suspend') : t('common.activate')}
                       </button>
                       <button
                         className="button button-small"
                         type="button"
+                        title={t('onboarding.settings.reinitialiserMdp')}
                         onClick={() =>
                           void usersControllerSetUserPassword(user.userId, {
                             newPassword: 'Root@123456',
@@ -243,7 +244,7 @@ export function UsersAdminPage() {
                             .then(() =>
                               notify({
                                 tone: 'success',
-                                title: 'Mot de passe réinitialisé',
+                                title: t('admin.users.passwordResetSuccess'),
                                 message: user.username,
                               }),
                             )
@@ -255,6 +256,7 @@ export function UsersAdminPage() {
                       <button
                         className="button button-small button-danger"
                         type="button"
+                        title={t('admin.users.deconnecter')}
                         onClick={() => {
                           setDisconnecting(user);
                         }}
@@ -329,9 +331,9 @@ export function UsersAdminPage() {
                 setEditForm({ ...editForm, language: event.target.value });
               }}
             >
-              <option value="fr">{t('common.francais')}</option>
+              <option value="fr">{t('locale.fr')}</option>
               <option value="en">{t('common.english')}</option>
-              <option value="ar">العربية</option>
+              <option value="ar">{t('locale.ar')}</option>
             </select>
           </label>
         </div>
@@ -356,7 +358,7 @@ export function UsersAdminPage() {
                   .then(() => {
                     notify({
                       tone: 'success',
-                      title: 'Utilisateur déconnecté',
+                      title: t('settings.userDisconnected'),
                       message: disconnecting.username,
                     });
                     setDisconnecting(undefined);

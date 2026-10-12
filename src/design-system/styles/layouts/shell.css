@@ -123,6 +123,14 @@
   color: white;
   background: rgb(255 255 255 / 6%);
 }
+:is([dir='rtl'], :lang(ar)) .nav-section-toggle {
+  direction: rtl;
+  font-size: 16px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-align: start;
+  text-transform: none;
+}
 .nav-links {
   display: grid;
   gap: 4px;

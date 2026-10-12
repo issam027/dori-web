@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { translationsControllerGetBundle } from '@/api/generated/translations/translations';
 import { legacyUiKeyAliases, uiFallbackFr } from './ui-fallback.fr';
+import { pageTableFallbackAr, pageTableFallbackEn } from './page-table-fallbacks';
 
 const fallbackResources = {
   fr: {
@@ -333,6 +334,7 @@ const fallbackResources = {
       'nav.administration': 'Administration',
       'nav.desk': 'Cockpit guichet',
       'nav.myQueues': 'Mes files',
+      'nav.persons': 'Personnes',
       'nav.appointments': 'Rendez-vous',
       'nav.controlRoom': 'Supervision',
       'nav.portfolio': 'Portefeuille de sites',
@@ -416,6 +418,7 @@ const fallbackResources = {
   },
   en: {
     fallback: {
+      ...pageTableFallbackEn,
       'app.name': 'DORIFY',
       'bootstrap.eyebrow': 'DORIFY',
       'bootstrap.title': 'Application foundation initialized',
@@ -724,6 +727,7 @@ const fallbackResources = {
       'nav.administration': 'Administration',
       'nav.desk': 'Desk cockpit',
       'nav.myQueues': 'My queues',
+      'nav.persons': 'People',
       'nav.appointments': 'Appointments',
       'nav.controlRoom': 'Control room',
       'nav.portfolio': 'Site portfolio',
@@ -806,6 +810,7 @@ const fallbackResources = {
   },
   ar: {
     fallback: {
+      ...pageTableFallbackAr,
       'app.name': 'دوريفاي',
       'bootstrap.eyebrow': 'دوريفاي',
       'bootstrap.title': 'تم إعداد أساس التطبيق',
@@ -872,6 +877,7 @@ const fallbackResources = {
       'nav.administration': 'الإدارة',
       'nav.desk': 'شباك الاستقبال',
       'nav.myQueues': 'صفوفي',
+      'nav.persons': '\u0627\u0644\u0623\u0634\u062e\u0627\u0635',
       'nav.appointments': 'المواعيد',
       'nav.controlRoom': 'الإشراف',
       'nav.portfolio': 'المواقع',

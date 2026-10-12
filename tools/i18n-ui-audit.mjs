@@ -8,6 +8,7 @@ const visibleAttributes = new Set([
   'aria-label',
   'caption',
   'description',
+  'eyebrow',
   'label',
   'placeholder',
   'text',
@@ -15,13 +16,32 @@ const visibleAttributes = new Set([
   'successMessage',
   'title',
 ]);
-const findings = [];
+const visiblePropertyNames = new Set([
+  'caption',
+  'description',
+  'emptyLabel',
+  'eyebrow',
+  'header',
+  'label',
+  'message',
+  'placeholder',
+  'successMessage',
+  'text',
+  'title',
+]);
+const findings = new Set();
 
 function filesIn(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const target = path.join(directory, entry.name);
     if (entry.isDirectory()) return filesIn(target);
-    if (!entry.isFile() || !target.endsWith('.tsx') || /(?:\.test|\.spec)\.tsx$/.test(target)) {
+    if (
+      target.includes(`${path.sep}core${path.sep}i18n${path.sep}`) ||
+      target.includes(`${path.sep}api${path.sep}generated${path.sep}`)
+    ) {
+      return [];
+    }
+    if (!entry.isFile() || !/\.tsx?$/.test(target) || /(?:\.test|\.spec)\.tsx?$/.test(target)) {
       return [];
     }
     return [target];
@@ -29,7 +49,9 @@ function filesIn(directory) {
 }
 
 function isVisibleText(value) {
-  return /[A-Za-zÀ-ÿ]/.test(value.replace(/\s+/g, ' ').trim());
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  if (new Set(['expired', 'invalid', 'unavailable']).has(normalized)) return false;
+  return /[A-Za-z\u00c0-\u00ff]/.test(normalized);
 }
 
 for (const file of filesIn(sourceRoot)) {
@@ -37,11 +59,39 @@ for (const file of filesIn(sourceRoot)) {
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   function report(node, value) {
     const position = ast.getLineAndCharacterOfPosition(node.getStart(ast));
-    findings.push(
+    findings.add(
       `${path.relative(root, file)}:${String(position.line + 1)}: ${value.replace(/\s+/g, ' ').trim()}`,
     );
   }
   function visit(node) {
+    function inspectVisibleExpression(expression) {
+      if (ts.isCallExpression(expression)) return;
+      if (
+        (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) &&
+        isVisibleText(expression.text)
+      ) {
+        report(expression, expression.text);
+        return;
+      }
+      if (
+        ts.isTemplateExpression(expression) &&
+        [expression.head.text, ...expression.templateSpans.map((span) => span.literal.text)].some(
+          isVisibleText,
+        )
+      ) {
+        report(expression, expression.getText(ast));
+        return;
+      }
+      if (ts.isConditionalExpression(expression)) {
+        inspectVisibleExpression(expression.whenTrue);
+        inspectVisibleExpression(expression.whenFalse);
+      } else if (ts.isBinaryExpression(expression)) {
+        inspectVisibleExpression(expression.left);
+        inspectVisibleExpression(expression.right);
+      } else if (ts.isParenthesizedExpression(expression)) {
+        inspectVisibleExpression(expression.expression);
+      }
+    }
     if (ts.isJsxText(node) && isVisibleText(node.text)) report(node, node.text);
     if (
       ts.isJsxAttribute(node) &&
@@ -51,6 +101,29 @@ for (const file of filesIn(sourceRoot)) {
       isVisibleText(node.initializer.text)
     ) {
       report(node.initializer, node.initializer.text);
+    }
+    if (
+      ts.isPropertyAssignment(node) &&
+      visiblePropertyNames.has(node.name.getText(ast).replaceAll(/["']/g, '')) &&
+      (ts.isStringLiteral(node.initializer) ||
+        ts.isNoSubstitutionTemplateLiteral(node.initializer)) &&
+      isVisibleText(node.initializer.text)
+    ) {
+      report(node.initializer, node.initializer.text);
+    }
+    if (
+      ts.isPropertyAssignment(node) &&
+      visiblePropertyNames.has(node.name.getText(ast).replaceAll(/["']/g, ''))
+    ) {
+      inspectVisibleExpression(node.initializer);
+    }
+    if (
+      ts.isJsxExpression(node) &&
+      ts.isJsxAttribute(node.parent) &&
+      visibleAttributes.has(node.parent.name.getText(ast)) &&
+      node.expression
+    ) {
+      inspectVisibleExpression(node.expression);
     }
     if (
       ts.isCallExpression(node) &&
@@ -72,7 +145,12 @@ for (const file of filesIn(sourceRoot)) {
         }
       }
     }
-    if (ts.isJsxExpression(node) && node.parent && !ts.isJsxAttribute(node.parent) && node.expression) {
+    if (
+      ts.isJsxExpression(node) &&
+      node.parent &&
+      !ts.isJsxAttribute(node.parent) &&
+      node.expression
+    ) {
       function inspectRenderedExpression(expression) {
         if (ts.isCallExpression(expression)) return;
         if (
@@ -119,9 +197,9 @@ for (const file of filesIn(sourceRoot)) {
   visit(ast);
 }
 
-if (findings.length) {
-  console.error(`Hard-coded visible UI strings detected (${String(findings.length)}):`);
-  console.error(findings.join('\n'));
+if (findings.size) {
+  console.error(`Hard-coded visible UI strings detected (${String(findings.size)}):`);
+  console.error([...findings].join('\n'));
   process.exitCode = 1;
 } else {
   console.log('i18n UI audit passed: no hard-coded JSX text, visible attribute, or toast literal.');

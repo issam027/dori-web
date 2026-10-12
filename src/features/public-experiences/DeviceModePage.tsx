@@ -31,9 +31,7 @@ export function DeviceModePage() {
           </span>
           <span>
             <strong>{__t('public-experiences.deviceMode.borneDAccueil')}</strong>
-            <small>
-              {__t('public-experiences.deviceMode.inscriptionDesNouveauxArrivantsEtCreationD')}
-            </small>
+            <small>{__t('deviceMode.kioskDescription')}</small>
           </span>
           <b>{__t('public-experiences.deviceMode.ouvrirLaBorne')}</b>
         </Link>
@@ -43,17 +41,13 @@ export function DeviceModePage() {
           </span>
           <span>
             <strong>{__t('public-experiences.deviceMode.ecranDeSalle')}</strong>
-            <small>
-              {__t('public-experiences.deviceMode.affichageDesTicketsAppelesDesGuichetsEtDe')}
-            </small>
+            <small>{__t('deviceMode.displayDescription')}</small>
           </span>
           <b>{__t('public-experiences.deviceMode.ouvrirLEcranSalle')}</b>
         </Link>
       </div>
       <div className="device-mode-footer">
-        <p className="device-mode-hint">
-          {__t('public-experiences.deviceMode.conseilUtilisezLeModePleinEcranDuNavigate')}
-        </p>
+        <p className="device-mode-hint">{__t('deviceMode.fullscreenTip')}</p>
         <button
           className="button"
           type="button"

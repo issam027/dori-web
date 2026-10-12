@@ -92,9 +92,7 @@ export function PersonPickerOrCreate({
               </div>
             </FormField>
             {search.trim().length > 0 && search.trim().length < 3 ? (
-              <small className="form-hint">
-                {__t('persons.personPickerOrCreate.saisissezAuMoins3Caracteres')}
-              </small>
+              <small className="form-hint">{__t('persons.search.minimumCharacters')}</small>
             ) : null}
           </div>
           {search.trim().length >= 3 ? (
@@ -104,7 +102,7 @@ export function PersonPickerOrCreate({
                 entities={people.data?.data.items ?? []}
                 selectedKey={value?.kind === 'existing' ? value.person.personId : null}
                 getKey={(person) => person.personId}
-                label={people.isFetching ? 'Recherche en cours…' : 'Résultats'}
+                label={people.isFetching ? __t('common.searching') : __t('common.results')}
                 render={(person) =>
                   `${person.firstName} ${person.lastName} — ${person.phoneNumber ?? ''}`
                 }
@@ -133,7 +131,7 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('common.prenomH4ba4')}>
+          <FormField label={__t('common.firstName')}>
             <input
               autoComplete="given-name"
               value={draft.firstName}
@@ -142,11 +140,11 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('persons.personPickerOrCreate.telephoneE164')} required>
+          <FormField label={__t('persons.phone.e164Label')} required>
             <InternationalPhoneInput
               value={draft.phoneNumber}
               countryLabel={__t('phone.countryCode')}
-              phoneLabel={__t('persons.personPickerOrCreate.telephoneE164')}
+              phoneLabel={__t('persons.phone.e164Label')}
               required
               onChange={(phoneNumber) => {
                 setDraft({ ...draft, phoneNumber });
@@ -180,7 +178,7 @@ export function PersonPickerOrCreate({
                 setDraft({ ...draft, languagePreference: e.target.value || undefined });
               }}
             >
-              <option value="fr">{__t('common.frVariant2')}</option>
+              <option value="fr">{__t('locale.fr')}</option>
               <option value="en">{__t('persons.personPickerOrCreate.language.en')}</option>
               <option value="ar">{__t('persons.personPickerOrCreate.language.ar')}</option>
             </select>

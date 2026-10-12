@@ -140,9 +140,7 @@ export function QuickRegistration({
         <div>
           <p className="eyebrow">{__t('queue-operations.quickRegistration.accueil')}</p>
           <h2>{__t('queue-operations.quickRegistration.accueilRapide')}</h2>
-          <p>
-            {__t('queue-operations.quickRegistration.rechercherOuCreerUnePersonnePuisGenererSo')}
-          </p>
+          <p>{__t('quickRegistration.description')}</p>
         </div>
         <button
           className="button button-primary"
@@ -162,10 +160,10 @@ export function QuickRegistration({
         title={__t('queue-operations.quickRegistration.accueilRapide')}
         description={
           step === 1
-            ? 'Étape 1 sur 3 · Rechercher ou créer la personne'
+            ? __t('queue-operations.quickRegistration.stepPerson')
             : step === 2
-              ? 'Étape 2 sur 3 · Qualifier le ticket'
-              : 'Étape 3 sur 3 · Ticket créé'
+              ? __t('queue-operations.quickRegistration.stepTicket')
+              : __t('queue-operations.quickRegistration.stepComplete')
         }
         actions={
           <>
@@ -222,7 +220,10 @@ export function QuickRegistration({
         }
       >
         <div className="quick-registration-form">
-          <div className="wizard-progress" aria-label={`Étape ${String(step)} sur 3`}>
+          <div
+            className="wizard-progress"
+            aria-label={__t('wizard.progress', { step: String(step), stepCount: '3' })}
+          >
             {[1, 2, 3].map((item) => (
               <span key={item} className={item <= step ? 'is-complete' : undefined} />
             ))}
@@ -236,11 +237,7 @@ export function QuickRegistration({
                 <span>1</span>
                 <div>
                   <h3>{__t('queue-operations.quickRegistration.quiAccueillezVous')}</h3>
-                  <p>
-                    {__t(
-                      'queue-operations.quickRegistration.retrouvezUnDossierExistantOuCreezUneNouve',
-                    )}
-                  </p>
+                  <p>{__t('quickRegistration.personStepHint')}</p>
                 </div>
               </div>
               <PersonPickerOrCreate siteId={siteId} value={choice} onChange={setChoice} />
@@ -258,22 +255,14 @@ export function QuickRegistration({
                 <div>
                   <small>{__t('common.personneSelectionnee')}</small>
                   <strong>{personName}</strong>
-                  <span>
-                    {__t(
-                      'queue-operations.quickRegistration.vousPouvezRevenirALEtapePrecedentePourMo',
-                    )}
-                  </span>
+                  <span>{__t('quickRegistration.backHint')}</span>
                 </div>
               </div>
               <div className="wizard-step-heading">
                 <span>2</span>
                 <div>
                   <h3>{__t('queue-operations.quickRegistration.commentPreparerSonPassage')}</h3>
-                  <p>
-                    {__t(
-                      'queue-operations.quickRegistration.selectionnezLaFileLeNiveauDeServiceEtLe',
-                    )}
-                  </p>
+                  <p>{__t('quickRegistration.ticketStepHint')}</p>
                 </div>
               </div>
               <div className="form-grid">
@@ -294,7 +283,7 @@ export function QuickRegistration({
                     ))}
                   </select>
                 </FormField>
-                <FormField label={__t('tiers.singular')} required>
+                <FormField label={__t('common.tier')} required>
                   <select
                     value={tierId}
                     onChange={(e) => {
@@ -304,7 +293,11 @@ export function QuickRegistration({
                     <option value={0}>{__t('common.choose')}</option>
                     {activeTiers.map((tier) => (
                       <option key={tier.tierId} value={tier.tierId}>
-                        {tier.tier?.tierName ?? `Service ${String(tier.tierId)}`} ·{' '}
+                        {tier.tier?.tierName ??
+                          __t('queue-operations.quickRegistration.serviceFallback', {
+                            id: String(tier.tierId),
+                          })}{' '}
+                        ·{' '}
                         {new Intl.NumberFormat(i18n.language, {
                           style: 'currency',
                           currency: tier.currency,
@@ -322,15 +315,17 @@ export function QuickRegistration({
                         }).format(selectedTier.price)}
                       </span>
                       <small>
-                        {selectedTierRules.some((rule) => rule.channel === 'sms') ? 'SMS · ' : ''}
+                        {selectedTierRules.some((rule) => rule.channel === 'sms')
+                          ? __t('queue-operations.quickRegistration.benefitSms') + ' ? '
+                          : ''}
                         {selectedTierRules.some((rule) => rule.notificationType === 'welcome')
-                          ? 'Bienvenue · '
+                          ? __t('queue-operations.quickRegistration.benefitWelcome') + ' ? '
                           : ''}
                         {selectedTierRules.some((rule) => rule.notificationType === 'threshold')
-                          ? 'Alerte d’approche · '
+                          ? __t('queue-operations.quickRegistration.benefitApproachAlert') + ' ? '
                           : ''}
                         {selectedTierRules.some((rule) => rule.includeTrackingLink)
-                          ? 'Lien de suivi'
+                          ? __t('queue-operations.quickRegistration.benefitTrackingLink')
                           : ''}
                       </small>
                     </div>
@@ -371,10 +366,10 @@ export function QuickRegistration({
                     required
                     hint={
                       availability.isFetching
-                        ? 'Chargement des disponibilités…'
+                        ? __t('appointments.availability.loading')
                         : availableSlots.length
-                          ? 'Créneaux retournés pour la date sélectionnée'
-                          : 'Aucun créneau disponible pour cette date'
+                          ? __t('appointments.availability.loaded')
+                          : __t('appointments.actions.noSlots')
                     }
                   >
                     <select
@@ -404,7 +399,7 @@ export function QuickRegistration({
               <span className="quick-registration-success" aria-hidden="true">
                 ✓
               </span>
-              <p className="eyebrow">{__t('common.inscriptionConfirmeeKt7nz')}</p>
+              <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
               <h3>{personName}</h3>
               <strong>{ticket}</strong>
               <p>

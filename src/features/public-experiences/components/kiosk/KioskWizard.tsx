@@ -153,7 +153,7 @@ export function KioskWizard() {
   });
   const registrationError = register.error
     ? register.error instanceof NormalizedApiError && register.error.status === 409
-      ? 'Ce numéro de téléphone est déjà associé à une personne. Adressez-vous à l’accueil pour retrouver votre dossier.'
+      ? __t('kiosk.errors.phoneAlreadyExists')
       : presentError(register.error).message
     : '';
   if (!validScope)
@@ -220,7 +220,10 @@ export function KioskWizard() {
       ) : null}
       {flow === 'walkin' ? (
         <div className="kiosk-panel">
-          <div className="kiosk-progress" aria-label={`Étape ${String(walkinStep)} sur 4`}>
+          <div
+            className="kiosk-progress"
+            aria-label={__t('wizard.progress', { step: String(walkinStep), stepCount: '4' })}
+          >
             {[1, 2, 3, 4].map((step) => (
               <span className={step <= walkinStep ? 'done' : ''} key={step} />
             ))}
@@ -228,16 +231,16 @@ export function KioskWizard() {
           <div className="kiosk-stage-title">
             <span>
               {__t('common.etape')}
-              {walkinStep} {__t('public-experiences.kiosk.sur4')}
+              {walkinStep} {__t('kiosk.walkIn.totalSteps')}
             </span>
             <h1>
               {
                 [
                   '',
-                  'Quel service souhaitez-vous ?',
-                  'Vos informations',
-                  'Votre niveau de service',
-                  'Vérifiez votre demande',
+                  __t('kiosk.walkIn.steps.service.title'),
+                  __t('kiosk.walkIn.steps.identity.title'),
+                  __t('kiosk.walkIn.steps.tier.title'),
+                  __t('kiosk.walkIn.steps.review.title'),
                 ][walkinStep]
               }
             </h1>
@@ -245,10 +248,10 @@ export function KioskWizard() {
               {
                 [
                   '',
-                  'Choisissez la file qui correspond à votre besoin.',
-                  'Ces informations servent uniquement à créer et suivre votre ticket.',
-                  'Les options proposées sont celles configurées pour cette file.',
-                  'Confirmez les informations avant la création du ticket.',
+                  __t('kiosk.walkIn.steps.service.description'),
+                  __t('kiosk.walkIn.steps.identity.description'),
+                  __t('kiosk.walkIn.steps.tier.description'),
+                  __t('kiosk.walkIn.steps.review.description'),
                 ][walkinStep]
               }
             </p>
@@ -270,7 +273,7 @@ export function KioskWizard() {
                     <strong>{queue.queueName}</strong>
                     <span className="kiosk-wait-estimate">
                       {queueStatuses[index]?.data
-                        ? __t('public-experiences.kiosk.environValue0MinValue1EnAttenteFu76o', {
+                        ? __t('kiosk.queue.waitEstimate', {
                             value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
                             value1: String(queueStatuses[index].data.data.waitingCount),
                           })
@@ -306,7 +309,7 @@ export function KioskWizard() {
                   />
                 </label>
                 <label>
-                  {__t('common.prenomH4ba4')}
+                  {__t('common.firstName')}
                   <input
                     autoComplete="given-name"
                     value={firstName}
@@ -334,7 +337,7 @@ export function KioskWizard() {
                 </label>
                 <label>
                   <span className="kiosk-field-label">
-                    {__t('public-experiences.kiosk.telephone')}
+                    {__t('common.phone')}
                     <span className="required-mark" aria-hidden="true">
                       *
                     </span>
@@ -343,12 +346,12 @@ export function KioskWizard() {
                     value={phone}
                     onChange={setPhone}
                     countryLabel={__t('public-experiences.kiosk.indicatifPays')}
-                    phoneLabel={__t('public-experiences.kiosk.telephone')}
+                    phoneLabel={__t('common.phone')}
                     required
                   />
                   <small>
                     {phoneValid
-                      ? __t('public-experiences.kiosk.numeroEnregistreValue0', { value0: phone })
+                      ? __t('kiosk.phone.savedNumber', { value0: phone })
                       : __t('public-experiences.kiosk.choisissezLePaysPuisSaisissezLeNumero')}
                   </small>
                 </label>
@@ -388,7 +391,7 @@ export function KioskWizard() {
                         </small>
                         <strong>
                           {item.tier?.tierName ??
-                            __t('public-experiences.kiosk.forfaitValue0', {
+                            __t('kiosk.tier.name', {
                               value0: String(item.tierId),
                             })}
                         </strong>
@@ -448,7 +451,7 @@ export function KioskWizard() {
                       <th>{__t('public-experiences.kiosk.attenteEstimee')}</th>
                       <td>
                         {queueId
-                          ? __t('public-experiences.kiosk.value0Minutes', {
+                          ? __t('common.durationMinutes', {
                               value0: String(
                                 queueStatuses[
                                   queues.data?.data.items.findIndex(
@@ -465,7 +468,7 @@ export function KioskWizard() {
                       <td>{lastName}</td>
                     </tr>
                     <tr>
-                      <th>{__t('common.prenomH4ba4')}</th>
+                      <th>{__t('common.firstName')}</th>
                       <td>{firstName || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
@@ -473,14 +476,14 @@ export function KioskWizard() {
                       <td>{email || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
-                      <th>{__t('public-experiences.kiosk.telephone')}</th>
+                      <th>{__t('common.phone')}</th>
                       <td>{phone}</td>
                     </tr>
                     <tr>
                       <th>{__t('public-experiences.kiosk.niveauDeService')}</th>
                       <td>
                         {tier?.tier?.tierName ??
-                          __t('public-experiences.kiosk.forfaitValue0', {
+                          __t('kiosk.tier.name', {
                             value0: String(tier?.tierId ?? ''),
                           })}
                       </td>
@@ -650,13 +653,13 @@ export function KioskWizard() {
               ✓
             </span>
             <div>
-              <p className="eyebrow">{__t('common.inscriptionConfirmeeKt7nz')}</p>
+              <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
               <h1>{__t('public-experiences.kiosk.votreTicketEstPret')}</h1>
             </div>
           </div>
           <div className="kiosk-ticket-result">
             <div>
-              <small>{__t('public-experiences.kiosk.numeroDeTicketV2lgk')}</small>
+              <small>{__t('kiosk.ticket.numberHeading')}</small>
               <strong>{result.ticketNumber}</strong>
               <span>{result.queueName}</span>
             </div>

@@ -101,7 +101,7 @@ export function DisplayPage() {
   if (!activeSiteId)
     return (
       <section className="display-screen display-empty-state">
-        <h1>{__t('common.aucunSiteActifHmb19')}</h1>
+        <h1>{__t('common.noActiveSite')}</h1>
         <p>{__t('public-experiences.display.selectionnezUnSitePourAfficherSesFiles')}</p>
       </section>
     );
@@ -167,7 +167,7 @@ export function DisplayPage() {
                     </b>
                     <span>
                       {call.queueName ??
-                        __t('public-experiences.display.fileValue0', {
+                        __t('display.queueName', {
                           value0: String(call.queueId),
                         })}
                     </span>
@@ -203,7 +203,7 @@ export function DisplayPage() {
                     <strong>{item.ticket}</strong>
                     <small>
                       {item.queueName ??
-                        __t('public-experiences.display.fileValue0', {
+                        __t('display.queueName', {
                           value0: String(item.queueId),
                         })}
                     </small>

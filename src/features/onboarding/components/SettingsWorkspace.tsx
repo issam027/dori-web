@@ -34,7 +34,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   return (
     <div className="page-stack admin-page">
       <PageHeader
-        eyebrow="Administration"
+        eyebrow={__t('nav.administration')}
         title={__t('onboarding.settings.configurationDuService')}
         description={__t('onboarding.settings.gerezLesRessourcesReellementProposeesParDo')}
         actions={
@@ -193,10 +193,11 @@ function SitesPanel({
                   </span>
                 </td>
                 <td>
-                  <div className="table-actions">
+                  <div className="table-actions responsive-table-actions">
                     <button
                       className="button button-small"
                       type="button"
+                      title={__t('settings.assignUser')}
                       onClick={() => {
                         assign({ kind: 'site', id: s.siteId, label: s.siteName });
                       }}
@@ -206,14 +207,15 @@ function SitesPanel({
                     </button>
                     <button
                       className="button button-small"
+                      title={
+                        s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
+                      }
                       onClick={() =>
                         void updateSite(s.siteId, { isActive: !s.isActive }).then(refresh)
                       }
                     >
                       {s.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
-                      {s.isActive
-                        ? __t('onboarding.settings.desactiver')
-                        : __t('onboarding.settings.activer')}
+                      {s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
                     </button>
                   </div>
                 </td>
@@ -290,9 +292,10 @@ function QueuesPanel({
                   </span>
                 </td>
                 <td>
-                  <div className="table-actions">
+                  <div className="table-actions responsive-table-actions">
                     <button
                       className="button button-small"
+                      title={__t('common.edit')}
                       onClick={() => {
                         edit(q);
                       }}
@@ -304,6 +307,7 @@ function QueuesPanel({
                     <button
                       className="button button-small"
                       type="button"
+                      title={__t('settings.assignUser')}
                       onClick={() => {
                         assign({ kind: 'queue', id: q.queueId, label: q.queueName });
                       }}
@@ -313,14 +317,15 @@ function QueuesPanel({
                     </button>
                     <button
                       className="button button-small"
+                      title={
+                        q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
+                      }
                       onClick={() =>
                         void updateQueue(q.queueId, { isActive: !q.isActive }).then(refresh)
                       }
                     >
                       {q.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
-                      {q.isActive
-                        ? __t('onboarding.settings.desactiver')
-                        : __t('onboarding.settings.activer')}
+                      {q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
                     </button>
                   </div>
                 </td>

@@ -22,7 +22,7 @@ export const uiFallbackFr: Record<string, string> = {
   'appointments.appointmentEditor.personne': '← Personne',
   'appointments.appointmentEditor.placeS': 'place(s))',
   'appointments.appointmentEditor.quiSouhaitezVousRecevoir': 'Qui souhaitez-vous recevoir ?',
-  'appointments.appointmentEditor.recherchezUnePersonneExistanteOuSaisissezS':
+  'appointments.editor.personSearchHint':
     'Recherchez une personne existante ou saisissez ses coordonnées.',
   'appointments.appointmentEditor.serviceEtCreneau': 'Service et créneau',
   'appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi':
@@ -36,8 +36,7 @@ export const uiFallbackFr: Record<string, string> = {
   'appointments.appointments.semaine': 'Semaine',
   'appointments.title': 'Rendez-vous',
   'auth.changePassword.changerLeMotDePasse': 'Changer le mot de passe',
-  'auth.changePassword.choisissezUnMotDePasseDe10A20Caracteres':
-    'Choisissez un mot de passe de 10 à 20 caractères.',
+  'auth.changePassword.passwordHint': 'Choisissez un mot de passe de 10 à 20 caractères.',
   'auth.changePassword.confirmation': 'Confirmation',
   'auth.changePassword.leMotDePasseNAPasPuEtreModifie': 'Le mot de passe n’a pas pu être modifié.',
   'auth.changePassword.motDePasseActuel': 'Mot de passe actuel',
@@ -50,7 +49,7 @@ export const uiFallbackFr: Record<string, string> = {
   'auth.login.connexion': 'Connexion...',
   'auth.login.connexionRapide': 'Connexion rapide',
   'auth.login.connexionSecurisee': 'Connexion securisee',
-  'auth.login.connexionVariant2': 'Connexion…',
+  'auth.login.signingIn': 'Connexion…',
   'auth.login.emailOuNomUtilisateur': 'Email ou nom utilisateur',
   'auth.login.identifiantOuMotDePasseIncorrect': 'Identifiant ou mot de passe incorrect.',
   'auth.login.memoriserMonIdentifiant': 'Mémoriser mon identifiant',
@@ -59,6 +58,81 @@ export const uiFallbackFr: Record<string, string> = {
   'auth.login.motDePasseOublie': 'Mot de passe oublié',
   'auth.login.plateformeDeGestionDesFlux': 'Plateforme de gestion des flux',
   'auth.login.seConnecter': 'Se connecter',
+  'common.administration': 'Administration',
+  'common.activate': 'Activer',
+  'common.activeCounters': 'Guichets actifs',
+  'common.activeQueues': 'Files actives',
+  'common.activeSites': 'Sites actifs',
+  'common.attempts': 'Tentatives',
+  'common.businessDate': 'Date métier',
+  'common.createdAt': 'Cr\u00e9\u00e9e le',
+  'common.entryType': 'Type d’entrée',
+  'common.fullName': 'Nom complet',
+  'common.identifier': 'Identifiant',
+  'common.noShow': 'No-show',
+  'common.person': 'Personne',
+  'common.phone': 'Téléphone',
+  'common.pilotage': 'Pilotage',
+  'common.recipient': 'Destinataire',
+  'common.registered': 'Inscrits',
+  'common.servedPlural': 'Servis',
+  'common.tier': 'Forfait',
+  'common.todayAppointments': 'Rendez-vous du jour',
+  'common.updatedAt': 'Dernière mise à jour',
+  'common.waiting': 'En attente',
+  'nav.expandMenu': 'Agrandir le menu',
+  'nav.collapseMenu': 'Réduire le menu',
+  'common.refreshing': 'Actualisation en cours',
+  'common.refreshPage': 'Actualiser la page',
+  'common.searching': 'Recherche en cours?',
+  'common.results': 'Résultats',
+  'appointments.appointmentEditor.stepDescription': 'Étape {{step}} sur 2 · {{label}}',
+  'appointments.appointmentEditor.serviceAndSlot': 'Service et créneau',
+  'admin.translations.updateSuccess': 'Traduction modifiée',
+  'admin.translations.createSuccess': 'Traduction créée',
+  'admin.translations.createdLocales': '{{key}} · FR, EN, AR',
+  'common.apply': 'Appliquer',
+  'common.contact': 'Coordonn\u00e9es',
+  'common.notProvided': 'Non renseign\u00e9',
+  'common.reset': 'R\u00e9initialiser',
+  'common.saving': 'Enregistrement\u2026',
+  'common.view': 'Consulter',
+  'persons.admin.title': 'Personnes',
+  'persons.admin.description':
+    'Consultez et mettez \u00e0 jour les personnes rattach\u00e9es au site actif.',
+  'persons.admin.newPerson': 'Nouvelle personne',
+  'persons.admin.notes': 'Notes',
+  'persons.admin.unknownPerson': 'Personne sans nom',
+  'persons.admin.searchTitle': 'Rechercher une personne',
+  'persons.admin.searchHint': 'Nom, pr\u00e9nom, e-mail ou num\u00e9ro de t\u00e9l\u00e9phone',
+  'persons.admin.searchPlaceholder': 'Saisissez un nom, un e-mail ou un t\u00e9l\u00e9phone',
+  'persons.admin.directory': 'R\u00e9pertoire des personnes',
+  'persons.admin.resultCount': '{{count}} personne(s) dans ce p\u00e9rim\u00e8tre',
+  'persons.admin.empty': 'Aucune personne trouv\u00e9e',
+  'persons.admin.emptyHint': 'Modifiez votre recherche ou cr\u00e9ez une nouvelle personne.',
+  'persons.admin.person': 'Personne',
+  'persons.admin.createTitle': 'Cr\u00e9er une personne',
+  'persons.admin.createDescription': 'Ajoutez une personne au r\u00e9pertoire du site actif.',
+  'persons.admin.editTitle': 'Modifier la personne',
+  'persons.admin.editDescription': 'Mettez \u00e0 jour son identit\u00e9 et ses coordonn\u00e9es.',
+  'persons.admin.identity': 'Identit\u00e9 et coordonn\u00e9es',
+  'persons.admin.formHint': 'Le nom et le num\u00e9ro de t\u00e9l\u00e9phone sont obligatoires.',
+  'persons.admin.activePerson': 'Personne active',
+  'persons.admin.created': 'Personne cr\u00e9\u00e9e',
+  'persons.admin.updated': 'Personne modifi\u00e9e',
+  'persons.admin.detailsTitle': 'D\u00e9tail de la personne',
+  'persons.admin.personReference': 'Fiche personne #{{id}}',
+  'persons.notes.title': 'Notes de {{name}}',
+  'persons.notes.count': '{{count}} note(s)',
+  'portfolio.siteSummary': 'Synthèse {{site}}',
+  'queue-operations.quickRegistration.stepPerson':
+    'Étape 1 sur 3 · Rechercher ou créer la personne',
+  'queue-operations.quickRegistration.stepTicket': 'Étape 2 sur 3 · Qualifier le ticket',
+  'queue-operations.quickRegistration.stepComplete': 'Étape 3 sur 3 · Ticket créé',
+  'supervision.controlRoom.resetDescription':
+    'La file « {{queue}} » sera réinitialisée. Les inscriptions en attente du jour seront clôturées selon le mode configuré côté serveur. Cette action ne peut pas être annulée.',
+  'supervision.controlRoom.resetting': 'Réinitialisation…',
+  'supervision.controlRoom.confirmReset': 'Confirmer la réinitialisation',
   'common.absent': 'Absent',
   'common.actions': 'Actions',
   'common.active': 'Actif',
@@ -67,13 +141,13 @@ export const uiFallbackFr: Record<string, string> = {
   'common.api': 'API',
   'common.ar': 'ar',
   'common.aucuneFileConfiguree': 'Aucune file configurée',
-  'common.aucunSiteActifHmb19': 'Aucun site actif',
+  'common.noActiveSite': 'Aucun site actif',
   'common.canal': 'Canal',
   'common.capacite': 'Capacité',
   'common.choose': 'Choisir',
   'common.contenu': 'Contenu',
   'common.continue': 'Continuer',
-  'common.continuer': 'Continuer →',
+  'common.continuer': 'Continuer',
   'common.creation': 'Création…',
   'common.d': 'D',
   'common.date': 'Date',
@@ -92,14 +166,13 @@ export const uiFallbackFr: Record<string, string> = {
   'common.fermerLeMenu': 'Fermer le menu',
   'common.fermeture': 'Fermeture',
   'common.fr': 'fr',
-  'common.francais': 'Français',
-  'common.frVariant2': 'Français',
+  'locale.fr': 'Français',
   'common.guichet': 'Guichet',
   'common.guichets': 'Guichets',
   'common.heritee': 'Héritée',
   'common.humain': 'Humain',
   'common.inactive': 'Inactif',
-  'common.inscriptionConfirmeeKt7nz': 'Inscription confirmée',
+  'common.registrationConfirmed': 'Inscription confirmée',
   'common.language': 'Langue',
   'common.locale': 'Locale',
   'common.localisation': 'Localisation',
@@ -114,7 +187,7 @@ export const uiFallbackFr: Record<string, string> = {
   'common.perimetre': 'Périmètre',
   'common.personneSelectionnee': 'Personne sélectionnée',
   'common.position': 'Position',
-  'common.prenomH4ba4': 'Prénom',
+  'common.firstName': 'Prénom',
   'common.rdv': 'RDV',
   'common.rechercherUnePersonne': 'Rechercher une personne',
   'common.retour': '← Retour',
@@ -134,10 +207,9 @@ export const uiFallbackFr: Record<string, string> = {
   'common.usd': 'USD',
   'common.valeur': 'Valeur',
   'common.valide': 'Validé',
-  'common.value0': '#{{value0}}',
   'design.components.notificationCenter.fermerLaNotification': 'Fermer la notification',
   'design.components.notificationCenter.referenceSupport': 'Référence support :',
-  'health.health.5Compteurs': '5 compteurs',
+  'health.counterCount': '5 compteurs',
   'health.health.arrayBuffers': 'Array buffers',
   'health.health.baseDeDonnees': 'Base de données',
   'health.health.champApi': 'Champ API',
@@ -160,7 +232,7 @@ export const uiFallbackFr: Record<string, string> = {
   'health.health.heapUtilise': 'Heap utilisé',
   'health.health.horodatageApi': 'Horodatage API',
   'health.health.indisponible': 'indisponible',
-  'health.health.indisponibleVariant2': 'Indisponible',
+  'health.unavailable': 'Indisponible',
   'health.health.interpretation': 'Interprétation',
   'health.health.lectureSeule': 'Lecture seule',
   'health.health.leStatutGlobalDependActuellementDePostgres':
@@ -180,10 +252,10 @@ export const uiFallbackFr: Record<string, string> = {
   'health.health.tempsReel': 'Temps réel',
   'health.health.uptime': 'uptime',
   'health.health.uptimeHorodatageEtMemoire': 'Uptime, horodatage et mémoire',
-  'health.health.uptimeVariant2': 'Uptime',
+  'health.uptime': 'Uptime',
   'health.health.valeursExposeesParLeProcessusApiAuDernier':
     'Valeurs exposées par le processus API au dernier contrôle.',
-  'health.health.value0S': '{{value0}} s',
+  'health.durationSeconds': '{{value0}} s',
   'health.health.workersFournisseursSmsEmailLatenceEtHistor':
     'Workers, fournisseurs SMS/email, latence et historique d’incidents ne sont pas présentés comme supervisés.',
   'onboarding.onboarding.activerLeSite': 'Activer le site',
@@ -209,7 +281,7 @@ export const uiFallbackFr: Record<string, string> = {
   'onboarding.onboarding.debutInterruption': 'Début interruption',
   'onboarding.onboarding.defaultsOperationnelsDuSite': 'Defaults opérationnels du site',
   'onboarding.onboarding.dureeCreneau': 'Durée créneau',
-  'onboarding.onboarding.enregistrerEtContinuer': 'Enregistrer et continuer →',
+  'onboarding.onboarding.enregistrerEtContinuer': 'Enregistrer et continuer',
   'onboarding.onboarding.enregistrerLeBrouillon': 'Enregistrer le brouillon',
   'onboarding.onboarding.equipeAppareils': 'Équipe & appareils',
   'onboarding.onboarding.etapeEnregistreeAvecSucces': 'Étape enregistrée avec succès.',
@@ -222,7 +294,7 @@ export const uiFallbackFr: Record<string, string> = {
   'onboarding.onboarding.heriteParLesFiles': 'Hérité par les files',
   'onboarding.onboarding.identiteDuSite': 'Identité du site',
   'onboarding.onboarding.lancerLeTest': 'Lancer le test',
-  'onboarding.onboarding.leSiteValue0EstMaintenantActifLaConfi':
+  'onboarding.activation.successMessage':
     'Le site {{value0}} est maintenant actif. La configuration est terminée et l’assistant a été réinitialisé.',
   'onboarding.onboarding.niveauXSelectionneS': 'niveau(x) sélectionné(s)',
   'onboarding.onboarding.nomDuSite': 'Nom du site *',
@@ -240,7 +312,7 @@ export const uiFallbackFr: Record<string, string> = {
   'onboarding.onboarding.selectionner': 'Sélectionner',
   'onboarding.onboarding.selectionRequise': 'Sélection requise',
   'onboarding.onboarding.site': 'Site #',
-  'onboarding.onboarding.sur6': 'sur 6',
+  'onboarding.totalSteps': 'sur 6',
   'onboarding.onboarding.termine': 'Terminé',
   'onboarding.onboarding.testDAppelComplet': 'Test d’appel complet',
   'onboarding.onboarding.uneConfigurationProgressiveEnregistreeAChaq':
@@ -249,7 +321,6 @@ export const uiFallbackFr: Record<string, string> = {
     'Une valeur absente ou remise à « Hériter » utilise le default du site.',
   'onboarding.onboarding.urlDuLogo': 'URL du logo',
   'onboarding.settings.action': 'Action',
-  'onboarding.settings.activer': 'Activer',
   'onboarding.settings.affectationsGereesParLAssistant': 'Affectations gérées par l’assistant',
   'onboarding.settings.associer': 'Associer',
   'onboarding.settings.associerUnNiveau': 'Associer un niveau',
@@ -317,7 +388,7 @@ export const uiFallbackFr: Record<string, string> = {
   'persons.personNotesViewer.precedente': 'Précédente',
   'persons.personNotesViewer.retourAuxNotes': 'Retour aux notes',
   'persons.personNotesViewer.suivante': 'Suivante',
-  'persons.personNotesViewer.utilisateurValue0': 'Utilisateur {{value0}}',
+  'persons.notes.userReference': 'Utilisateur {{value0}}',
   'persons.personPickerOrCreate.birthDate': 'Date de naissance',
   'persons.personPickerOrCreate.email': 'Adresse e-mail',
   'persons.personPickerOrCreate.informationsValidesVousPouvezContinuer':
@@ -329,8 +400,8 @@ export const uiFallbackFr: Record<string, string> = {
   'persons.personPickerOrCreate.personneConnue': 'Personne connue',
   'persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat':
     'Renseignez un nom et un téléphone au format international.',
-  'persons.personPickerOrCreate.saisissezAuMoins3Caracteres': 'Saisissez au moins 3 caractères.',
-  'persons.personPickerOrCreate.telephoneE164': 'Téléphone E.164',
+  'persons.search.minimumCharacters': 'Saisissez au moins 3 caractères.',
+  'persons.phone.e164Label': 'Téléphone E.164',
   'portfolio.portfolio.activerCeSite': 'Activer ce site',
   'portfolio.portfolio.aucunSiteAutorise': 'Aucun site autorisé',
   'portfolio.portfolio.contexteActif': 'Contexte actif',
@@ -342,6 +413,27 @@ export const uiFallbackFr: Record<string, string> = {
   'portfolio.portfolio.selectionnezLeSiteSurLequelVousSouhaitezT':
     'Sélectionnez le site sur lequel vous souhaitez travailler.',
   'portfolio.portfolio.sitesAutorises': 'Sites autorisés',
+  'profile.appearance.title': 'Personnalisation du thème',
+  'profile.appearance.description':
+    'Choisissez la couleur dominante de votre espace. Elle est appliquée instantanément.',
+  'profile.appearance.dominantColor': 'Couleur dominante',
+  'profile.appearance.selectedColor': 'Couleur sélectionnée',
+  'profile.appearance.colors.lagoon': 'Lagon',
+  'profile.appearance.colors.ocean': 'Océan',
+  'profile.appearance.colors.royal': 'Bleu royal',
+  'profile.appearance.colors.iris': 'Iris',
+  'profile.appearance.colors.orchid': 'Orchidée',
+  'profile.appearance.colors.berry': 'Baie',
+  'profile.appearance.colors.coral': 'Corail',
+  'profile.appearance.colors.ember': 'Braise',
+  'profile.appearance.colors.amber': 'Ambre',
+  'profile.appearance.colors.lime': 'Citron vert',
+  'profile.appearance.colors.forest': 'Forêt',
+  'profile.appearance.colors.mint': 'Menthe',
+  'profile.appearance.colors.slate': 'Ardoise',
+  'profile.appearance.colors.graphite': 'Graphite',
+  'profile.appearance.colors.cocoa': 'Cacao',
+  'profile.appearance.colors.wine': 'Bordeaux',
   'profile.profile.changerMonMotDePasse': 'Changer mon mot de passe',
   'profile.profile.compteActif': 'Compte actif',
   'profile.profile.compteUtilisateur': 'Compte utilisateur',
@@ -360,23 +452,22 @@ export const uiFallbackFr: Record<string, string> = {
   'profile.profile.technique': 'Technique',
   'profile.profile.toutes': 'Toutes',
   'profile.profile.typeDeCompte': 'Type de compte',
-  'profile.profile.value0SiteS': '{{value0}} site(s)',
-  'profile.profile.value0SiteSValue1FileSL4y6h': '{{value0}} site(s), {{value1}} file(s)',
+  'profile.scope.sites': '{{value0}} site(s)',
+  'profile.scope.sitesAndQueues': '{{value0}} site(s), {{value1}} file(s)',
   'profile.profile.votreIdentiteVosHabilitationsEtVosPreferen':
     'Votre identité, vos habilitations et vos préférences.',
-  'public-experiences.deviceMode.affichageDesTicketsAppelesDesGuichetsEtDe':
+  'deviceMode.displayDescription':
     'Affichage des tickets appelés, des guichets et des prochains passages.',
   'public-experiences.deviceMode.borneDAccueil': 'Borne d’accueil',
   'public-experiences.deviceMode.choisissezLUsageDeCetAppareilVousPourrez':
     'Choisissez l’usage de cet appareil. Vous pourrez revenir à cette page après une nouvelle connexion.',
   'public-experiences.deviceMode.configurationDeLAppareil': 'Configuration de l’appareil',
-  'public-experiences.deviceMode.conseilUtilisezLeModePleinEcranDuNavigate':
+  'deviceMode.fullscreenTip':
     'Conseil : utilisez le mode plein écran du navigateur sur les appareils installés en salle.',
   'public-experiences.deviceMode.deconnecterCetAppareil': 'Déconnecter cet appareil',
   'public-experiences.deviceMode.deconnexion': 'Déconnexion…',
   'public-experiences.deviceMode.ecranDeSalle': 'Écran de salle',
-  'public-experiences.deviceMode.inscriptionDesNouveauxArrivantsEtCreationD':
-    'Inscription des nouveaux arrivants et création de leur ticket.',
+  'deviceMode.kioskDescription': 'Inscription des nouveaux arrivants et création de leur ticket.',
   'public-experiences.deviceMode.ouvrirLaBorne': 'Ouvrir la borne',
   'public-experiences.deviceMode.ouvrirLEcranSalle': 'Ouvrir l’écran salle',
   'public-experiences.deviceMode.quelEcranSouhaitezVousAfficher':
@@ -387,7 +478,7 @@ export const uiFallbackFr: Record<string, string> = {
   'public-experiences.display.aVenir': 'À venir',
   'public-experiences.display.ceSiteNeDisposeActuellementDAucuneFileAc':
     'Ce site ne dispose actuellement d’aucune file active autorisée.',
-  'public-experiences.display.fileValue0': 'File {{value0}}',
+  'display.queueName': 'File {{value0}}',
   'public-experiences.display.merciDePreparerVotreTicketEtDeRejoindreL':
     'Merci de préparer votre ticket et de rejoindre le guichet indiqué.',
   'public-experiences.display.nousVousAppelonsBientot': 'Nous vous appelons bientôt',
@@ -414,10 +505,9 @@ export const uiFallbackFr: Record<string, string> = {
     'Conservez ce ticket et suivez l’écran de salle. Scannez le QR code pour consulter votre position.',
   'public-experiences.kiosk.creerMonTicket': 'Créer mon ticket',
   'public-experiences.kiosk.effacementDans': 'Effacement dans',
-  'public-experiences.kiosk.environValue0MinValue1EnAttenteFu76o':
-    'Environ {{value0}} min · {{value1}} en attente',
+  'kiosk.queue.waitEstimate': 'Environ {{value0}} min · {{value1}} en attente',
   'public-experiences.kiosk.estimationEnCours': 'Estimation en cours…',
-  'public-experiences.kiosk.forfaitValue0': 'Forfait {{value0}}',
+  'kiosk.tier.name': 'Forfait {{value0}}',
   'public-experiences.kiosk.heureNonFournie': 'heure non fournie',
   'public-experiences.kiosk.heurePrevue': 'Heure prévue',
   'public-experiences.kiosk.imprimerMonTicket': 'Imprimer mon ticket',
@@ -435,8 +525,8 @@ export const uiFallbackFr: Record<string, string> = {
   'public-experiences.kiosk.nonConfiguree': 'non configurée',
   'public-experiences.kiosk.nonRenseigne': 'Non renseigné',
   'public-experiences.kiosk.numeroDeTicket': 'Numéro de ticket',
-  'public-experiences.kiosk.numeroDeTicketV2lgk': 'NUMÉRO DE TICKET',
-  'public-experiences.kiosk.numeroEnregistreValue0': 'Numéro enregistré : {{value0}}',
+  'kiosk.ticket.numberHeading': 'NUMÉRO DE TICKET',
+  'kiosk.phone.savedNumber': 'Numéro enregistré : {{value0}}',
   'public-experiences.kiosk.optionDisponible': 'Option disponible',
   'public-experiences.kiosk.optionnel': 'Optionnel',
   'public-experiences.kiosk.ou': 'ou',
@@ -453,12 +543,11 @@ export const uiFallbackFr: Record<string, string> = {
   'public-experiences.kiosk.service': 'Service',
   'public-experiences.kiosk.serviceDisponible': 'Service disponible',
   'public-experiences.kiosk.sessionInactive': 'Session inactive',
-  'public-experiences.kiosk.sur4': 'sur 4',
+  'kiosk.walkIn.totalSteps': 'sur 4',
   'public-experiences.kiosk.tarif': 'Tarif',
-  'public-experiences.kiosk.telephone': 'Téléphone',
   'public-experiences.kiosk.touchezVotreSituationPourCommencer':
     'Touchez votre situation pour commencer.',
-  'public-experiences.kiosk.value0Minutes': '{{value0}} minutes',
+  'common.durationMinutes': '{{value0}} minutes',
   'public-experiences.kiosk.verifiezVosInformationsOuDemandezDeLAide':
     'Vérifiez vos informations ou demandez de l’aide à l’accueil.',
   'public-experiences.kiosk.votreTicketEstPret': 'Votre ticket est prêt',
@@ -472,7 +561,7 @@ export const uiFallbackFr: Record<string, string> = {
     'Cette page vous indiquera votre guichet dès votre appel.',
   'public-experiences.track.chargement': 'chargement',
   'public-experiences.track.dansLaFile': 'dans la file',
-  'public-experiences.track.environValue0Minutes': 'Environ {{value0}} minutes',
+  'tracking.estimatedMinutes': 'Environ {{value0}} minutes',
   'public-experiences.track.estimationEnCours': 'Estimation en cours',
   'public-experiences.track.lienDeSuiviInvalide': 'Lien de suivi invalide',
   'public-experiences.track.merciDeVousPresenterAuPosteIndique':
@@ -530,8 +619,7 @@ export const uiFallbackFr: Record<string, string> = {
   'queue-operations.desk.signatureCachetDeLEtablissement': 'Signature / cachet de l’établissement',
   'queue-operations.desk.sortie': 'Sortie',
   'queue-operations.desk.ticketEnCours': 'Ticket en cours',
-  'queue-operations.desk.uneSessionActiveEstRequisePourAppelerLeP3hwh4':
-    'Une session active est requise pour appeler le prochain client.',
+  'desk.sessionRequired': 'Une session active est requise pour appeler le prochain client.',
   'queue-operations.myQueues.affichezToutesLesFilesAutoriseesOuConcentr':
     'Affichez toutes les files autorisées ou concentrez-vous sur une seule.',
   'queue-operations.myQueues.ceSiteNePossedeActuellementAucuneFile':
@@ -558,16 +646,14 @@ export const uiFallbackFr: Record<string, string> = {
   'queue-operations.quickRegistration.placeS': 'place(s)',
   'queue-operations.quickRegistration.qualificationDuTicket': 'Qualification du ticket',
   'queue-operations.quickRegistration.quiAccueillezVous': 'Qui accueillez-vous ?',
-  'queue-operations.quickRegistration.rechercherOuCreerUnePersonnePuisGenererSo':
-    'Rechercher ou créer une personne, puis générer son ticket.',
+  'quickRegistration.description': 'Rechercher ou créer une personne, puis générer son ticket.',
   'queue-operations.quickRegistration.rendezVousReserve': 'rendez-vous réservé',
-  'queue-operations.quickRegistration.retrouvezUnDossierExistantOuCreezUneNouve':
+  'quickRegistration.personStepHint':
     'Retrouvez un dossier existant ou créez une nouvelle personne.',
   'queue-operations.quickRegistration.sansRendezVous': 'Sans rendez-vous',
-  'queue-operations.quickRegistration.selectionnezLaFileLeNiveauDeServiceEtLe':
+  'quickRegistration.ticketStepHint':
     'Sélectionnez la file, le niveau de service et le type d’entrée.',
-  'queue-operations.quickRegistration.vousPouvezRevenirALEtapePrecedentePourMo':
-    'Vous pouvez revenir à l’étape précédente pour modifier ce choix.',
+  'quickRegistration.backHint': 'Vous pouvez revenir à l’étape précédente pour modifier ce choix.',
   'queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe':
     'Document non fiscal — données confirmées par le service.',
   'queue-operations.receipt80mm.heureDAppel': "Heure d'appel",
@@ -575,7 +661,7 @@ export const uiFallbackFr: Record<string, string> = {
   'queue-operations.receipt80mm.recapitulatifDePassage': 'Récapitulatif de passage',
   'queue-operations.receipt80mm.resultat': 'Résultat',
   'queues.plural': 'Files',
-  'queues.queueEditor.afficherPem1r': 'Afficher',
+  'common.show': 'Afficher',
   'queues.queueEditor.attenteMoyenne': 'Attente moyenne',
   'queues.queueEditor.code': 'Code *',
   'queues.queueEditor.dureeDuCreneau': 'Durée du créneau',
@@ -604,7 +690,7 @@ export const uiFallbackFr: Record<string, string> = {
   'supervision.controlRoom.flottant': 'flottant',
   'supervision.controlRoom.guichetSActifS': 'guichet(s) actif(s) ·',
   'supervision.controlRoom.notificationsRecentes': 'Notifications récentes',
-  'supervision.controlRoom.operateurValue0': 'opérateur #{{value0}}',
+  'controlRoom.operatorReference': 'opérateur #{{value0}}',
   'supervision.controlRoom.reinitialisationDUrgence': 'Réinitialisation d’urgence',
   'supervision.controlRoom.sessionS': 'session(s)',
   'supervision.controlRoom.seuilLocalDeVigilanceDepasseVerifiezLaCha':
@@ -612,7 +698,7 @@ export const uiFallbackFr: Record<string, string> = {
   'supervision.controlRoom.sla': 'SLA',
   'supervision.controlRoom.supervisionTempsReel': 'Supervision temps réel',
   'supervision.controlRoom.vers': 'vers',
-  'supervision.notifications.480Caracteres': '/ 480 caractères',
+  'notifications.characterLimit': '/ 480 caractères',
   'supervision.notifications.apercuEmail': 'Aperçu email',
   'supervision.notifications.apercuSms': 'Aperçu SMS',
   'supervision.notifications.aQuiSouhaitezVousEcrire': 'À qui souhaitez-vous écrire ?',
@@ -622,7 +708,6 @@ export const uiFallbackFr: Record<string, string> = {
   'supervision.notifications.choisissezLeTicketAuquelLaNotificationSera':
     'Choisissez le ticket auquel la notification sera rattachée.',
   'supervision.notifications.destinataire': 'Destinataire :',
-  'supervision.notifications.destinataireVariant2': 'Destinataire',
   'supervision.notifications.detail': 'Détail',
   'supervision.notifications.detailDeLaNotification': 'Détail de la notification',
   'supervision.notifications.echec': 'Échec',
@@ -662,7 +747,6 @@ export const uiFallbackFr: Record<string, string> = {
   'supervision.reports.rapportsQuotidiensParFile': 'Rapports quotidiens par file',
   'supervision.reports.siteValue0': 'site {{value0}}',
   'supervision.reports.tousLesSitesAutorises': 'tous les sites autorisés',
-  'tiers.singular': 'Forfait',
   'users.singular': 'Utilisateur',
   'users.userAccountWizard.creerUnCompte': 'Créer un compte',
   'users.userAccountWizard.kiosqueDisplay': 'Kiosque / display',
@@ -672,13 +756,30 @@ export const uiFallbackFr: Record<string, string> = {
   'users.userAccountWizard.nomDUtilisateur': 'Nom d’utilisateur *',
   'users.userAccountWizard.rang': 'Rang',
   'users.userAccountWizard.roleInitial': 'Rôle initial',
+  'admin.translations.pageDescription':
+    'Gérez les textes dynamiques de l’interface, des messages et des erreurs.',
+  'admin.translations.active': 'Active',
+  'admin.translations.inactive': 'Inactive',
+  'admin.translations.editTitle': 'Modifier la traduction',
+  'admin.translations.createTitle': 'Nouvelle traduction',
+  'admin.translations.editDescription': 'Ajustez le contenu publié sans changer son identité.',
+  'admin.translations.createDescription':
+    'Renseignez la clé et ses contenus français, anglais et arabe en une seule fois.',
+  'admin.translations.newKey': 'Nouvelle cl?',
+  'admin.translations.frenchText': 'Texte en français',
+  'admin.translations.englishText': 'English text',
+  'admin.translations.arabicText': 'النص بالعربية',
+  'admin.users.pageDescription': 'Recherchez, créez et administrez les comptes et leurs accès.',
+  'admin.users.updateSuccess': 'Utilisateur modifi?',
+  'admin.users.suspend': 'Suspendre',
+  'admin.users.passwordResetSuccess': 'Mot de passe réinitialisé',
   'admin.translations.catalogueDesTraductions': 'Catalogue des traductions',
   'admin.translations.cleCategorieOuLangue': 'Clé, catégorie ou langue',
   'admin.translations.contenusParLangue': 'Contenus par langue',
   'admin.translations.erreur': 'Erreur',
   'admin.translations.ihm': 'IHM',
   'admin.translations.langueASaisir': 'Langue à saisir',
-  'admin.translations.lesModificationsPublieesRemplacentLesValeursLocalesPourLeScopeIh':
+  'admin.translations.remoteOverrideNotice':
     'Les modifications publiées remplacent les valeurs locales pour le scope IHM.',
   'admin.translations.parametresAttendus': 'Paramètres attendus',
   'admin.translations.rechercherDansLesTraductions': 'Rechercher dans les traductions',
@@ -694,7 +795,7 @@ export const uiFallbackFr: Record<string, string> = {
   'admin.users.deconnecterToutesLesSessions': 'Déconnecter toutes les sessions',
   'admin.users.identiteEtPreferencesDuCompte': 'Identité et préférences du compte',
   'admin.users.kiosque': 'Kiosque',
-  'admin.users.lesActionsSensiblesSontImmediatementAppliqueesAToutesLesSessions':
+  'admin.users.sensitiveActionsNotice':
     'Les actions sensibles sont immédiatement appliquées à toutes les sessions concernées.',
   'admin.users.modifierLUtilisateur': 'Modifier l’utilisateur',
   'admin.users.nomDUtilisateurOuEmail': 'Nom d’utilisateur ou email',
@@ -706,33 +807,102 @@ export const uiFallbackFr: Record<string, string> = {
   'admin.users.utilisateurs': 'Utilisateurs',
   'queues.myQueues.clientOuTicket': 'Client ou ticket',
   'queues.myQueues.consulter': 'Consulter',
-  'queues.myQueues.exNadiaBenAliOuA042': 'Ex. Nadia, Ben Ali ou A-042',
+  'queues.search.example': 'Ex. Nadia, Ben Ali ou A-042',
   'queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre':
     'Nom, prénom ou numéro de ticket dans votre périmètre',
   'queues.myQueues.rechercherUnClient': 'Rechercher un client',
   'queues.registrationDetails.chargementDeLInscription…': 'Chargement de l’inscription…',
+  'queues.myQueues.siteAndQueue': 'Site / file',
+  'queues.myQueues.ageAndSla': 'Ancienneté / SLA',
+  'queues.myQueues.viewNotes': 'Consulter les notes ({{count}})',
+  'queues.myQueues.addNote': 'Ajouter une note',
+  'queues.registrationDetails.readOnlyDescription':
+    'Consultation uniquement · aucune information ne peut être modifiée ici.',
+  'queues.registrationDetails.queueFallback': 'File #{{id}}',
+  'queues.registrationDetails.appointmentStatus': 'Statut du rendez-vous',
+  'queue-operations.quickRegistration.serviceFallback': 'Service {{id}}',
+  'queue-operations.quickRegistration.benefitSms': 'SMS',
+  'queue-operations.quickRegistration.benefitWelcome': 'Bienvenue',
+  'queue-operations.quickRegistration.benefitApproachAlert': 'Alerte d’approche',
+  'queue-operations.quickRegistration.benefitTrackingLink': 'Lien de suivi',
+  'reports.averageWaitAbbreviation': 'TMA',
+  'reports.averageServiceAbbreviation': 'TMT',
+  'reports.servedFlow': 'Flux servi',
+  'reports.servedRatio': '{{served}} servis sur {{registered}}',
   'queues.registrationDetails.client': 'Client',
   'queues.registrationDetails.detailDeLInscription': 'Détail de l’inscription',
   'queues.registrationDetails.leDetailDeCetteInscriptionEstIndisponible.':
     'Le détail de cette inscription est indisponible.',
-  'tracking.qr.qrCodeDeTestDorify': 'QR code de test DORIFY',
+  'tracking.qr.testLabel': 'QR code de test DORIFY',
   'kiosk.walkIn.steps.service.title': 'Quel service souhaitez-vous ?',
   'kiosk.walkIn.steps.identity.title': 'Vos informations',
   'kiosk.walkIn.steps.tier.title': 'Votre niveau de service',
-  'kiosk.walkIn.steps.review.title': 'V?rifiez votre demande',
-  'kiosk.walkIn.steps.service.description': 'Choisissez la file qui correspond ? votre besoin.',
+  'kiosk.walkIn.steps.review.title': 'Vérifiez votre demande',
+  'kiosk.walkIn.steps.service.description': 'Choisissez la file qui correspond à votre besoin.',
   'kiosk.walkIn.steps.identity.description':
-    'Ces informations servent uniquement ? cr?er et suivre votre ticket.',
+    'Ces informations servent uniquement à créer et suivre votre ticket.',
   'kiosk.walkIn.steps.tier.description':
-    'Les options propos?es sont celles configur?es pour cette file.',
+    'Les options proposées sont celles configurées pour cette file.',
   'kiosk.walkIn.steps.review.description':
-    'Confirmez les informations avant la cr?ation du ticket.',
+    'Confirmez les informations avant la création du ticket.',
+  'appointments.availability.loading': 'Chargement des disponibilit\u00e9s\u2026',
+  'appointments.availability.loaded':
+    'Cr\u00e9neaux retourn\u00e9s pour la date s\u00e9lectionn\u00e9e',
+  'experience.preview.kiosk': 'Aper\u00e7u de la borne tactile',
+  'experience.preview.display': 'Aper\u00e7u de l\u2019\u00e9cran de salle',
+  'experience.preview.tracking': 'Aper\u00e7u du suivi mobile',
+  'publicExperiences.audio.ticketCalled': 'Ticket {{ticket}}, guichet num\u00e9ro {{counter}}',
+  'errors.rejectedPromise': 'Promesse rejet\u00e9e',
+  'errors.http.badRequest':
+    'Les informations envoy\u00e9es ne sont pas valides. V\u00e9rifiez votre saisie.',
+  'errors.http.unauthorized': 'Votre session a expir\u00e9. Reconnectez-vous pour continuer.',
+  'errors.http.forbidden':
+    'Vous n\u2019avez pas l\u2019autorisation n\u00e9cessaire pour cette action.',
+  'errors.http.notFound':
+    'La ressource demand\u00e9e est introuvable ou n\u2019est plus disponible.',
+  'errors.http.conflict':
+    'Cette action entre en conflit avec des donn\u00e9es qui viennent de changer.',
+  'errors.http.unprocessable':
+    'Cette action ne peut pas \u00eatre r\u00e9alis\u00e9e dans la situation actuelle.',
+  'errors.http.tooManyRequests':
+    'Trop de demandes ont \u00e9t\u00e9 envoy\u00e9es. Patientez quelques instants.',
+  'errors.http.internal': 'Le service a rencontr\u00e9 une erreur interne.',
+  'errors.http.unavailable': 'Le service est momentan\u00e9ment indisponible.',
+  'errors.http.timeout': 'Le service met trop de temps \u00e0 r\u00e9pondre.',
+  'errors.networkOffline':
+    'La connexion r\u00e9seau semble interrompue. V\u00e9rifiez votre acc\u00e8s \u00e0 Internet.',
+  'errors.actionFailedWithSupport':
+    'L\u2019action n\u2019a pas pu \u00eatre r\u00e9alis\u00e9e. R\u00e9essayez ou transmettez la r\u00e9f\u00e9rence au support.',
+  'errors.actionImpossible': 'Action impossible',
+  'errors.staleData': 'Donn\u00e9es \u00e0 actualiser',
+  'errors.unexpectedTitle': 'Erreur inattendue',
+  'errors.unexpectedRetry':
+    'Une erreur inattendue est survenue. R\u00e9essayez dans quelques instants.',
+  'legal.notConfigured': 'Non configur\u00e9',
+  'legal.invalidProductionConfig': 'Configuration l\u00e9gale de production invalide : {{fields}}',
+  'tracking.qr.testMessage': 'Bienvenue sur DORIFY',
+  'kiosk.errors.phoneAlreadyExists':
+    'Ce num\u00e9ro de t\u00e9l\u00e9phone est d\u00e9j\u00e0 associ\u00e9 \u00e0 une personne. Adressez-vous \u00e0 l\u2019accueil pour retrouver votre dossier.',
+  'onboarding.steps.identity': 'Identit\u00e9 du site',
+  'onboarding.steps.defaults': 'Param\u00e8tres',
+  'onboarding.steps.queues': 'Files et guichets',
+  'onboarding.steps.tiers': 'Niveaux de service',
+  'onboarding.steps.team': '\u00c9quipe et appareils',
+  'onboarding.steps.review': 'Recette et activation',
+  'onboarding.errors.siteNameRequired': 'Le nom du site est requis.',
+  'onboarding.errors.tierRequiredPerQueue':
+    'S\u00e9lectionnez au moins un niveau pour chaque file.',
+  'onboarding.errors.retryStep': 'Erreur. Relancez cette \u00e9tape.',
+  'onboarding.guidedAdministration': 'Administration guid\u00e9e',
+  'onboarding.review.siteAndDefaults': 'Site et param\u00e8tres',
+  'onboarding.review.queuesAndCounters': 'Files et guichets',
+  'onboarding.review.tiersAssociated': 'Niveaux associ\u00e9s',
   'admin.translations.delete.title': 'Supprimer cette traduction ?',
   'admin.translations.delete.description':
-    'La traduction {{key}} en {{locale}} sera d?sactiv?e et supprim?e du catalogue.',
+    'La traduction {{key}} en {{locale}} sera désactivée et supprimée du catalogue.',
   'admin.translations.delete.confirm': 'Supprimer la traduction',
-  'admin.translations.delete.successTitle': 'Traduction supprim?e',
-  'admin.translations.delete.successMessage': 'La cl? {{key}} a ?t? supprim?e.',
+  'admin.translations.delete.successTitle': 'Traduction supprimée',
+  'admin.translations.delete.successMessage': 'La clé {{key}} a été supprimée.',
 };
 
 // Temporary compatibility for remote catalogs created with legacy generated keys.
@@ -744,8 +914,8 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.appointments.appointment_action_dialog.english_7nql6j': 'common.english',
   'ui.appointments.appointment_action_dialog.enregistrer_les_modifications_qazi4g':
     'appointments.appointmentActionDialog.enregistrerLesModifications',
-  'ui.appointments.appointment_action_dialog.forfait_ke31ak': 'tiers.singular',
-  'ui.appointments.appointment_action_dialog.francais_1x2mspi': 'common.francais',
+  'ui.appointments.appointment_action_dialog.forfait_ke31ak': 'common.tier',
+  'ui.appointments.appointment_action_dialog.francais_1x2mspi': 'locale.fr',
   'ui.appointments.appointment_action_dialog.langue_4vkz5r': 'common.language',
   'ui.appointments.appointment_action_dialog.reprogrammer_13ws2nk':
     'appointments.appointmentActionDialog.reprogrammer',
@@ -758,7 +928,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.appointments.appointment_editor.creneau_7gzdko': 'appointments.appointmentEditor.creneau',
   'ui.appointments.appointment_editor.date_ggjuyh': 'common.date',
   'ui.appointments.appointment_editor.file_bygjtv': 'queues.singular',
-  'ui.appointments.appointment_editor.forfait_ke31ak': 'tiers.singular',
+  'ui.appointments.appointment_editor.forfait_ke31ak': 'common.tier',
   'ui.appointments.appointment_editor.modifier_1s45w8g': 'common.edit',
   'ui.appointments.appointment_editor.nouveau_rendez_vous_1dqutse':
     'appointments.appointmentEditor.nouveauRendezVous',
@@ -768,7 +938,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.appointments.appointment_editor.qui_souhaitez_vous_recevoir_1o2rz3u':
     'appointments.appointmentEditor.quiSouhaitezVousRecevoir',
   'ui.appointments.appointment_editor.recherchez_une_personne_existante_ou_saisissez_s_1vsirzx':
-    'appointments.appointmentEditor.recherchezUnePersonneExistanteOuSaisissezS',
+    'appointments.editor.personSearchHint',
   'ui.appointments.appointment_editor.service_et_creneau_1ml8wea':
     'appointments.appointmentEditor.serviceEtCreneau',
   'ui.appointments.appointments_page.donnees_et_disponibilites_chargees_depuis_l_api_15vqaj':
@@ -788,7 +958,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.auth.change_password_page.changer_le_mot_de_passe_1i41l8b':
     'auth.changePassword.changerLeMotDePasse',
   'ui.auth.change_password_page.choisissez_un_mot_de_passe_de_10_a_20_caracteres_1gdne07':
-    'auth.changePassword.choisissezUnMotDePasseDe10A20Caracteres',
+    'auth.changePassword.passwordHint',
   'ui.auth.change_password_page.confirmation_p3snlg': 'auth.changePassword.confirmation',
   'ui.auth.change_password_page.enregistrer_sywgdx': 'common.save',
   'ui.auth.change_password_page.mot_de_passe_actuel_43q4tg': 'auth.changePassword.motDePasseActuel',
@@ -830,21 +1000,21 @@ export const legacyUiKeyAliases: Record<string, string> = {
     'appointments.appointmentEditor.ficheExistante',
   'ui.expression.appointments.appointment_editor.nouvelle_personne_1mo0xl':
     'common.nouvellePersonne',
-  'ui.expression.appointments.appointments_page.value0_g7s8cl': 'common.value0',
+  'ui.expression.appointments.appointments_page.value0_g7s8cl': 'common.hashIdentifier',
   'ui.expression.auth.change_password_page.le_mot_de_passe_n_a_pas_pu_etre_modifie_1lvgut4':
     'auth.changePassword.leMotDePasseNAPasPuEtreModifie',
-  'ui.expression.auth.login_page.connexion_6397u6': 'auth.login.connexionVariant2',
+  'ui.expression.auth.login_page.connexion_6397u6': 'auth.login.signingIn',
   'ui.expression.auth.login_page.identifiant_ou_mot_de_passe_incorrect_qunbv0':
     'auth.login.identifiantOuMotDePasseIncorrect',
   'ui.expression.auth.login_page.se_connecter_1u4l9ls': 'auth.login.seConnecter',
-  'ui.expression.health.health_page.5_compteurs_ak74vk': 'health.health.5Compteurs',
+  'ui.expression.health.health_page.5_compteurs_ak74vk': 'health.counterCount',
   'ui.expression.health.health_page.degradee_12ojy1n': 'health.health.degradee',
   'ui.expression.health.health_page.down_h4k3yt': 'health.health.down',
   'ui.expression.health.health_page.indisponible_hivkzn': 'health.health.indisponible',
-  'ui.expression.health.health_page.indisponible_m9mk9v': 'health.health.indisponibleVariant2',
+  'ui.expression.health.health_page.indisponible_m9mk9v': 'health.unavailable',
   'ui.expression.health.health_page.mesure_d9esly': 'health.health.mesure',
   'ui.expression.health.health_page.operationnelle_up74kh': 'health.health.operationnelle',
-  'ui.expression.health.health_page.value0_s_17ykquz': 'health.health.value0S',
+  'ui.expression.health.health_page.value0_s_17ykquz': 'health.durationSeconds',
   'ui.expression.onboarding.onboarding_page.a_faire_ds4uh6': 'onboarding.onboarding.aFaire',
   'ui.expression.onboarding.onboarding_page.activer_le_site_o1qxct':
     'onboarding.onboarding.activerLeSite',
@@ -859,13 +1029,13 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.onboarding.onboarding_page.herite_604lqs': 'onboarding.onboarding.herite',
   'ui.expression.onboarding.onboarding_page.heritee_zqggrn': 'common.heritee',
   'ui.expression.onboarding.onboarding_page.le_site_value0_est_maintenant_actif_la_confi_i2kxg7':
-    'onboarding.onboarding.leSiteValue0EstMaintenantActifLaConfi',
+    'onboarding.activation.successMessage',
   'ui.expression.onboarding.onboarding_page.selectionne_vsjazw': 'common.selectionne',
   'ui.expression.onboarding.onboarding_page.selectionner_xccxvi':
     'onboarding.onboarding.selectionner',
   'ui.expression.onboarding.onboarding_page.valide_cy7xbc': 'common.valide',
   'ui.expression.onboarding.settings_page.actif_1410gao': 'common.active',
-  'ui.expression.onboarding.settings_page.activer_1qnbdon': 'onboarding.settings.activer',
+  'ui.expression.onboarding.settings_page.activer_1qnbdon': 'common.activate',
   'ui.expression.onboarding.settings_page.actives_1ntg7nc': 'common.actives',
   'ui.expression.onboarding.settings_page.catalogue_144nvkm': 'onboarding.settings.catalogue',
   'ui.expression.onboarding.settings_page.desactiver_1hfjss1': 'onboarding.settings.desactiver',
@@ -877,7 +1047,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.onboarding.settings_page.suspendre_5nkyya': 'onboarding.settings.suspendre',
   'ui.expression.onboarding.settings_page.systeme_exy534': 'onboarding.settings.systeme',
   'ui.expression.persons.person_notes_viewer.utilisateur_value0_q765mf':
-    'persons.personNotesViewer.utilisateurValue0',
+    'persons.notes.userReference',
   'ui.expression.persons.person_picker_or_create.informations_valides_vous_pouvez_continuer_1myt7p9':
     'persons.personPickerOrCreate.informationsValidesVousPouvezContinuer',
   'ui.expression.persons.person_picker_or_create.renseignez_un_nom_et_un_telephone_au_format__gar0el':
@@ -897,9 +1067,9 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.profile.profile_page.humain_18e4n9r': 'common.humain',
   'ui.expression.profile.profile_page.technique_tmfbah': 'profile.profile.technique',
   'ui.expression.profile.profile_page.toutes_1krg1dl': 'profile.profile.toutes',
-  'ui.expression.profile.profile_page.value0_site_s_a2wlej': 'profile.profile.value0SiteS',
+  'ui.expression.profile.profile_page.value0_site_s_a2wlej': 'profile.scope.sites',
   'ui.expression.profile.profile_page.value0_site_s_value1_file_s_l4y6h':
-    'profile.profile.value0SiteSValue1FileSL4y6h',
+    'profile.scope.sitesAndQueues',
   'ui.expression.public-experiences.device_mode_page.deconnecter_cet_appareil_1hklwq3':
     'public-experiences.deviceMode.deconnecterCetAppareil',
   'ui.expression.public-experiences.device_mode_page.deconnexion_vv1fmt':
@@ -907,8 +1077,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.public-experiences.display_page.activer_le_son_s79v3m':
     'public-experiences.display.activerLeSon',
   'ui.expression.public-experiences.display_page.dori_9y7skh': 'app.name',
-  'ui.expression.public-experiences.display_page.file_value0_jtr0pe':
-    'public-experiences.display.fileValue0',
+  'ui.expression.public-experiences.display_page.file_value0_jtr0pe': 'display.queueName',
   'ui.expression.public-experiences.display_page.son_active_sulxcn':
     'public-experiences.display.sonActive',
   'ui.expression.public-experiences.kiosk_page.choisir_ce_service_1ymypmf':
@@ -920,11 +1089,10 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.public-experiences.kiosk_page.creer_mon_ticket_csckmy':
     'public-experiences.kiosk.creerMonTicket',
   'ui.expression.public-experiences.kiosk_page.environ_value0_min_value1_en_attente_fu76o':
-    'public-experiences.kiosk.environValue0MinValue1EnAttenteFu76o',
+    'kiosk.queue.waitEstimate',
   'ui.expression.public-experiences.kiosk_page.estimation_en_cours_oo9gjf':
     'public-experiences.kiosk.estimationEnCours',
-  'ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z':
-    'public-experiences.kiosk.forfaitValue0',
+  'ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z': 'kiosk.tier.name',
   'ui.expression.public-experiences.kiosk_page.heure_non_fournie_cgiv4n':
     'public-experiences.kiosk.heureNonFournie',
   'ui.expression.public-experiences.kiosk_page.inclus_1me6j59': 'public-experiences.kiosk.inclus',
@@ -936,7 +1104,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.public-experiences.kiosk_page.non_renseigne_un1dwo':
     'public-experiences.kiosk.nonRenseigne',
   'ui.expression.public-experiences.kiosk_page.numero_enregistre_value0_18ylmh4':
-    'public-experiences.kiosk.numeroEnregistreValue0',
+    'kiosk.phone.savedNumber',
   'ui.expression.public-experiences.kiosk_page.option_disponible_16egb8x':
     'public-experiences.kiosk.optionDisponible',
   'ui.expression.public-experiences.kiosk_page.pour_recevoir_les_informations_si_le_service_1yuhipt':
@@ -946,8 +1114,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.public-experiences.kiosk_page.saisissez_une_adresse_email_valide_1vym397':
     'public-experiences.kiosk.saisissezUneAdresseEmailValide',
   'ui.expression.public-experiences.kiosk_page.selectionne_vsjazw': 'common.selectionne',
-  'ui.expression.public-experiences.kiosk_page.value0_minutes_1yug5bb':
-    'public-experiences.kiosk.value0Minutes',
+  'ui.expression.public-experiences.kiosk_page.value0_minutes_1yug5bb': 'common.durationMinutes',
   'ui.expression.public-experiences.track_page.activer_son_et_vibration_1op3ifm':
     'public-experiences.track.activerSonEtVibration',
   'ui.expression.public-experiences.track_page.cette_page_vous_indiquera_votre_guichet_des__1d2v3me':
@@ -955,7 +1122,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.expression.public-experiences.track_page.chargement_1w7q2bd':
     'public-experiences.track.chargement',
   'ui.expression.public-experiences.track_page.environ_value0_minutes_atcys8':
-    'public-experiences.track.environValue0Minutes',
+    'tracking.estimatedMinutes',
   'ui.expression.public-experiences.track_page.estimation_en_cours_ysdivz':
     'public-experiences.track.estimationEnCours',
   'ui.expression.public-experiences.track_page.rejoignez_votre_guichet_105p961':
@@ -993,14 +1160,14 @@ export const legacyUiKeyAliases: Record<string, string> = {
     'queue-operations.quickRegistration.rendezVousReserve',
   'ui.expression.queue-operations.receipt80mm.absent_meu720': 'common.absent',
   'ui.expression.queue-operations.receipt80mm.servi_1bextlc': 'common.servi',
-  'ui.expression.queues.queue_editor.afficher_pem1r': 'queues.queueEditor.afficherPem1r',
+  'ui.expression.queues.queue_editor.afficher_pem1r': 'common.show',
   'ui.expression.queues.queue_editor.masquer_12fkzf1': 'queues.queueEditor.masquer',
-  'ui.expression.shell.layouts.topbar.aucun_site_actif_hmb19': 'common.aucunSiteActifHmb19',
+  'ui.expression.shell.layouts.topbar.aucun_site_actif_hmb19': 'common.noActiveSite',
   'ui.expression.supervision.control_room_page.flottant_1p6rb7l':
     'supervision.controlRoom.flottant',
   'ui.expression.supervision.control_room_page.operateur_value0_117wv0a':
-    'supervision.controlRoom.operateurValue0',
-  'ui.expression.supervision.control_room_page.value0_g7s8cl': 'common.value0',
+    'controlRoom.operatorReference',
+  'ui.expression.supervision.control_room_page.value0_g7s8cl': 'common.hashIdentifier',
   'ui.expression.supervision.notifications_page.apercu_email_117cipf':
     'supervision.notifications.apercuEmail',
   'ui.expression.supervision.notifications_page.apercu_sms_1baojkm':
@@ -1055,7 +1222,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.health.health_page.uptime_1y4vs9l': 'health.health.uptime',
   'ui.health.health_page.uptime_horodatage_et_memoire_m53v08':
     'health.health.uptimeHorodatageEtMemoire',
-  'ui.health.health_page.uptime_ijqnzt': 'health.health.uptimeVariant2',
+  'ui.health.health_page.uptime_ijqnzt': 'health.uptime',
   'ui.health.health_page.valeur_oyhka0': 'common.valeur',
   'ui.health.health_page.valeurs_exposees_par_le_processus_api_au_dernier_1jkutlk':
     'health.health.valeursExposeesParLeProcessusApiAuDernier',
@@ -1139,7 +1306,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.onboarding.onboarding_page.selection_requise_10mlh1n':
     'onboarding.onboarding.selectionRequise',
   'ui.onboarding.onboarding_page.site_olnjkb': 'onboarding.onboarding.site',
-  'ui.onboarding.onboarding_page.sur_6_13lm64r': 'onboarding.onboarding.sur6',
+  'ui.onboarding.onboarding_page.sur_6_13lm64r': 'onboarding.totalSteps',
   'ui.onboarding.onboarding_page.termine_1osoj4f': 'onboarding.onboarding.termine',
   'ui.onboarding.onboarding_page.test_d_appel_complet_jj4cr6':
     'onboarding.onboarding.testDAppelComplet',
@@ -1257,7 +1424,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.persons.person_picker_or_create.email': 'persons.personPickerOrCreate.email',
   'ui.persons.person_picker_or_create.language.ar': 'persons.personPickerOrCreate.language.ar',
   'ui.persons.person_picker_or_create.language.en': 'persons.personPickerOrCreate.language.en',
-  'ui.persons.person_picker_or_create.language.fr': 'common.frVariant2',
+  'ui.persons.person_picker_or_create.language.fr': 'locale.fr',
   'ui.persons.person_picker_or_create.languagePreference':
     'persons.personPickerOrCreate.languagePreference',
   'ui.persons.person_picker_or_create.nom_15eqct1': 'common.name',
@@ -1266,13 +1433,12 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.persons.person_picker_or_create.nouvelle_personne_1mo0xl': 'common.nouvellePersonne',
   'ui.persons.person_picker_or_create.personne_connue_10o7xp7':
     'persons.personPickerOrCreate.personneConnue',
-  'ui.persons.person_picker_or_create.prenom_h4ba4': 'common.prenomH4ba4',
+  'ui.persons.person_picker_or_create.prenom_h4ba4': 'common.firstName',
   'ui.persons.person_picker_or_create.rechercher_une_personne_ger18e':
     'common.rechercherUnePersonne',
   'ui.persons.person_picker_or_create.saisissez_au_moins_3_caracteres_1trlzeu':
-    'persons.personPickerOrCreate.saisissezAuMoins3Caracteres',
-  'ui.persons.person_picker_or_create.telephone_e_164_jltmzn':
-    'persons.personPickerOrCreate.telephoneE164',
+    'persons.search.minimumCharacters',
+  'ui.persons.person_picker_or_create.telephone_e_164_jltmzn': 'persons.phone.e164Label',
   'ui.portfolio.portfolio_page.aucun_site_autorise_yhfs0w': 'portfolio.portfolio.aucunSiteAutorise',
   'ui.portfolio.portfolio_page.contexte_actif_1hf5mac': 'portfolio.portfolio.contexteActif',
   'ui.portfolio.portfolio_page.devise_1pl1r6r': 'common.devise',
@@ -1294,7 +1460,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.profile.profile_page.english_7nql6j': 'common.english',
   'ui.profile.profile_page.enregistrer_sywgdx': 'common.save',
   'ui.profile.profile_page.files_autorisees_z62lee': 'profile.profile.filesAutorisees',
-  'ui.profile.profile_page.francais_1x2mspi': 'common.francais',
+  'ui.profile.profile_page.francais_1x2mspi': 'locale.fr',
   'ui.profile.profile_page.informations_et_preferences_10ds0hx':
     'profile.profile.informationsEtPreferences',
   'ui.profile.profile_page.langue_4vkz5r': 'common.language',
@@ -1312,7 +1478,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.profile.profile_page.votre_identite_vos_habilitations_et_vos_preferen_1ixmftf':
     'profile.profile.votreIdentiteVosHabilitationsEtVosPreferen',
   'ui.public-experiences.device_mode_page.affichage_des_tickets_appeles_des_guichets_et_de_vgf37r':
-    'public-experiences.deviceMode.affichageDesTicketsAppelesDesGuichetsEtDe',
+    'deviceMode.displayDescription',
   'ui.public-experiences.device_mode_page.borne_d_accueil_1arxoay':
     'public-experiences.deviceMode.borneDAccueil',
   'ui.public-experiences.device_mode_page.choisissez_l_usage_de_cet_appareil_vous_pourrez__1pnwjqi':
@@ -1320,11 +1486,11 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.public-experiences.device_mode_page.configuration_de_l_appareil_12mejpd':
     'public-experiences.deviceMode.configurationDeLAppareil',
   'ui.public-experiences.device_mode_page.conseil_utilisez_le_mode_plein_ecran_du_navigate_nja46p':
-    'public-experiences.deviceMode.conseilUtilisezLeModePleinEcranDuNavigate',
+    'deviceMode.fullscreenTip',
   'ui.public-experiences.device_mode_page.ecran_de_salle_17zgbb2':
     'public-experiences.deviceMode.ecranDeSalle',
   'ui.public-experiences.device_mode_page.inscription_des_nouveaux_arrivants_et_creation_d_1mwarob':
-    'public-experiences.deviceMode.inscriptionDesNouveauxArrivantsEtCreationD',
+    'deviceMode.kioskDescription',
   'ui.public-experiences.device_mode_page.ouvrir_l_ecran_salle_h692bd':
     'public-experiences.deviceMode.ouvrirLEcranSalle',
   'ui.public-experiences.device_mode_page.ouvrir_la_borne_1wgp2br':
@@ -1334,7 +1500,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.public-experiences.display_page.a_venir_1kyl18d': 'public-experiences.display.aVenir',
   'ui.public-experiences.display_page.accueil_et_orientation_bsalw':
     'public-experiences.display.accueilEtOrientationBsalw',
-  'ui.public-experiences.display_page.aucun_site_actif_hmb19': 'common.aucunSiteActifHmb19',
+  'ui.public-experiences.display_page.aucun_site_actif_hmb19': 'common.noActiveSite',
   'ui.public-experiences.display_page.aucun_ticket_en_attente_1qqjurj':
     'public-experiences.display.aucunTicketEnAttente',
   'ui.public-experiences.display_page.aucune_file_configuree_1rf5ow7':
@@ -1383,8 +1549,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
     'public-experiences.kiosk.imprimerMonTicket',
   'ui.public-experiences.kiosk_page.indicatif_pays_1krknxf':
     'public-experiences.kiosk.indicatifPays',
-  'ui.public-experiences.kiosk_page.inscription_confirmee_kt7nz':
-    'common.inscriptionConfirmeeKt7nz',
+  'ui.public-experiences.kiosk_page.inscription_confirmee_kt7nz': 'common.registrationConfirmed',
   'ui.public-experiences.kiosk_page.inscription_impossible_jqnxnm':
     'public-experiences.kiosk.inscriptionImpossible',
   'ui.public-experiences.kiosk_page.j_ai_un_rendez_vous_fkfvt9':
@@ -1400,11 +1565,10 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.public-experiences.kiosk_page.nom_de_famille_pi8khu': 'public-experiences.kiosk.nomDeFamille',
   'ui.public-experiences.kiosk_page.numero_de_ticket_17ymtl0':
     'public-experiences.kiosk.numeroDeTicket',
-  'ui.public-experiences.kiosk_page.numero_de_ticket_v2lgk':
-    'public-experiences.kiosk.numeroDeTicketV2lgk',
+  'ui.public-experiences.kiosk_page.numero_de_ticket_v2lgk': 'kiosk.ticket.numberHeading',
   'ui.public-experiences.kiosk_page.optionnel_aqr9af': 'public-experiences.kiosk.optionnel',
   'ui.public-experiences.kiosk_page.ou_pkzwmp': 'public-experiences.kiosk.ou',
-  'ui.public-experiences.kiosk_page.prenom_h4ba4': 'common.prenomH4ba4',
+  'ui.public-experiences.kiosk_page.prenom_h4ba4': 'common.firstName',
   'ui.public-experiences.kiosk_page.rechercher_1jzbmpc': 'common.search',
   'ui.public-experiences.kiosk_page.rendez_vous_trouve_u0yq2a':
     'public-experiences.kiosk.rendezVousTrouve',
@@ -1422,9 +1586,9 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.public-experiences.kiosk_page.session_inactive_1jzrqso':
     'public-experiences.kiosk.sessionInactive',
   'ui.public-experiences.kiosk_page.sms_q3rkiy': 'common.sms',
-  'ui.public-experiences.kiosk_page.sur_4_145ldip': 'public-experiences.kiosk.sur4',
+  'ui.public-experiences.kiosk_page.sur_4_145ldip': 'kiosk.walkIn.totalSteps',
   'ui.public-experiences.kiosk_page.tarif_1fpn4rv': 'public-experiences.kiosk.tarif',
-  'ui.public-experiences.kiosk_page.telephone_p3xtrr': 'public-experiences.kiosk.telephone',
+  'ui.public-experiences.kiosk_page.telephone_p3xtrr': 'common.phone',
   'ui.public-experiences.kiosk_page.terminer_19zht57': 'common.terminer',
   'ui.public-experiences.kiosk_page.ticket_1nrpxxh': 'common.ticket',
   'ui.public-experiences.kiosk_page.touchez_votre_situation_pour_commencer_covkye':
@@ -1509,7 +1673,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.queue-operations.desk_page.sortie_1j61eqf': 'queue-operations.desk.sortie',
   'ui.queue-operations.desk_page.ticket_en_cours_12vcptu': 'queue-operations.desk.ticketEnCours',
   'ui.queue-operations.desk_page.une_session_active_est_requise_pour_appeler_le_p_3hwh4':
-    'queue-operations.desk.uneSessionActiveEstRequisePourAppelerLeP3hwh4',
+    'desk.sessionRequired',
   'ui.queue-operations.my_queues_page.affichez_toutes_les_files_autorisees_ou_concentr_6akqo5':
     'queue-operations.myQueues.affichezToutesLesFilesAutoriseesOuConcentr',
   'ui.queue-operations.my_queues_page.aucune_file_configuree_1rf5ow7':
@@ -1544,11 +1708,11 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.queue-operations.quick_registration.date_du_rendez_vous_160bcww':
     'queue-operations.quickRegistration.dateDuRendezVous',
   'ui.queue-operations.quick_registration.file_bygjtv': 'queues.singular',
-  'ui.queue-operations.quick_registration.forfait_ke31ak': 'tiers.singular',
+  'ui.queue-operations.quick_registration.forfait_ke31ak': 'common.tier',
   'ui.queue-operations.quick_registration.heure_disponible_19g6px5':
     'queue-operations.quickRegistration.heureDisponible',
   'ui.queue-operations.quick_registration.inscription_confirmee_kt7nz':
-    'common.inscriptionConfirmeeKt7nz',
+    'common.registrationConfirmed',
   'ui.queue-operations.quick_registration.modifier_la_personne_1h5j199':
     'queue-operations.quickRegistration.modifierLaPersonne',
   'ui.queue-operations.quick_registration.personne_selectionnee_1m33vg9':
@@ -1560,18 +1724,18 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.queue-operations.quick_registration.qui_accueillez_vous_1mip4ik':
     'queue-operations.quickRegistration.quiAccueillezVous',
   'ui.queue-operations.quick_registration.rechercher_ou_creer_une_personne_puis_generer_so_1vd7zg0':
-    'queue-operations.quickRegistration.rechercherOuCreerUnePersonnePuisGenererSo',
+    'quickRegistration.description',
   'ui.queue-operations.quick_registration.rendez_vous_1jmjhs7': 'appointments.title',
   'ui.queue-operations.quick_registration.retrouvez_un_dossier_existant_ou_creez_une_nouve_12icd6e':
-    'queue-operations.quickRegistration.retrouvezUnDossierExistantOuCreezUneNouve',
+    'quickRegistration.personStepHint',
   'ui.queue-operations.quick_registration.sans_rendez_vous_uzar0q':
     'queue-operations.quickRegistration.sansRendezVous',
   'ui.queue-operations.quick_registration.selectionnez_la_file_le_niveau_de_service_et_le__19uxnpu':
-    'queue-operations.quickRegistration.selectionnezLaFileLeNiveauDeServiceEtLe',
+    'quickRegistration.ticketStepHint',
   'ui.queue-operations.quick_registration.terminer_19zht57': 'common.terminer',
   'ui.queue-operations.quick_registration.type_1m2zofh': 'common.type',
   'ui.queue-operations.quick_registration.vous_pouvez_revenir_a_l_etape_precedente_pour_mo_edustt':
-    'queue-operations.quickRegistration.vousPouvezRevenirALEtapePrecedentePourMo',
+    'quickRegistration.backHint',
   'ui.queue-operations.receipt80mm.document_non_fiscal_donnees_confirmees_par_le_se_evtkln':
     'queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe',
   'ui.queue-operations.receipt80mm.dori_9y7skh': 'app.name',
@@ -1648,8 +1812,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.supervision.control_room_page.supervision_temps_reel_1phf055':
     'supervision.controlRoom.supervisionTempsReel',
   'ui.supervision.control_room_page.vers_1r1ik4j': 'supervision.controlRoom.vers',
-  'ui.supervision.notifications_page.480_caracteres_198qcea':
-    'supervision.notifications.480Caracteres',
+  'ui.supervision.notifications_page.480_caracteres_198qcea': 'notifications.characterLimit',
   'ui.supervision.notifications_page.a_qui_souhaitez_vous_ecrire_qsxij3':
     'supervision.notifications.aQuiSouhaitezVousEcrire',
   'ui.supervision.notifications_page.aucun_passage_recent_n_est_disponible_pour_cette_1xprp0p':
@@ -1663,8 +1826,7 @@ export const legacyUiKeyAliases: Record<string, string> = {
   'ui.supervision.notifications_page.date_ggjuyh': 'common.date',
   'ui.supervision.notifications_page.destinataire_1m2olzi':
     'supervision.notifications.destinataire',
-  'ui.supervision.notifications_page.destinataire_1qtg5cw':
-    'supervision.notifications.destinataireVariant2',
+  'ui.supervision.notifications_page.destinataire_1qtg5cw': 'common.recipient',
   'ui.supervision.notifications_page.detail_de_la_notification_xau4jx':
     'supervision.notifications.detailDeLaNotification',
   'ui.supervision.notifications_page.detail_qlpl2o': 'supervision.notifications.detail',

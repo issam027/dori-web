@@ -55,7 +55,7 @@ export function NotificationsPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Communication"
+        eyebrow={t('common.notifications')}
         title={t('common.notifications')}
         description={t('supervision.notifications.journalDEnvoiDetailEtEmissionManuelle')}
         actions={
@@ -127,23 +127,27 @@ export function NotificationsPage() {
           columns={[
             {
               key: 'created',
-              header: 'Créée',
+              header: t('common.createdAt'),
               render: (row) => new Date(row.createdAt).toLocaleString(),
             },
             {
               key: 'ticket',
-              header: 'Inscription',
+              header: t('supervision.notifications.inscription'),
               render: (row) => row.ticketNumber ?? `#${String(row.registrationId)}`,
             },
-            { key: 'channel', header: 'Canal', render: (row) => row.channel.toUpperCase() },
+            {
+              key: 'channel',
+              header: t('common.canal'),
+              render: (row) => row.channel.toUpperCase(),
+            },
             {
               key: 'recipient',
-              header: 'Destinataire',
+              header: t('common.recipient'),
               render: (row) => maskRecipient(row.recipient),
             },
             {
               key: 'status',
-              header: 'Statut',
+              header: t('common.status'),
               render: (row) => (
                 <StatusBadge tone={statusTone(row.notificationStatus)}>
                   {row.notificationStatus}
@@ -152,13 +156,13 @@ export function NotificationsPage() {
             },
             {
               key: 'attempts',
-              header: 'Tentatives',
+              header: t('common.attempts'),
               align: 'end',
               render: (row) => row.attemptCount,
             },
             {
               key: 'actions',
-              header: 'Actions',
+              header: t('common.actions'),
               render: (row) => (
                 <div className="action-row">
                   <button
@@ -216,7 +220,7 @@ function NotificationDetail({ notification }: { notification?: NotificationRespo
     <dl className="detail-list">
       <dt>{t('supervision.notifications.inscription')}</dt>
       <dd>#{notification.registrationId}</dd>
-      <dt>{t('supervision.notifications.destinataireVariant2')}</dt>
+      <dt>{t('common.recipient')}</dt>
       <dd>{maskRecipient(notification.recipient)}</dd>
       <dt>{t('common.canal')}</dt>
       <dd>{notification.channel}</dd>

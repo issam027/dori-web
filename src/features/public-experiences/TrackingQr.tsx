@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 
-export const QR_TEST_MESSAGE = 'Bienvenue sur DORIFY';
-
 export function TrackingQr({ onReady }: { value?: string | null; onReady?: () => void }) {
   const { t: __t } = useTranslation();
+  const appName = __t('app.name');
+  const qrValue = __t('tracking.qr.testMessage');
   const [source, setSource] = useState('');
   useEffect(() => {
     let active = true;
-    void QRCode.toString(QR_TEST_MESSAGE, {
+    void QRCode.toString(qrValue, {
       type: 'svg',
       margin: 1,
       width: 220,
@@ -24,19 +24,15 @@ export function TrackingQr({ onReady }: { value?: string | null; onReady?: () =>
     return () => {
       active = false;
     };
-  }, [onReady]);
+  }, [onReady, qrValue]);
   if (!source) return null;
   return (
     <figure className="tracking-qr">
       <span className="tracking-qr-code">
-        <img
-          className="tracking-qr-image"
-          src={source}
-          aria-label={__t('tracking.qr.qrCodeDeTestDorify')}
-        />
+        <img className="tracking-qr-image" src={source} aria-label={__t('tracking.qr.testLabel')} />
         <span className="tracking-qr-logo" aria-hidden="true">
-          <b>DOR</b>
-          <b>IFY</b>
+          <b>{appName.slice(0, 3)}</b>
+          <b>{appName.slice(3)}</b>
         </span>
       </span>
       <figcaption>{__t('public-experiences.trackingQr.scannezPourSuivreVotrePosition')}</figcaption>

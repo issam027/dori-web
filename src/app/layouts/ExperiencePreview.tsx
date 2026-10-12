@@ -1,20 +1,25 @@
+import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 
-const labels = {
-  kiosk: 'Aperçu de la borne tactile',
-  display: 'Aperçu de l’écran de salle',
-  tracking: 'Aperçu du suivi mobile',
+const labelKeys = {
+  kiosk: 'experience.preview.kiosk',
+  display: 'experience.preview.display',
+  tracking: 'experience.preview.tracking',
 } as const;
 
 export function ExperiencePreview({
   mode,
   children,
 }: {
-  mode: keyof typeof labels;
+  mode: keyof typeof labelKeys;
   children: ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
-    <section className={`experience-preview experience-preview-${mode}`} aria-label={labels[mode]}>
+    <section
+      className={`experience-preview experience-preview-${mode}`}
+      aria-label={t(labelKeys[mode])}
+    >
       <div className="experience-preview-stage">{children}</div>
     </section>
   );

@@ -22,7 +22,7 @@ export function KioskTicketPrintDocument({
         <span>{t('kiosk.print.title')}</span>
       </header>
       <main>
-        <small>{t('public-experiences.kiosk.numeroDeTicketV2lgk')}</small>
+        <small>{t('kiosk.ticket.numberHeading')}</small>
         <h1>{ticketNumber}</h1>
         {queueName ? <p className="kiosk-print-queue">{queueName}</p> : null}
         <TrackingQr value={trackingUrl} onReady={onReady} />

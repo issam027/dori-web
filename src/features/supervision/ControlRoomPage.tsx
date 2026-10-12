@@ -51,21 +51,29 @@ export function ControlRoomPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Pilotage"
+        eyebrow={__t('common.pilotage')}
         title={__t('supervision.controlRoom.supervisionTempsReel')}
         description={__t('supervision.controlRoom.chargeGuichetsSessionsEtAlertesIssuesDeL')}
       />
       <div className="metric-grid">
         {[
-          { label: 'Files actives', value: summary.data?.data.activeQueues, icon: ListChecks },
-          { label: 'En attente', value: summary.data?.data.waitingTotal, icon: UsersRound },
           {
-            label: 'Guichets actifs',
+            label: __t('common.activeQueues'),
+            value: summary.data?.data.activeQueues,
+            icon: ListChecks,
+          },
+          {
+            label: __t('common.waiting'),
+            value: summary.data?.data.waitingTotal,
+            icon: UsersRound,
+          },
+          {
+            label: __t('common.activeCounters'),
             value: `${String(activeCounters)}/${totalCounters ? String(totalCounters) : '—'}`,
             icon: MonitorUp,
           },
           {
-            label: 'Rendez-vous du jour',
+            label: __t('common.todayAppointments'),
             value: summary.data?.data.appointmentsToday,
             icon: CalendarDays,
           },
@@ -113,7 +121,7 @@ export function ControlRoomPage() {
                         {__t('common.guichet')}
                         {session.threadNumber ?? __t('supervision.controlRoom.flottant')} ·{' '}
                         {session.username ??
-                          __t('supervision.controlRoom.operateurValue0', {
+                          __t('controlRoom.operatorReference', {
                             value0: String(session.userId),
                           })}
                       </li>
@@ -148,7 +156,7 @@ export function ControlRoomPage() {
             <li key={notification.notificationId}>
               <strong>
                 {notification.ticketNumber ??
-                  __t('common.value0', {
+                  __t('common.hashIdentifier', {
                     value0: String(notification.registrationId),
                   })}
               </strong>{' '}
@@ -175,8 +183,14 @@ export function ControlRoomPage() {
           if (!open) setResetQueue(undefined);
         }}
         title={__t('supervision.controlRoom.reinitialisationDUrgence')}
-        description={`La file « ${resetQueue?.name ?? ''} » sera réinitialisée. Les inscriptions en attente du jour seront clôturées selon le mode configuré côté serveur. Cette action ne peut pas être annulée.`}
-        confirmLabel={reset.isPending ? 'Réinitialisation…' : 'Confirmer la réinitialisation'}
+        description={__t('supervision.controlRoom.resetDescription', {
+          queue: resetQueue?.name ?? '',
+        })}
+        confirmLabel={
+          reset.isPending
+            ? __t('supervision.controlRoom.resetting')
+            : __t('supervision.controlRoom.confirmReset')
+        }
         destructive
         onConfirm={() => {
           if (resetQueue) reset.run(resetQueue.id);

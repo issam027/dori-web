@@ -129,8 +129,10 @@ export function TranslationsAdminPage() {
       }
       notify({
         tone: 'success',
-        title: editing ? 'Traduction modifiée' : 'Traduction créée',
-        message: editing ? form.key : `${form.key} · FR, EN, AR`,
+        title: editing
+          ? t('admin.translations.updateSuccess')
+          : t('admin.translations.createSuccess'),
+        message: editing ? form.key : t('admin.translations.createdLocales', { key: form.key }),
       });
       setOpen(false);
     } catch (error) {
@@ -164,9 +166,9 @@ export function TranslationsAdminPage() {
   return (
     <div className="page-stack admin-page translations-admin-page">
       <PageHeader
-        eyebrow="Administration"
+        eyebrow={t('common.administration')}
         title={t('onboarding.settings.traductions')}
-        description="Gérez les textes dynamiques de l’interface, des messages et des erreurs."
+        description={t('admin.translations.pageDescription')}
         actions={
           <button className="button button-primary" type="button" onClick={showCreate}>
             <Plus /> {t('onboarding.settings.nouvelleTraduction')}
@@ -250,11 +252,7 @@ export function TranslationsAdminPage() {
               <Languages />
             </span>
             <h2>{t('admin.translations.catalogueDesTraductions')}</h2>
-            <p>
-              {t(
-                'admin.translations.lesModificationsPublieesRemplacentLesValeursLocalesPourLeScopeIh',
-              )}
-            </p>
+            <p>{t('admin.translations.remoteOverrideNotice')}</p>
           </div>
         </div>
         <div className="table-wrap admin-table-wrap">
@@ -282,14 +280,17 @@ export function TranslationsAdminPage() {
                   <td className="translation-content-cell">{item.content}</td>
                   <td>
                     <span className={`status-badge ${item.isActive ? 'status-success' : ''}`}>
-                      {item.isActive ? 'Active' : 'Inactive'}
+                      {item.isActive
+                        ? t('admin.translations.active')
+                        : t('admin.translations.inactive')}
                     </span>
                   </td>
                   <td>
-                    <div className="table-actions">
+                    <div className="table-actions responsive-table-actions">
                       <button
                         className="button button-small"
                         type="button"
+                        title={t('common.edit')}
                         onClick={() => {
                           showEdit(item);
                         }}
@@ -299,6 +300,7 @@ export function TranslationsAdminPage() {
                       <button
                         className="button button-small button-danger"
                         type="button"
+                        title={t('common.delete')}
                         onClick={() => {
                           setDeleting(item);
                         }}
@@ -335,11 +337,11 @@ export function TranslationsAdminPage() {
         onOpenChange={(next) => {
           if (!pending) setOpen(next);
         }}
-        title={editing ? 'Modifier la traduction' : 'Nouvelle traduction'}
+        title={editing ? t('admin.translations.editTitle') : t('admin.translations.createTitle')}
         description={
           editing
-            ? 'Ajustez le contenu publié sans changer son identité.'
-            : 'Renseignez la clé et ses contenus français, anglais et arabe en une seule fois.'
+            ? t('admin.translations.editDescription')
+            : t('admin.translations.createDescription')
         }
         actions={
           <>
@@ -365,7 +367,7 @@ export function TranslationsAdminPage() {
             <Languages />
           </span>
           <div>
-            <strong>{editing ? form.key : 'Nouvelle clé'}</strong>
+            <strong>{editing ? form.key : t('admin.translations.newKey')}</strong>
             <small>{t('admin.translations.scopeDynamiqueDeTraductionDorify')}</small>
           </div>
         </div>
@@ -440,9 +442,9 @@ export function TranslationsAdminPage() {
               >
                 {(
                   [
-                    ['fr', '🇫🇷', 'Français'],
-                    ['en', '🇬🇧', 'English'],
-                    ['ar', '🇹🇳', 'العربية'],
+                    ['fr', '\u{1F1EB}\u{1F1F7}', 'locale.fr'],
+                    ['en', '\u{1F1EC}\u{1F1E7}', 'locale.en'],
+                    ['ar', '\u{1F1F9}\u{1F1F3}', 'locale.ar'],
                   ] as const
                 ).map(([locale, flag, label]) => {
                   const completed = Boolean(form.contents[locale].trim());
@@ -459,7 +461,7 @@ export function TranslationsAdminPage() {
                     >
                       <span aria-hidden="true">{flag}</span>
                       <span>
-                        <strong>{label}</strong>
+                        <strong>{t(label)}</strong>
                         <small>{locale.toUpperCase()}</small>
                       </span>
                       {completed ? (
@@ -474,10 +476,10 @@ export function TranslationsAdminPage() {
               <label className="translation-active-content">
                 <span>
                   {createLocale === 'fr'
-                    ? 'Texte en français'
+                    ? t('admin.translations.frenchText')
                     : createLocale === 'en'
-                      ? 'English text'
-                      : 'النص بالعربية'}
+                      ? t('admin.translations.englishText')
+                      : t('admin.translations.arabicText')}
                 </span>
                 <textarea
                   rows={6}
