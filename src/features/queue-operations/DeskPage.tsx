@@ -140,9 +140,7 @@ export function DeskPage() {
       useOperationStore.getState().addPassage({
         registrationId: call.registrationId,
         ticketNumber: call.ticketNumber,
-        personName:
-          personName ||
-          t('ui.expression.queue-operations.desk_page.personne_non_renseignee_1306yk1'),
+        personName: personName || t('queue-operations.desk.personneNonRenseignee'),
         firstName: activePerson.data?.data.firstName ?? undefined,
         lastName: activePerson.data?.data.lastName ?? undefined,
         arrivedAt: registration?.createdAt,
@@ -169,11 +167,7 @@ export function DeskPage() {
   const occupyDesk = (queueId: number, queueName: string, occupiedThread?: number) => {
     const takeOver =
       occupiedThread !== undefined &&
-      window.confirm(
-        t(
-          'ui.expression.queue-operations.desk_page.ce_guichet_est_occupe_confirmer_la_reprise_hnywz6',
-        ),
-      );
+      window.confirm(t('queue-operations.desk.ceGuichetEstOccupeConfirmerLaReprise'));
     if (occupiedThread !== undefined && !takeOver) return;
     void execute(async () => {
       await openSession.execute({
@@ -210,23 +204,19 @@ export function DeskPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Opérations"
-        title={t('ui.queue-operations.desk_page.cockpit_guichet_o7323f')}
+        title={t('queue-operations.desk.cockpitGuichet')}
         description={
           deskSessionsLoading
             ? undefined
             : hasActiveDeskSession
               ? t('desk.activeSessionDescription')
-              : t(
-                  'ui.queue-operations.desk_page.une_session_active_est_requise_pour_appeler_le_p_3hwh4',
-                )
+              : t('queue-operations.desk.uneSessionActiveEstRequisePourAppelerLeP3hwh4')
         }
       />
       {queues.isSuccess && allowed.length === 0 ? (
         <EmptyState
-          title={t('ui.queue-operations.desk_page.aucune_file_active_12limf6')}
-          description={t(
-            'ui.queue-operations.desk_page.aucune_file_n_est_configuree_ou_active_pour_ce_s_10fp5h5',
-          )}
+          title={t('queue-operations.desk.aucuneFileActive')}
+          description={t('queue-operations.desk.aucuneFileNEstConfigureeOuActivePourCeS')}
         />
       ) : null}
       {siteId !== null && allowed.length > 0 ? (

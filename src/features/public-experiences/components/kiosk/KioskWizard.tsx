@@ -159,12 +159,8 @@ export function KioskWizard() {
   if (!validScope)
     return (
       <section className="kiosk-screen">
-        <h1>{__t('ui.public-experiences.kiosk_page.borne_indisponible_crj57x')}</h1>
-        <p>
-          {__t(
-            'ui.public-experiences.kiosk_page.selectionnez_un_site_actif_pour_utiliser_cette_e_p6tmjj',
-          )}
-        </p>
+        <h1>{__t('public-experiences.kiosk.borneIndisponible')}</h1>
+        <p>{__t('common.selectionnezUnSiteActifPourUtiliserCetteE')}</p>
       </section>
     );
   if (!queues.isPending && queues.data?.data.items.length === 0)
@@ -173,12 +169,8 @@ export function KioskWizard() {
         <span className="empty-state-icon" aria-hidden="true">
           ≡
         </span>
-        <h1>{__t('ui.public-experiences.kiosk_page.aucune_file_configuree_1rf5ow7')}</h1>
-        <p>
-          {__t(
-            'ui.public-experiences.kiosk_page.ce_site_ne_dispose_actuellement_d_aucune_file_ac_7s9gmf',
-          )}
-        </p>
+        <h1>{__t('common.aucuneFileConfiguree')}</h1>
+        <p>{__t('public-experiences.kiosk.ceSiteNeDisposeActuellementDAucuneFileAc')}</p>
       </section>
     );
   return (
@@ -190,27 +182,21 @@ export function KioskWizard() {
     >
       {watchdog.warning && flow !== 'home' ? (
         <div className="kiosk-timeout" role="alertdialog" aria-live="assertive">
-          <strong>{__t('ui.public-experiences.kiosk_page.session_inactive_1jzrqso')}</strong>
+          <strong>{__t('public-experiences.kiosk.sessionInactive')}</strong>
           <span>
-            {__t('ui.public-experiences.kiosk_page.effacement_dans_1ror7ih')}
-            {watchdog.remainingSeconds} {__t('ui.public-experiences.kiosk_page.secondes_1kq4svx')}
+            {__t('public-experiences.kiosk.effacementDans')}
+            {watchdog.remainingSeconds} {__t('public-experiences.kiosk.secondes')}
           </span>
           <button type="button" className="button button-primary" onClick={watchdog.prolong}>
-            {__t('ui.public-experiences.kiosk_page.continuer_1dbvwde')}
+            {__t('common.continue')}
           </button>
         </div>
       ) : null}
       {flow === 'home' ? (
         <KioskWelcomeStep>
           <div className="kiosk-welcome">
-            <h1>
-              {__t('ui.public-experiences.kiosk_page.comment_pouvons_nous_vous_accueillir_1ii9ogv')}
-            </h1>
-            <p>
-              {__t(
-                'ui.public-experiences.kiosk_page.touchez_votre_situation_pour_commencer_covkye',
-              )}
-            </p>
+            <h1>{__t('public-experiences.kiosk.commentPouvonsNousVousAccueillir')}</h1>
+            <p>{__t('public-experiences.kiosk.touchezVotreSituationPourCommencer')}</p>
           </div>
           <div className="kiosk-choices">
             <button
@@ -219,7 +205,7 @@ export function KioskWizard() {
                 dispatch({ type: 'START_WALKIN' });
               }}
             >
-              {__t('ui.public-experiences.kiosk_page.je_viens_sans_rendez_vous_1reoz0q')}
+              {__t('public-experiences.kiosk.jeViensSansRendezVous')}
             </button>
             <button
               type="button"
@@ -227,7 +213,7 @@ export function KioskWizard() {
                 dispatch({ type: 'START_APPOINTMENT' });
               }}
             >
-              {__t('ui.public-experiences.kiosk_page.j_ai_un_rendez_vous_fkfvt9')}
+              {__t('public-experiences.kiosk.jAiUnRendezVous')}
             </button>
           </div>
         </KioskWelcomeStep>
@@ -241,8 +227,8 @@ export function KioskWizard() {
           </div>
           <div className="kiosk-stage-title">
             <span>
-              {__t('ui.public-experiences.kiosk_page.etape_1mygumc')}
-              {walkinStep} {__t('ui.public-experiences.kiosk_page.sur_4_145ldip')}
+              {__t('common.etape')}
+              {walkinStep} {__t('public-experiences.kiosk.sur4')}
             </span>
             <h1>
               {
@@ -280,29 +266,20 @@ export function KioskWizard() {
                       setTier(undefined);
                     }}
                   >
-                    <small>
-                      {__t('ui.public-experiences.kiosk_page.service_disponible_1wf3ald')}
-                    </small>
+                    <small>{__t('public-experiences.kiosk.serviceDisponible')}</small>
                     <strong>{queue.queueName}</strong>
                     <span className="kiosk-wait-estimate">
                       {queueStatuses[index]?.data
-                        ? __t(
-                            'ui.expression.public-experiences.kiosk_page.environ_value0_min_value1_en_attente_fu76o',
-                            {
-                              value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
-                              value1: String(queueStatuses[index].data.data.waitingCount),
-                            },
-                          )
-                        : __t(
-                            'ui.expression.public-experiences.kiosk_page.estimation_en_cours_oo9gjf',
-                          )}
+                        ? __t('public-experiences.kiosk.environValue0MinValue1EnAttenteFu76o', {
+                            value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
+                            value1: String(queueStatuses[index].data.data.waitingCount),
+                          })
+                        : __t('public-experiences.kiosk.estimationEnCours')}
                     </span>
                     <span>
                       {queueId === queue.queueId
-                        ? __t('ui.expression.public-experiences.kiosk_page.selectionne_vsjazw')
-                        : __t(
-                            'ui.expression.public-experiences.kiosk_page.choisir_ce_service_1ymypmf',
-                          )}
+                        ? __t('common.selectionne')
+                        : __t('public-experiences.kiosk.choisirCeService')}
                     </span>
                   </button>
                 ))}
@@ -314,7 +291,7 @@ export function KioskWizard() {
               <div className="kiosk-form-grid">
                 <label>
                   <span className="kiosk-field-label">
-                    {__t('ui.public-experiences.kiosk_page.nom_de_famille_pi8khu')}
+                    {__t('public-experiences.kiosk.nomDeFamille')}
                     <span className="required-mark" aria-hidden="true">
                       *
                     </span>
@@ -329,7 +306,7 @@ export function KioskWizard() {
                   />
                 </label>
                 <label>
-                  {__t('ui.public-experiences.kiosk_page.prenom_h4ba4')}
+                  {__t('common.prenomH4ba4')}
                   <input
                     autoComplete="given-name"
                     value={firstName}
@@ -339,7 +316,7 @@ export function KioskWizard() {
                   />
                 </label>
                 <label>
-                  {__t('ui.public-experiences.kiosk_page.email_inbfc7')}
+                  {__t('common.email')}
                   <input
                     autoComplete="email"
                     type="email"
@@ -351,17 +328,13 @@ export function KioskWizard() {
                   />
                   <small>
                     {emailValid
-                      ? __t(
-                          'ui.expression.public-experiences.kiosk_page.pour_recevoir_les_informations_si_le_service_1yuhipt',
-                        )
-                      : __t(
-                          'ui.expression.public-experiences.kiosk_page.saisissez_une_adresse_email_valide_1vym397',
-                        )}
+                      ? __t('public-experiences.kiosk.pourRecevoirLesInformationsSiLeService')
+                      : __t('public-experiences.kiosk.saisissezUneAdresseEmailValide')}
                   </small>
                 </label>
                 <label>
                   <span className="kiosk-field-label">
-                    {__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                    {__t('public-experiences.kiosk.telephone')}
                     <span className="required-mark" aria-hidden="true">
                       *
                     </span>
@@ -369,19 +342,14 @@ export function KioskWizard() {
                   <InternationalPhoneInput
                     value={phone}
                     onChange={setPhone}
-                    countryLabel={__t('ui.public-experiences.kiosk_page.indicatif_pays_1krknxf')}
-                    phoneLabel={__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}
+                    countryLabel={__t('public-experiences.kiosk.indicatifPays')}
+                    phoneLabel={__t('public-experiences.kiosk.telephone')}
                     required
                   />
                   <small>
                     {phoneValid
-                      ? __t(
-                          'ui.expression.public-experiences.kiosk_page.numero_enregistre_value0_18ylmh4',
-                          { value0: phone },
-                        )
-                      : __t(
-                          'ui.expression.public-experiences.kiosk_page.choisissez_le_pays_puis_saisissez_le_numero_ohnccb',
-                        )}
+                      ? __t('public-experiences.kiosk.numeroEnregistreValue0', { value0: phone })
+                      : __t('public-experiences.kiosk.choisissezLePaysPuisSaisissezLeNumero')}
                   </small>
                 </label>
               </div>
@@ -415,17 +383,14 @@ export function KioskWizard() {
                       >
                         <small>
                           {item.isDefault
-                            ? __t('ui.expression.public-experiences.kiosk_page.recommande_ho1o0g')
-                            : __t(
-                                'ui.expression.public-experiences.kiosk_page.option_disponible_16egb8x',
-                              )}
+                            ? __t('public-experiences.kiosk.recommande')
+                            : __t('public-experiences.kiosk.optionDisponible')}
                         </small>
                         <strong>
                           {item.tier?.tierName ??
-                            __t(
-                              'ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z',
-                              { value0: String(item.tierId) },
-                            )}
+                            __t('public-experiences.kiosk.forfaitValue0', {
+                              value0: String(item.tierId),
+                            })}
                         </strong>
                         <span>
                           {new Intl.NumberFormat(undefined, {
@@ -435,36 +400,28 @@ export function KioskWizard() {
                         </span>
                         <ul className="kiosk-tier-benefits">
                           <li className={hasSms ? 'included' : ''}>
-                            {__t('ui.public-experiences.kiosk_page.sms_q3rkiy')}
+                            {__t('common.sms')}
                             {hasSms
-                              ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
-                              : __t(
-                                  'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
-                                )}
+                              ? __t('public-experiences.kiosk.inclus')
+                              : __t('public-experiences.kiosk.nonConfigure')}
                           </li>
                           <li className={hasWelcome ? 'included' : ''}>
-                            {__t('ui.public-experiences.kiosk_page.message_de_bienvenue_1pfo98i')}
+                            {__t('public-experiences.kiosk.messageDeBienvenue')}
                             {hasWelcome
-                              ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
-                              : __t(
-                                  'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
-                                )}
+                              ? __t('public-experiences.kiosk.inclus')
+                              : __t('public-experiences.kiosk.nonConfigure')}
                           </li>
                           <li className={hasThreshold ? 'included' : ''}>
-                            {__t('ui.public-experiences.kiosk_page.alerte_d_approche_1d977f9')}
+                            {__t('public-experiences.kiosk.alerteDApproche')}
                             {hasThreshold
-                              ? __t('ui.expression.public-experiences.kiosk_page.incluse_nqq1lk')
-                              : __t(
-                                  'ui.expression.public-experiences.kiosk_page.non_configuree_136zuar',
-                                )}
+                              ? __t('public-experiences.kiosk.incluse')
+                              : __t('public-experiences.kiosk.nonConfiguree')}
                           </li>
                           <li className={hasTracking ? 'included' : ''}>
-                            {__t('ui.public-experiences.kiosk_page.lien_de_suivi_zldvh6')}
+                            {__t('public-experiences.kiosk.lienDeSuivi')}
                             {hasTracking
-                              ? __t('ui.expression.public-experiences.kiosk_page.inclus_1me6j59')
-                              : __t(
-                                  'ui.expression.public-experiences.kiosk_page.non_configure_8cidzo',
-                                )}
+                              ? __t('public-experiences.kiosk.inclus')
+                              : __t('public-experiences.kiosk.nonConfigure')}
                           </li>
                         </ul>
                       </button>
@@ -479,7 +436,7 @@ export function KioskWizard() {
                 <table>
                   <tbody>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.service_1eklb0k')}</th>
+                      <th>{__t('public-experiences.kiosk.service')}</th>
                       <td>
                         {
                           queues.data?.data.items.find((item) => item.queueId === queueId)
@@ -488,60 +445,48 @@ export function KioskWizard() {
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.attente_estimee_wo76kg')}</th>
+                      <th>{__t('public-experiences.kiosk.attenteEstimee')}</th>
                       <td>
                         {queueId
-                          ? __t(
-                              'ui.expression.public-experiences.kiosk_page.value0_minutes_1yug5bb',
-                              {
-                                value0: String(
-                                  queueStatuses[
-                                    queues.data?.data.items.findIndex(
-                                      (item) => item.queueId === queueId,
-                                    ) ?? -1
-                                  ]?.data?.data.estimatedWaitMinutes ?? '—',
-                                ),
-                              },
-                            )
+                          ? __t('public-experiences.kiosk.value0Minutes', {
+                              value0: String(
+                                queueStatuses[
+                                  queues.data?.data.items.findIndex(
+                                    (item) => item.queueId === queueId,
+                                  ) ?? -1
+                                ]?.data?.data.estimatedWaitMinutes ?? '—',
+                              ),
+                            })
                           : '—'}
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.nom_15eqct1')}</th>
+                      <th>{__t('common.name')}</th>
                       <td>{lastName}</td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.prenom_h4ba4')}</th>
-                      <td>
-                        {firstName ||
-                          __t('ui.expression.public-experiences.kiosk_page.non_renseigne_un1dwo')}
-                      </td>
+                      <th>{__t('common.prenomH4ba4')}</th>
+                      <td>{firstName || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.email_inbfc7')}</th>
-                      <td>
-                        {email ||
-                          __t('ui.expression.public-experiences.kiosk_page.non_renseigne_un1dwo')}
-                      </td>
+                      <th>{__t('common.email')}</th>
+                      <td>{email || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.telephone_p3xtrr')}</th>
+                      <th>{__t('public-experiences.kiosk.telephone')}</th>
                       <td>{phone}</td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.niveau_de_service_1g6qs3d')}</th>
+                      <th>{__t('public-experiences.kiosk.niveauDeService')}</th>
                       <td>
                         {tier?.tier?.tierName ??
-                          __t(
-                            'ui.expression.public-experiences.kiosk_page.forfait_value0_1ftj76z',
-                            {
-                              value0: String(tier?.tierId ?? ''),
-                            },
-                          )}
+                          __t('public-experiences.kiosk.forfaitValue0', {
+                            value0: String(tier?.tierId ?? ''),
+                          })}
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('ui.public-experiences.kiosk_page.tarif_1fpn4rv')}</th>
+                      <th>{__t('public-experiences.kiosk.tarif')}</th>
                       <td>
                         {tier
                           ? new Intl.NumberFormat(undefined, {
@@ -558,14 +503,10 @@ export function KioskWizard() {
           ) : null}
           {registrationError ? (
             <div className="kiosk-error" role="alert">
-              <strong>
-                {__t('ui.public-experiences.kiosk_page.inscription_impossible_jqnxnm')}
-              </strong>
+              <strong>{__t('public-experiences.kiosk.inscriptionImpossible')}</strong>
               <p>{registrationError}</p>
               <span>
-                {__t(
-                  'ui.public-experiences.kiosk_page.verifiez_vos_informations_ou_demandez_de_l_aide__wwhufs',
-                )}
+                {__t('public-experiences.kiosk.verifiezVosInformationsOuDemandezDeLAide')}
               </span>
             </div>
           ) : null}
@@ -577,7 +518,7 @@ export function KioskWizard() {
                 else dispatch({ type: 'BACK' });
               }}
             >
-              {__t('ui.public-experiences.kiosk_page.retour_18dwyy2')}
+              {__t('common.retour')}
             </button>
             <button
               type="button"
@@ -595,9 +536,9 @@ export function KioskWizard() {
             >
               {walkinStep === 4
                 ? register.isPending
-                  ? __t('ui.expression.public-experiences.kiosk_page.creation_uqudte')
-                  : __t('ui.expression.public-experiences.kiosk_page.creer_mon_ticket_csckmy')
-                : __t('ui.expression.public-experiences.kiosk_page.continuer_5vzly4')}
+                  ? __t('common.creation')
+                  : __t('public-experiences.kiosk.creerMonTicket')
+                : __t('common.continuer')}
             </button>
           </div>
         </div>
@@ -608,13 +549,13 @@ export function KioskWizard() {
             <span className="kiosk-appointment-icon" aria-hidden="true">
               <CalendarCheck2 />
             </span>
-            <h1>{__t('ui.public-experiences.kiosk_page.retrouver_mon_rendez_vous_1w6p9nd')}</h1>
+            <h1>{__t('public-experiences.kiosk.retrouverMonRendezVous')}</h1>
           </div>
           <div className="kiosk-appointment-searches">
             <section>
               <div className="kiosk-appointment-option-title">
                 <Ticket aria-hidden="true" />
-                <strong>{__t('ui.public-experiences.kiosk_page.numero_de_ticket_17ymtl0')}</strong>
+                <strong>{__t('public-experiences.kiosk.numeroDeTicket')}</strong>
               </div>
               <input
                 autoComplete="off"
@@ -624,13 +565,11 @@ export function KioskWizard() {
                 }}
               />
             </section>
-            <span className="kiosk-appointment-or">
-              {__t('ui.public-experiences.kiosk_page.ou_pkzwmp')}
-            </span>
+            <span className="kiosk-appointment-or">{__t('public-experiences.kiosk.ou')}</span>
             <section>
               <div className="kiosk-appointment-option-title">
                 <UserRound aria-hidden="true" />
-                <strong>{__t('ui.public-experiences.kiosk_page.nom_15eqct1')}</strong>
+                <strong>{__t('common.name')}</strong>
               </div>
               <input
                 autoComplete="family-name"
@@ -641,7 +580,7 @@ export function KioskWizard() {
               />
               <label className="kiosk-appointment-time">
                 <Clock3 aria-hidden="true" />
-                <span>{__t('ui.public-experiences.kiosk_page.heure_prevue_m6637b')}</span>
+                <span>{__t('public-experiences.kiosk.heurePrevue')}</span>
                 <input
                   type="datetime-local"
                   value={scheduledTime}
@@ -654,7 +593,7 @@ export function KioskWizard() {
           </div>
           <div className="kiosk-appointment-actions">
             <button type="button" onClick={purge}>
-              {__t('ui.public-experiences.kiosk_page.retour_a_l_accueil_48kqql')}
+              {__t('common.retourALAccueil')}
             </button>
             <button
               type="button"
@@ -667,7 +606,7 @@ export function KioskWizard() {
               }}
             >
               <Search aria-hidden="true" />
-              {__t('ui.public-experiences.kiosk_page.rechercher_1jzbmpc')}
+              {__t('common.search')}
             </button>
           </div>
           {found ? (
@@ -676,10 +615,9 @@ export function KioskWizard() {
                 ✓
               </span>
               <div>
-                <h2>{__t('ui.public-experiences.kiosk_page.rendez_vous_trouve_u0yq2a')}</h2>
+                <h2>{__t('public-experiences.kiosk.rendezVousTrouve')}</h2>
                 <p>
-                  {__t('ui.public-experiences.kiosk_page.ticket_1nrpxxh')}{' '}
-                  <strong>{found.ticketNumber}</strong>
+                  {__t('common.ticket')} <strong>{found.ticketNumber}</strong>
                 </p>
                 <p>
                   {found.businessDate} ·{' '}
@@ -688,7 +626,7 @@ export function KioskWizard() {
                         hour: '2-digit',
                         minute: '2-digit',
                       })
-                    : __t('ui.expression.public-experiences.kiosk_page.heure_non_fournie_cgiv4n')}
+                    : __t('public-experiences.kiosk.heureNonFournie')}
                 </p>
               </div>
               <button
@@ -699,7 +637,7 @@ export function KioskWizard() {
                   checkIn.mutate();
                 }}
               >
-                {__t('ui.public-experiences.kiosk_page.confirmer_ma_presence_1efjx0r')}
+                {__t('public-experiences.kiosk.confirmerMaPresence')}
               </button>
             </Card>
           ) : null}
@@ -712,24 +650,20 @@ export function KioskWizard() {
               ✓
             </span>
             <div>
-              <p className="eyebrow">
-                {__t('ui.public-experiences.kiosk_page.inscription_confirmee_kt7nz')}
-              </p>
-              <h1>{__t('ui.public-experiences.kiosk_page.votre_ticket_est_pret_12garfj')}</h1>
+              <p className="eyebrow">{__t('common.inscriptionConfirmeeKt7nz')}</p>
+              <h1>{__t('public-experiences.kiosk.votreTicketEstPret')}</h1>
             </div>
           </div>
           <div className="kiosk-ticket-result">
             <div>
-              <small>{__t('ui.public-experiences.kiosk_page.numero_de_ticket_v2lgk')}</small>
+              <small>{__t('public-experiences.kiosk.numeroDeTicketV2lgk')}</small>
               <strong>{result.ticketNumber}</strong>
               <span>{result.queueName}</span>
             </div>
             <TrackingQr value={result.trackingUrl} />
           </div>
           <p className="kiosk-result-guidance">
-            {__t(
-              'ui.public-experiences.kiosk_page.conservez_ce_ticket_et_suivez_l_ecran_de_salle_s_11uvt5o',
-            )}
+            {__t('public-experiences.kiosk.conservezCeTicketEtSuivezLEcranDeSalleS')}
           </p>
           <div className="kiosk-result-actions">
             <button
@@ -745,10 +679,10 @@ export function KioskWizard() {
                 window.setTimeout(cleanup, 30_000);
               }}
             >
-              {__t('ui.public-experiences.kiosk_page.imprimer_mon_ticket_xbrafa')}
+              {__t('public-experiences.kiosk.imprimerMonTicket')}
             </button>
             <button type="button" className="primary" onClick={purge}>
-              {__t('ui.public-experiences.kiosk_page.terminer_19zht57')}
+              {__t('common.terminer')}
             </button>
           </div>
           <KioskTicketPrintDocument

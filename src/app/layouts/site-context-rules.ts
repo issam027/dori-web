@@ -4,6 +4,8 @@ const siteIndependentPaths = new Set([
   '/change-password',
   '/onboarding',
   '/health',
+  '/legal',
+  '/admin/translations',
 ]);
 
 export function routeRequiresActiveSite(pathname: string): boolean {

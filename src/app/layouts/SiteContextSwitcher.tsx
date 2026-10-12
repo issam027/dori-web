@@ -23,7 +23,7 @@ export function SiteContextSwitcher({
       <summary aria-label={t('site.change')}>
         <span aria-hidden="true">⌂</span>
         <span>
-          <small>{__t('ui.shell.layouts.site_context_switcher.site_actif_uvd9tt')}</small>
+          <small>{__t('common.siteActif')}</small>
           <strong>{activeSite?.name}</strong>
         </span>
         <span aria-hidden="true">▾</span>

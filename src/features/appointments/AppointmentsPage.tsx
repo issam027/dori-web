@@ -58,9 +58,7 @@ export function AppointmentsPage() {
   const personName = (personId: number) => {
     const person = appointmentPeople[appointmentPersonIds.indexOf(personId)]?.data?.data;
     if (!person) return __t('appointments.calendar.unknownPerson');
-    return [person.firstName, person.lastName]
-      .filter((part) => part.trim().length > 0)
-      .join(' ');
+    return [person.firstName, person.lastName].filter((part) => part.trim().length > 0).join(' ');
   };
   const byDate = (date: string): RegistrationResponseDto[] =>
     daily[dates.indexOf(date)]?.data?.data.items ?? [];
@@ -86,10 +84,8 @@ export function AppointmentsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Planning"
-        title={__t('ui.appointments.appointments_page.rendez_vous_1jmjhs7')}
-        description={__t(
-          'ui.appointments.appointments_page.donnees_et_disponibilites_chargees_depuis_l_api_15vqaj',
-        )}
+        title={__t('appointments.title')}
+        description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
         actions={
           <div className="segmented">
             <button
@@ -100,7 +96,7 @@ export function AppointmentsPage() {
                 setView('week');
               }}
             >
-              {__t('ui.appointments.appointments_page.semaine_1h9600n')}
+              {__t('appointments.appointments.semaine')}
             </button>
             <button
               className="button"
@@ -110,7 +106,7 @@ export function AppointmentsPage() {
                 setView('month');
               }}
             >
-              {__t('ui.appointments.appointments_page.mois_s4y96t')}
+              {__t('appointments.appointments.mois')}
             </button>
           </div>
         }
@@ -121,16 +117,16 @@ export function AppointmentsPage() {
             ▦
           </span>
           <div>
-            <h2>{__t('ui.appointments.appointments_page.rendez_vous_indisponibles_877wds')}</h2>
+            <h2>{__t('appointments.appointments.rendezVousIndisponibles')}</h2>
             <p>
-              {__t('ui.appointments.appointments_page.le_site_x7168t')}
+              {__t('appointments.appointments.leSite')}
               <strong>
                 {site.data?.data.siteName ??
-                  __t('ui.expression.appointments.appointments_page.value0_g7s8cl', {
+                  __t('common.value0', {
                     value0: String(siteId),
                   })}
               </strong>{' '}
-              {__t('ui.appointments.appointments_page.ne_gere_pas_les_rendez_vous_ioiivw')}
+              {__t('appointments.appointments.neGerePasLesRendezVous')}
             </p>
           </div>
         </div>
@@ -139,7 +135,7 @@ export function AppointmentsPage() {
         <>
           <div className="calendar-toolbar">
             <select
-              aria-label={__t('ui.appointments.appointments_page.file_bygjtv')}
+              aria-label={__t('queues.singular')}
               value={selectedQueue?.queueId ?? 0}
               onChange={(e) => {
                 setQueueId(Number(e.target.value));
@@ -158,7 +154,7 @@ export function AppointmentsPage() {
                 move(-1);
               }}
             >
-              {__t('ui.appointments.appointments_page.precedent_v4av9v')}
+              {__t('appointments.appointments.precedent')}
             </button>
             <strong>
               {dates[0]} — {dates.at(-1)}
@@ -170,7 +166,7 @@ export function AppointmentsPage() {
                 move(1);
               }}
             >
-              {__t('ui.appointments.appointments_page.suivant_182am67')}
+              {__t('common.next')}
             </button>
           </div>
           {view === 'week' ? (
@@ -219,7 +215,7 @@ export function AppointmentsPage() {
                       >
                         <span>{time}</span>
                         {isBreak ? (
-                          <em>{__t('ui.appointments.appointments_page.pause_j4z771')}</em>
+                          <em>{__t('appointments.appointments.pause')}</em>
                         ) : appointments.length ? (
                           appointments.map((item) => (
                             <button

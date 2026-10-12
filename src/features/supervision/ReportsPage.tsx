@@ -73,12 +73,12 @@ export function ReportsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Pilotage"
-        title={__t('ui.supervision.reports_page.rapports_14c3yxg')}
+        title={__t('supervision.reports.rapports')}
         description={__t('reports.periodDescription')}
         actions={
           <button type="button" className="button" disabled={!items.length} onClick={exportCsv}>
             <Download aria-hidden="true" />
-            {__t('ui.supervision.reports_page.exporter_csv_local_17y7htf')}
+            {__t('supervision.reports.exporterCsvLocal')}
           </button>
         }
       />
@@ -135,7 +135,7 @@ export function ReportsPage() {
         <EmptyState title={__t('reports.noDataForPeriod')} />
       ) : (
         <Card>
-          <h2>{__t('ui.supervision.reports_page.performance_par_file_r9y7ow')}</h2>
+          <h2>{__t('supervision.reports.performanceParFile')}</h2>
           <DataTable
             caption={__t('reports.periodReportByQueue')}
             rows={queueItems}

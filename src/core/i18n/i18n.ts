@@ -1,8 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { translationsControllerGetBundle } from '@/api/generated/translations/translations';
-import { generatedUiFallbackFr } from './generated-ui-fallback.fr';
-import { generatedUiExpressionFallbackFr } from './generated-ui-expressions.fr';
+import { legacyUiKeyAliases, uiFallbackFr } from './ui-fallback.fr';
 
 const fallbackResources = {
   fr: {
@@ -19,8 +18,7 @@ const fallbackResources = {
       'tracking.error.unavailableTitle': 'Suivi momentanément indisponible',
       'tracking.error.unavailableText':
         'Nous ne pouvons pas actualiser votre position. Réessayez dans quelques instants.',
-      ...generatedUiFallbackFr,
-      ...generatedUiExpressionFallbackFr,
+      ...uiFallbackFr,
       'app.name': 'DORIFY',
       'bootstrap.eyebrow': 'DORIFY',
       'bootstrap.title': 'Socle de l’application initialisé',
@@ -121,21 +119,25 @@ const fallbackResources = {
       'onboarding.defaultsHelp': 'Ces valeurs deviennent les paramètres hérités des files.',
       'onboarding.queueOverrideHelp': 'Choisissez l’héritage ou une surcharge propre à la file.',
       'onboarding.tiersHelp':
-        'S�lectionnez les services propos�s, puis configurez imm�diatement leur tarif et leurs options pour chaque file.',
-      'onboarding.selectedServices': '{{count}} service s�lectionn�',
-      'onboarding.selectedServices_plural': '{{count}} services s�lectionn�s',
+        'Sélectionnez les services proposés, puis configurez immédiatement leur tarif et leurs options pour chaque file.',
+      'onboarding.selectedServices': '{{count}} service sélectionné',
+      'onboarding.selectedServices_plural': '{{count}} services sélectionnés',
       'onboarding.enableService': 'Activer ce service',
-      'onboarding.serviceEnabled': 'Service activ�',
+      'onboarding.serviceEnabled': 'Service activé',
       'onboarding.servicePrice': 'Prix',
       'onboarding.serviceCurrency': 'Devise',
-      'onboarding.inheritedCurrency': 'H�rit�e du site ({{currency}})',
-      'onboarding.defaultService': 'Service propos� par d�faut',
-      'onboarding.defaultServiceHint': 'Un seul service par file peut �tre pr�s�lectionn�.',
+      'onboarding.inheritedCurrency': 'Héritée du site ({{currency}})',
+      'onboarding.defaultService': 'Service par défaut',
+      'onboarding.defaultServiceHint': 'Un seul service par file peut être présélectionné.',
       'onboarding.serviceOptions': 'Communications incluses',
       'onboarding.welcomeSms': 'SMS de bienvenue',
       'onboarding.welcomeEmail': 'Email de bienvenue',
       'onboarding.approachSms': 'SMS lorsque le tour approche',
-      'onboarding.alertPosition': 'Envoyer � partir de la position',
+      'onboarding.alertPosition': 'Envoyer à partir de la position',
+      'onboarding.alertThresholdType': 'Type de seuil',
+      'onboarding.thresholdByPosition': 'Position dans la file',
+      'onboarding.thresholdByTime': 'Temps d’attente estimé',
+      'onboarding.alertMinutes': 'Envoyer à partir de ce nombre de minutes',
       'onboarding.trackingLink': 'Inclure le lien de suivi',
       'onboarding.accountsHelp':
         'Comptes humains, kiosque et écran de salle avec leurs périmètres.',
@@ -158,6 +160,23 @@ const fallbackResources = {
       'settings.usersHelp': 'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
       'settings.tiersHelp': 'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
       'settings.rulesHelp': 'Règles persistantes par file et niveau, avec simulation locale.',
+      'settings.queueServices.empty': 'Aucune file n’est configurée pour ce site.',
+      'settings.queueServices.count': '{{count}} service(s)',
+      'settings.queueServices.activateFirst':
+        'Activez d’abord un service dans l’onglet Niveaux de service.',
+      'settings.queueServices.active': 'Actif',
+      'settings.queueServices.disable': 'Désactiver',
+      'settings.queueServices.enable': 'Activer et configurer',
+      'settings.queueServices.disabled': 'Service désactivé',
+      'settings.queueServices.saved': 'Configuration enregistrée',
+      'settings.notifications.saved': 'Notifications enregistrées',
+      'settings.notifications.service': 'Service',
+      'settings.notifications.welcome': 'Message de bienvenue',
+      'settings.notifications.welcomeHint': 'Envoyé dès la création du ticket.',
+      'settings.notifications.threshold': 'Message d’approche',
+      'settings.notifications.thresholdHint': 'Prévient lorsque le tour du client approche.',
+      'settings.notifications.trackingHint': 'Ajoute le lien public dans les messages actifs.',
+      'settings.notifications.save': 'Enregistrer les notifications',
       'settings.translationsHelp': 'Catégories IHM, SMS et erreurs, avec paramètres attendus.',
       'settings.disconnectUser': 'Déconnecter',
       'settings.disconnectUserTitle': 'Déconnecter toutes les sessions',
@@ -324,6 +343,8 @@ const fallbackResources = {
       'nav.tracking': 'Suivi mobile',
       'nav.onboarding': 'Créer un site',
       'nav.settings': 'Paramètres du site',
+      'nav.usersAdmin': 'Utilisateurs',
+      'nav.translations': 'Traductions',
       'nav.health': 'État de la plateforme',
       'health.applicationVersion': 'Version {{version}}',
       'nav.legal': 'Mentions légales · Confidentialité',
@@ -501,13 +522,17 @@ const fallbackResources = {
       'onboarding.servicePrice': 'Price',
       'onboarding.serviceCurrency': 'Currency',
       'onboarding.inheritedCurrency': 'Inherited from site ({{currency}})',
-      'onboarding.defaultService': 'Default proposed service',
+      'onboarding.defaultService': 'Default service',
       'onboarding.defaultServiceHint': 'Only one service per queue can be preselected.',
       'onboarding.serviceOptions': 'Included communications',
       'onboarding.welcomeSms': 'Welcome SMS',
       'onboarding.welcomeEmail': 'Welcome email',
       'onboarding.approachSms': 'SMS when the turn is approaching',
       'onboarding.alertPosition': 'Send from position',
+      'onboarding.alertThresholdType': 'Threshold type',
+      'onboarding.thresholdByPosition': 'Position in queue',
+      'onboarding.thresholdByTime': 'Estimated waiting time',
+      'onboarding.alertMinutes': 'Send from this number of minutes',
       'onboarding.trackingLink': 'Include tracking link',
       'onboarding.accountsHelp': 'Human, kiosk and display accounts with their scopes.',
       'onboarding.validationHelp': 'Validate the journey before opening it to the public.',
@@ -528,6 +553,24 @@ const fallbackResources = {
       'settings.usersHelp': 'Account, email, language, status, password, role and scope.',
       'settings.tiersHelp': 'Fixed Free, Standard and Premium catalog; availability by queue.',
       'settings.rulesHelp': 'Persistent rules by queue and tier, with local simulation.',
+
+      'settings.queueServices.empty': 'No queue is configured for this site.',
+      'settings.queueServices.count': '{{count}} service(s)',
+      'settings.queueServices.activateFirst': 'Enable a service in the Service levels tab first.',
+      'settings.queueServices.active': 'Active',
+      'settings.queueServices.disable': 'Disable',
+      'settings.queueServices.enable': 'Enable and configure',
+      'settings.queueServices.disabled': 'Service disabled',
+      'settings.queueServices.saved': 'Configuration saved',
+      'settings.notifications.saved': 'Notifications saved',
+      'settings.notifications.service': 'Service',
+      'settings.notifications.welcome': 'Welcome message',
+      'settings.notifications.welcomeHint': 'Sent as soon as the ticket is created.',
+      'settings.notifications.threshold': 'Approaching-turn message',
+      'settings.notifications.thresholdHint':
+        'Notifies the customer when their turn is approaching.',
+      'settings.notifications.trackingHint': 'Adds the public tracking link to active messages.',
+      'settings.notifications.save': 'Save notifications',
       'settings.translationsHelp': 'UI, SMS and error categories, with their expected parameters.',
       'settings.disconnectUser': 'Disconnect',
       'settings.disconnectUserTitle': 'Disconnect all sessions',
@@ -691,6 +734,8 @@ const fallbackResources = {
       'nav.tracking': 'Mobile tracking',
       'nav.onboarding': 'New site',
       'nav.settings': 'Settings',
+      'nav.usersAdmin': 'Users',
+      'nav.translations': 'Translations',
       'nav.health': 'Platform health',
       'health.applicationVersion': 'Version {{version}}',
       'nav.legal': 'Legal · Privacy',
@@ -837,6 +882,8 @@ const fallbackResources = {
       'nav.tracking': 'التتبع',
       'nav.onboarding': 'موقع جديد',
       'nav.settings': 'الإعدادات',
+      'nav.usersAdmin': 'المستخدمون',
+      'nav.translations': 'الترجمات',
       'nav.health': 'صحة المنصة',
       'health.applicationVersion': 'الإصدار {{version}}',
       'nav.legal': 'الشروط القانونية · الخصوصية',
@@ -905,15 +952,19 @@ const bundleRequests = new Map<string, Promise<number>>();
 
 type TranslationCategory = 'ihm' | 'sms' | 'error';
 
-function applyCurrentProductName(entries: Record<string, string>): Record<string, string> {
+function normalizeRemoteEntries(entries: Record<string, string>): Record<string, string> {
   return Object.fromEntries(
-    Object.entries(entries).map(([key, value]) => [key, value.replace(/\bDORI\b/g, 'DORIFY')]),
+    Object.entries(entries).map(([key, value]) => [
+      legacyUiKeyAliases[key] ?? key,
+      value.replace(/\bDORI\b/g, 'DORIFY'),
+    ]),
   );
 }
 
 export async function loadTranslationBundle(
   locale: string,
   category: TranslationCategory = 'ihm',
+  force = false,
 ): Promise<number> {
   const requestKey = `${locale}:${category}`;
   const pending = bundleRequests.get(requestKey);
@@ -925,14 +976,14 @@ export async function loadTranslationBundle(
     const cacheKey = `${bundle.locale}:${bundle.category}`;
     const currentVersion = loadedBundleVersions.get(cacheKey);
 
-    if (currentVersion !== bundle.version) {
+    if (force || currentVersion !== bundle.version) {
       if (i18n.hasResourceBundle(bundle.locale, 'translation')) {
         i18n.removeResourceBundle(bundle.locale, 'translation');
       }
       i18n.addResourceBundle(
         bundle.locale,
         'translation',
-        applyCurrentProductName(bundle.entries),
+        normalizeRemoteEntries(bundle.entries),
         true,
         true,
       );

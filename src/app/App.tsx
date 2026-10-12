@@ -61,6 +61,14 @@ const OnboardingPage = lazyNamed(
   'OnboardingPage',
 );
 const SettingsPage = lazyNamed(() => import('@/features/onboarding/SettingsPage'), 'SettingsPage');
+const UsersAdminPage = lazyNamed(
+  () => import('@/features/onboarding/UsersAdminPage'),
+  'UsersAdminPage',
+);
+const TranslationsAdminPage = lazyNamed(
+  () => import('@/features/onboarding/TranslationsAdminPage'),
+  'TranslationsAdminPage',
+);
 
 function Page({ title }: { title: string }) {
   const { t } = useTranslation();
@@ -73,7 +81,7 @@ function Page({ title }: { title: string }) {
           <img className="brand-logo" src={logoUrl} alt="" />
         ) : (
           <span className="brand-mark" aria-hidden="true">
-            {t('ui.shell.app.d_1hkaexf')}
+            {t('common.d')}
           </span>
         )}
         <div>
@@ -161,6 +169,8 @@ const protectedRouteViews: Record<string, RouteView> = {
   '/display': { component: DisplayPage, frame: 'experience', experienceMode: 'display' },
   '/onboarding': { component: OnboardingPage, frame: 'shell' },
   '/settings/*': { component: SettingsPage, frame: 'shell' },
+  '/admin/users': { component: UsersAdminPage, frame: 'shell' },
+  '/admin/translations': { component: TranslationsAdminPage, frame: 'shell' },
   '/health': { component: HealthPage, frame: 'shell' },
 };
 

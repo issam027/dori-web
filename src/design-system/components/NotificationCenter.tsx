@@ -52,7 +52,7 @@ function NotificationItem({ item }: { item: AppNotification }) {
         {item.message ? <p>{item.message}</p> : null}
         {item.correlationId ? (
           <small>
-            {__t('ui.design.components.notification_center.reference_support_6nw5u7')}
+            {__t('design.components.notificationCenter.referenceSupport')}
             {item.correlationId}
           </small>
         ) : null}
@@ -60,7 +60,7 @@ function NotificationItem({ item }: { item: AppNotification }) {
       <button
         type="button"
         className="app-notification-dismiss"
-        aria-label={__t('ui.design.components.notification_center.fermer_la_notification_120dc1w')}
+        aria-label={__t('design.components.notificationCenter.fermerLaNotification')}
         onClick={() => {
           dismiss(item.id);
         }}
@@ -85,10 +85,7 @@ export function NotificationCenter() {
   const { t: __t } = useTranslation();
   const items = useNotificationStore((state) => state.items);
   return (
-    <aside
-      className="app-notification-center"
-      aria-label={__t('ui.design.components.notification_center.notifications_fki4un')}
-    >
+    <aside className="app-notification-center" aria-label={__t('common.notifications')}>
       {items.map((item) => (
         <NotificationItem item={item} key={item.id} />
       ))}

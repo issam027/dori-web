@@ -535,3 +535,313 @@ table td small {
     grid-template-columns: 1fr;
   }
 }
+.queue-service-settings {
+  display: grid;
+  gap: 20px;
+}
+.queue-service-group {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface-subtle);
+}
+.queue-service-group > header,
+.tier-config-card-heading,
+.tier-config-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.queue-service-group h3,
+.tier-config-card h4,
+.notification-config-card h4 {
+  margin: 2px 0 0;
+}
+.queue-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.tier-config-card,
+.notification-config-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+.queue-service-settings .tier-config-card.is-disabled {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--color-surface-subtle) 88%, var(--color-text-muted));
+  box-shadow: none;
+  opacity: 0.72;
+}
+.queue-service-settings .tier-config-card.is-disabled:hover,
+.queue-service-settings .tier-config-card.is-disabled:focus-within {
+  border-color: var(--color-primary);
+  opacity: 1;
+  transform: translateY(-2px);
+}
+.tier-config-card.is-selected {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+}
+.tier-config-card > p {
+  min-height: 2.8em;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.tier-config-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+  gap: 10px;
+}
+.notification-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--color-surface-subtle);
+}
+.notification-option span {
+  display: grid;
+  gap: 3px;
+}
+.notification-option small {
+  color: var(--color-text-muted);
+}
+@media (max-width: 1100px) {
+  .queue-service-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.translation-heading-icon,
+.translation-modal-intro > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.translation-heading-icon {
+  float: left;
+  margin-right: 12px;
+}
+.translation-heading-icon svg,
+.translation-modal-intro svg {
+  width: 20px;
+  height: 20px;
+}
+.translation-content-cell {
+  max-width: 32rem;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+.translation-modal-intro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-surface));
+}
+.translation-modal-intro div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.translation-modal-intro strong,
+.translation-modal-intro small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.translation-modal-intro small {
+  color: var(--color-text-muted);
+}
+.tier-threshold-config {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+@media (max-width: 640px) {
+  .tier-threshold-config {
+    grid-template-columns: 1fr;
+  }
+}
+.admin-filter-card {
+  padding: 0;
+  overflow: hidden;
+}
+.admin-filter-card summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+.admin-filter-card summary::-webkit-details-marker {
+  display: none;
+}
+.admin-filter-card summary > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+.admin-filter-card summary svg {
+  width: 19px;
+  color: var(--color-primary);
+}
+.admin-filter-card summary small {
+  color: var(--color-text-muted);
+}
+.admin-filter-card details[open] summary {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-subtle);
+}
+.admin-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+  padding: 18px;
+}
+.admin-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+@media (max-width: 760px) {
+  .admin-filter-card summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .admin-filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-filter-actions {
+    justify-content: stretch;
+  }
+  .admin-filter-actions .button {
+    flex: 1;
+  }
+}
+
+.translation-language-editor {
+  display: grid;
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface-subtle);
+}
+.translation-language-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.translation-language-heading > div {
+  display: grid;
+  gap: 3px;
+}
+.translation-language-heading small {
+  color: var(--color-text-muted);
+}
+.translation-language-heading > span {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.translation-language-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.translation-language-tabs button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+.translation-language-tabs button:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+  transform: translateY(-1px);
+}
+.translation-language-tabs button.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+.translation-language-tabs button > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+}
+.translation-language-tabs button small {
+  color: var(--color-text-muted);
+}
+.translation-language-tabs button svg,
+.translation-language-tabs button i {
+  width: 17px;
+  height: 17px;
+}
+.translation-language-tabs button svg {
+  padding: 2px;
+  border-radius: 50%;
+  color: var(--color-success-contrast);
+  background: var(--color-success);
+}
+.translation-language-tabs button i {
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+}
+.translation-active-content {
+  display: grid;
+  gap: 7px;
+}
+.translation-active-content > span {
+  font-weight: 800;
+}
+.translation-active-content textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+@media (max-width: 640px) {
+  .translation-language-heading {
+    align-items: flex-start;
+  }
+  .translation-language-tabs {
+    grid-template-columns: 1fr;
+  }
+}

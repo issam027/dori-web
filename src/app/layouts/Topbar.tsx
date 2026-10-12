@@ -62,14 +62,14 @@ export function Topbar({
         className="topbar-icon-button mobile-menu-trigger"
         type="button"
         onClick={onOpenNavigation}
-        aria-label={__t('ui.shell.layouts.topbar.ouvrir_le_menu_q76zys')}
+        aria-label={__t('shell.layouts.topbar.ouvrirLeMenu')}
       >
         <Menu aria-hidden="true" />
       </button>
       <div className="topbar-title">
         <span className="eyebrow">
           {sites.find((site) => site.id === activeSiteId)?.name ??
-            __t('ui.expression.shell.layouts.topbar.aucun_site_actif_hmb19')}
+            __t('common.aucunSiteActifHmb19')}
         </span>
         <h1>{t(routeLabel)}</h1>
       </div>
@@ -85,7 +85,7 @@ export function Topbar({
           <RefreshCw aria-hidden="true" className={refreshing ? 'is-spinning' : undefined} />
         </button>
         <button className="command-trigger" type="button" onClick={onOpenCommands}>
-          {t('commands.open')} <kbd>{__t('ui.shell.layouts.topbar.k_1f6nlc4')}</kbd>
+          {t('commands.open')} <kbd>{__t('shell.layouts.topbar.k')}</kbd>
         </button>
         <ThemeSwitcher />
         <div className="topbar-desktop-account">

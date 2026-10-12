@@ -51,6 +51,7 @@
   display: flex;
   height: 100vh;
   flex-direction: column;
+  overflow: hidden;
   padding: 24px 18px;
   color: #eef6f8;
   background: linear-gradient(165deg, #0b2034 0%, #123752 58%, #0c5b63 130%);
@@ -79,7 +80,26 @@
   letter-spacing: 0.12em;
 }
 .sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgb(88 200 196 / 55%) transparent;
+  scrollbar-width: thin;
+}
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(88 200 196 / 42%);
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgb(88 200 196 / 72%);
 }
 .nav-section-toggle {
   display: flex;

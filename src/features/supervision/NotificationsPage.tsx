@@ -56,16 +56,14 @@ export function NotificationsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Communication"
-        title={t('ui.supervision.notifications_page.notifications_fki4un')}
-        description={t(
-          'ui.supervision.notifications_page.journal_d_envoi_detail_et_emission_manuelle_pbxvuy',
-        )}
+        title={t('common.notifications')}
+        description={t('supervision.notifications.journalDEnvoiDetailEtEmissionManuelle')}
         actions={
           <div className="action-row">
             <FilterDrawer activeCount={activeFilters}>
               <div className="form-stack">
                 <label>
-                  {t('ui.supervision.notifications_page.canal_1219p1c')}
+                  {t('common.canal')}
                   <select
                     value={channel}
                     onChange={(event) => {
@@ -73,15 +71,13 @@ export function NotificationsPage() {
                       setPage(1);
                     }}
                   >
-                    <option value="">{t('ui.supervision.notifications_page.tous_1eotn8w')}</option>
-                    <option value="sms">{t('ui.supervision.notifications_page.sms_q3rkiy')}</option>
-                    <option value="email">
-                      {t('ui.supervision.notifications_page.email_inbfc7')}
-                    </option>
+                    <option value="">{t('supervision.notifications.tous')}</option>
+                    <option value="sms">{t('common.sms')}</option>
+                    <option value="email">{t('common.email')}</option>
                   </select>
                 </label>
                 <label>
-                  {t('ui.supervision.notifications_page.statut_1yaum3a')}
+                  {t('common.status')}
                   <select
                     value={status}
                     onChange={(event) => {
@@ -89,14 +85,14 @@ export function NotificationsPage() {
                       setPage(1);
                     }}
                   >
-                    <option value="">{t('ui.supervision.notifications_page.tous_1eotn8w')}</option>
+                    <option value="">{t('supervision.notifications.tous')}</option>
                     {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
                       <option key={value}>{value}</option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  {t('ui.supervision.notifications_page.date_ggjuyh')}
+                  {t('common.date')}
                   <input
                     type="date"
                     value={date}
@@ -117,7 +113,7 @@ export function NotificationsPage() {
                 }}
               >
                 <Plus aria-hidden="true" />
-                {t('ui.supervision.notifications_page.nouvel_envoi_1kutyxn')}
+                {t('supervision.notifications.nouvelEnvoi')}
               </button>
             ) : null}
           </div>
@@ -125,7 +121,7 @@ export function NotificationsPage() {
       />
       <Card>
         <DataTable
-          caption={t('ui.supervision.notifications_page.journal_des_notifications_1gdlx9g')}
+          caption={t('supervision.notifications.journalDesNotifications')}
           rows={items}
           getRowKey={(row) => row.notificationId}
           columns={[
@@ -173,7 +169,7 @@ export function NotificationsPage() {
                     }}
                   >
                     <Search aria-hidden="true" />
-                    {t('ui.supervision.notifications_page.detail_qlpl2o')}
+                    {t('supervision.notifications.detail')}
                   </button>
                   {canResendNotification(row.notificationStatus, canSend) ? (
                     <button
@@ -185,7 +181,7 @@ export function NotificationsPage() {
                       }}
                     >
                       <RefreshCcw aria-hidden="true" />
-                      {t('ui.supervision.notifications_page.reemettre_1d0q7c4')}
+                      {t('supervision.notifications.reemettre')}
                     </button>
                   ) : null}
                 </div>
@@ -205,7 +201,7 @@ export function NotificationsPage() {
         onOpenChange={(nextOpen) => {
           if (!nextOpen) setDetailId(undefined);
         }}
-        title={t('ui.supervision.notifications_page.detail_de_la_notification_xau4jx')}
+        title={t('supervision.notifications.detailDeLaNotification')}
       >
         <NotificationDetail notification={detail.data?.data} />
       </Modal>
@@ -215,20 +211,20 @@ export function NotificationsPage() {
 
 function NotificationDetail({ notification }: { notification?: NotificationResponseDto }) {
   const { t } = useTranslation();
-  if (!notification) return <p>{t('ui.supervision.notifications_page.chargement_16kwy5p')}</p>;
+  if (!notification) return <p>{t('supervision.notifications.chargement')}</p>;
   return (
     <dl className="detail-list">
-      <dt>{t('ui.supervision.notifications_page.inscription_1bzavbp')}</dt>
+      <dt>{t('supervision.notifications.inscription')}</dt>
       <dd>#{notification.registrationId}</dd>
-      <dt>{t('ui.supervision.notifications_page.destinataire_1qtg5cw')}</dt>
+      <dt>{t('supervision.notifications.destinataireVariant2')}</dt>
       <dd>{maskRecipient(notification.recipient)}</dd>
-      <dt>{t('ui.supervision.notifications_page.canal_1219p1c')}</dt>
+      <dt>{t('common.canal')}</dt>
       <dd>{notification.channel}</dd>
-      <dt>{t('ui.supervision.notifications_page.statut_1yaum3a')}</dt>
+      <dt>{t('common.status')}</dt>
       <dd>{notification.notificationStatus}</dd>
-      <dt>{t('ui.supervision.notifications_page.contenu_1hxusj9')}</dt>
+      <dt>{t('common.contenu')}</dt>
       <dd>{notification.notificationContent}</dd>
-      <dt>{t('ui.supervision.notifications_page.echec_14peoen')}</dt>
+      <dt>{t('supervision.notifications.echec')}</dt>
       <dd>{notification.failureReason ?? '—'}</dd>
     </dl>
   );

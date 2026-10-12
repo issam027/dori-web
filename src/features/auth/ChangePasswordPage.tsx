@@ -44,20 +44,14 @@ export function ChangePasswordPage() {
       const user = useSessionStore.getState().user;
       if (user) void navigate(findFirstAuthorizedPath(user), { replace: true });
     } catch {
-      setApiError(
-        __t(
-          'ui.expression.auth.change_password_page.le_mot_de_passe_n_a_pas_pu_etre_modifie_1lvgut4',
-        ),
-      );
+      setApiError(__t('auth.changePassword.leMotDePasseNAPasPuEtreModifie'));
     }
   });
   return (
     <div className="page-stack">
       <PageHeader
-        title={__t('ui.auth.change_password_page.changer_le_mot_de_passe_1i41l8b')}
-        description={__t(
-          'ui.auth.change_password_page.choisissez_un_mot_de_passe_de_10_a_20_caracteres_1gdne07',
-        )}
+        title={__t('auth.changePassword.changerLeMotDePasse')}
+        description={__t('auth.changePassword.choisissezUnMotDePasseDe10A20Caracteres')}
       />
       <Card>
         <form
@@ -66,10 +60,7 @@ export function ChangePasswordPage() {
             void submit(e);
           }}
         >
-          <FormField
-            label={__t('ui.auth.change_password_page.mot_de_passe_actuel_43q4tg')}
-            required
-          >
+          <FormField label={__t('auth.changePassword.motDePasseActuel')} required>
             <input
               type="password"
               autoComplete="current-password"
@@ -77,14 +68,14 @@ export function ChangePasswordPage() {
             />
           </FormField>
           <FormField
-            label={__t('ui.auth.change_password_page.nouveau_mot_de_passe_hl1ug5')}
+            label={__t('auth.changePassword.nouveauMotDePasse')}
             required
             error={errors.newPassword ? 'Entre 10 et 20 caractères.' : undefined}
           >
             <input type="password" autoComplete="new-password" {...register('newPassword')} />
           </FormField>
           <FormField
-            label={__t('ui.auth.change_password_page.confirmation_p3snlg')}
+            label={__t('auth.changePassword.confirmation')}
             required
             error={errors.confirmation?.message}
           >
@@ -97,7 +88,7 @@ export function ChangePasswordPage() {
           ) : null}
           <button className="button button-primary" disabled={isSubmitting} type="submit">
             <Save aria-hidden="true" />
-            {__t('ui.auth.change_password_page.enregistrer_sywgdx')}
+            {__t('common.save')}
           </button>
         </form>
       </Card>

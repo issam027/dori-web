@@ -26,19 +26,17 @@ export function PortfolioPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Organisation"
-        title={__t('ui.portfolio.portfolio_page.portefeuille_de_sites_13kj62k')}
-        description={__t(
-          'ui.portfolio.portfolio_page.selectionnez_le_site_sur_lequel_vous_souhaitez_t_1pmhaen',
-        )}
+        title={__t('portfolio.portfolio.portefeuilleDeSites')}
+        description={__t('portfolio.portfolio.selectionnezLeSiteSurLequelVousSouhaitezT')}
       />
       <div className="metrics-grid">
         <MetricCard
-          label={__t('ui.portfolio.portfolio_page.sites_autorises_kxxnqk')}
+          label={__t('portfolio.portfolio.sitesAutorises')}
           value={allowed.length}
           icon={<Building2 />}
         />
         <MetricCard
-          label={__t('ui.portfolio.portfolio_page.contexte_actif_1hf5mac')}
+          label={__t('portfolio.portfolio.contexteActif')}
           icon={<MapPin />}
           value={allowed.find((site) => site.siteId === activeSiteId)?.siteName ?? '—'}
         />
@@ -51,7 +49,7 @@ export function PortfolioPage() {
         />
       ) : null}
       {sites.isSuccess && allowed.length === 0 ? (
-        <EmptyState title={__t('ui.portfolio.portfolio_page.aucun_site_autorise_yhfs0w')} />
+        <EmptyState title={__t('portfolio.portfolio.aucunSiteAutorise')} />
       ) : null}
       <div className="site-grid">
         {allowed.map((site, index) => (
@@ -66,43 +64,38 @@ export function PortfolioPage() {
                 }
               >
                 {site.siteId === activeSiteId
-                  ? __t('ui.expression.portfolio.portfolio_page.site_actif_uvd9tt')
-                  : __t('ui.expression.portfolio.portfolio_page.disponible_lmh7q8')}
+                  ? __t('common.siteActif')
+                  : __t('portfolio.portfolio.disponible')}
               </span>
               <h2>{site.siteName}</h2>
               <p>{site.siteLocation ?? site.timezone}</p>
             </div>
             <dl className="detail-list">
               <div>
-                <dt>{__t('ui.portfolio.portfolio_page.devise_1pl1r6r')}</dt>
+                <dt>{__t('common.devise')}</dt>
                 <dd>{site.defaultCurrency}</dd>
               </div>
               <div>
-                <dt>{__t('ui.portfolio.portfolio_page.locale_1pfta5z')}</dt>
+                <dt>{__t('common.locale')}</dt>
                 <dd>{site.defaultLocale}</dd>
               </div>
               <div>
-                <dt>{__t('ui.portfolio.portfolio_page.etat_525179')}</dt>
-                <dd>
-                  {site.isActive
-                    ? __t('ui.expression.portfolio.portfolio_page.actif_1410gao')
-                    : __t('ui.expression.portfolio.portfolio_page.inactif_11hqnbx')}
-                </dd>
+                <dt>{__t('common.etat')}</dt>
+                <dd>{site.isActive ? __t('common.active') : __t('common.inactive')}</dd>
               </div>
             </dl>
             {canViewSummary && summaries[index]?.data ? (
               <div className="site-summary" aria-label={`Synthese ${site.siteName}`}>
                 <span>
-                  {summaries[index].data.data.waitingTotal}{' '}
-                  {__t('ui.portfolio.portfolio_page.en_attente_1fzxwnp')}
+                  {summaries[index].data.data.waitingTotal} {__t('common.enAttente')}
                 </span>
                 <span>
                   {summaries[index].data.data.activeQueues}{' '}
-                  {__t('ui.portfolio.portfolio_page.files_actives_nqxf9n')}
+                  {__t('portfolio.portfolio.filesActives')}
                 </span>
                 <span>
                   {summaries[index].data.data.appointmentsToday}{' '}
-                  {__t('ui.portfolio.portfolio_page.rdv_aujourd_hui_xbfs44')}
+                  {__t('portfolio.portfolio.rdvAujourdHui')}
                 </span>
               </div>
             ) : null}
@@ -121,8 +114,8 @@ export function PortfolioPage() {
                 }}
               >
                 {site.siteId === activeSiteId
-                  ? __t('ui.expression.portfolio.portfolio_page.continuer_sur_ce_site_1iqwc3')
-                  : __t('ui.expression.portfolio.portfolio_page.activer_ce_site_7ymtes')}
+                  ? __t('portfolio.portfolio.continuerSurCeSite')
+                  : __t('portfolio.portfolio.activerCeSite')}
               </button>
             ) : null}
           </Card>

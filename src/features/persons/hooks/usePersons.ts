@@ -24,10 +24,7 @@ export function usePersonsSearch(options: {
     ),
     queryFn: ({ signal }) => {
       if (options.siteId === null) throw new Error('An active site is required');
-      return findPersons(
-        { siteId: options.siteId, search, page: options.page, pageSize },
-        signal,
-      );
+      return findPersons({ siteId: options.siteId, search, page: options.page, pageSize }, signal);
     },
     enabled: options.enabled !== false && options.siteId !== null && search.length >= 3,
   });

@@ -22,7 +22,8 @@ type BusinessMutationOptions<TData, TVariables, TContext = unknown> = Omit<
   expectedErrorStatuses?: readonly number[];
   invalidate?: (data: TData, variables: TVariables) => unknown;
   invalidateOnConflict?: (error: NormalizedApiError, variables: TVariables) => unknown;
-  successNotice?: MutationNotice | ((data: TData, variables: TVariables) => MutationNotice | undefined);
+  successNotice?:
+    MutationNotice | ((data: TData, variables: TVariables) => MutationNotice | undefined);
 };
 
 export type BusinessMutationResult<TData, TVariables, TContext = unknown> = UseMutationResult<

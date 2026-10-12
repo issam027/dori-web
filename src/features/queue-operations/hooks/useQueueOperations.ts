@@ -21,8 +21,7 @@ import { useBusinessMutation } from '@/api/client/use-business-mutation';
 export function useRegistration(registrationId: number | null | undefined, enabled = true) {
   return useQuery({
     queryKey: queryKeys.registrations.detail(registrationId),
-    queryFn: ({ signal }) =>
-      registrationsControllerFindOne(registrationId ?? 0, undefined, signal),
+    queryFn: ({ signal }) => registrationsControllerFindOne(registrationId ?? 0, undefined, signal),
     enabled: enabled && Boolean(registrationId),
   });
 }
@@ -31,6 +30,7 @@ export function useWaitingRegistrations(options: {
   siteId: number | null;
   queueId?: number;
   page: number;
+  search?: string;
 }) {
   return useQuery({
     queryKey: queryKeys.registrations.list({
@@ -46,6 +46,7 @@ export function useWaitingRegistrations(options: {
           siteId: options.siteId ?? undefined,
           queueId: options.queueId,
           status: 'waiting',
+          search: options.search || undefined,
           page: options.page,
           pageSize: 10,
           sort: 'createdAt:asc',
@@ -81,12 +82,7 @@ export function useDeskSession(siteId: number | null, queueIds: readonly number[
     queries: queueIds.map((queueId) => ({
       queryKey: queryKeys.threads.byQueue(queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        queueEngineControllerGetThreads(
-          queueId,
-          { page: 1, pageSize: 100 },
-          undefined,
-          signal,
-        ),
+        queueEngineControllerGetThreads(queueId, { page: 1, pageSize: 100 }, undefined, signal),
     })),
   });
   return { previews, sessions, threads };

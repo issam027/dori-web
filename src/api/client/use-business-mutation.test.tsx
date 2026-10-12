@@ -18,10 +18,9 @@ describe('useBusinessMutation', () => {
           resolveRequest = resolve;
         }),
     );
-    const { result } = renderHook(
-      () => useBusinessMutation({ mutationFn: () => mutationFn() }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useBusinessMutation({ mutationFn: () => mutationFn() }), {
+      wrapper,
+    });
 
     let first: Promise<string> | undefined;
     let second: Promise<string> | undefined;

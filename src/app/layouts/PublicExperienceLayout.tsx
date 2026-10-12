@@ -36,9 +36,7 @@ export function PublicExperienceLayout({
       <div className={`public-layout public-${mode}`}>
         <main className="experience-logout" role="status" aria-live="polite">
           <span className="spinner" aria-hidden="true" />
-          <strong>
-            {__t('ui.shell.layouts.public_experience_layout.deconnexion_de_l_appareil_1tsww9p')}
-          </strong>
+          <strong>{__t('shell.layouts.publicExperienceLayout.deconnexionDeLAppareil')}</strong>
         </main>
       </div>
     );

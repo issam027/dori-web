@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
-import { Check, CircleAlert } from 'lucide-react';
+import { Check, CircleAlert, X } from 'lucide-react';
 
 interface ModalProps {
   open: boolean;
@@ -29,6 +29,7 @@ export function Modal({ open, onOpenChange, title, description, children, action
           <footer className="dialog-actions">
             <Dialog.Close asChild>
               <button className="button" type="button">
+                <X aria-hidden="true" />
                 {t('common.cancel')}
               </button>
             </Dialog.Close>

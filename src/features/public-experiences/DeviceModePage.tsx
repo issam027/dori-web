@@ -18,17 +18,11 @@ export function DeviceModePage() {
         <div className="device-mode-theme">
           <ThemeSwitcher />
         </div>
-        <p className="eyebrow">
-          {__t('ui.public-experiences.device_mode_page.configuration_de_l_appareil_12mejpd')}
-        </p>
+        <p className="eyebrow">{__t('public-experiences.deviceMode.configurationDeLAppareil')}</p>
         <h1 id="device-mode-title">
-          {__t('ui.public-experiences.device_mode_page.quel_ecran_souhaitez_vous_afficher_14by7b0')}
+          {__t('public-experiences.deviceMode.quelEcranSouhaitezVousAfficher')}
         </h1>
-        <p>
-          {__t(
-            'ui.public-experiences.device_mode_page.choisissez_l_usage_de_cet_appareil_vous_pourrez__1pnwjqi',
-          )}
-        </p>
+        <p>{__t('public-experiences.deviceMode.choisissezLUsageDeCetAppareilVousPourrez')}</p>
       </div>
       <div className="device-mode-grid">
         <Link className="device-mode-card" to="/kiosk">
@@ -36,35 +30,29 @@ export function DeviceModePage() {
             <ClipboardPenLine />
           </span>
           <span>
-            <strong>{__t('ui.public-experiences.device_mode_page.borne_d_accueil_1arxoay')}</strong>
+            <strong>{__t('public-experiences.deviceMode.borneDAccueil')}</strong>
             <small>
-              {__t(
-                'ui.public-experiences.device_mode_page.inscription_des_nouveaux_arrivants_et_creation_d_1mwarob',
-              )}
+              {__t('public-experiences.deviceMode.inscriptionDesNouveauxArrivantsEtCreationD')}
             </small>
           </span>
-          <b>{__t('ui.public-experiences.device_mode_page.ouvrir_la_borne_1wgp2br')}</b>
+          <b>{__t('public-experiences.deviceMode.ouvrirLaBorne')}</b>
         </Link>
         <Link className="device-mode-card" to="/display">
           <span className="device-mode-icon" aria-hidden="true">
             <Monitor />
           </span>
           <span>
-            <strong>{__t('ui.public-experiences.device_mode_page.ecran_de_salle_17zgbb2')}</strong>
+            <strong>{__t('public-experiences.deviceMode.ecranDeSalle')}</strong>
             <small>
-              {__t(
-                'ui.public-experiences.device_mode_page.affichage_des_tickets_appeles_des_guichets_et_de_vgf37r',
-              )}
+              {__t('public-experiences.deviceMode.affichageDesTicketsAppelesDesGuichetsEtDe')}
             </small>
           </span>
-          <b>{__t('ui.public-experiences.device_mode_page.ouvrir_l_ecran_salle_h692bd')}</b>
+          <b>{__t('public-experiences.deviceMode.ouvrirLEcranSalle')}</b>
         </Link>
       </div>
       <div className="device-mode-footer">
         <p className="device-mode-hint">
-          {__t(
-            'ui.public-experiences.device_mode_page.conseil_utilisez_le_mode_plein_ecran_du_navigate_nja46p',
-          )}
+          {__t('public-experiences.deviceMode.conseilUtilisezLeModePleinEcranDuNavigate')}
         </p>
         <button
           className="button"
@@ -78,10 +66,8 @@ export function DeviceModePage() {
           }}
         >
           {disconnecting
-            ? __t('ui.expression.public-experiences.device_mode_page.deconnexion_vv1fmt')
-            : __t(
-                'ui.expression.public-experiences.device_mode_page.deconnecter_cet_appareil_1hklwq3',
-              )}
+            ? __t('public-experiences.deviceMode.deconnexion')
+            : __t('public-experiences.deviceMode.deconnecterCetAppareil')}
         </button>
       </div>
     </section>

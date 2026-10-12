@@ -33,9 +33,9 @@ describe('onboarding workflow', () => {
       selectedTierIds: { '41': [1] },
     };
     expect(canAdvanceOnboarding(draft, 3)).toBe(false);
-    expect(
-      canAdvanceOnboarding({ ...draft, selectedTierIds: { '41': [1], '42': [2] } }, 3),
-    ).toBe(true);
+    expect(canAdvanceOnboarding({ ...draft, selectedTierIds: { '41': [1], '42': [2] } }, 3)).toBe(
+      true,
+    );
   });
 
   it('resets the complete wizard state after activation', () => {

@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <button
           className="sidebar-backdrop"
           type="button"
-          aria-label={__t('ui.shell.layouts.app_shell.fermer_le_menu_1fo6hqo')}
+          aria-label={__t('common.fermerLeMenu')}
           onClick={() => {
             setMobileNavigationOpen(false);
           }}
@@ -125,13 +125,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             {requiresSite && activeSiteId === null && !sitesQuery.isLoading ? (
               <div className="site-required-card">
                 <EmptyState
-                  title={__t('ui.shell.layouts.app_shell.choisissez_un_site_actif_w5t05i')}
+                  title={__t('shell.layouts.appShell.choisissezUnSiteActif')}
                   description={__t(
-                    'ui.shell.layouts.app_shell.selectionnez_le_site_sur_lequel_vous_souhaitez_t_umf4sj',
+                    'shell.layouts.appShell.selectionnezLeSiteSurLequelVousSouhaitezT',
                   )}
                   action={
                     <Link className="button button-primary" to="/portfolio">
-                      {__t('ui.shell.layouts.app_shell.ouvrir_le_portefeuille_de_sites_1jrlgpe')}
+                      {__t('shell.layouts.appShell.ouvrirLePortefeuilleDeSites')}
                     </Link>
                   }
                 />

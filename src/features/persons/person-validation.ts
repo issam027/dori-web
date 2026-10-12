@@ -4,9 +4,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function isValidPersonIdentity(person: PersonIdentityDto): boolean {
   const emailIsValid = !person.email || emailPattern.test(person.email);
-  const parsedBirthDate = person.birthDate
-    ? new Date(`${person.birthDate}T00:00:00Z`)
-    : undefined;
+  const parsedBirthDate = person.birthDate ? new Date(`${person.birthDate}T00:00:00Z`) : undefined;
   const birthDateIsValid =
     !person.birthDate ||
     (/^\d{4}-\d{2}-\d{2}$/.test(person.birthDate) &&

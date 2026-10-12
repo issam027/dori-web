@@ -14,7 +14,7 @@ export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewIte
   const { t } = useTranslation();
   return (
     <Card className="desk-operational-card desk-preview-card">
-      <h2>{t('ui.queue-operations.desk_page.prochains_eligibles_14q7gdk')}</h2>
+      <h2>{t('queue-operations.desk.prochainsEligibles')}</h2>
       <div className="preview-list">
         {items.map((item) => (
           <span key={item.registrationId}>
@@ -49,27 +49,26 @@ export function ActiveCallCard({
   const { t } = useTranslation();
   return (
     <Card className="desk-operational-card desk-active-card">
-      <h2>{t('ui.queue-operations.desk_page.prise_en_charge_140wd1j')}</h2>
+      <h2>{t('queue-operations.desk.priseEnCharge')}</h2>
       {call ? (
         <div className="active-call">
           <div className="active-call-heading">
             <div>
-              <small>{t('ui.queue-operations.desk_page.ticket_en_cours_12vcptu')}</small>
+              <small>{t('queue-operations.desk.ticketEnCours')}</small>
               <strong>{call.ticketNumber}</strong>
             </div>
             <StatusBadge tone="accent">
-              {t('ui.queue-operations.desk_page.guichet_15ztv8y')}
+              {t('common.guichet')}
               {call.threadNumber}
             </StatusBadge>
           </div>
           <h3 className="active-person-name">
-            {personName ||
-              t('ui.expression.queue-operations.desk_page.personne_non_renseignee_1306yk1')}
+            {personName || t('queue-operations.desk.personneNonRenseignee')}
           </h3>
           {registration ? (
             <dl className="active-call-metrics">
               <div>
-                <dt>{t('ui.queue-operations.desk_page.arrivee_8ef051')}</dt>
+                <dt>{t('queue-operations.desk.arrivee')}</dt>
                 <dd>
                   {new Intl.DateTimeFormat(undefined, {
                     hour: '2-digit',
@@ -78,7 +77,7 @@ export function ActiveCallCard({
                 </dd>
               </div>
               <div>
-                <dt>{t('ui.queue-operations.desk_page.attente_avant_appel_1k7uziu')}</dt>
+                <dt>{t('queue-operations.desk.attenteAvantAppel')}</dt>
                 <dd>
                   {Math.max(
                     0,
@@ -88,7 +87,7 @@ export function ActiveCallCard({
                         60000,
                     ),
                   )}{' '}
-                  {t('ui.queue-operations.desk_page.min_1jxbmtz')}
+                  {t('common.min')}
                 </dd>
               </div>
             </dl>
@@ -100,7 +99,7 @@ export function ActiveCallCard({
               onClick={onServed}
             >
               <Check aria-hidden="true" />
-              {t('ui.queue-operations.desk_page.servi_1bextlc')}
+              {t('common.servi')}
             </button>
             <button
               className="button button-danger active-call-action"
@@ -108,13 +107,13 @@ export function ActiveCallCard({
               onClick={onNoShow}
             >
               <UserX aria-hidden="true" />
-              {t('ui.queue-operations.desk_page.absent_meu720')}
+              {t('common.absent')}
             </button>
           </div>
           {onNotes ? (
             <button className="button active-call-notes" type="button" onClick={onNotes}>
               <StickyNote aria-hidden="true" />
-              {t('ui.queue-operations.desk_page.consulter_les_notes_esjdmp')}
+              {t('queue-operations.desk.consulterLesNotes')}
               <span className="note-count" aria-label={`${String(noteCount)} note(s)`}>
                 {noteCount}
               </span>
@@ -122,7 +121,7 @@ export function ActiveCallCard({
           ) : null}
         </div>
       ) : (
-        <p>{t('ui.queue-operations.desk_page.aucune_personne_en_cours_rsgt2z')}</p>
+        <p>{t('queue-operations.desk.aucunePersonneEnCours')}</p>
       )}
     </Card>
   );
@@ -160,27 +159,27 @@ export function QueueDeskCard({
     >
       <h2>{queue.queueName}</h2>
       <p>
-        {waitingCount ?? '—'} {t('ui.queue-operations.desk_page.en_attente_sla_estime_1k6oejn')}{' '}
-        {estimatedWaitMinutes ?? '—'} {t('ui.queue-operations.desk_page.min_1jxbmtz')}
+        {waitingCount ?? '—'} {t('queue-operations.desk.enAttenteSlaEstime')}{' '}
+        {estimatedWaitMinutes ?? '—'} {t('common.min')}
       </p>
       {session ? (
         <>
           <StatusBadge tone={active ? 'success' : 'neutral'}>
             {active
-              ? t('ui.expression.queue-operations.desk_page.guichet_value0_1v9uvfd', {
+              ? t('common.guichetValue0', {
                   value0: String(session.threadNumber),
                 })
-              : t('ui.expression.queue-operations.desk_page.consultation_1xb0x0k')}
+              : t('queue-operations.desk.consultation')}
           </StatusBadge>
           <button className="button" disabled={pending || hasActiveCall} onClick={onRelease}>
-            {t('ui.queue-operations.desk_page.liberer_icbzzg')}
+            {t('queue-operations.desk.liberer')}
           </button>
         </>
       ) : (
         <button className="button" disabled={pending} onClick={onOccupy}>
           {occupied
-            ? t('ui.expression.queue-operations.desk_page.reprendre_le_guichet_1mzik24')
-            : t('ui.expression.queue-operations.desk_page.occuper_le_guichet_eenwno')}
+            ? t('queue-operations.desk.reprendreLeGuichet')
+            : t('queue-operations.desk.occuperLeGuichet')}
         </button>
       )}
       <button
@@ -189,7 +188,7 @@ export function QueueDeskCard({
         onClick={onCallNext}
       >
         <PhoneCall aria-hidden="true" />
-        {t('ui.queue-operations.desk_page.appeler_le_suivant_1q7561l')}
+        {t('queue-operations.desk.appelerLeSuivant')}
       </button>
     </Card>
   );

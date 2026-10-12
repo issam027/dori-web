@@ -28,6 +28,8 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
     path: '/settings/*',
     permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
   },
+  { path: '/admin/users', permissions: ['user_manage_admin'] },
+  { path: '/admin/translations', permissions: ['translation_manage'] },
   { path: '/health', permissions: ['system_manage'] },
 ] as const;
 

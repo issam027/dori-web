@@ -65,14 +65,9 @@ export function AppointmentEditor({
     } catch (cause) {
       notifyError(cause);
       if ((cause as { status?: number }).status === 409) {
-        setError(
-          __t(
-            'ui.expression.appointments.appointment_editor.ce_creneau_vient_d_etre_reserve_les_disponib_1bkik3g',
-          ),
-        );
+        setError(__t('appointments.appointmentEditor.ceCreneauVientDEtreReserveLesDisponib'));
         await availability.refetch();
-      } else
-        setError(__t('ui.expression.appointments.appointment_editor.creation_impossible_1g64rg5'));
+      } else setError(__t('appointments.appointmentEditor.creationImpossible'));
     }
   };
   const slots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
@@ -89,7 +84,7 @@ export function AppointmentEditor({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={__t('ui.appointments.appointment_editor.nouveau_rendez_vous_1dqutse')}
+      title={__t('appointments.appointmentEditor.nouveauRendezVous')}
       description={`Étape ${String(step)} sur 2 · ${step === 1 ? 'Personne' : 'Service et créneau'}`}
       actions={
         <>
@@ -101,7 +96,7 @@ export function AppointmentEditor({
                 setStep(1);
               }}
             >
-              {__t('ui.appointments.appointment_editor.personne_16xin39')}
+              {__t('appointments.appointmentEditor.personne')}
             </button>
           ) : null}
           {step === 1 ? (
@@ -113,7 +108,7 @@ export function AppointmentEditor({
                 setStep(2);
               }}
             >
-              {__t('ui.appointments.appointment_editor.continuer_5vzly4')}
+              {__t('common.continuer')}
               <ArrowRight aria-hidden="true" />
             </button>
           ) : (
@@ -124,7 +119,7 @@ export function AppointmentEditor({
               onClick={() => void submit()}
             >
               <CalendarPlus aria-hidden="true" />
-              {__t('ui.appointments.appointment_editor.creer_le_rendez_vous_1xjfxor')}
+              {__t('appointments.appointmentEditor.creerLeRendezVous')}
             </button>
           )}
         </>
@@ -140,13 +135,9 @@ export function AppointmentEditor({
             <div className="appointment-step-heading">
               <span className="ticket-chip">1</span>
               <div>
-                <h3>
-                  {__t('ui.appointments.appointment_editor.qui_souhaitez_vous_recevoir_1o2rz3u')}
-                </h3>
+                <h3>{__t('appointments.appointmentEditor.quiSouhaitezVousRecevoir')}</h3>
                 <p>
-                  {__t(
-                    'ui.appointments.appointment_editor.recherchez_une_personne_existante_ou_saisissez_s_1vsirzx',
-                  )}
+                  {__t('appointments.appointmentEditor.recherchezUnePersonneExistanteOuSaisissezS')}
                 </p>
               </div>
             </div>
@@ -159,14 +150,12 @@ export function AppointmentEditor({
                 {personLabel.slice(0, 2).toUpperCase()}
               </span>
               <div>
-                <small>
-                  {__t('ui.appointments.appointment_editor.personne_selectionnee_1m33vg9')}
-                </small>
+                <small>{__t('common.personneSelectionnee')}</small>
                 <strong>{personLabel}</strong>
                 <span>
                   {person?.kind === 'existing'
-                    ? __t('ui.expression.appointments.appointment_editor.fiche_existante_18g8h45')
-                    : __t('ui.expression.appointments.appointment_editor.nouvelle_personne_1mo0xl')}
+                    ? __t('appointments.appointmentEditor.ficheExistante')
+                    : __t('common.nouvellePersonne')}
                 </span>
               </div>
               <button
@@ -176,32 +165,28 @@ export function AppointmentEditor({
                   setStep(1);
                 }}
               >
-                {__t('ui.appointments.appointment_editor.modifier_1s45w8g')}
+                {__t('common.edit')}
               </button>
             </div>
             <div className="appointment-step-heading">
               <span className="ticket-chip">2</span>
               <div>
-                <h3>{__t('ui.appointments.appointment_editor.service_et_creneau_1ml8wea')}</h3>
+                <h3>{__t('appointments.appointmentEditor.serviceEtCreneau')}</h3>
                 <p>
-                  {__t(
-                    'ui.appointments.appointment_editor.choisissez_la_file_le_niveau_de_service_et_une_d_enig89',
-                  )}
+                  {__t('appointments.appointmentEditor.choisissezLaFileLeNiveauDeServiceEtUneD')}
                 </p>
               </div>
             </div>
             <div className="form-grid">
               <label>
-                {__t('ui.appointments.appointment_editor.file_bygjtv')}
+                {__t('queues.singular')}
                 <select
                   value={queueId}
                   onChange={(e) => {
                     setQueueId(Number(e.target.value));
                   }}
                 >
-                  <option value={0}>
-                    {__t('ui.appointments.appointment_editor.choisir_4zi3t4')}
-                  </option>
+                  <option value={0}>{__t('common.choose')}</option>
                   {queues
                     .filter((q) => q.appointmentsEnabled)
                     .map((q) => (
@@ -212,16 +197,14 @@ export function AppointmentEditor({
                 </select>
               </label>
               <label>
-                {__t('ui.appointments.appointment_editor.forfait_ke31ak')}
+                {__t('tiers.singular')}
                 <select
                   value={tierId}
                   onChange={(e) => {
                     setTierId(Number(e.target.value));
                   }}
                 >
-                  <option value={0}>
-                    {__t('ui.appointments.appointment_editor.choisir_4zi3t4')}
-                  </option>
+                  <option value={0}>{__t('common.choose')}</option>
                   {tiers.data?.data.items.map((tier) => (
                     <option key={tier.tierId} value={tier.tierId}>
                       {tier.tierName}
@@ -230,7 +213,7 @@ export function AppointmentEditor({
                 </select>
               </label>
               <label>
-                {__t('ui.appointments.appointment_editor.date_ggjuyh')}
+                {__t('common.date')}
                 <input
                   type="date"
                   value={date}
@@ -240,7 +223,7 @@ export function AppointmentEditor({
                 />
               </label>
               <label>
-                {__t('ui.appointments.appointment_editor.creneau_7gzdko')}
+                {__t('appointments.appointmentEditor.creneau')}
                 <select
                   value={effectiveTime}
                   onChange={(e) => {
@@ -250,7 +233,7 @@ export function AppointmentEditor({
                   {slots.map((slot) => (
                     <option key={slot.time} value={slotTime(slot.time)}>
                       {slotTime(slot.time)} ({slot.available}{' '}
-                      {__t('ui.appointments.appointment_editor.place_s_fej3an')}
+                      {__t('appointments.appointmentEditor.placeS')}
                     </option>
                   ))}
                 </select>

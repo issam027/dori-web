@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 
@@ -75,7 +74,6 @@ export function LocaleSwitcher() {
         }}
       >
         <CountryFlag locale={activeLocale} />
-        <ChevronDown aria-hidden="true" />
       </button>
       {open ? (
         <div className="locale-switcher-menu" role="listbox" aria-label={t('locale.label')}>

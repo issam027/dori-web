@@ -26,10 +26,7 @@ export function moveToPreviousOnboardingStep(draft: OnboardingDraft): Onboarding
   return { ...draft, step: Math.max(1, draft.step - 1) };
 }
 
-export function canAdvanceOnboarding(
-  draft: OnboardingDraft,
-  availableTierCount: number,
-): boolean {
+export function canAdvanceOnboarding(draft: OnboardingDraft, availableTierCount: number): boolean {
   if (draft.step === 3) return draft.queues.length > 0;
   if (draft.step === 4) {
     return (

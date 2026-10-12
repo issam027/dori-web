@@ -138,12 +138,10 @@ export function QuickRegistration({
     <>
       <Card className="quick-registration-launcher">
         <div>
-          <p className="eyebrow">{__t('ui.queue-operations.quick_registration.accueil_lf64h9')}</p>
-          <h2>{__t('ui.queue-operations.quick_registration.accueil_rapide_o49gqa')}</h2>
+          <p className="eyebrow">{__t('queue-operations.quickRegistration.accueil')}</p>
+          <h2>{__t('queue-operations.quickRegistration.accueilRapide')}</h2>
           <p>
-            {__t(
-              'ui.queue-operations.quick_registration.rechercher_ou_creer_une_personne_puis_generer_so_1vd7zg0',
-            )}
+            {__t('queue-operations.quickRegistration.rechercherOuCreerUnePersonnePuisGenererSo')}
           </p>
         </div>
         <button
@@ -155,13 +153,13 @@ export function QuickRegistration({
           }}
         >
           <Plus aria-hidden="true" />
-          {__t('ui.queue-operations.quick_registration.creer_un_ticket_2iit6s')}
+          {__t('queue-operations.quickRegistration.creerUnTicket')}
         </button>
       </Card>
       <Modal
         open={open}
         onOpenChange={handleOpenChange}
-        title={__t('ui.queue-operations.quick_registration.accueil_rapide_o49gqa')}
+        title={__t('queue-operations.quickRegistration.accueilRapide')}
         description={
           step === 1
             ? 'Étape 1 sur 3 · Rechercher ou créer la personne'
@@ -180,7 +178,7 @@ export function QuickRegistration({
                   setStep(2);
                 }}
               >
-                {__t('ui.queue-operations.quick_registration.continuer_vers_le_ticket_ydsvdz')}
+                {__t('queue-operations.quickRegistration.continuerVersLeTicket')}
                 <ArrowRight aria-hidden="true" />
               </button>
             ) : null}
@@ -193,7 +191,7 @@ export function QuickRegistration({
                     setStep(1);
                   }}
                 >
-                  {__t('ui.queue-operations.quick_registration.modifier_la_personne_1h5j199')}
+                  {__t('queue-operations.quickRegistration.modifierLaPersonne')}
                 </button>
                 <button
                   className="button button-primary"
@@ -203,10 +201,8 @@ export function QuickRegistration({
                 >
                   <TicketCheck aria-hidden="true" />
                   {pending
-                    ? __t('ui.expression.queue-operations.quick_registration.creation_uqudte')
-                    : __t(
-                        'ui.expression.queue-operations.quick_registration.creer_le_ticket_hj5xhl',
-                      )}
+                    ? __t('common.creation')
+                    : __t('queue-operations.quickRegistration.creerLeTicket')}
                 </button>
               </>
             ) : null}
@@ -219,7 +215,7 @@ export function QuickRegistration({
                 }}
               >
                 <Check aria-hidden="true" />
-                {__t('ui.queue-operations.quick_registration.terminer_19zht57')}
+                {__t('common.terminer')}
               </button>
             ) : null}
           </>
@@ -234,19 +230,15 @@ export function QuickRegistration({
           {step === 1 ? (
             <section
               className="quick-registration-step"
-              aria-label={__t(
-                'ui.queue-operations.quick_registration.choix_de_la_personne_1kpwbrc',
-              )}
+              aria-label={__t('queue-operations.quickRegistration.choixDeLaPersonne')}
             >
               <div className="wizard-step-heading">
                 <span>1</span>
                 <div>
-                  <h3>
-                    {__t('ui.queue-operations.quick_registration.qui_accueillez_vous_1mip4ik')}
-                  </h3>
+                  <h3>{__t('queue-operations.quickRegistration.quiAccueillezVous')}</h3>
                   <p>
                     {__t(
-                      'ui.queue-operations.quick_registration.retrouvez_un_dossier_existant_ou_creez_une_nouve_12icd6e',
+                      'queue-operations.quickRegistration.retrouvezUnDossierExistantOuCreezUneNouve',
                     )}
                   </p>
                 </div>
@@ -257,22 +249,18 @@ export function QuickRegistration({
           {step === 2 ? (
             <section
               className="quick-registration-step"
-              aria-label={__t(
-                'ui.queue-operations.quick_registration.qualification_du_ticket_a4e96j',
-              )}
+              aria-label={__t('queue-operations.quickRegistration.qualificationDuTicket')}
             >
               <div className="appointment-person-recap">
                 <div className="person-avatar" aria-hidden="true">
                   {personName.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <small>
-                    {__t('ui.queue-operations.quick_registration.personne_selectionnee_1m33vg9')}
-                  </small>
+                  <small>{__t('common.personneSelectionnee')}</small>
                   <strong>{personName}</strong>
                   <span>
                     {__t(
-                      'ui.queue-operations.quick_registration.vous_pouvez_revenir_a_l_etape_precedente_pour_mo_edustt',
+                      'queue-operations.quickRegistration.vousPouvezRevenirALEtapePrecedentePourMo',
                     )}
                   </span>
                 </div>
@@ -280,23 +268,16 @@ export function QuickRegistration({
               <div className="wizard-step-heading">
                 <span>2</span>
                 <div>
-                  <h3>
-                    {__t(
-                      'ui.queue-operations.quick_registration.comment_preparer_son_passage_2zsr3c',
-                    )}
-                  </h3>
+                  <h3>{__t('queue-operations.quickRegistration.commentPreparerSonPassage')}</h3>
                   <p>
                     {__t(
-                      'ui.queue-operations.quick_registration.selectionnez_la_file_le_niveau_de_service_et_le__19uxnpu',
+                      'queue-operations.quickRegistration.selectionnezLaFileLeNiveauDeServiceEtLe',
                     )}
                   </p>
                 </div>
               </div>
               <div className="form-grid">
-                <FormField
-                  label={__t('ui.queue-operations.quick_registration.file_bygjtv')}
-                  required
-                >
+                <FormField label={__t('queues.singular')} required>
                   <select
                     value={queueId}
                     onChange={(e) => {
@@ -305,9 +286,7 @@ export function QuickRegistration({
                       setAppointmentTime('');
                     }}
                   >
-                    <option value={0}>
-                      {__t('ui.queue-operations.quick_registration.choisir_4zi3t4')}
-                    </option>
+                    <option value={0}>{__t('common.choose')}</option>
                     {queues.map((queue) => (
                       <option key={queue.queueId} value={queue.queueId}>
                         {queue.queueName}
@@ -315,22 +294,17 @@ export function QuickRegistration({
                     ))}
                   </select>
                 </FormField>
-                <FormField
-                  label={__t('ui.queue-operations.quick_registration.forfait_ke31ak')}
-                  required
-                >
+                <FormField label={__t('tiers.singular')} required>
                   <select
                     value={tierId}
                     onChange={(e) => {
                       setTierId(Number(e.target.value));
                     }}
                   >
-                    <option value={0}>
-                      {__t('ui.queue-operations.quick_registration.choisir_4zi3t4')}
-                    </option>
+                    <option value={0}>{__t('common.choose')}</option>
                     {activeTiers.map((tier) => (
                       <option key={tier.tierId} value={tier.tierId}>
-                        {tier.tier?.tierName ?? `Service ${String(tier.tierId)}`} �{' '}
+                        {tier.tier?.tierName ?? `Service ${String(tier.tierId)}`} ·{' '}
                         {new Intl.NumberFormat(i18n.language, {
                           style: 'currency',
                           currency: tier.currency,
@@ -348,12 +322,12 @@ export function QuickRegistration({
                         }).format(selectedTier.price)}
                       </span>
                       <small>
-                        {selectedTierRules.some((rule) => rule.channel === 'sms') ? 'SMS � ' : ''}
+                        {selectedTierRules.some((rule) => rule.channel === 'sms') ? 'SMS · ' : ''}
                         {selectedTierRules.some((rule) => rule.notificationType === 'welcome')
-                          ? 'Bienvenue � '
+                          ? 'Bienvenue · '
                           : ''}
                         {selectedTierRules.some((rule) => rule.notificationType === 'threshold')
-                          ? 'Alerte d�approche � '
+                          ? 'Alerte d’approche · '
                           : ''}
                         {selectedTierRules.some((rule) => rule.includeTrackingLink)
                           ? 'Lien de suivi'
@@ -362,7 +336,7 @@ export function QuickRegistration({
                     </div>
                   ) : null}
                 </FormField>
-                <FormField label={__t('ui.queue-operations.quick_registration.type_1m2zofh')}>
+                <FormField label={__t('common.type')}>
                   <select
                     value={entryType}
                     onChange={(e) => {
@@ -371,18 +345,14 @@ export function QuickRegistration({
                     }}
                   >
                     <option value="walkin">
-                      {__t('ui.queue-operations.quick_registration.sans_rendez_vous_uzar0q')}
+                      {__t('queue-operations.quickRegistration.sansRendezVous')}
                     </option>
-                    <option value="appointment">
-                      {__t('ui.queue-operations.quick_registration.rendez_vous_1jmjhs7')}
-                    </option>
+                    <option value="appointment">{__t('appointments.title')}</option>
                   </select>
                 </FormField>
                 {entryType === 'appointment' ? (
                   <FormField
-                    label={__t(
-                      'ui.queue-operations.quick_registration.date_du_rendez_vous_160bcww',
-                    )}
+                    label={__t('queue-operations.quickRegistration.dateDuRendezVous')}
                     required
                   >
                     <input
@@ -397,7 +367,7 @@ export function QuickRegistration({
                 ) : null}
                 {entryType === 'appointment' && appointmentDate ? (
                   <FormField
-                    label={__t('ui.queue-operations.quick_registration.heure_disponible_19g6px5')}
+                    label={__t('queue-operations.quickRegistration.heureDisponible')}
                     required
                     hint={
                       availability.isFetching
@@ -415,12 +385,12 @@ export function QuickRegistration({
                       }}
                     >
                       <option value="">
-                        {__t('ui.queue-operations.quick_registration.choisir_une_heure_14eyqbt')}
+                        {__t('queue-operations.quickRegistration.choisirUneHeure')}
                       </option>
                       {availableSlots.map((slot) => (
                         <option key={slot.time} value={slotTime(slot.time)}>
                           {slotTime(slot.time)} · {slot.available}{' '}
-                          {__t('ui.queue-operations.quick_registration.place_s_11pxlwc')}
+                          {__t('queue-operations.quickRegistration.placeS')}
                         </option>
                       ))}
                     </select>
@@ -434,18 +404,14 @@ export function QuickRegistration({
               <span className="quick-registration-success" aria-hidden="true">
                 ✓
               </span>
-              <p className="eyebrow">
-                {__t('ui.queue-operations.quick_registration.inscription_confirmee_kt7nz')}
-              </p>
+              <p className="eyebrow">{__t('common.inscriptionConfirmeeKt7nz')}</p>
               <h3>{personName}</h3>
               <strong>{ticket}</strong>
               <p>
                 {queues.find((queue) => queue.queueId === queueId)?.queueName} ·{' '}
                 {entryType === 'appointment'
-                  ? __t(
-                      'ui.expression.queue-operations.quick_registration.rendez_vous_reserve_t3albf',
-                    )
-                  : __t('ui.expression.queue-operations.quick_registration.en_attente_1fzxwnp')}
+                  ? __t('queue-operations.quickRegistration.rendezVousReserve')
+                  : __t('common.enAttente')}
               </p>
             </section>
           ) : null}

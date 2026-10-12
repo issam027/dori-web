@@ -49,10 +49,16 @@ export const queryKeys = {
   },
   persons: {
     all: ['persons'] as const,
-    search: (siteId: number | null, search: string, page: number, pageSize: number, usage?: string) =>
-      ['persons', 'search', { siteId, search, page, pageSize, usage }] as const,
+    search: (
+      siteId: number | null,
+      search: string,
+      page: number,
+      pageSize: number,
+      usage?: string,
+    ) => ['persons', 'search', { siteId, search, page, pageSize, usage }] as const,
     detail: (personId: number | null | undefined) => ['persons', 'detail', personId] as const,
-    notes: (personId: number, usage = 'list') => ['persons', 'detail', personId, 'notes', usage] as const,
+    notes: (personId: number, usage = 'list') =>
+      ['persons', 'detail', personId, 'notes', usage] as const,
   },
   tiers: {
     all: ['tiers'] as const,

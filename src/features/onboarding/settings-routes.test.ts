@@ -5,10 +5,7 @@ describe('settingsSectionFromPath', () => {
   it.each([
     ['/settings/sites', 'sites'],
     ['/settings/queues', 'queues'],
-    ['/settings/users', 'users'],
     ['/settings/tiers', 'tiers'],
-    ['/settings/notifications', 'notifications'],
-    ['/settings/translations', 'translations'],
   ] as const)('maps %s to %s', (path, section) => {
     expect(settingsSectionFromPath(path)).toBe(section);
   });

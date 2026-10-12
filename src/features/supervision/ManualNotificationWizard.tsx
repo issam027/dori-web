@@ -88,7 +88,7 @@ export function ManualNotificationWizard({
     <Modal
       open={open}
       onOpenChange={close}
-      title={t('ui.supervision.notifications_page.nouvelle_notification_1mnw5o2')}
+      title={t('supervision.notifications.nouvelleNotification')}
       description={t('wizard.progress', { step: stepNumber[step], stepCount: 3 })}
       actions={
         <>
@@ -128,8 +128,8 @@ export function ManualNotificationWizard({
             >
               <Send aria-hidden="true" />
               {send.isPending
-                ? t('ui.expression.supervision.notifications_page.envoi_en_cours_wrdm0l')
-                : t('ui.expression.supervision.notifications_page.envoyer_la_notification_yb0lpd')}
+                ? t('supervision.notifications.envoiEnCours')
+                : t('supervision.notifications.envoyerLaNotification')}
             </button>
           )}
         </>
@@ -209,22 +209,18 @@ function NotificationAudienceStep({
       <div className="notification-guidance">
         <span className="ticket-chip">1</span>
         <div>
-          <h3>{t('ui.supervision.notifications_page.a_qui_souhaitez_vous_ecrire_qsxij3')}</h3>
-          <p>
-            {t(
-              'ui.supervision.notifications_page.recherchez_la_personne_concernee_par_son_nom_ou__tipor4',
-            )}
-          </p>
+          <h3>{t('supervision.notifications.aQuiSouhaitezVousEcrire')}</h3>
+          <p>{t('supervision.notifications.recherchezLaPersonneConcerneeParSonNomOu')}</p>
         </div>
       </div>
       <label>
-        {t('ui.supervision.notifications_page.rechercher_une_personne_ger18e')}
+        {t('common.rechercherUnePersonne')}
         <input
           value={search}
           onChange={(event) => {
             onSearch(event.target.value);
           }}
-          placeholder={t('ui.supervision.notifications_page.nom_email_ou_telephone_10wtb1')}
+          placeholder={t('supervision.notifications.nomEmailOuTelephone')}
         />
       </label>
       <div className="picker-list">
@@ -272,12 +268,8 @@ function NotificationRegistrationStep({
       <div className="notification-guidance">
         <span className="ticket-chip">2</span>
         <div>
-          <h3>{t('ui.supervision.notifications_page.quel_passage_est_concerne_ythpcs')}</h3>
-          <p>
-            {t(
-              'ui.supervision.notifications_page.choisissez_le_ticket_auquel_la_notification_sera_ck6t53',
-            )}
-          </p>
+          <h3>{t('supervision.notifications.quelPassageEstConcerne')}</h3>
+          <p>{t('supervision.notifications.choisissezLeTicketAuquelLaNotificationSera')}</p>
         </div>
       </div>
       <Card className="notification-person-recap">
@@ -301,7 +293,7 @@ function NotificationRegistrationStep({
             }}
           >
             <strong>
-              {t('ui.supervision.notifications_page.ticket_1nrpxxh')}
+              {t('common.ticket')}
               {item.ticketNumber}
             </strong>
             <span>
@@ -312,9 +304,7 @@ function NotificationRegistrationStep({
       </div>
       {loaded && registrations.length === 0 ? (
         <p className="field-hint">
-          {t(
-            'ui.supervision.notifications_page.aucun_passage_recent_n_est_disponible_pour_cette_1xprp0p',
-          )}
+          {t('supervision.notifications.aucunPassageRecentNEstDisponiblePourCette')}
         </p>
       ) : null}
     </section>
@@ -344,12 +334,8 @@ function NotificationContentStep({
       <div className="notification-guidance">
         <span className="ticket-chip">3</span>
         <div>
-          <h3>{t('ui.supervision.notifications_page.redigez_votre_message_1a07wcw')}</h3>
-          <p>
-            {t(
-              'ui.supervision.notifications_page.verifiez_le_canal_et_le_destinataire_avant_l_env_jfp76y',
-            )}
-          </p>
+          <h3>{t('supervision.notifications.redigezVotreMessage')}</h3>
+          <p>{t('supervision.notifications.verifiezLeCanalEtLeDestinataireAvantLEnv')}</p>
         </div>
       </div>
       <Card className="notification-person-recap">
@@ -357,12 +343,12 @@ function NotificationContentStep({
           {person?.firstName} {person?.lastName}
         </strong>
         <p>
-          {t('ui.supervision.notifications_page.inscription_1bzavbp')}
+          {t('supervision.notifications.inscription')}
           {registration?.ticketNumber} · #{registration?.registrationId}
         </p>
       </Card>
       <label className="form-field">
-        {t('ui.supervision.notifications_page.canal_1219p1c')}
+        {t('common.canal')}
         <select
           value={channel}
           onChange={(event) => {
@@ -370,48 +356,43 @@ function NotificationContentStep({
           }}
         >
           <option value="sms" disabled={!person?.phoneNumber}>
-            {t('ui.supervision.notifications_page.sms_q3rkiy')}
+            {t('common.sms')}
           </option>
           <option value="email" disabled={!person?.email}>
-            {t('ui.supervision.notifications_page.email_inbfc7')}
+            {t('common.email')}
           </option>
         </select>
       </label>
       <p className="notification-recipient">
-        {t('ui.supervision.notifications_page.destinataire_1m2olzi')}{' '}
+        {t('supervision.notifications.destinataire')}{' '}
         <strong>{maskRecipient(notificationRecipient(person, channel))}</strong>
       </p>
       <label className="form-field">
-        {t('ui.supervision.notifications_page.message_1cam7ic')}
+        {t('common.message')}
         <textarea
           rows={5}
           value={content}
           onChange={(event) => {
             onContent(event.target.value);
           }}
-          placeholder={t(
-            'ui.supervision.notifications_page.saisissez_un_message_clair_et_concis_1f79kui',
-          )}
+          placeholder={t('supervision.notifications.saisissezUnMessageClairEtConcis')}
           maxLength={480}
         />
         <small className="field-hint">
-          {content.length} {t('ui.supervision.notifications_page.480_caracteres_198qcea')}
+          {content.length} {t('supervision.notifications.480Caracteres')}
         </small>
       </label>
       <div className="notification-preview">
         <span>
           {channel === 'sms'
-            ? t('ui.expression.supervision.notifications_page.apercu_sms_1baojkm')
-            : t('ui.expression.supervision.notifications_page.apercu_email_117cipf')}
+            ? t('supervision.notifications.apercuSms')
+            : t('supervision.notifications.apercuEmail')}
         </span>
-        <p>
-          {content ||
-            t('ui.expression.supervision.notifications_page.votre_message_apparaitra_ici_kkqap3')}
-        </p>
+        <p>{content || t('supervision.notifications.votreMessageApparaitraIci')}</p>
       </div>
       {error ? (
         <p role="alert" className="error-text">
-          {t('ui.supervision.notifications_page.l_envoi_n_a_pas_pu_etre_mis_en_file_k30dtn')}
+          {t('supervision.notifications.lEnvoiNAPasPuEtreMisEnFile')}
         </p>
       ) : null}
     </section>

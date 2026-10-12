@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { Eye, Plus, RotateCcw, Search, StickyNote } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { DataTable } from '@/design-system/components/DataTable';
 import { Card } from '@/design-system/components/Card';
@@ -11,6 +12,7 @@ import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
 import { usePersonsByIds, usePersonNotesPresence } from '@/features/persons/hooks/usePersons';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useWaitingRegistrations } from './hooks/useQueueOperations';
+import { RegistrationDetailsModal } from './RegistrationDetailsModal';
 
 export function MyQueuesPage() {
   const { t: __t } = useTranslation();
@@ -19,8 +21,14 @@ export function MyQueuesPage() {
   const [queueId, setQueueId] = useState<number | undefined>();
   const [notesPersonId, setNotesPersonId] = useState<number | null>(null);
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
+  const [searchDraft, setSearchDraft] = useState('');
+  const [search, setSearch] = useState('');
+  const [registrationDetails, setRegistrationDetails] = useState<{
+    id: number;
+    queueName: string;
+  } | null>(null);
   const queues = useQueues({ siteId });
-  const registrations = useWaitingRegistrations({ siteId, queueId, page });
+  const registrations = useWaitingRegistrations({ siteId, queueId, page, search });
   const items = registrations.data?.data.items ?? [];
   const people = usePersonsByIds(items.map((item) => item.personId));
   const notes = usePersonNotesPresence(items.map((item) => item.personId));
@@ -28,33 +36,25 @@ export function MyQueuesPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Opérations"
-        title={__t('ui.queue-operations.my_queues_page.mes_files_17hxf37')}
-        description={__t(
-          'ui.queue-operations.my_queues_page.vue_consolidee_des_personnes_en_attente_dans_vos_n63by0',
-        )}
+        title={__t('queue-operations.myQueues.mesFiles')}
+        description={__t('queue-operations.myQueues.vueConsolideeDesPersonnesEnAttenteDansVos')}
       />
       {queues.isSuccess && queues.data.data.items.length === 0 ? (
         <EmptyState
-          title={__t('ui.queue-operations.my_queues_page.aucune_file_configuree_1rf5ow7')}
-          description={__t(
-            'ui.queue-operations.my_queues_page.ce_site_ne_possede_actuellement_aucune_file_93symj',
-          )}
+          title={__t('common.aucuneFileConfiguree')}
+          description={__t('queue-operations.myQueues.ceSiteNePossedeActuellementAucuneFile')}
         />
       ) : null}
       {queues.data?.data.items.length ? (
         <Card className="queue-filter-banner">
           <div>
-            <h2>{__t('ui.queue-operations.my_queues_page.perimetre_de_la_file_8gpp9p')}</h2>
-            <p>
-              {__t(
-                'ui.queue-operations.my_queues_page.affichez_toutes_les_files_autorisees_ou_concentr_6akqo5',
-              )}
-            </p>
+            <h2>{__t('queue-operations.myQueues.perimetreDeLaFile')}</h2>
+            <p>{__t('queue-operations.myQueues.affichezToutesLesFilesAutoriseesOuConcentr')}</p>
           </div>
           <div
             className="queue-filter-tabs"
             role="group"
-            aria-label={__t('ui.queue-operations.my_queues_page.filtrer_par_file_jg7lak')}
+            aria-label={__t('queue-operations.myQueues.filtrerParFile')}
           >
             <button
               className="button"
@@ -65,7 +65,7 @@ export function MyQueuesPage() {
                 setPage(1);
               }}
             >
-              {__t('ui.queue-operations.my_queues_page.toutes_tin5fo')}
+              {__t('queue-operations.myQueues.toutes')}
               {queues.data.data.total}
             </button>
             {queues.data.data.items.map((queue) => (
@@ -86,8 +86,56 @@ export function MyQueuesPage() {
         </Card>
       ) : null}
       {queues.data?.data.items.length ? (
+        <Card className="admin-filter-card queue-customer-search">
+          <details>
+            <summary>
+              <span>
+                <Search aria-hidden="true" /> {__t('queues.myQueues.rechercherUnClient')}
+              </span>
+              <small>{__t('queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre')}</small>
+            </summary>
+            <form
+              className="queue-customer-search-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setSearch(searchDraft.trim());
+                setPage(1);
+              }}
+            >
+              <label>
+                {__t('queues.myQueues.clientOuTicket')}
+                <input
+                  type="search"
+                  value={searchDraft}
+                  placeholder={__t('queues.myQueues.exNadiaBenAliOuA042')}
+                  onChange={(event) => {
+                    setSearchDraft(event.target.value);
+                  }}
+                />
+              </label>
+              <div className="admin-filter-actions">
+                <button
+                  className="button"
+                  type="button"
+                  onClick={() => {
+                    setSearchDraft('');
+                    setSearch('');
+                    setPage(1);
+                  }}
+                >
+                  <RotateCcw aria-hidden="true" /> {__t('admin.translations.reinitialiser')}
+                </button>
+                <button className="button button-primary" type="submit">
+                  <Search aria-hidden="true" /> {__t('common.search')}
+                </button>
+              </div>
+            </form>
+          </details>
+        </Card>
+      ) : null}
+      {queues.data?.data.items.length ? (
         <DataTable
-          caption={__t('ui.queue-operations.my_queues_page.inscriptions_dans_mes_files_1937v4q')}
+          caption={__t('queue-operations.myQueues.inscriptionsDansMesFiles')}
           rows={items}
           getRowKey={(item) => item.registrationId}
           columns={[
@@ -126,25 +174,39 @@ export function MyQueuesPage() {
             },
             { key: 'tier', header: 'Forfait', render: (item) => `#${String(item.tierId)}` },
             {
-              key: 'notes',
-              header: 'Notes',
-              render: (item) => (
-                <button
-                  className="button"
-                  type="button"
-                  onClick={() => {
-                    setNotesMode(notes[items.indexOf(item)]?.data?.data.total ? 'view' : 'add');
-                    setNotesPersonId(item.personId);
-                  }}
-                >
-                  {notes[items.indexOf(item)]?.data?.data.total
-                    ? __t(
-                        'ui.expression.queue-operations.my_queues_page.voir_ajouter_value0_7sl59g',
-                        { value0: String(notes[items.indexOf(item)]?.data?.data.total) },
-                      )
-                    : __t('ui.expression.queue-operations.my_queues_page.ajouter_17wnmfl')}
-                </button>
-              ),
+              key: 'actions',
+              header: 'Actions',
+              render: (item) => {
+                const index = items.indexOf(item);
+                const noteCount = notes[index]?.data?.data.total ?? 0;
+                const queueName =
+                  queues.data.data.items.find((queue) => queue.queueId === item.queueId)
+                    ?.queueName ?? 'File #' + String(item.queueId);
+                return (
+                  <div className="table-actions">
+                    <button
+                      className="button button-small"
+                      type="button"
+                      onClick={() => {
+                        setRegistrationDetails({ id: item.registrationId, queueName });
+                      }}
+                    >
+                      <Eye aria-hidden="true" /> {__t('queues.myQueues.consulter')}
+                    </button>
+                    <button
+                      className="button button-small"
+                      type="button"
+                      onClick={() => {
+                        setNotesMode(noteCount ? 'view' : 'add');
+                        setNotesPersonId(item.personId);
+                      }}
+                    >
+                      {noteCount ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
+                      {noteCount ? 'Consulter notes (' + String(noteCount) + ')' : 'Ajouter note'}
+                    </button>
+                  </div>
+                );
+              },
             },
           ]}
         />
@@ -154,6 +216,16 @@ export function MyQueuesPage() {
           page={page}
           totalPages={registrations.data?.data.totalPages ?? 1}
           onPageChange={setPage}
+        />
+      ) : null}
+      {registrationDetails ? (
+        <RegistrationDetailsModal
+          registrationId={registrationDetails.id}
+          queueName={registrationDetails.queueName}
+          open
+          onOpenChange={(open) => {
+            if (!open) setRegistrationDetails(null);
+          }}
         />
       ) : null}
       {notesPersonId !== null ? (

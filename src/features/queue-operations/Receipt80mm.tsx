@@ -12,32 +12,24 @@ export function Receipt80mm({
   const { t: __t } = useTranslation();
   return (
     <article className="receipt-80mm">
-      <h2>{__t('ui.queue-operations.receipt80mm.dori_9y7skh')}</h2>
-      <p>{__t('ui.queue-operations.receipt80mm.recapitulatif_de_passage_8g2a11')}</p>
+      <h2>{__t('app.name')}</h2>
+      <p>{__t('queue-operations.receipt80mm.recapitulatifDePassage')}</p>
       <strong>{call.ticketNumber}</strong>
       <dl>
         <div>
-          <dt>{__t('ui.queue-operations.receipt80mm.guichet_15ztv8y')}</dt>
+          <dt>{__t('common.guichet')}</dt>
           <dd>{call.threadNumber}</dd>
         </div>
         <div>
-          <dt>{__t('ui.queue-operations.receipt80mm.heure_d_appel_j17a5x')}</dt>
+          <dt>{__t('queue-operations.receipt80mm.heureDAppel')}</dt>
           <dd>{new Date(call.calledAt).toLocaleTimeString()}</dd>
         </div>
         <div>
-          <dt>{__t('ui.queue-operations.receipt80mm.resultat_3anr1h')}</dt>
-          <dd>
-            {outcome === 'served'
-              ? __t('ui.expression.queue-operations.receipt80mm.servi_1bextlc')
-              : __t('ui.expression.queue-operations.receipt80mm.absent_meu720')}
-          </dd>
+          <dt>{__t('queue-operations.receipt80mm.resultat')}</dt>
+          <dd>{outcome === 'served' ? __t('common.servi') : __t('common.absent')}</dd>
         </div>
       </dl>
-      <small>
-        {__t(
-          'ui.queue-operations.receipt80mm.document_non_fiscal_donnees_confirmees_par_le_se_evtkln',
-        )}
-      </small>
+      <small>{__t('queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe')}</small>
       <button
         className="button print-hidden"
         type="button"
@@ -46,7 +38,7 @@ export function Receipt80mm({
         }}
       >
         <Printer aria-hidden="true" />
-        {__t('ui.queue-operations.receipt80mm.imprimer_gwyilo')}
+        {__t('queue-operations.receipt80mm.imprimer')}
       </button>
     </article>
   );

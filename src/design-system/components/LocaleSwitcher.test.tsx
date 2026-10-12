@@ -8,7 +8,7 @@ describe('LocaleSwitcher', () => {
     usePreferencesStore.getState().setLocale('fr');
     const { container } = render(<LocaleSwitcher />);
 
-    expect(container.querySelectorAll('.locale-switcher-trigger svg')).toHaveLength(2);
+    expect(container.querySelectorAll('.locale-switcher-trigger svg')).toHaveLength(1);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /langue.*français/i }));

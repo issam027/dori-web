@@ -41,15 +41,11 @@ export function DeskPassages({
     <section className="passage-summary" aria-labelledby="passage-summary-title">
       <div className="passage-summary-heading">
         <div>
-          <span className="eyebrow">
-            {t('ui.queue-operations.desk_page.session_en_cours_1tmgxtg')}
-          </span>
-          <h2 id="passage-summary-title">
-            {t('ui.queue-operations.desk_page.recapitulatif_des_passages_d3ru2n')}
-          </h2>
+          <span className="eyebrow">{t('queue-operations.desk.sessionEnCours')}</span>
+          <h2 id="passage-summary-title">{t('queue-operations.desk.recapitulatifDesPassages')}</h2>
         </div>
         <StatusBadge tone="neutral">
-          {passages.length} {t('ui.queue-operations.desk_page.passage_s_1rhvk1p')}
+          {passages.length} {t('queue-operations.desk.passageS')}
         </StatusBadge>
       </div>
       <div className="passage-summary-grid">
@@ -61,23 +57,19 @@ export function DeskPassages({
             <header>
               <div>
                 <small>
-                  {passage.ticketNumber} {t('ui.queue-operations.desk_page.guichet_gvzfu7')}
+                  {passage.ticketNumber} {t('common.guichetLabel')}
                   {passage.threadNumber}
                 </small>
                 <h3>{passage.personName}</h3>
               </div>
               <StatusBadge tone={passage.outcome === 'served' ? 'success' : 'neutral'}>
-                {passage.outcome === 'served'
-                  ? t('ui.expression.queue-operations.desk_page.servi_1bextlc')
-                  : t('ui.expression.queue-operations.desk_page.absent_meu720')}
+                {passage.outcome === 'served' ? t('common.servi') : t('common.absent')}
               </StatusBadge>
             </header>
             <div className="passage-print-header" aria-hidden="true">
-              <strong>
-                {t('ui.queue-operations.desk_page.dori_justificatif_de_passage_13e6u9q')}
-              </strong>
+              <strong>{t('queue-operations.desk.doriJustificatifDePassage')}</strong>
               <span>
-                {t('ui.queue-operations.desk_page.imprime_le_wx6ut5')}{' '}
+                {t('queue-operations.desk.imprimeLe')}{' '}
                 {new Intl.DateTimeFormat(undefined, {
                   dateStyle: 'long',
                   timeStyle: 'short',
@@ -86,32 +78,28 @@ export function DeskPassages({
             </div>
             <dl>
               <div>
-                <dt>{t('ui.queue-operations.desk_page.date_d_arrivee_zmki1y')}</dt>
+                <dt>{t('queue-operations.desk.dateDArrivee')}</dt>
                 <dd>
                   {passage.arrivedAt ? dateFormatter.format(new Date(passage.arrivedAt)) : '—'}
                 </dd>
               </div>
               <div>
-                <dt>{t('ui.queue-operations.desk_page.arrivee_8ef051')}</dt>
+                <dt>{t('queue-operations.desk.arrivee')}</dt>
                 <dd>
                   {passage.arrivedAt ? timeFormatter.format(new Date(passage.arrivedAt)) : '—'}
                 </dd>
               </div>
               <div>
-                <dt>{t('ui.queue-operations.desk_page.appel_1i9dqud')}</dt>
+                <dt>{t('queue-operations.desk.appel')}</dt>
                 <dd>{timeFormatter.format(new Date(passage.calledAt))}</dd>
               </div>
               <div>
-                <dt>{t('ui.queue-operations.desk_page.sortie_1j61eqf')}</dt>
+                <dt>{t('queue-operations.desk.sortie')}</dt>
                 <dd>{timeFormatter.format(new Date(passage.closedAt))}</dd>
               </div>
             </dl>
             <footer>
-              <small>
-                {t(
-                  'ui.queue-operations.desk_page.justificatif_de_passage_dori_document_non_fiscal_1knp9yu',
-                )}
-              </small>
+              <small>{t('queue-operations.desk.justificatifDePassageDoriDocumentNonFiscal')}</small>
               <button
                 className="button print-hidden"
                 type="button"
@@ -121,19 +109,13 @@ export function DeskPassages({
                 }}
               >
                 <Printer aria-hidden="true" />
-                {t('ui.queue-operations.desk_page.imprimer_le_justificatif_3rhfqy')}
+                {t('queue-operations.desk.imprimerLeJustificatif')}
               </button>
             </footer>
             <div className="passage-print-legal" aria-hidden="true">
-              <p>
-                {t(
-                  'ui.queue-operations.desk_page.ce_justificatif_est_imprime_a_la_demande_du_clie_16a2ra6',
-                )}
-              </p>
+              <p>{t('queue-operations.desk.ceJustificatifEstImprimeALaDemandeDuClie')}</p>
               <div>
-                <span>
-                  {t('ui.queue-operations.desk_page.signature_cachet_de_l_etablissement_5o6gtm')}
-                </span>
+                <span>{t('queue-operations.desk.signatureCachetDeLEtablissement')}</span>
               </div>
             </div>
           </article>

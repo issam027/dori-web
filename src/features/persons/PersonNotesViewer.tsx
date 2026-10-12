@@ -50,9 +50,7 @@ export function PersonNotesViewer({
       open={open}
       onOpenChange={onOpenChange}
       title={`Notes de ${personName}`}
-      description={__t(
-        'ui.persons.person_notes_viewer.historique_partage_avec_les_operateurs_autorises_oesch4',
-      )}
+      description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
       actions={
         <>
           {adding && items.length > 0 ? (
@@ -64,7 +62,7 @@ export function PersonNotesViewer({
               }}
             >
               <ArrowLeft aria-hidden="true" />
-              {__t('ui.persons.person_notes_viewer.retour_aux_notes_1nkxpit')}
+              {__t('persons.personNotesViewer.retourAuxNotes')}
             </button>
           ) : null}
           {adding ? (
@@ -75,7 +73,7 @@ export function PersonNotesViewer({
               onClick={() => void add()}
             >
               <Save aria-hidden="true" />
-              {__t('ui.persons.person_notes_viewer.enregistrer_la_note_w8aayc')}
+              {__t('persons.personNotesViewer.enregistrerLaNote')}
             </button>
           ) : (
             <button
@@ -86,7 +84,7 @@ export function PersonNotesViewer({
               }}
             >
               <Plus aria-hidden="true" />
-              {__t('ui.persons.person_notes_viewer.ajouter_17wnmfl')}
+              {__t('common.add')}
             </button>
           )}
         </>
@@ -99,22 +97,16 @@ export function PersonNotesViewer({
               <StickyNote />
             </span>
             <div>
-              <h3>{__t('ui.persons.person_notes_viewer.nouvelle_note_ot3to1')}</h3>
-              <p>
-                {__t(
-                  'ui.persons.person_notes_viewer.cette_information_sera_visible_lors_des_prochain_zpb7ne',
-                )}
-              </p>
+              <h3>{__t('persons.personNotesViewer.nouvelleNote')}</h3>
+              <p>{__t('persons.personNotesViewer.cetteInformationSeraVisibleLorsDesProchain')}</p>
             </div>
           </div>
           <label>
-            {__t('ui.persons.person_notes_viewer.contenu_de_la_note_1b8xbrd')}
+            {__t('persons.personNotesViewer.contenuDeLaNote')}
             <textarea
-              aria-label={__t('ui.persons.person_notes_viewer.nouvelle_note_ot3to1')}
+              aria-label={__t('persons.personNotesViewer.nouvelleNote')}
               rows={6}
-              placeholder={__t(
-                'ui.persons.person_notes_viewer.ex_documents_a_verifier_besoin_d_assistance_qql32h',
-              )}
+              placeholder={__t('persons.personNotesViewer.exDocumentsAVerifierBesoinDAssistance')}
               value={content}
               onChange={(e) => {
                 setContent(e.target.value);
@@ -127,7 +119,7 @@ export function PersonNotesViewer({
           <blockquote>{current.content}</blockquote>
           <small className="note-meta">
             {current.authorUsername ??
-              __t('ui.expression.persons.person_notes_viewer.utilisateur_value0_q765mf', {
+              __t('persons.personNotesViewer.utilisateurValue0', {
                 value0: String(current.createdByUserId),
               })}{' '}
             · {new Date(current.createdAt).toLocaleString()}
@@ -143,7 +135,7 @@ export function PersonNotesViewer({
                 }}
               >
                 <ChevronLeft aria-hidden="true" />
-                {__t('ui.persons.person_notes_viewer.precedente_j6o8ea')}
+                {__t('persons.personNotesViewer.precedente')}
               </button>
               <span>
                 {index + 1} / {items.length}
@@ -156,7 +148,7 @@ export function PersonNotesViewer({
                   setIndex(index - 1);
                 }}
               >
-                {__t('ui.persons.person_notes_viewer.suivante_1og87ce')}
+                {__t('persons.personNotesViewer.suivante')}
                 <ChevronRight aria-hidden="true" />
               </button>
             </div>
@@ -167,12 +159,8 @@ export function PersonNotesViewer({
           <span className="note-icon" aria-hidden="true">
             <StickyNote />
           </span>
-          <h3>{__t('ui.persons.person_notes_viewer.aucune_note_x1ege2')}</h3>
-          <p>
-            {__t(
-              'ui.persons.person_notes_viewer.ajoutez_la_premiere_information_utile_pour_cette_12nj0ek',
-            )}
-          </p>
+          <h3>{__t('persons.personNotesViewer.aucuneNote')}</h3>
+          <p>{__t('persons.personNotesViewer.ajoutezLaPremiereInformationUtilePourCette')}</p>
         </div>
       )}
     </Modal>

@@ -10,9 +10,7 @@ describe('queryKeys', () => {
     expect(queryKeys.persons.search(1, 'ali', 1, 5, 'fr')).not.toEqual(
       queryKeys.persons.search(1, 'ali', 2, 5, 'fr'),
     );
-    expect(queryKeys.admin.translations('fr')).not.toEqual(
-      queryKeys.admin.translations('en'),
-    );
+    expect(queryKeys.admin.translations('fr')).not.toEqual(queryKeys.admin.translations('en'));
     expect(queryKeys.reports.daily(1, '2026-10-01', '2026-10-07', [10])).not.toEqual(
       queryKeys.reports.daily(1, '2026-10-01', '2026-10-07', [11]),
     );

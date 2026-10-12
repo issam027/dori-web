@@ -60,4 +60,3 @@ export const useNotificationStore = create<NotificationState>((set) => ({
 
 export const notify = (notification: NotificationInput) =>
   useNotificationStore.getState().push(notification);
-

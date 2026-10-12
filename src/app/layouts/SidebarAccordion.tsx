@@ -14,11 +14,13 @@ import {
   FileBarChart,
   HeartPulse,
   LayoutDashboard,
+  Languages,
   Monitor,
   Settings,
   ShieldCheck,
   Smartphone,
   Store,
+  UserCog,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -120,6 +122,18 @@ const sections: readonly NavSection[] = [
         permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
         icon: Settings,
       },
+      {
+        path: '/admin/users',
+        labelKey: 'nav.usersAdmin',
+        permissions: ['user_manage_admin'],
+        icon: UserCog,
+      },
+      {
+        path: '/admin/translations',
+        labelKey: 'nav.translations',
+        permissions: ['translation_manage'],
+        icon: Languages,
+      },
       { path: '/health', labelKey: 'nav.health', permissions: ['system_manage'], icon: HeartPulse },
     ],
   },
@@ -173,15 +187,13 @@ export function SidebarAccordion({
       className={`sidebar${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
     >
       <div className="sidebar-brand">
-        <span className="brand-mark">{__t('ui.shell.layouts.sidebar_accordion.d_1hkaexf')}</span>
-        <strong className="sidebar-label">
-          {__t('ui.shell.layouts.sidebar_accordion.dori_9y7skh')}
-        </strong>
+        <span className="brand-mark">{__t('common.d')}</span>
+        <strong className="sidebar-label">{__t('app.name')}</strong>
         <button
           className="sidebar-mobile-close"
           type="button"
           onClick={onCloseMobile}
-          aria-label={__t('ui.shell.layouts.sidebar_accordion.fermer_le_menu_1fo6hqo')}
+          aria-label={__t('common.fermerLeMenu')}
         >
           <X aria-hidden="true" />
         </button>
@@ -241,9 +253,7 @@ export function SidebarAccordion({
         aria-label={collapsed ? 'Agrandir le menu' : 'Réduire le menu'}
       >
         {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
-        <span className="sidebar-label">
-          {__t('ui.shell.layouts.sidebar_accordion.reduire_zrtdhr')}
-        </span>
+        <span className="sidebar-label">{__t('shell.layouts.sidebarAccordion.reduire')}</span>
       </button>
     </aside>
   );

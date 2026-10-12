@@ -55,7 +55,7 @@ export function PersonPickerOrCreate({
             onChange(null);
           }}
         >
-          {__t('ui.persons.person_picker_or_create.personne_connue_10o7xp7')}
+          {__t('persons.personPickerOrCreate.personneConnue')}
         </button>
         <button
           type="button"
@@ -65,21 +65,17 @@ export function PersonPickerOrCreate({
             onChange(null);
           }}
         >
-          {__t('ui.persons.person_picker_or_create.nouvelle_personne_1mo0xl')}
+          {__t('common.nouvellePersonne')}
         </button>
       </div>
       {mode === 'existing' ? (
         <>
           <div className="person-search">
-            <FormField
-              label={__t('ui.persons.person_picker_or_create.rechercher_une_personne_ger18e')}
-            >
+            <FormField label={__t('common.rechercherUnePersonne')}>
               <div className="input-with-action">
                 <input
                   value={search}
-                  placeholder={__t(
-                    'ui.persons.person_picker_or_create.nom_telephone_ou_email_9m7yu9',
-                  )}
+                  placeholder={__t('persons.personPickerOrCreate.nomTelephoneOuEmail')}
                   onChange={(event) => {
                     setSearch(event.target.value);
                     setPage(1);
@@ -97,7 +93,7 @@ export function PersonPickerOrCreate({
             </FormField>
             {search.trim().length > 0 && search.trim().length < 3 ? (
               <small className="form-hint">
-                {__t('ui.persons.person_picker_or_create.saisissez_au_moins_3_caracteres_1trlzeu')}
+                {__t('persons.personPickerOrCreate.saisissezAuMoins3Caracteres')}
               </small>
             ) : null}
           </div>
@@ -128,7 +124,7 @@ export function PersonPickerOrCreate({
         </>
       ) : (
         <div className="person-create-grid">
-          <FormField label={__t('ui.persons.person_picker_or_create.nom_15eqct1')} required>
+          <FormField label={__t('common.name')} required>
             <input
               autoComplete="family-name"
               value={draft.lastName}
@@ -137,7 +133,7 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('ui.persons.person_picker_or_create.prenom_h4ba4')}>
+          <FormField label={__t('common.prenomH4ba4')}>
             <input
               autoComplete="given-name"
               value={draft.firstName}
@@ -146,21 +142,18 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField
-            label={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
-            required
-          >
+          <FormField label={__t('persons.personPickerOrCreate.telephoneE164')} required>
             <InternationalPhoneInput
               value={draft.phoneNumber}
               countryLabel={__t('phone.countryCode')}
-              phoneLabel={__t('ui.persons.person_picker_or_create.telephone_e_164_jltmzn')}
+              phoneLabel={__t('persons.personPickerOrCreate.telephoneE164')}
               required
               onChange={(phoneNumber) => {
                 setDraft({ ...draft, phoneNumber });
               }}
             />
           </FormField>
-          <FormField label={__t('ui.persons.person_picker_or_create.email')}>
+          <FormField label={__t('persons.personPickerOrCreate.email')}>
             <input
               type="email"
               autoComplete="email"
@@ -170,7 +163,7 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('ui.persons.person_picker_or_create.birthDate')}>
+          <FormField label={__t('persons.personPickerOrCreate.birthDate')}>
             <input
               type="date"
               autoComplete="bday"
@@ -180,16 +173,16 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('ui.persons.person_picker_or_create.languagePreference')}>
+          <FormField label={__t('persons.personPickerOrCreate.languagePreference')}>
             <select
               value={draft.languagePreference ?? ''}
               onChange={(e) => {
                 setDraft({ ...draft, languagePreference: e.target.value || undefined });
               }}
             >
-              <option value="fr">{__t('ui.persons.person_picker_or_create.language.fr')}</option>
-              <option value="en">{__t('ui.persons.person_picker_or_create.language.en')}</option>
-              <option value="ar">{__t('ui.persons.person_picker_or_create.language.ar')}</option>
+              <option value="fr">{__t('common.frVariant2')}</option>
+              <option value="en">{__t('persons.personPickerOrCreate.language.en')}</option>
+              <option value="ar">{__t('persons.personPickerOrCreate.language.ar')}</option>
             </select>
           </FormField>
           <p
@@ -197,12 +190,8 @@ export function PersonPickerOrCreate({
             role="status"
           >
             {draftIsValid
-              ? __t(
-                  'ui.expression.persons.person_picker_or_create.informations_valides_vous_pouvez_continuer_1myt7p9',
-                )
-              : __t(
-                  'ui.expression.persons.person_picker_or_create.renseignez_un_nom_et_un_telephone_au_format__gar0el',
-                )}
+              ? __t('persons.personPickerOrCreate.informationsValidesVousPouvezContinuer')
+              : __t('persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat')}
           </p>
         </div>
       )}

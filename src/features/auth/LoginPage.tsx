@@ -200,9 +200,7 @@ export function LoginPage() {
           { replace: true },
         );
     } catch {
-      setApiError(
-        __t('ui.expression.auth.login_page.identifiant_ou_mot_de_passe_incorrect_qunbv0'),
-      );
+      setApiError(__t('auth.login.identifiantOuMotDePasseIncorrect'));
     } finally {
       setQuickProfile(null);
     }
@@ -212,17 +210,17 @@ export function LoginPage() {
   return (
     <section className="auth-card" aria-labelledby="login-title">
       <div className="login-brand">
-        <span className="brand-mark">{__t('ui.auth.login_page.d_1hkaexf')}</span>
+        <span className="brand-mark">{__t('common.d')}</span>
         <span>
-          <strong>{__t('ui.auth.login_page.dori_9y7skh')}</strong>
-          <small>{__t('ui.auth.login_page.plateforme_de_gestion_des_flux_cy6z8f')}</small>
+          <strong>{__t('app.name')}</strong>
+          <small>{__t('auth.login.plateformeDeGestionDesFlux')}</small>
         </span>
       </div>
       <div className="login-grid">
         <div className="login-form-panel">
-          <p className="eyebrow">{__t('ui.auth.login_page.connexion_securisee_8ak5sk')}</p>
-          <h1 id="login-title">{__t('ui.auth.login_page.bienvenue_sur_votre_espace_z9natn')}</h1>
-          <p>{__t('ui.auth.login_page.connectez_vous_avec_votre_identifiant_dori_xe5h0m')}</p>
+          <p className="eyebrow">{__t('auth.login.connexionSecurisee')}</p>
+          <h1 id="login-title">{__t('auth.login.bienvenueSurVotreEspace')}</h1>
+          <p>{__t('auth.login.connectezVousAvecVotreIdentifiantDori')}</p>
           <form
             className="form-stack"
             onSubmit={(event) => {
@@ -230,14 +228,14 @@ export function LoginPage() {
             }}
           >
             <FormField
-              label={__t('ui.auth.login_page.email_ou_nom_utilisateur_18xczuw')}
+              label={__t('auth.login.emailOuNomUtilisateur')}
               required
               error={errors.username?.message}
             >
               <input autoComplete="username" {...register('username')} />
             </FormField>
             <FormField
-              label={__t('ui.auth.login_page.mot_de_passe_15gpn9e')}
+              label={__t('auth.login.motDePasse')}
               required
               error={errors.password?.message}
             >
@@ -245,10 +243,10 @@ export function LoginPage() {
             </FormField>
             <label className="check-row">
               <input type="checkbox" {...register('rememberUsername')} />{' '}
-              {__t('ui.auth.login_page.memoriser_mon_identifiant_4tfz4b')}
+              {__t('auth.login.memoriserMonIdentifiant')}
             </label>
             <button type="button" className="text-button" disabled>
-              {__t('ui.auth.login_page.mot_de_passe_oublie_sc5mxu')}
+              {__t('auth.login.motDePasseOublie')}
             </button>
             {apiError ? (
               <p className="field-error" role="alert">
@@ -257,20 +255,16 @@ export function LoginPage() {
             ) : null}
             <button className="button button-primary" disabled={isSubmitting} type="submit">
               <LogIn aria-hidden="true" />
-              {isSubmitting
-                ? __t('ui.expression.auth.login_page.connexion_6397u6')
-                : __t('ui.expression.auth.login_page.se_connecter_1u4l9ls')}
+              {isSubmitting ? __t('auth.login.connexionVariant2') : __t('auth.login.seConnecter')}
             </button>
           </form>
         </div>
         {import.meta.env.DEV ? (
           <aside className="quick-login" aria-labelledby="quick-login-title">
             <div>
-              <p className="eyebrow">{__t('ui.auth.login_page.mode_demonstration_17pdpyl')}</p>
-              <h2 id="quick-login-title">{__t('ui.auth.login_page.connexion_rapide_1wyr4bt')}</h2>
-              <p>
-                {__t('ui.auth.login_page.chaque_profil_utilise_le_parcours_normal_de_l_ap_17kz34e')}
-              </p>
+              <p className="eyebrow">{__t('auth.login.modeDemonstration')}</p>
+              <h2 id="quick-login-title">{__t('auth.login.connexionRapide')}</h2>
+              <p>{__t('auth.login.chaqueProfilUtiliseLeParcoursNormalDeLAp')}</p>
             </div>
             <div className="quick-login-grid">
               {demoProfiles.map(({ username, labelKey, detailKey, icon: ProfileIcon }) => (
@@ -294,9 +288,7 @@ export function LoginPage() {
                   <strong>{__t(labelKey)}</strong>
                   <span>{__t(detailKey)}</span>
                   <small>@{username}</small>
-                  {quickProfile === username ? (
-                    <small>{__t('ui.auth.login_page.connexion_1a0ztte')}</small>
-                  ) : null}
+                  {quickProfile === username ? <small>{__t('auth.login.connexion')}</small> : null}
                 </button>
               ))}
             </div>

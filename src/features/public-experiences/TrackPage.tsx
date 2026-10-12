@@ -47,13 +47,9 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   if (!token && !preview)
     return (
       <section className="tracking-screen tracking-invalid">
-        <span className="tracking-brand">
-          {__t('ui.public-experiences.track_page.dori_9y7skh')}
-        </span>
-        <h1>{__t('ui.public-experiences.track_page.lien_de_suivi_invalide_1p5x488')}</h1>
-        <p>
-          {__t('ui.public-experiences.track_page.ouvrez_le_lien_recu_avec_votre_ticket_stx7r1')}
-        </p>
+        <span className="tracking-brand">{__t('app.name')}</span>
+        <h1>{__t('public-experiences.track.lienDeSuiviInvalide')}</h1>
+        <p>{__t('public-experiences.track.ouvrezLeLienRecuAvecVotreTicket')}</p>
       </section>
     );
 
@@ -74,18 +70,12 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
         >
           <div>
             <div>
-              <strong>
-                {__t('ui.public-experiences.track_page.tester_un_suivi_reel_1sdkxl1')}
-              </strong>
+              <strong>{__t('public-experiences.track.testerUnSuiviReel')}</strong>
               <span>
-                {__t(
-                  'ui.public-experiences.track_page.ce_champ_est_visible_uniquement_dans_l_apercu_in_1bkpujh',
-                )}
+                {__t('public-experiences.track.ceChampEstVisibleUniquementDansLApercuIn')}
               </span>
             </div>
-            <label htmlFor="tracking-id">
-              {__t('ui.public-experiences.track_page.tracking_id_1tjzg1l')}
-            </label>
+            <label htmlFor="tracking-id">{__t('public-experiences.track.trackingId')}</label>
           </div>
           <div className="tracking-lookup-actions">
             <input
@@ -93,13 +83,13 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
               type="text"
               autoComplete="off"
               value={trackingId}
-              placeholder={__t('ui.public-experiences.track_page.saisir_le_tracking_id_pvcg03')}
+              placeholder={__t('public-experiences.track.saisirLeTrackingId')}
               onChange={(event) => {
                 setTrackingId(event.target.value);
               }}
             />
             <button type="submit" className="button button-primary" disabled={!trackingId.trim()}>
-              {__t('ui.public-experiences.track_page.appliquer_1qx2qgq')}
+              {__t('public-experiences.track.appliquer')}
             </button>
           </div>
         </form>
@@ -112,21 +102,13 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
         <div className="tracking-device-notch" aria-hidden="true" />
         {!token ? (
           <div className="tracking-placeholder">
-            <span className="tracking-brand">
-              {__t('ui.public-experiences.track_page.dori_9y7skh')}
-            </span>
-            <h1>{__t('ui.public-experiences.track_page.aucun_ticket_affiche_1bhhh0x')}</h1>
-            <p>
-              {__t(
-                'ui.public-experiences.track_page.utilisez_le_champ_de_test_situe_au_dessus_du_tel_1s2i7dy',
-              )}
-            </p>
+            <span className="tracking-brand">{__t('app.name')}</span>
+            <h1>{__t('public-experiences.track.aucunTicketAffiche')}</h1>
+            <p>{__t('public-experiences.track.utilisezLeChampDeTestSitueAuDessusDuTel')}</p>
           </div>
         ) : trackingError ? (
           <div className="tracking-placeholder tracking-error" role="alert">
-            <span className="tracking-brand">
-              {__t('ui.public-experiences.track_page.dori_9y7skh')}
-            </span>
+            <span className="tracking-brand">{__t('app.name')}</span>
             <h1>{__t(`tracking.error.${trackingError}Title`)}</h1>
             <p>{__t(`tracking.error.${trackingError}Text`)}</p>
           </div>
@@ -134,85 +116,67 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
           <>
             <header>
               <div className="tracking-brand-row">
-                <span className="tracking-brand">
-                  {__t('ui.public-experiences.track_page.dori_9y7skh')}
-                </span>
+                <span className="tracking-brand">{__t('app.name')}</span>
                 <span className="tracking-live">
-                  <i aria-hidden="true" />{' '}
-                  {__t('ui.public-experiences.track_page.en_direct_10riirr')}
+                  <i aria-hidden="true" /> {__t('common.enDirect')}
                 </span>
               </div>
-              <span>{__t('ui.public-experiences.track_page.votre_ticket_15st9il')}</span>
+              <span>{__t('public-experiences.track.votreTicket')}</span>
               <strong>{position?.ticketNumber ?? '—'}</strong>
             </header>
             {called ? (
               <div className="tracking-called" role="alert">
-                <span>{__t('ui.public-experiences.track_page.c_est_votre_tour_15u43pb')}</span>
+                <span>{__t('public-experiences.track.cEstVotreTour')}</span>
                 <h1>
-                  {__t('ui.public-experiences.track_page.guichet_15ztv8y')}
+                  {__t('common.guichet')}
                   {position.counterNumber ?? '—'}
                 </h1>
-                <p>
-                  {__t(
-                    'ui.public-experiences.track_page.merci_de_vous_presenter_au_poste_indique_jhsjl9',
-                  )}
-                </p>
+                <p>{__t('public-experiences.track.merciDeVousPresenterAuPosteIndique')}</p>
               </div>
             ) : (
               <>
                 <div
                   className="tracking-gauge"
                   role="progressbar"
-                  aria-label={__t(
-                    'ui.public-experiences.track_page.proximite_estimee_du_passage_12j09z5',
-                  )}
+                  aria-label={__t('public-experiences.track.proximiteEstimeeDuPassage')}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={progress}
                   style={{ '--progress': `${String(progress * 3.6)}deg` } as React.CSSProperties}
                 >
                   <div>
-                    <span>{__t('ui.public-experiences.track_page.position_1quewx6')}</span>
+                    <span>{__t('common.position')}</span>
                     <strong>{position?.position ?? '—'}</strong>
-                    <small>{__t('ui.public-experiences.track_page.dans_la_file_1up9yai')}</small>
+                    <small>{__t('public-experiences.track.dansLaFile')}</small>
                   </div>
                 </div>
                 <h1 className="tracking-estimate">
                   {position?.estimatedWaitMinutes !== undefined
-                    ? __t(
-                        'ui.expression.public-experiences.track_page.environ_value0_minutes_atcys8',
-                        { value0: String(position.estimatedWaitMinutes) },
-                      )
-                    : __t('ui.expression.public-experiences.track_page.estimation_en_cours_ysdivz')}
+                    ? __t('public-experiences.track.environValue0Minutes', {
+                        value0: String(position.estimatedWaitMinutes),
+                      })
+                    : __t('public-experiences.track.estimationEnCours')}
                 </h1>
                 <p className="tracking-queue">
-                  {position?.queueName ??
-                    __t('ui.expression.public-experiences.track_page.votre_file_vz9wq3')}
+                  {position?.queueName ?? __t('public-experiences.track.votreFile')}
                 </p>
               </>
             )}
             <div className="tracking-guidance">
               <strong>
                 {called
-                  ? __t(
-                      'ui.expression.public-experiences.track_page.rejoignez_votre_guichet_105p961',
-                    )
-                  : __t('ui.expression.public-experiences.track_page.restez_attentif_55cdo3')}
+                  ? __t('public-experiences.track.rejoignezVotreGuichet')
+                  : __t('public-experiences.track.restezAttentif')}
               </strong>
               <p>
                 {called
-                  ? __t(
-                      'ui.expression.public-experiences.track_page.votre_numero_vient_d_etre_appele_1o6w7p0',
-                    )
-                  : __t(
-                      'ui.expression.public-experiences.track_page.cette_page_vous_indiquera_votre_guichet_des__1d2v3me',
-                    )}
+                  ? __t('public-experiences.track.votreNumeroVientDEtreAppele')
+                  : __t('public-experiences.track.cettePageVousIndiqueraVotreGuichetDes')}
               </p>
             </div>
             <p className="tracking-status">
-              {__t('ui.public-experiences.track_page.statut_1gq3888')}
-              {position?.status ??
-                __t('ui.expression.public-experiences.track_page.chargement_1w7q2bd')}
+              {__t('public-experiences.track.statut')}
+              {position?.status ?? __t('public-experiences.track.chargement')}
             </p>
             <button
               type="button"
@@ -223,10 +187,8 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
               }}
             >
               {consent
-                ? __t('ui.expression.public-experiences.track_page.son_et_vibration_actives_q1p8ol')
-                : __t(
-                    'ui.expression.public-experiences.track_page.activer_son_et_vibration_1op3ifm',
-                  )}
+                ? __t('public-experiences.track.sonEtVibrationActives')
+                : __t('public-experiences.track.activerSonEtVibration')}
             </button>
           </>
         )}

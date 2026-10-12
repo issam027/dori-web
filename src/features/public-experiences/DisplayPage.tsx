@@ -94,23 +94,15 @@ export function DisplayPage() {
   if (!queues.isPending && activeSiteId && allowedQueues.length === 0)
     return (
       <section className="display-screen display-empty-state">
-        <h1>{__t('ui.public-experiences.display_page.aucune_file_configuree_1rf5ow7')}</h1>
-        <p>
-          {__t(
-            'ui.public-experiences.display_page.ce_site_ne_dispose_actuellement_d_aucune_file_ac_ofrpsk',
-          )}
-        </p>
+        <h1>{__t('common.aucuneFileConfiguree')}</h1>
+        <p>{__t('public-experiences.display.ceSiteNeDisposeActuellementDAucuneFileAc')}</p>
       </section>
     );
   if (!activeSiteId)
     return (
       <section className="display-screen display-empty-state">
-        <h1>{__t('ui.public-experiences.display_page.aucun_site_actif_hmb19')}</h1>
-        <p>
-          {__t(
-            'ui.public-experiences.display_page.selectionnez_un_site_pour_afficher_ses_files_15855xc',
-          )}
-        </p>
+        <h1>{__t('common.aucunSiteActifHmb19')}</h1>
+        <p>{__t('public-experiences.display.selectionnezUnSitePourAfficherSesFiles')}</p>
       </section>
     );
 
@@ -123,10 +115,8 @@ export function DisplayPage() {
     <section className="display-screen">
       <header>
         <div>
-          <strong className="display-brand">
-            {brandName || __t('ui.expression.public-experiences.display_page.dori_9y7skh')}
-          </strong>
-          <span>{__t('ui.public-experiences.display_page.accueil_et_orientation_bsalw')}</span>
+          <strong className="display-brand">{brandName || __t('app.name')}</strong>
+          <span>{__t('public-experiences.display.accueilEtOrientationBsalw')}</span>
           <h1>{scopeTitle}</h1>
         </div>
         <time>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
@@ -139,16 +129,16 @@ export function DisplayPage() {
           }}
         >
           {audio
-            ? __t('ui.expression.public-experiences.display_page.son_active_sulxcn')
-            : __t('ui.expression.public-experiences.display_page.activer_le_son_s79v3m')}
+            ? __t('public-experiences.display.sonActive')
+            : __t('public-experiences.display.activerLeSon')}
         </button>
       </header>
       <main className="display-board">
         <section className="display-active-zone" aria-live="assertive">
           <div className="display-section-heading">
             <div>
-              <span>{__t('ui.public-experiences.display_page.en_direct_10riirr')}</span>
-              <h2>{__t('ui.public-experiences.display_page.prises_en_charge_en_cours_1ycwyl7')}</h2>
+              <span>{__t('common.enDirect')}</span>
+              <h2>{__t('public-experiences.display.prisesEnChargeEnCours')}</h2>
             </div>
             <div className="display-section-count">
               <strong>{activeCalls.length}</strong>
@@ -167,20 +157,17 @@ export function DisplayPage() {
                   key={`${call.currentTicket ?? ''}-${String(call.queueId)}-${String(call.threadNumber)}`}
                 >
                   <div className="display-ticket-number">
-                    <small>{__t('ui.public-experiences.display_page.ticket_1nrpxxh')}</small>
+                    <small>{__t('common.ticket')}</small>
                     <strong>{call.currentTicket}</strong>
                   </div>
                   <div className="display-destination">
-                    <small>
-                      {__t('ui.public-experiences.display_page.veuillez_rejoindre_bdsyjn')}
-                    </small>
+                    <small>{__t('public-experiences.display.veuillezRejoindre')}</small>
                     <b>
-                      {__t('ui.public-experiences.display_page.guichet_15ztv8y')}{' '}
-                      {call.threadNumber}
+                      {__t('common.guichet')} {call.threadNumber}
                     </b>
                     <span>
                       {call.queueName ??
-                        __t('ui.expression.public-experiences.display_page.file_value0_jtr0pe', {
+                        __t('public-experiences.display.fileValue0', {
                           value0: String(call.queueId),
                         })}
                     </span>
@@ -190,22 +177,16 @@ export function DisplayPage() {
             </div>
           ) : (
             <div className="display-no-call">
-              <strong>
-                {__t('ui.public-experiences.display_page.nous_vous_appelons_bientot_1p9h8e5')}
-              </strong>
-              <p>
-                {__t(
-                  'ui.public-experiences.display_page.surveillez_votre_numero_dans_la_liste_des_procha_1ajw72y',
-                )}
-              </p>
+              <strong>{__t('public-experiences.display.nousVousAppelonsBientot')}</strong>
+              <p>{__t('public-experiences.display.surveillezVotreNumeroDansLaListeDesProcha')}</p>
             </div>
           )}
         </section>
         <aside className="display-next-zone">
           <div className="display-section-heading">
             <div>
-              <span>{__t('ui.public-experiences.display_page.a_venir_1kyl18d')}</span>
-              <h2>{__t('ui.public-experiences.display_page.prochains_tickets_130baxr')}</h2>
+              <span>{__t('public-experiences.display.aVenir')}</span>
+              <h2>{__t('public-experiences.display.prochainsTickets')}</h2>
             </div>
             {nextPageCount > 1 ? (
               <small className="display-page-indicator">
@@ -222,7 +203,7 @@ export function DisplayPage() {
                     <strong>{item.ticket}</strong>
                     <small>
                       {item.queueName ??
-                        __t('ui.expression.public-experiences.display_page.file_value0_jtr0pe', {
+                        __t('public-experiences.display.fileValue0', {
                           value0: String(item.queueId),
                         })}
                     </small>
@@ -232,16 +213,12 @@ export function DisplayPage() {
             </ol>
           ) : (
             <p className="display-next-empty">
-              {__t('ui.public-experiences.display_page.aucun_ticket_en_attente_1qqjurj')}
+              {__t('public-experiences.display.aucunTicketEnAttente')}
             </p>
           )}
         </aside>
       </main>
-      <footer>
-        {__t(
-          'ui.public-experiences.display_page.merci_de_preparer_votre_ticket_et_de_rejoindre_l_8vcez6',
-        )}
-      </footer>
+      <footer>{__t('public-experiences.display.merciDePreparerVotreTicketEtDeRejoindreL')}</footer>
     </section>
   );
 }

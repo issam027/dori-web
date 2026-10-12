@@ -331,21 +331,34 @@ select:focus-visible {
 }
 .locale-switcher-trigger {
   display: inline-flex;
-  width: 44px;
+  width: 42px;
   min-height: 42px;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   border: 1px solid var(--color-line);
   border-radius: 12px;
-  padding: 0 7px;
+  padding: 0;
   color: var(--color-ink);
   background: var(--color-surface);
   cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
-.locale-switcher-trigger > svg:last-child {
-  width: 12px;
-  height: 12px;
+.locale-switcher-trigger:hover {
+  transform: translateY(-1px) scale(1.04);
+  border-color: color-mix(in srgb, var(--color-accent) 46%, var(--color-line));
+  background: var(--color-primary-soft);
+  box-shadow: 0 5px 14px rgb(16 42 67 / 14%);
+}
+.locale-switcher-trigger:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  outline-offset: 2px;
+}
+.locale-switcher-trigger:active {
+  transform: scale(0.96);
 }
 .locale-switcher-menu {
   position: absolute;

@@ -29,15 +29,17 @@ export function TrackingQr({ onReady }: { value?: string | null; onReady?: () =>
   return (
     <figure className="tracking-qr">
       <span className="tracking-qr-code">
-        <img className="tracking-qr-image" src={source} aria-label="QR code de test DORIFY" />
+        <img
+          className="tracking-qr-image"
+          src={source}
+          aria-label={__t('tracking.qr.qrCodeDeTestDorify')}
+        />
         <span className="tracking-qr-logo" aria-hidden="true">
           <b>DOR</b>
           <b>IFY</b>
         </span>
       </span>
-      <figcaption>
-        {__t('ui.public-experiences.tracking_qr.scannez_pour_suivre_votre_position_fk8hq8')}
-      </figcaption>
+      <figcaption>{__t('public-experiences.trackingQr.scannezPourSuivreVotrePosition')}</figcaption>
     </figure>
   );
 }

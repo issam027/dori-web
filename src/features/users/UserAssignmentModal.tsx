@@ -13,6 +13,7 @@ import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { queryKeys } from '@/api/client/query-keys';
+import { UserPlus } from 'lucide-react';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -116,26 +117,15 @@ export function UserAssignmentModal({
       title={t('settings.assignUser')}
       description={t('settings.assignUserDescription', { resource: target?.label ?? '' })}
       actions={
-        <>
-          <button
-            className="button"
-            type="button"
-            disabled={saving}
-            onClick={() => {
-              close();
-            }}
-          >
-            {t('common.cancel')}
-          </button>
-          <button
-            className="button button-primary"
-            type="button"
-            disabled={!selectedUser || !roleId || saving}
-            onClick={() => void assign()}
-          >
-            {t('settings.confirmAssignment')}
-          </button>
-        </>
+        <button
+          className="button button-primary"
+          type="button"
+          disabled={!selectedUser || !roleId || saving}
+          onClick={() => void assign()}
+        >
+          <UserPlus aria-hidden="true" />
+          {t('settings.confirmAssignment')}
+        </button>
       }
     >
       <div className="assignment-flow">
@@ -176,9 +166,7 @@ export function UserAssignmentModal({
                     setRoleId(0);
                   }}
                 >
-                  <span className="profile-avatar">
-                    {user.username.slice(0, 2).toUpperCase()}
-                  </span>
+                  <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
                   <span>
                     <strong>{user.username}</strong>
                     <small>{user.email ?? t('settings.noEmail')}</small>

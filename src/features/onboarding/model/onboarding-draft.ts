@@ -12,6 +12,7 @@ export interface OnboardingTierConfiguration {
   welcomeSms: boolean;
   welcomeEmail: boolean;
   alertSms: boolean;
+  alertThresholdType: 'position' | 'estimatedTime';
   alertPosition: number;
   includeTrackingLink: boolean;
 }
@@ -64,6 +65,25 @@ export const initialOnboardingDraft: OnboardingDraft = {
   testValidated: false,
 };
 
+function normalizeTierConfigurations(
+  configurations: Partial<OnboardingDraft['tierConfigurations']> = {},
+): OnboardingDraft['tierConfigurations'] {
+  return Object.fromEntries(
+    Object.entries(configurations).map(([queueId, queueConfigurations]) => [
+      queueId,
+      Object.fromEntries(
+        Object.entries(queueConfigurations ?? {}).map(([tierId, configuration]) => [
+          tierId,
+          {
+            ...configuration,
+            alertThresholdType:
+              configuration.alertThresholdType === 'estimatedTime' ? 'estimatedTime' : 'position',
+          },
+        ]),
+      ),
+    ]),
+  );
+}
 export function loadOnboardingDraft(
   storage: Pick<Storage, 'getItem'> = localStorage,
 ): OnboardingDraft {
@@ -80,7 +100,7 @@ export function loadOnboardingDraft(
       site: { ...initialOnboardingDraft.site, ...parsed.site },
       confirmedQueueIds: parsed.confirmedQueueIds ?? {},
       selectedTierIds: parsed.selectedTierIds ?? {},
-      tierConfigurations: parsed.tierConfigurations ?? {},
+      tierConfigurations: normalizeTierConfigurations(parsed.tierConfigurations),
       associatedTierQueueIds: parsed.associatedTierQueueIds ?? [],
       completedUserIds: parsed.completedUserIds ?? [],
     };

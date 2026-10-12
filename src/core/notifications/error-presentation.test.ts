@@ -26,4 +26,3 @@ describe('presentError', () => {
     expect(presentError(new Error('secret token')).message).not.toContain('secret token');
   });
 });
-

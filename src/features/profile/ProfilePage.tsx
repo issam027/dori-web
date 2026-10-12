@@ -82,47 +82,42 @@ export function ProfilePage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Compte"
-        title={__t('ui.profile.profile_page.mon_profil_9ov59t')}
-        description={__t(
-          'ui.profile.profile_page.votre_identite_vos_habilitations_et_vos_preferen_1ixmftf',
-        )}
+        title={__t('profile.profile.monProfil')}
+        description={__t('profile.profile.votreIdentiteVosHabilitationsEtVosPreferen')}
       />
       <div className="profile-layout">
         <Card className="profile-identity-card">
           <div className="profile-portrait">
             <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
             <h2>{user.username}</h2>
-            <p>
-              {user.roles.join(' · ') ||
-                __t('ui.expression.profile.profile_page.compte_utilisateur_1twv5sm')}
-            </p>
+            <p>{user.roles.join(' · ') || __t('profile.profile.compteUtilisateur')}</p>
             <span className="status-badge status-success">
-              {__t('ui.profile.profile_page.compte_actif_12z992e')}
+              {__t('profile.profile.compteActif')}
             </span>
           </div>
           <dl className="detail-list">
             <div>
-              <dt>{__t('ui.profile.profile_page.type_de_compte_h99ahc')}</dt>
+              <dt>{__t('profile.profile.typeDeCompte')}</dt>
               <dd>
                 {user.userType === 'human'
-                  ? __t('ui.expression.profile.profile_page.humain_18e4n9r')
-                  : __t('ui.expression.profile.profile_page.technique_tmfbah')}
+                  ? __t('common.humain')
+                  : __t('profile.profile.technique')}
               </dd>
             </div>
             <div>
-              <dt>{__t('ui.profile.profile_page.permissions_11gikqr')}</dt>
+              <dt>{__t('profile.profile.permissions')}</dt>
               <dd>{user.permissions.length}</dd>
             </div>
             <div>
-              <dt>{__t('ui.profile.profile_page.derniere_connexion_2t8q7t')}</dt>
+              <dt>{__t('profile.profile.derniereConnexion')}</dt>
               <dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '—'}</dd>
             </div>
             <div>
-              <dt>{__t('ui.profile.profile_page.scope_rpvfkb')}</dt>
+              <dt>{__t('common.scope')}</dt>
               <dd>
                 {user.scope.isGlobal
-                  ? __t('ui.expression.profile.profile_page.global_rrldxq')
-                  : __t('ui.expression.profile.profile_page.value0_site_s_value1_file_s_l4y6h', {
+                  ? __t('profile.profile.global')
+                  : __t('profile.profile.value0SiteSValue1FileSL4y6h', {
                       value0: String(user.scope.siteIds.length),
                       value1: String(user.scope.queueIds.length),
                     })}
@@ -133,12 +128,8 @@ export function ProfilePage() {
         <Card className="profile-settings-card">
           <div className="card-heading">
             <div>
-              <h2>{__t('ui.profile.profile_page.informations_et_preferences_10ds0hx')}</h2>
-              <p>
-                {__t(
-                  'ui.profile.profile_page.le_role_et_le_perimetre_sont_geres_par_un_admini_q8b8gl',
-                )}
-              </p>
+              <h2>{__t('profile.profile.informationsEtPreferences')}</h2>
+              <p>{__t('profile.profile.leRoleEtLePerimetreSontGeresParUnAdmini')}</p>
             </div>
           </div>
           <form
@@ -147,18 +138,15 @@ export function ProfilePage() {
               void submit(e);
             }}
           >
-            <FormField
-              label={__t('ui.profile.profile_page.email_inbfc7')}
-              error={errors.email?.message}
-            >
+            <FormField label={__t('common.email')} error={errors.email?.message}>
               <input type="email" autoComplete="email" {...register('email')} />
             </FormField>
-            <FormField label={__t('ui.profile.profile_page.langue_4vkz5r')}>
+            <FormField label={__t('common.language')}>
               <select {...register('languagePreference')}>
-                <option value="fr" aria-label={__t('ui.profile.profile_page.francais_1x2mspi')}>
+                <option value="fr" aria-label={__t('common.francais')}>
                   {String.fromCodePoint(0x1f1eb, 0x1f1f7)}
                 </option>
-                <option value="en" aria-label={__t('ui.profile.profile_page.english_7nql6j')}>
+                <option value="en" aria-label={__t('common.english')}>
                   {String.fromCodePoint(0x1f1ec, 0x1f1e7)}
                 </option>
                 <option value="ar" aria-label="العربية">
@@ -166,24 +154,18 @@ export function ProfilePage() {
                 </option>
               </select>
             </FormField>
-            {saved ? (
-              <p role="status">{__t('ui.profile.profile_page.profil_enregistre_1kk86qt')}</p>
-            ) : null}
+            {saved ? <p role="status">{__t('profile.profile.profilEnregistre')}</p> : null}
             <button className="button button-primary" disabled={isSubmitting} type="submit">
               <Save aria-hidden="true" />
-              {__t('ui.profile.profile_page.enregistrer_sywgdx')}
+              {__t('common.save')}
             </button>
           </form>
           <div className={`profile-security-panel${passwordEditing ? ' is-editing' : ''}`}>
             {!passwordEditing ? (
               <>
                 <div>
-                  <strong>{__t('ui.profile.profile_page.securite_du_compte_jw1voy')}</strong>
-                  <p>
-                    {__t(
-                      'ui.profile.profile_page.modifiez_votre_mot_de_passe_depuis_un_parcours_d_o6z9ng',
-                    )}
-                  </p>
+                  <strong>{__t('profile.profile.securiteDuCompte')}</strong>
+                  <p>{__t('profile.profile.modifiezVotreMotDePasseDepuisUnParcoursD')}</p>
                 </div>
                 <button
                   className="button button-primary"
@@ -193,7 +175,7 @@ export function ProfilePage() {
                   }}
                 >
                   <KeyRound aria-hidden="true" />
-                  {__t('ui.profile.profile_page.changer_mon_mot_de_passe_1pun60i')}
+                  {__t('profile.profile.changerMonMotDePasse')}
                 </button>
               </>
             ) : (
@@ -266,28 +248,24 @@ export function ProfilePage() {
       </div>
       <div className="metrics-grid profile-scope-metrics">
         <MetricCard
-          label={__t('ui.profile.profile_page.perimetre_ai7per')}
+          label={__t('common.perimetre')}
           value={
             user.scope.isGlobal
-              ? __t('ui.expression.profile.profile_page.global_rrldxq')
-              : __t('ui.expression.profile.profile_page.value0_site_s_a2wlej', {
+              ? __t('profile.profile.global')
+              : __t('profile.profile.value0SiteS', {
                   value0: String(user.scope.siteIds.length),
                 })
           }
           icon={<Globe2 />}
         />
         <MetricCard
-          label={__t('ui.profile.profile_page.files_autorisees_z62lee')}
-          value={
-            user.scope.isGlobal
-              ? __t('ui.expression.profile.profile_page.toutes_1krg1dl')
-              : user.scope.queueIds.length
-          }
+          label={__t('profile.profile.filesAutorisees')}
+          value={user.scope.isGlobal ? __t('profile.profile.toutes') : user.scope.queueIds.length}
           icon={<ListChecks />}
         />
         <MetricCard
-          label={__t('ui.profile.profile_page.langue_4vkz5r')}
-          value={user.languagePreference ?? __t('ui.expression.profile.profile_page.fr_o6dm29')}
+          label={__t('common.language')}
+          value={user.languagePreference ?? __t('common.fr')}
           icon={<Languages />}
         />
       </div>
