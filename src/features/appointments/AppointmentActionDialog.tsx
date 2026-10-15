@@ -54,7 +54,7 @@ export function AppointmentActionDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const availability = useAvailability(appointment.queueId, date);
-  const slots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
+  const slots = availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
   const manageable = canManageAppointment(appointment);
   const checkInAllowed = canCheckIn(appointment, dateInTimeZone(timeZone));
   const details = person.data?.data;

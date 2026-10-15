@@ -1,69 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import type { DailyQueueReportResponseDto } from '@/api/generated/models';
-import {
-  addDays,
-  aggregateReports,
-  aggregateReportsByQueue,
-  reportPeriodDates,
-  reportsToCsv,
-} from './report-utils';
+import type { QueueResponseDto, ReportGroupDto } from '@/api/generated/models';
+import { addDays, groupsToQueueRows, reportPeriodDates, reportsToCsv } from './report-utils';
 
-const report = (
-  registered: number,
-  served: number,
-  noShow: number,
-  wait: number,
-): DailyQueueReportResponseDto => ({
-  queueId: registered,
-  queueCode: `Q${String(registered)}`,
-  queueName: 'Accueil',
-  siteName: 'Site',
-  businessDate: '2026-10-08',
-  volume: {
-    totalRegistered: registered,
-    totalWalkin: registered,
-    totalAppointment: 0,
-    totalServed: served,
-    totalNoShow: noShow,
-    totalExpired: 0,
-    totalCancelled: 0,
-    totalOpen: 0,
-  },
-  kpis: { noShowRate: 0, averageWaitMinutes: wait, averageServiceMinutes: 5 },
-});
+const group: ReportGroupDto = {
+  dimension: { queueId: 10 }, timezone: 'Europe/Paris', buckets: [],
+  volume: { registered: 12, walkin: 8, appointments: 4, served: 10, noShow: 1, expired: 0, cancelled: 1 },
+  timing: { averageWaitMinutes: 7, medianWaitMinutes: 6, p90WaitMinutes: 12, averageServiceMinutes: 5, medianServiceMinutes: 4, p90ServiceMinutes: 9 },
+  rates: { noShowRate: 0.1, cancellationRate: 0.08, expirationRate: 0 },
+};
 
 describe('report calculations', () => {
-  it('aggregates API reports with weighted averages', () => {
-    expect(aggregateReports([report(10, 8, 2, 10), report(30, 27, 3, 20)])).toEqual({
-      registered: 40,
-      served: 35,
-      noShowRate: 5 / 40,
-      averageWaitMinutes: 17.5,
-      averageServiceMinutes: 5,
-    });
+  it('maps grouped API series to queue rows', () => {
+    const queue = { queueId: 10, queueCode: 'A', queueName: 'Accueil' } as QueueResponseDto;
+    expect(groupsToQueueRows([group], [queue])[0]).toMatchObject({ queueId: 10, queueName: 'Accueil' });
   });
 
-  it('exports the API rows as a clearly local CSV', () => {
-    const csv = reportsToCsv([report(10, 8, 2, 10)]);
-    expect(csv).toContain('attente_moyenne_min');
-    expect(csv).toContain('"Accueil"');
+  it('exports grouped rows as CSV', () => {
+    const row = { ...group, queueId: 10, queueCode: 'A', queueName: 'Accueil' };
+    expect(reportsToCsv([row])).toContain('"Accueil"');
   });
 
-  it('builds an inclusive period limited to seven days', () => {
-    expect(reportPeriodDates('2026-10-04', '2026-10-10')).toHaveLength(7);
-    expect(reportPeriodDates('2026-10-04', '2026-10-11')).toEqual([]);
-    expect(reportPeriodDates('2026-10-10', '2026-10-09')).toEqual([]);
+  it('accepts the API maximum inclusive period of 366 days', () => {
+    expect(reportPeriodDates('2026-01-01', '2026-12-31')).toHaveLength(365);
+    expect(reportPeriodDates('2026-01-01', '2027-01-02')).toEqual([]);
     expect(addDays('2026-10-10', -6)).toBe('2026-10-04');
-  });
-
-  it('consolidates daily reports into one weighted row per queue', () => {
-    const first = report(10, 8, 2, 10);
-    const second = { ...report(30, 27, 3, 20), queueId: first.queueId, queueCode: first.queueCode };
-    const [consolidated] = aggregateReportsByQueue([first, second]);
-
-    expect(consolidated?.volume.totalRegistered).toBe(40);
-    expect(consolidated?.volume.totalServed).toBe(35);
-    expect(consolidated?.kpis.averageWaitMinutes).toBe(17.5);
-    expect(consolidated?.kpis.noShowRate).toBe(5 / 40);
   });
 });

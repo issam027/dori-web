@@ -16,7 +16,6 @@ import {
 import {
   registrationsControllerCheckIn,
   registrationsControllerGetPublicPosition,
-  registrationsControllerFindRegistrations,
   registrationsControllerLookup,
   registrationsControllerRegister,
 } from '@/api/generated/registrations/registrations';
@@ -179,20 +178,5 @@ export function useKioskRegistration(options: {
   return { register, lookup, checkIn };
 }
 
-export async function findCreatedRegistrationTrackingToken(
-  queueId: number,
-  registration: CreateRegistrationResponseDto,
-): Promise<string | null> {
-  const response = await registrationsControllerFindRegistrations({
-    page: 1,
-    pageSize: 100,
-    queueId,
-    businessDate: registration.businessDate,
-  });
-  return (
-    response.data.items.find((item) => item.registrationId === registration.registrationId)
-      ?.registrationTrackingToken ?? null
-  );
-}
 
 export type KioskTier = QueueTierResponseDto;

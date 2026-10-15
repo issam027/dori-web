@@ -13,7 +13,6 @@ const propertyTypeOverrides = {
   'UpdateNotificationRuleDto.thresholdValue': 'number',
   'CreateRegistrationResponseDto.appointmentStatus': 'string',
   'CreateRegistrationResponseDto.scheduledTime': 'string',
-  'CreateRegistrationResponseDto.trackingUrl': 'string',
   'CreateRegistrationResponseDto.registrationTrackingTokenValidUntil': 'string',
   'RescheduleRegistrationResponseDto.appointmentStatus': 'string',
   'RescheduleRegistrationResponseDto.scheduledTime': 'string',
@@ -51,6 +50,13 @@ export default function normalizeSpec(document) {
     );
   }
   delete dailyResetOrigin.format;
+
+  // Swagger currently emits `required: true` on this property schema, while
+  // OpenAPI only permits `required` as an array on the containing object.
+  const averageHttpDuration =
+    schemas.MonitoringMetricsResponseDto?.properties?.derived?.properties
+      ?.averageHttpRequestDurationMs;
+  if (averageHttpDuration) delete averageHttpDuration.required;
 
   return normalized;
 }

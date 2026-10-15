@@ -29,7 +29,8 @@ export function useNotifications(filters: {
           status: filters.status
             ? (filters.status as 'pending' | 'processing' | 'sent' | 'delivered' | 'failed')
             : undefined,
-          businessDate: filters.date,
+          dateFrom: filters.date,
+          dateTo: filters.date,
         },
         undefined,
         signal,

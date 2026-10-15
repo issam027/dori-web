@@ -14,11 +14,7 @@ import { TrackingQr } from '../../TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from '../../useKioskWatchdog';
 import { presentError } from '@/core/notifications/error-presentation';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
-import {
-  findCreatedRegistrationTrackingToken,
-  useKioskCatalog,
-  useKioskRegistration,
-} from '../../hooks/usePublicExperiences';
+import { useKioskCatalog, useKioskRegistration } from '../../hooks/usePublicExperiences';
 
 import { initialKioskWizardState, kioskWizardReducer } from '../../model/kiosk-wizard-state';
 import {
@@ -30,18 +26,10 @@ import {
   KioskWelcomeStep,
 } from './KioskSteps';
 import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
-type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber' | 'trackingUrl'> & {
+type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
+  trackingUrl: string | null;
   queueName?: string;
 };
-
-function trackingUrlOnCurrentHost(value?: string | null): string | null {
-  if (!value) return null;
-  const source = new URL(value, window.location.origin);
-  const token =
-    source.searchParams.get('token') ?? source.pathname.match(/\/track\/([^/]+)\/?$/)?.[1];
-  if (!token) return null;
-  return `${window.location.origin}/track?token=${encodeURIComponent(token)}`;
-}
 
 function trackingUrlFromToken(token?: string | null): string | null {
   return token ? `${window.location.origin}/track?token=${encodeURIComponent(token)}` : null;
@@ -113,17 +101,8 @@ export function KioskWizard() {
         },
       };
     },
-    onRegistered: async (data) => {
-      let trackingUrl = trackingUrlOnCurrentHost(data.trackingUrl);
-      if (!trackingUrl && queueId) {
-        try {
-          trackingUrl = trackingUrlFromToken(
-            await findCreatedRegistrationTrackingToken(queueId, data),
-          );
-        } catch {
-          trackingUrl = null;
-        }
-      }
+    onRegistered: (data) => {
+      const trackingUrl = trackingUrlFromToken(data.registrationTrackingToken);
       setResult({
         ticketNumber: data.ticketNumber,
         trackingUrl,

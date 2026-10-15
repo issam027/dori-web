@@ -1,5 +1,5 @@
-import { healthControllerCheck } from '@/api/generated/health/health';
+import { monitoringControllerHealth } from '@/api/generated/monitoring/monitoring';
 
 export function fetchHealth(signal?: AbortSignal) {
-  return healthControllerCheck(undefined, signal);
+  return monitoringControllerHealth(undefined, signal);
 }

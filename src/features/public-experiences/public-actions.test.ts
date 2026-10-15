@@ -6,123 +6,42 @@ import {
   registrationsControllerRegister,
 } from '@/api/generated/registrations/registrations';
 import { mockServer } from '@/shared/testing/mock-server';
-import { findCreatedRegistrationTrackingToken } from './hooks/usePublicExperiences';
 
 describe('specialized public flows', () => {
-  it('recovers the tracking token of a newly created kiosk registration', async () => {
-    mockServer.use(
-      http.get('http://localhost:3000/api/v1/registrations', ({ request }) => {
-        const url = new URL(request.url);
-        expect(url.searchParams.get('queueId')).toBe('4');
-        expect(url.searchParams.get('businessDate')).toBe('2026-10-11');
-        return HttpResponse.json({
-          code: 'OK',
-          translationKey: null,
-          translationParams: {},
-          data: {
-            page: 1,
-            pageSize: 100,
-            total: 1,
-            totalPages: 1,
-            items: [
-              {
-                registrationId: 81,
-                queueId: 4,
-                personId: 9,
-                ticketNumber: 'A081',
-                entryType: 'walkin',
-                status: 'waiting',
-                businessDate: '2026-10-11',
-                registrationTrackingToken: 'tracking-81',
-                tierId: 2,
-                createdAt: '2026-10-11T08:00:00Z',
-                updatedAt: '2026-10-11T08:00:00Z',
-              },
-            ],
-          },
-        });
-      }),
-    );
-
-    await expect(
-      findCreatedRegistrationTrackingToken(4, {
-        registrationId: 81,
-        ticketNumber: 'A081',
-        businessDate: '2026-10-11',
-        entryType: 'walkin',
-        status: 'waiting',
-        tier: {},
-        priorityReferenceTime: '2026-10-11T08:00:00Z',
-      }),
-    ).resolves.toBe('tracking-81');
-  });
-
-  it('registers a kiosk walk-in with API-confirmed identity, queue and tier', async () => {
+  it('registers a kiosk walk-in and receives its tracking token directly', async () => {
     let body: unknown;
-    mockServer.use(
-      http.post('http://localhost:3000/api/v1/registrations', async ({ request }) => {
-        body = await request.json();
-        return HttpResponse.json(
-          {
-            code: 'OK',
-            translationKey: null,
-            translationParams: {},
-            data: {
-              registrationId: 8,
-              ticketNumber: 'A008',
-              businessDate: '2026-10-08',
-              entryType: 'walkin',
-              status: 'waiting',
-              tier: {},
-              priorityReferenceTime: '2026-10-08T08:00:00Z',
-              trackingUrl: 'https://dori.test/track?token=opaque',
-            },
-          },
-          { status: 201 },
-        );
-      }),
-    );
-    await registrationsControllerRegister({
-      queueId: 4,
-      tierId: 2,
-      entryType: 'walkin',
+    mockServer.use(http.post('http://localhost:3000/api/v1/registrations', async ({ request }) => {
+      body = await request.json();
+      return HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: {
+        registrationId: 8, ticketNumber: 'A008', businessDate: '2026-10-08',
+        entryType: 'walkin', status: 'waiting', tier: {},
+        priorityReferenceTime: '2026-10-08T08:00:00Z',
+        registrationTrackingToken: 'opaque',
+        registrationTrackingTokenValidUntil: '2026-10-09T08:00:00Z',
+      } }, { status: 201 });
+    }));
+    const response = await registrationsControllerRegister({
+      queueId: 4, tierId: 2, entryType: 'walkin',
       person: { lastName: 'Test', phoneNumber: '+33612345678' },
     });
     expect(body).toMatchObject({ queueId: 4, tierId: 2, entryType: 'walkin' });
+    expect(response.data.registrationTrackingToken).toBe('opaque');
   });
 
-  it('looks up and checks in an appointment without exposing cancellation', async () => {
+  it('looks up and checks in an appointment', async () => {
     let checkedIn = false;
     const registration = {
-      registrationId: 7,
-      queueId: 4,
-      personId: 9,
-      ticketNumber: 'A007',
-      entryType: 'appointment',
-      status: 'scheduled',
-      businessDate: '2026-10-08',
-      registrationTrackingToken: 'opaque',
-      tierId: 2,
-      createdAt: '2026-10-08T08:00:00Z',
-      updatedAt: '2026-10-08T08:00:00Z',
+      registrationId: 7, queueId: 4, personId: 9, ticketNumber: 'A007',
+      entryType: 'appointment', status: 'scheduled', businessDate: '2026-10-08',
+      registrationTrackingToken: 'opaque', tierId: 2,
+      createdAt: '2026-10-08T08:00:00Z', updatedAt: '2026-10-08T08:00:00Z', isActive: true,
     };
     mockServer.use(
       http.get('http://localhost:3000/api/v1/registrations/lookup', () =>
-        HttpResponse.json({
-          code: 'OK',
-          translationKey: null,
-          translationParams: {},
-          data: registration,
-        }),
-      ),
+        HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: registration })),
       http.post('http://localhost:3000/api/v1/registrations/7/check-in', () => {
         checkedIn = true;
-        return HttpResponse.json({
-          code: 'OK',
-          translationKey: null,
-          translationParams: {},
-          data: { ...registration, status: 'waiting' },
-        });
+        return HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: { ...registration, status: 'waiting' } });
       }),
     );
     const found = await registrationsControllerLookup({ ticketNumber: 'A007' });
@@ -130,28 +49,15 @@ describe('specialized public flows', () => {
     expect(checkedIn).toBe(true);
   });
 
-  it('sends the opaque tracking token only in the dedicated header', async () => {
+  it('sends the tracking token only in the dedicated header', async () => {
     let token: string | null = null;
-    mockServer.use(
-      http.get('http://localhost:3000/api/v1/public/registrations/position', ({ request }) => {
-        token = request.headers.get('X-Registration-Token');
-        return HttpResponse.json({
-          code: 'OK',
-          translationKey: null,
-          translationParams: {},
-          data: {
-            ticketNumber: 'A008',
-            position: 2,
-            estimatedWaitMinutes: 8,
-            status: 'waiting',
-            queueName: 'Accueil',
-          },
-        });
-      }),
-    );
-    await registrationsControllerGetPublicPosition({
-      headers: { 'X-Registration-Token': 'opaque-secret' },
-    });
+    mockServer.use(http.get('http://localhost:3000/api/v1/public/registrations/position', ({ request }) => {
+      token = request.headers.get('X-Registration-Token');
+      return HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: {
+        ticketNumber: 'A008', position: 2, estimatedWaitMinutes: 8, status: 'waiting', queueName: 'Accueil',
+      } });
+    }));
+    await registrationsControllerGetPublicPosition({ headers: { 'X-Registration-Token': 'opaque-secret' } });
     expect(token).toBe('opaque-secret');
   });
 });

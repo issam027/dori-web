@@ -71,10 +71,12 @@ export function QuickRegistration({
   });
   const availability = useQuery({
     queryKey: queryKeys.availability(queueId, appointmentDate),
-    queryFn: () => getAvailability(queueId, { date: appointmentDate }),
+    queryFn: () =>
+      getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
     enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
   });
-  const availableSlots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
+  const availableSlots =
+    availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
   const submit = async () => {
     if (!choice || !queueId || !tierId || submissionInFlight.current) return;
     submissionInFlight.current = true;

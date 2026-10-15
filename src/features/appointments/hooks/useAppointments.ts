@@ -19,7 +19,9 @@ export function useAppointments(options: {
         const params = {
           siteId: options.siteId ?? undefined,
           queueId: options.queueId,
-          businessDate,
+          dateFrom: businessDate,
+          dateTo: businessDate,
+          isActive: true,
           entryType: 'appointment' as const,
           pageSize: 25,
           sort: 'scheduledTime:asc' as const,
@@ -70,7 +72,12 @@ export function useAvailability(queueId: number, date: string) {
   return useQuery({
     queryKey: queryKeys.availability(queueId, date),
     queryFn: ({ signal }) =>
-      registrationsControllerGetAvailability(queueId, { date }, undefined, signal),
+      registrationsControllerGetAvailability(
+        queueId,
+        { dateFrom: date, dateTo: date },
+        undefined,
+        signal,
+      ),
     enabled: queueId > 0 && date.length > 0,
   });
 }

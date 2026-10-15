@@ -18,8 +18,7 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { PageHeader } from '@/design-system/components/PageHeader';
 import {
   addDays,
-  aggregateReports,
-  aggregateReportsByQueue,
+  groupsToQueueRows,
   reportPeriodDates,
   reportsToCsv,
 } from './report-utils';
@@ -41,21 +40,21 @@ export function ReportsPage() {
   const effectiveStartDate = startDate || addDays(effectiveEndDate, -6);
   const periodDates = reportPeriodDates(effectiveStartDate, effectiveEndDate);
   const queues = useQueues({ siteId, isActive: true, usage: 'reports' });
-  const summary = useDashboardSummary(siteId);
+  const liveSummary = useDashboardSummary(siteId);
   const reports = useReports({
     siteId,
     startDate: effectiveStartDate,
     endDate: effectiveEndDate,
-    dates: periodDates,
-    queueIds: queues.data?.data.items.map((queue) => queue.queueId) ?? [],
     enabled: Boolean(queues.data && periodDates.length),
   });
-  const items = reports.data ?? [];
-  const queueItems = aggregateReportsByQueue(items);
-  const totals = aggregateReports(items);
+  const queueItems = groupsToQueueRows(
+    reports.data?.data.groups ?? [],
+    queues.data?.data.items ?? [],
+  );
+  const totals = reports.data?.data.summary;
   const exportCsv = () => {
     const url = URL.createObjectURL(
-      new Blob([reportsToCsv(items)], { type: 'text/csv;charset=utf-8' }),
+      new Blob([reportsToCsv(queueItems)], { type: 'text/csv;charset=utf-8' }),
     );
     const link = document.createElement('a');
     link.href = url;
@@ -63,10 +62,10 @@ export function ReportsPage() {
     link.click();
     URL.revokeObjectURL(url);
   };
-  if (queues.isError || summary.isError || reports.isError)
+  if (queues.isError || liveSummary.isError || reports.isError)
     return (
       <ErrorState
-        onRetry={() => void Promise.all([queues.refetch(), summary.refetch(), reports.refetch()])}
+        onRetry={() => void Promise.all([queues.refetch(), liveSummary.refetch(), reports.refetch()])}
       />
     );
   return (
@@ -76,7 +75,7 @@ export function ReportsPage() {
         title={__t('supervision.reports.rapports')}
         description={__t('reports.periodDescription')}
         actions={
-          <button type="button" className="button" disabled={!items.length} onClick={exportCsv}>
+          <button type="button" className="button" disabled={!queueItems.length} onClick={exportCsv}>
             <Download aria-hidden="true" />
             {__t('supervision.reports.exporterCsvLocal')}
           </button>
@@ -95,8 +94,8 @@ export function ReportsPage() {
                 setStartDate(nextStart);
                 if (!nextStart) return;
                 if (effectiveEndDate < nextStart) setEndDate(nextStart);
-                else if (effectiveEndDate > addDays(nextStart, 6))
-                  setEndDate(addDays(nextStart, 6));
+                else if (effectiveEndDate > addDays(nextStart, 365))
+                  setEndDate(addDays(nextStart, 365));
               }}
             />
           </label>
@@ -106,7 +105,7 @@ export function ReportsPage() {
               type="date"
               value={effectiveEndDate}
               min={effectiveStartDate}
-              max={addDays(effectiveStartDate, 6) < today ? addDays(effectiveStartDate, 6) : today}
+              max={addDays(effectiveStartDate, 365) < today ? addDays(effectiveStartDate, 365) : today}
               onChange={(event) => {
                 setEndDate(event.target.value);
               }}
@@ -121,41 +120,41 @@ export function ReportsPage() {
         {[
           {
             label: __t('common.activeSites'),
-            value: summary.data?.data.activeSites,
+            value: liveSummary.data?.data.activeSites,
             icon: Building2,
           },
           {
             label: __t('common.activeQueues'),
-            value: summary.data?.data.activeQueues,
+            value: liveSummary.data?.data.activeQueues,
             icon: ListChecks,
           },
           {
             label: __t('common.waiting'),
-            value: summary.data?.data.waitingTotal,
+            value: liveSummary.data?.data.waitingTotal,
             icon: UsersRound,
           },
-          { label: __t('common.registered'), value: totals.registered, icon: UserPlus },
-          { label: __t('common.servedPlural'), value: totals.served, icon: CircleCheck },
+          { label: __t('common.registered'), value: totals?.volume.registered, icon: UserPlus },
+          { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
           {
             label: __t('reports.averageWaitAbbreviation'),
-            value: `${totals.averageWaitMinutes.toFixed(1)} min`,
+            value: totals?.timing.averageWaitMinutes == null ? '—' : `${totals.timing.averageWaitMinutes.toFixed(1)} min`,
             icon: Timer,
           },
           {
             label: __t('reports.averageServiceAbbreviation'),
-            value: `${totals.averageServiceMinutes.toFixed(1)} min`,
+            value: totals?.timing.averageServiceMinutes == null ? '—' : `${totals.timing.averageServiceMinutes.toFixed(1)} min`,
             icon: Gauge,
           },
           {
             label: __t('common.noShow'),
-            value: `${(totals.noShowRate * 100).toFixed(1)} %`,
+            value: totals?.rates.noShowRate == null ? '—' : `${(totals.rates.noShowRate * 100).toFixed(1)} %`,
             icon: UserX,
           },
         ].map(({ label, value, icon: Icon }) => (
           <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
       </div>
-      {!reports.isLoading && !items.length ? (
+      {!reports.isLoading && !queueItems.length ? (
         <EmptyState title={__t('reports.noDataForPeriod')} />
       ) : (
         <Card>
@@ -172,7 +171,7 @@ export function ReportsPage() {
                   <>
                     <strong>{row.queueName}</strong>
                     <br />
-                    <span className="muted">{row.siteName}</span>
+                    <span className="muted">{row.queueCode}</span>
                   </>
                 ),
               },
@@ -180,31 +179,31 @@ export function ReportsPage() {
                 key: 'registered',
                 header: __t('common.registered'),
                 align: 'end',
-                render: (row) => row.volume.totalRegistered,
+                render: (row) => row.volume.registered,
               },
               {
                 key: 'served',
                 header: __t('common.servedPlural'),
                 align: 'end',
-                render: (row) => row.volume.totalServed,
+                render: (row) => row.volume.served,
               },
               {
                 key: 'wait',
                 header: __t('reports.averageWaitAbbreviation'),
                 align: 'end',
-                render: (row) => `${row.kpis.averageWaitMinutes.toFixed(1)} min`,
+                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${row.timing.averageWaitMinutes.toFixed(1)} min`,
               },
               {
                 key: 'service',
                 header: __t('reports.averageServiceAbbreviation'),
                 align: 'end',
-                render: (row) => `${row.kpis.averageServiceMinutes.toFixed(1)} min`,
+                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${row.timing.averageServiceMinutes.toFixed(1)} min`,
               },
               {
                 key: 'noShow',
                 header: __t('common.noShow'),
                 align: 'end',
-                render: (row) => `${(row.kpis.noShowRate * 100).toFixed(1)} %`,
+                render: (row) => row.rates.noShowRate == null ? '—' : `${(row.rates.noShowRate * 100).toFixed(1)} %`,
               },
               {
                 key: 'chart',
@@ -213,13 +212,13 @@ export function ReportsPage() {
                   <div
                     className="report-bar"
                     aria-label={__t('reports.servedRatio', {
-                      served: String(row.volume.totalServed),
-                      registered: String(row.volume.totalRegistered),
+                      served: String(row.volume.served),
+                      registered: String(row.volume.registered),
                     })}
                   >
                     <span
                       style={{
-                        width: `${String(row.volume.totalRegistered ? (row.volume.totalServed / row.volume.totalRegistered) * 100 : 0)}%`,
+                        width: `${String(row.volume.registered ? (row.volume.served / row.volume.registered) * 100 : 0)}%`,
                       }}
                     />
                   </div>

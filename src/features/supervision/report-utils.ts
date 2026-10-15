@@ -1,4 +1,4 @@
-import type { DailyQueueReportResponseDto } from '@/api/generated/models';
+import type { QueueResponseDto, ReportGroupDto } from '@/api/generated/models';
 
 const DAY_IN_MS = 86_400_000;
 
@@ -18,101 +18,50 @@ export function reportPeriodDates(startDate: string, endDate: string): string[] 
   const start = parseBusinessDate(startDate).getTime();
   const end = parseBusinessDate(endDate).getTime();
   if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return [];
-
   const dayCount = Math.floor((end - start) / DAY_IN_MS) + 1;
-  if (dayCount > 7) return [];
+  if (dayCount > 366) return [];
   return Array.from({ length: dayCount }, (_, index) =>
     formatBusinessDate(new Date(start + index * DAY_IN_MS)),
   );
 }
 
-export function aggregateReports(reports: readonly DailyQueueReportResponseDto[]) {
-  const registered = reports.reduce((sum, report) => sum + report.volume.totalRegistered, 0);
-  const served = reports.reduce((sum, report) => sum + report.volume.totalServed, 0);
-  const noShow = reports.reduce((sum, report) => sum + report.volume.totalNoShow, 0);
-  const weight = reports.reduce((sum, report) => sum + report.volume.totalRegistered, 0);
-  const weighted = (field: 'averageWaitMinutes' | 'averageServiceMinutes') =>
-    weight === 0
-      ? 0
-      : reports.reduce(
-          (sum, report) => sum + report.kpis[field] * report.volume.totalRegistered,
-          0,
-        ) / weight;
-  return {
-    registered,
-    served,
-    noShowRate: served + noShow === 0 ? 0 : noShow / (served + noShow),
-    averageWaitMinutes: weighted('averageWaitMinutes'),
-    averageServiceMinutes: weighted('averageServiceMinutes'),
-  };
-}
+export type QueueReportRow = ReportGroupDto & {
+  queueId: number;
+  queueCode: string;
+  queueName: string;
+};
 
-export function aggregateReportsByQueue(
-  reports: readonly DailyQueueReportResponseDto[],
-): DailyQueueReportResponseDto[] {
-  const grouped = new Map<number, DailyQueueReportResponseDto[]>();
-  reports.forEach((report) => {
-    const queueReports = grouped.get(report.queueId) ?? [];
-    queueReports.push(report);
-    grouped.set(report.queueId, queueReports);
-  });
-  return Array.from(grouped.values(), (queueReports) => {
-    const first = queueReports[0];
-    if (!first) throw new Error('A queue report group cannot be empty');
-    const totals = aggregateReports(queueReports);
-    const sumVolume = (field: keyof DailyQueueReportResponseDto['volume']) =>
-      queueReports.reduce((sum, report) => sum + report.volume[field], 0);
-
+export function groupsToQueueRows(
+  groups: readonly ReportGroupDto[],
+  queues: readonly QueueResponseDto[],
+): QueueReportRow[] {
+  return groups.map((group, index) => {
+    const rawId = group.dimension.queueId ?? group.dimension.id;
+    const queueId = typeof rawId === 'number' ? rawId : Number(rawId);
+    const queue = queues.find((candidate) => candidate.queueId === queueId) ?? queues[index];
     return {
-      ...first,
-      volume: {
-        totalRegistered: totals.registered,
-        totalWalkin: sumVolume('totalWalkin'),
-        totalAppointment: sumVolume('totalAppointment'),
-        totalServed: totals.served,
-        totalNoShow: sumVolume('totalNoShow'),
-        totalExpired: sumVolume('totalExpired'),
-        totalCancelled: sumVolume('totalCancelled'),
-        totalOpen: sumVolume('totalOpen'),
-      },
-      kpis: {
-        noShowRate: totals.noShowRate,
-        averageWaitMinutes: totals.averageWaitMinutes,
-        averageServiceMinutes: totals.averageServiceMinutes,
-      },
+      ...group,
+      queueId: Number.isFinite(queueId) ? queueId : (queue?.queueId ?? index),
+      queueCode: queue?.queueCode ?? String(group.dimension.queueCode ?? ''),
+      queueName: queue?.queueName ?? String(group.dimension.queueName ?? queueId),
     };
   });
 }
 
-export function reportsToCsv(reports: readonly DailyQueueReportResponseDto[]) {
-  const rows = reports.map((report) => [
-    report.businessDate,
-    report.siteName,
-    report.queueCode,
-    report.queueName,
-    report.volume.totalRegistered,
-    report.volume.totalServed,
-    report.volume.totalNoShow,
-    report.kpis.noShowRate,
-    report.kpis.averageWaitMinutes,
-    report.kpis.averageServiceMinutes,
+export function reportsToCsv(rows: readonly QueueReportRow[]) {
+  const data = rows.map((row) => [
+    row.queueCode,
+    row.queueName,
+    row.volume.registered,
+    row.volume.served,
+    row.volume.noShow,
+    row.rates.noShowRate ?? '',
+    row.timing.averageWaitMinutes ?? '',
+    row.timing.averageServiceMinutes ?? '',
   ]);
   const escape = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`;
   return [
-    [
-      'date',
-      'site',
-      'code',
-      'file',
-      'inscrits',
-      'servis',
-      'absents',
-      'taux_absence',
-      'attente_moyenne_min',
-      'service_moyen_min',
-    ],
-    ...rows,
-  ]
-    .map((row) => row.map(escape).join(','))
-    .join('\n');
+    ['code', 'file', 'inscrits', 'servis', 'absents', 'taux_absence', 'attente_moyenne_min', 'service_moyen_min'],
+    ...data,
+  ].map((row) => row.map(escape).join(',')).join('\n');
 }

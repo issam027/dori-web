@@ -70,7 +70,7 @@ export function AppointmentEditor({
       } else setError(__t('appointments.appointmentEditor.creationImpossible'));
     }
   };
-  const slots = availability.data?.data.slots.filter((slot) => slot.isAvailable) ?? [];
+  const slots = availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
   const availableTimes = slots.map((slot) => slotTime(slot.time));
   const effectiveTime =
     availableTimes.find((candidate) => candidate === time) ??
