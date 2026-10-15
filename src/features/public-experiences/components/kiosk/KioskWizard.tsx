@@ -26,14 +26,11 @@ import {
   KioskWelcomeStep,
 } from './KioskSteps';
 import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
+import { trackingUrlFromToken } from '../../tracking-url';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
   trackingUrl: string | null;
   queueName?: string;
 };
-
-function trackingUrlFromToken(token?: string | null): string | null {
-  return token ? `${window.location.origin}/track?token=${encodeURIComponent(token)}` : null;
-}
 
 export function KioskWizard() {
   const { t: __t } = useTranslation();
@@ -119,9 +116,7 @@ export function KioskWizard() {
     },
     selectedRegistration: () => found,
     onCheckedIn: (data) => {
-      const trackingUrl = data.registrationTrackingToken
-        ? `${window.location.origin}/track?token=${encodeURIComponent(data.registrationTrackingToken)}`
-        : null;
+      const trackingUrl = trackingUrlFromToken(data.registrationTrackingToken);
       setResult({
         ticketNumber: data.ticketNumber,
         trackingUrl,

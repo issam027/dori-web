@@ -1,14 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
-  Building2,
   CircleCheck,
   Download,
   Gauge,
-  ListChecks,
   Timer,
   UserPlus,
-  UsersRound,
   UserX,
 } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -25,7 +22,9 @@ import {
 import { dateInTimeZone } from '@/features/appointments/appointment-rules';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
-import { useDashboardSummary, useReports } from './hooks/useReports';
+import { useReports } from './hooks/useReports';
+import { ReportVisualizations } from './ReportVisualizations';
+import { ReportAnalyticsSections } from './ReportAnalyticsSections';
 
 const fallbackTimeZone = 'UTC';
 
@@ -34,17 +33,20 @@ export function ReportsPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [queueId, setQueueId] = useState<number>();
+  const [granularity, setGranularity] = useState<'day' | 'week' | 'month'>('day');
   const site = useSite(siteId);
   const today = dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
   const effectiveEndDate = endDate || today;
   const effectiveStartDate = startDate || addDays(effectiveEndDate, -6);
   const periodDates = reportPeriodDates(effectiveStartDate, effectiveEndDate);
   const queues = useQueues({ siteId, isActive: true, usage: 'reports' });
-  const liveSummary = useDashboardSummary(siteId);
   const reports = useReports({
     siteId,
     startDate: effectiveStartDate,
     endDate: effectiveEndDate,
+    queueId,
+    granularity,
     enabled: Boolean(queues.data && periodDates.length),
   });
   const queueItems = groupsToQueueRows(
@@ -54,7 +56,7 @@ export function ReportsPage() {
   const totals = reports.data?.data.summary;
   const exportCsv = () => {
     const url = URL.createObjectURL(
-      new Blob([reportsToCsv(queueItems)], { type: 'text/csv;charset=utf-8' }),
+      new Blob([reportsToCsv(queueItems, reports.data?.data.buckets, totals)], { type: 'text/csv;charset=utf-8' }),
     );
     const link = document.createElement('a');
     link.href = url;
@@ -62,10 +64,10 @@ export function ReportsPage() {
     link.click();
     URL.revokeObjectURL(url);
   };
-  if (queues.isError || liveSummary.isError || reports.isError)
+  if (queues.isError || reports.isError)
     return (
       <ErrorState
-        onRetry={() => void Promise.all([queues.refetch(), liveSummary.refetch(), reports.refetch()])}
+        onRetry={() => void Promise.all([queues.refetch(), reports.refetch()])}
       />
     );
   return (
@@ -111,38 +113,35 @@ export function ReportsPage() {
               }}
             />
           </label>
-          <div className="report-period-context">
-            <strong>{__t('reports.maximumPeriod')}</strong>
-          </div>
+          <label>
+            {__t('reports.granularity')}
+            <select value={granularity} onChange={(event) => { setGranularity(event.target.value as 'day' | 'week' | 'month'); }}>
+              <option value="day">{__t('reports.granularity.day')}</option>
+              <option value="week">{__t('reports.granularity.week')}</option>
+              <option value="month">{__t('reports.granularity.month')}</option>
+            </select>
+          </label>
+          <label>
+            {__t('queues.singular')}
+            <select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); }}>
+              <option value="">{__t('common.all')}</option>
+              {queues.data?.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueCode} · {queue.queueName}</option>)}
+            </select>
+          </label>
         </div>
       </Card>
       <div className="metric-grid">
         {[
-          {
-            label: __t('common.activeSites'),
-            value: liveSummary.data?.data.activeSites,
-            icon: Building2,
-          },
-          {
-            label: __t('common.activeQueues'),
-            value: liveSummary.data?.data.activeQueues,
-            icon: ListChecks,
-          },
-          {
-            label: __t('common.waiting'),
-            value: liveSummary.data?.data.waitingTotal,
-            icon: UsersRound,
-          },
           { label: __t('common.registered'), value: totals?.volume.registered, icon: UserPlus },
           { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
           {
             label: __t('reports.averageWaitAbbreviation'),
-            value: totals?.timing.averageWaitMinutes == null ? '—' : `${totals.timing.averageWaitMinutes.toFixed(1)} min`,
+            value: totals?.timing.averageWaitMinutes == null ? '—' : `${totals.timing.averageWaitMinutes.toFixed(1)} ${__t('common.min')}`,
             icon: Timer,
           },
           {
             label: __t('reports.averageServiceAbbreviation'),
-            value: totals?.timing.averageServiceMinutes == null ? '—' : `${totals.timing.averageServiceMinutes.toFixed(1)} min`,
+            value: totals?.timing.averageServiceMinutes == null ? '—' : `${totals.timing.averageServiceMinutes.toFixed(1)} ${__t('common.min')}`,
             icon: Gauge,
           },
           {
@@ -154,6 +153,18 @@ export function ReportsPage() {
           <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
       </div>
+      {reports.data ? (
+        <ReportVisualizations buckets={reports.data.data.buckets} groups={reports.data.data.groups ?? []} summary={reports.data.data.summary} queues={queues.data?.data.items ?? []} />
+      ) : null}
+      {totals ? (
+        <div className="metric-grid report-percentiles">
+          <MetricCard label={__t('reports.medianWait')} value={totals.timing.medianWaitMinutes == null ? '—' : `${totals.timing.medianWaitMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Timer />} />
+          <MetricCard label={__t('reports.p90Wait')} value={totals.timing.p90WaitMinutes == null ? '—' : `${totals.timing.p90WaitMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Timer />} />
+          <MetricCard label={__t('reports.medianService')} value={totals.timing.medianServiceMinutes == null ? '—' : `${totals.timing.medianServiceMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Gauge />} />
+          <MetricCard label={__t('reports.p90Service')} value={totals.timing.p90ServiceMinutes == null ? '—' : `${totals.timing.p90ServiceMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Gauge />} />
+        </div>
+      ) : null}
+      {totals && queueItems.length ? <ReportAnalyticsSections summary={totals} buckets={reports.data?.data.buckets ?? []} queues={queueItems} /> : null}
       {!reports.isLoading && !queueItems.length ? (
         <EmptyState title={__t('reports.noDataForPeriod')} />
       ) : (
@@ -191,13 +202,13 @@ export function ReportsPage() {
                 key: 'wait',
                 header: __t('reports.averageWaitAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${row.timing.averageWaitMinutes.toFixed(1)} min`,
+                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${row.timing.averageWaitMinutes.toFixed(1)} ${__t('common.min')}`,
               },
               {
                 key: 'service',
                 header: __t('reports.averageServiceAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${row.timing.averageServiceMinutes.toFixed(1)} min`,
+                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${row.timing.averageServiceMinutes.toFixed(1)} ${__t('common.min')}`,
               },
               {
                 key: 'noShow',

@@ -2,12 +2,26 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidateAdmin } from '@/api/client/query-invalidations';
 import { findQueues, findRoles, findSites, findTiers } from '../api/onboarding-api';
+import { sitesControllerGetManagers } from '@/api/generated/sites/sites';
 
 export function useSettingsData(siteId: number | null) {
   const queryClient = useQueryClient();
   const sites = useQuery({
     queryKey: queryKeys.admin.sites,
-    queryFn: ({ signal }) => findSites({ page: 1, pageSize: 100 }, undefined, signal),
+    queryFn: async ({ signal }) => {
+      const [active, inactive] = await Promise.all([
+        findSites({ page: 1, pageSize: 100, isActive: true }, undefined, signal),
+        findSites({ page: 1, pageSize: 100, isActive: false }, undefined, signal),
+      ]);
+      return {
+        ...active,
+        data: {
+          ...active.data,
+          items: [...active.data.items, ...inactive.data.items],
+          total: active.data.total + inactive.data.total,
+        },
+      };
+    },
   });
   const queues = useQuery({
     queryKey: queryKeys.admin.queues(siteId),
@@ -23,12 +37,25 @@ export function useSettingsData(siteId: number | null) {
     queryKey: queryKeys.admin.tiers,
     queryFn: ({ signal }) => findTiers({ page: 1, pageSize: 100 }, undefined, signal),
   });
+  const managers = useQuery({
+    queryKey: ['admin', 'site-managers', siteId],
+    queryFn: ({ signal }) =>
+      sitesControllerGetManagers(
+        siteId ?? 0,
+        { page: 1, pageSize: 100, sort: 'username:asc' },
+        undefined,
+        signal,
+      ),
+    enabled: siteId !== null,
+  });
 
   return {
     sites: sites.data?.data.items ?? [],
     queues: queues.data?.data.items ?? [],
     roles: roles.data?.data.items ?? [],
     tiers: tiers.data?.data.items ?? [],
+    managers: managers.data?.data.items ?? [],
+    refreshManagers: () => managers.refetch(),
     refresh: () => invalidateAdmin(queryClient),
   };
 }

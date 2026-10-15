@@ -5,6 +5,11 @@ import { Modal } from '@/design-system/components/Modal';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { usePerson } from '@/features/persons/hooks/usePersons';
 import { useRegistration } from './hooks/useQueueOperations';
+import { TrackingQr } from '@/features/public-experiences/TrackingQr';
+import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
+
+const safeText = (value: unknown, fallback = '—') =>
+  typeof value === 'string' || typeof value === 'number' ? String(value) : fallback;
 
 export function RegistrationDetailsModal({
   registrationId,
@@ -22,17 +27,20 @@ export function RegistrationDetailsModal({
   const item = registration.data?.data;
   const person = usePerson(item?.personId, open && Boolean(item));
   const customer = person.data?.data;
-  const formatDate = (value?: string, dateOnly = false) =>
-    value
-      ? new Intl.DateTimeFormat(
-          'fr-FR',
-          dateOnly ? { dateStyle: 'long' } : { dateStyle: 'medium', timeStyle: 'short' },
-        ).format(new Date(value))
-      : '—';
+  const formatDate = (value?: string, dateOnly = false) => {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    return new Intl.DateTimeFormat(
+      undefined,
+      dateOnly ? { dateStyle: 'long' } : { dateStyle: 'medium', timeStyle: 'short' },
+    ).format(date);
+  };
+  const status = safeText(item?.status);
   const tone =
-    item?.status === 'served'
+    status === 'served'
       ? 'success'
-      : item?.status === 'waiting' || item?.status === 'in_progress'
+      : status === 'waiting' || status === 'in_progress'
         ? 'warning'
         : 'neutral';
 
@@ -55,13 +63,16 @@ export function RegistrationDetailsModal({
             </span>
             <div>
               <small>{t('common.ticket')}</small>
-              <strong>{item.ticketNumber}</strong>
+              <strong>{safeText(item.ticketNumber)}</strong>
               <span>
                 {queueName ??
                   t('queues.registrationDetails.queueFallback', { id: String(item.queueId) })}
               </span>
             </div>
-            <StatusBadge tone={tone}>{item.status}</StatusBadge>
+            <div className="registration-detail-qr">
+              <TrackingQr value={trackingUrlFromToken(item.registrationTrackingToken)} />
+            </div>
+            <StatusBadge tone={tone}>{status}</StatusBadge>
           </header>
           <section className="registration-detail-section">
             <h3>
@@ -73,20 +84,20 @@ export function RegistrationDetailsModal({
                 label={t('common.fullName')}
                 value={
                   customer
-                    ? ((customer.firstName || '') + ' ' + (customer.lastName || '')).trim()
-                    : '…'
+                    ? `${safeText(customer.firstName, '')} ${safeText(customer.lastName, '')}`.trim()
+                    : `${safeText(item.firstName, '')} ${safeText(item.lastName, '')}`.trim() || '…'
                 }
               />
               <Detail
                 icon={<Phone />}
                 label={t('common.phone')}
-                value={customer?.phoneNumber ?? '—'}
+                value={safeText(customer?.phoneNumber)}
               />
-              <Detail icon={<Mail />} label={t('common.email')} value={customer?.email ?? '—'} />
+              <Detail icon={<Mail />} label={t('common.email')} value={safeText(customer?.email)} />
               <Detail
                 icon={<MapPin />}
                 label={t('common.language')}
-                value={customer?.preferredLanguage.toUpperCase() ?? '—'}
+                value={typeof customer?.preferredLanguage === 'string' ? customer.preferredLanguage.toUpperCase() : '—'}
               />
             </div>
           </section>
@@ -115,7 +126,7 @@ export function RegistrationDetailsModal({
                 label={t('common.updatedAt')}
                 value={formatDate(item.updatedAt)}
               />
-              <Detail icon={<Ticket />} label={t('common.entryType')} value={item.entryType} />
+              <Detail icon={<Ticket />} label={t('common.entryType')} value={safeText(item.entryType)} />
               <Detail icon={<Hash />} label={t('common.tier')} value={'#' + String(item.tierId)} />
               {item.scheduledTime ? (
                 <Detail
@@ -128,7 +139,7 @@ export function RegistrationDetailsModal({
                 <Detail
                   icon={<Clock3 />}
                   label={t('queues.registrationDetails.appointmentStatus')}
-                  value={item.appointmentStatus}
+                  value={safeText(item.appointmentStatus)}
                 />
               ) : null}
             </div>

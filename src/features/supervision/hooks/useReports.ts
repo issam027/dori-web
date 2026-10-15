@@ -65,16 +65,27 @@ export function useReports(options: {
   siteId: number | null;
   startDate: string;
   endDate: string;
+  queueId?: number;
+  granularity: 'day' | 'week' | 'month';
   enabled: boolean;
 }) {
   return useQuery({
-    queryKey: queryKeys.reports.daily(options.siteId, options.startDate, options.endDate, []),
+    queryKey: [
+      ...queryKeys.reports.daily(
+        options.siteId,
+        options.startDate,
+        options.endDate,
+        options.queueId ? [options.queueId] : [],
+      ),
+      options.granularity,
+    ],
     enabled: options.enabled && options.siteId !== null,
     queryFn: ({ signal }) => monitoringControllerSeries({
-      siteId: options.siteId ?? undefined,
+      siteId: options.queueId ? undefined : (options.siteId ?? undefined),
+      queueIds: options.queueId ? String(options.queueId) : undefined,
       dateFrom: options.startDate,
       dateTo: options.endDate,
-      granularity: 'day',
+      granularity: options.granularity,
       groupBy: 'queue',
       includeEmpty: true,
     }, undefined, signal),

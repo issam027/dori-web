@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check, Plus, TicketCheck } from 'lucide-react';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
+import type { CreateRegistrationDto, CreateRegistrationResponseDto } from '@/api/generated/models';
 import {
   findSite,
   getAvailability,
   getQueueTiers,
-  getTierRules,
   registerPerson,
 } from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
@@ -19,6 +19,10 @@ import { notify } from '@/core/notifications/notification-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
 import { appointmentUtcIso } from '@/features/appointments/appointment-rules';
+import { TrackingQr } from '@/features/public-experiences/TrackingQr';
+import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
+import { findPersons } from '@/features/persons/api/persons-api';
+import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 
 const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
@@ -37,8 +41,9 @@ export function QuickRegistration({
   const [entryType, setEntryType] = useState<'walkin' | 'appointment'>('walkin');
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
-  const [ticket, setTicket] = useState('');
+  const [result, setResult] = useState<CreateRegistrationResponseDto>();
   const [pending, setPending] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const submissionInFlight = useRef(false);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -54,17 +59,6 @@ export function QuickRegistration({
     enabled: queueId > 0,
   });
   const activeTiers = tiers.data?.data.items.filter((item) => item.isActive) ?? [];
-  const tierRules = useQueries({
-    queries: activeTiers.map((item) => ({
-      queryKey: queryKeys.tiers.rules(item.queueId, item.tierId),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        getTierRules(item.queueId, item.tierId, { page: 1, pageSize: 100 }, undefined, signal),
-    })),
-  });
-  const selectedTierIndex = activeTiers.findIndex((item) => item.tierId === tierId);
-  const selectedTier = activeTiers[selectedTierIndex];
-  const selectedTierRules =
-    tierRules[selectedTierIndex]?.data?.data.items.filter((rule) => rule.isActive) ?? [];
   const site = useQuery({
     queryKey: queryKeys.sites.detail(siteId),
     queryFn: () => findSite(siteId),
@@ -81,9 +75,10 @@ export function QuickRegistration({
     if (!choice || !queueId || !tierId || submissionInFlight.current) return;
     submissionInFlight.current = true;
     setPending(true);
-    setTicket('');
+    setSubmitError('');
+    setResult(undefined);
     try {
-      const response = await registerPerson({
+      const dto: CreateRegistrationDto = {
         queueId,
         tierId,
         entryType,
@@ -94,8 +89,19 @@ export function QuickRegistration({
         ...(choice.kind === 'existing'
           ? { personId: choice.person.personId }
           : { person: choice.person }),
-      });
-      setTicket(response.data.ticketNumber);
+      };
+      let response;
+      try {
+        response = await registerPerson(dto);
+      } catch (error) {
+        if (!(error instanceof NormalizedApiError) || error.status !== 409 || choice.kind !== 'new') throw error;
+        const people = await findPersons({ siteId, search: choice.person.phoneNumber, page: 1, pageSize: 100 });
+        const phone = choice.person.phoneNumber.replaceAll(' ', '');
+        const existing = people.data.items.find((person) => person.phoneNumber?.replaceAll(' ', '') === phone);
+        if (!existing) throw error;
+        response = await registerPerson({ ...dto, person: undefined, personId: existing.personId });
+      }
+      setResult(response.data);
       setStep(3);
       await invalidateQueueOperations(queryClient);
       notify({
@@ -107,7 +113,11 @@ export function QuickRegistration({
         message: __t('notifications.visit.ticketMessage', { ticket: response.data.ticketNumber }),
       });
     } catch (error) {
-      notifyError(error);
+      if (error instanceof NormalizedApiError && error.status === 409) {
+        setSubmitError(__t('quickRegistration.activeConflict'));
+      } else {
+        notifyError(error);
+      }
     } finally {
       submissionInFlight.current = false;
       setPending(false);
@@ -130,7 +140,8 @@ export function QuickRegistration({
     setEntryType('walkin');
     setAppointmentDate('');
     setAppointmentTime('');
-    setTicket('');
+    setSubmitError('');
+    setResult(undefined);
   };
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -307,31 +318,6 @@ export function QuickRegistration({
                       </option>
                     ))}
                   </select>
-                  {selectedTier ? (
-                    <div className="quick-registration-tier-details">
-                      <strong>{selectedTier.tier?.tierName}</strong>
-                      <span>
-                        {new Intl.NumberFormat(i18n.language, {
-                          style: 'currency',
-                          currency: selectedTier.currency,
-                        }).format(selectedTier.price)}
-                      </span>
-                      <small>
-                        {selectedTierRules.some((rule) => rule.channel === 'sms')
-                          ? __t('queue-operations.quickRegistration.benefitSms') + ' ? '
-                          : ''}
-                        {selectedTierRules.some((rule) => rule.notificationType === 'welcome')
-                          ? __t('queue-operations.quickRegistration.benefitWelcome') + ' ? '
-                          : ''}
-                        {selectedTierRules.some((rule) => rule.notificationType === 'threshold')
-                          ? __t('queue-operations.quickRegistration.benefitApproachAlert') + ' ? '
-                          : ''}
-                        {selectedTierRules.some((rule) => rule.includeTrackingLink)
-                          ? __t('queue-operations.quickRegistration.benefitTrackingLink')
-                          : ''}
-                      </small>
-                    </div>
-                  ) : null}
                 </FormField>
                 <FormField label={__t('common.type')}>
                   <select
@@ -394,22 +380,13 @@ export function QuickRegistration({
                   </FormField>
                 ) : null}
               </div>
+              {submitError ? <p className="field-error quick-registration-submit-error" role="alert">{submitError}</p> : null}
             </section>
           ) : null}
-          {step === 3 && ticket ? (
+          {step === 3 && result ? (
             <section className="quick-registration-result" role="status">
-              <span className="quick-registration-success" aria-hidden="true">
-                ✓
-              </span>
-              <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
-              <h3>{personName}</h3>
-              <strong>{ticket}</strong>
-              <p>
-                {queues.find((queue) => queue.queueId === queueId)?.queueName} ·{' '}
-                {entryType === 'appointment'
-                  ? __t('queue-operations.quickRegistration.rendezVousReserve')
-                  : __t('common.enAttente')}
-              </p>
+              <div className="quick-registration-result-details"><span className="quick-registration-success" aria-hidden="true">✓</span><p className="eyebrow">{__t('common.registrationConfirmed')}</p><h3>{personName}</h3><strong>{result.ticketNumber}</strong><p>{queues.find((queue) => queue.queueId === queueId)?.queueName} · {entryType === 'appointment' ? __t('queue-operations.quickRegistration.rendezVousReserve') : __t('common.enAttente')}</p></div>
+              <div className="quick-registration-tracking"><TrackingQr value={trackingUrlFromToken(result.registrationTrackingToken)} /><p>{__t('quickRegistration.trackingQrHelp')}</p></div>
             </section>
           ) : null}
         </div>

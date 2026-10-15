@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Layers3, ListTree, Pencil, Plus, Power, PowerOff, UserPlus } from 'lucide-react';
+import { Layers3, ListTree, Pencil, Plus, Power, PowerOff, UserMinus, UserPlus } from 'lucide-react';
+import { sitesControllerRemoveManager } from '@/api/generated/sites/sites';
+import type { SiteManagerResponseDto } from '@/api/generated/models';
 import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-api';
 import type { findSites, findTiers } from '../api/onboarding-api';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -19,15 +21,18 @@ import { QueueServiceSettings } from './QueueServiceSettings';
 
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
-  const siteId = useScopeStore((s) => s.activeSiteId);
+  const activeSiteId = useScopeStore((s) => s.activeSiteId);
+  const [selectedSiteId, setSelectedSiteId] = useState<number | null>(activeSiteId);
   const {
     sites: ss,
     queues: qs,
     roles: rs,
     tiers: ts,
+    managers,
+    refreshManagers,
     refresh: refreshData,
-  } = useSettingsData(siteId);
-  const refresh = () => void refreshData();
+  } = useSettingsData(selectedSiteId ?? activeSiteId);
+  const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
     [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null);
@@ -38,10 +43,19 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         title={__t('onboarding.settings.configurationDuService')}
         description={__t('onboarding.settings.gerezLesRessourcesReellementProposeesParDo')}
         actions={
-          <span className="status-badge status-success">
-            {__t('onboarding.settings.scope')}
-            {ss.find((s) => s.siteId === siteId)?.siteName ?? __t('onboarding.settings.global')}
-          </span>
+          <label className="settings-site-picker">
+            <span>{__t('onboarding.settings.scope')}</span>
+            <select
+              value={selectedSiteId ?? activeSiteId ?? ''}
+              onChange={(event) => { setSelectedSiteId(Number(event.target.value)); }}
+            >
+              {ss.map((site) => (
+                <option key={site.siteId} value={site.siteId}>
+                  {site.siteName}{site.isActive ? '' : ` · ${__t('common.inactive')}`}
+                </option>
+              ))}
+            </select>
+          </label>
         }
       />
       <div className="metrics-grid">
@@ -59,7 +73,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
       <Card className="settings-card">
         <SettingsNavigation active={section} />
         {section === 'sites' ? (
-          <SitesPanel items={ss} refresh={refresh} assign={setAssignmentTarget} />
+          <SitesPanel items={ss.filter((site) => site.siteId === (selectedSiteId ?? activeSiteId))} managers={managers} refresh={refresh} assign={setAssignmentTarget} />
         ) : null}
         {section === 'queues' ? (
           <QueuesPanel
@@ -85,7 +99,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         initial={editQueue}
         onSave={async (v) => {
           if (editQueue) await updateQueue(editQueue.queueId, v);
-          else if (siteId) await createQueueForSite(siteId, v);
+          else if (selectedSiteId ?? activeSiteId) await createQueueForSite((selectedSiteId ?? activeSiteId) as number, v);
           refresh();
         }}
       />
@@ -146,10 +160,12 @@ function useAdminPagination<T>(items: readonly T[]) {
 
 function SitesPanel({
   items,
+  managers,
   refresh,
   assign,
 }: {
   items: Sites;
+  managers: SiteManagerResponseDto[];
   refresh: () => void;
   assign: (target: AssignmentTarget) => void;
 }) {
@@ -160,8 +176,6 @@ function SitesPanel({
       <Header
         title={__t('onboarding.settings.sitesManagers')}
         text={__t('settings.siteHelp')}
-        to="/onboarding"
-        label={__t('settings.newSite')}
       />
       <div className="table-wrap admin-table-wrap">
         <table>
@@ -224,6 +238,15 @@ function SitesPanel({
           </tbody>
         </table>
       </div>
+      {items[0] ? (
+        <Card className="site-managers-card">
+          <div className="card-heading">
+            <div><h3>{__t('settings.managers')}</h3><p>{__t('settings.managersHelp')}</p></div>
+            <button className="button button-primary" type="button" onClick={() => { const site = items[0]; if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName }); }}><UserPlus />{__t('settings.addManager')}</button>
+          </div>
+          {managers.length ? <ul className="manager-list">{managers.map((manager) => <li key={manager.userId}><div><strong>{manager.username}</strong><span>{manager.email}</span></div><span className={`status-badge ${manager.isActive ? 'status-success' : ''}`}>{manager.isActive ? __t('common.active') : __t('common.inactive')}</span><button className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveManager(site.siteId, manager.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
+        </Card>
+      ) : null}
       {items.length > ADMIN_PAGE_SIZE ? (
         <Pagination
           page={pagination.currentPage}

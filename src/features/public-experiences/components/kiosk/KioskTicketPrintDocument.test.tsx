@@ -24,19 +24,19 @@ describe('KioskTicketPrintDocument', () => {
     expect(screen.getByText('A042')).toBeInTheDocument();
     expect(screen.getByText('Accueil général')).toBeInTheDocument();
     expect(await screen.findByRole('img', { hidden: true })).toHaveAccessibleName(
-      'QR code de test DORIFY',
+      'QR code permettant d’ouvrir le suivi du ticket',
     );
     await waitFor(() => {
       expect(onReady).toHaveBeenCalled();
     });
   });
 
-  it('still renders the test QR when no tracking link exists', async () => {
+  it('does not invent a QR payload when no tracking link exists', async () => {
     const onReady = vi.fn();
     render(<KioskTicketPrintDocument ticketNumber="A043" onReady={onReady} />);
     await waitFor(() => {
       expect(onReady).toHaveBeenCalledOnce();
     });
-    expect(await screen.findByRole('img', { hidden: true })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { hidden: true })).not.toBeInTheDocument();
   });
 });

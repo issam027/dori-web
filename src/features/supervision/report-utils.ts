@@ -1,4 +1,4 @@
-import type { QueueResponseDto, ReportGroupDto } from '@/api/generated/models';
+import type { QueueResponseDto, ReportBucketDto, ReportGroupDto, ReportMetricsDto } from '@/api/generated/models';
 
 const DAY_IN_MS = 86_400_000;
 
@@ -42,13 +42,19 @@ export function groupsToQueueRows(
     return {
       ...group,
       queueId: Number.isFinite(queueId) ? queueId : (queue?.queueId ?? index),
-      queueCode: queue?.queueCode ?? String(group.dimension.queueCode ?? ''),
-      queueName: queue?.queueName ?? String(group.dimension.queueName ?? queueId),
+      queueCode:
+        queue?.queueCode ??
+        (typeof group.dimension.queueCode === 'string' ? group.dimension.queueCode : ''),
+      queueName:
+        queue?.queueName ??
+        (typeof group.dimension.queueName === 'string'
+          ? group.dimension.queueName
+          : String(queueId)),
     };
   });
 }
 
-export function reportsToCsv(rows: readonly QueueReportRow[]) {
+export function reportsToCsv(rows: readonly QueueReportRow[], buckets: readonly ReportBucketDto[] = [], summary?: ReportMetricsDto) {
   const data = rows.map((row) => [
     row.queueCode,
     row.queueName,
@@ -60,8 +66,21 @@ export function reportsToCsv(rows: readonly QueueReportRow[]) {
     row.timing.averageServiceMinutes ?? '',
   ]);
   const escape = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`;
-  return [
+  const queueSection = [
+    ['COMPARAISON PAR FILE'],
     ['code', 'file', 'inscrits', 'servis', 'absents', 'taux_absence', 'attente_moyenne_min', 'service_moyen_min'],
     ...data,
-  ].map((row) => row.map(escape).join(',')).join('\n');
+  ];
+  const summarySection = summary ? [
+    ['SYNTHESE'],
+    ['inscrits', 'servis', 'sans_rendez_vous', 'rendez_vous', 'absents', 'annules', 'expires', 'attente_moyenne_min', 'attente_mediane_min', 'attente_p90_min', 'service_moyen_min', 'service_median_min', 'service_p90_min'],
+    [summary.volume.registered, summary.volume.served, summary.volume.walkin, summary.volume.appointments, summary.volume.noShow, summary.volume.cancelled, summary.volume.expired, summary.timing.averageWaitMinutes ?? '', summary.timing.medianWaitMinutes ?? '', summary.timing.p90WaitMinutes ?? '', summary.timing.averageServiceMinutes ?? '', summary.timing.medianServiceMinutes ?? '', summary.timing.p90ServiceMinutes ?? ''],
+    [],
+  ] : [];
+  const timelineSection = buckets.length ? [
+    [], ['SERIE TEMPORELLE'],
+    ['debut', 'fin', 'inscrits', 'sans_rendez_vous', 'rendez_vous', 'servis', 'absents', 'annules', 'expires', 'attente_moyenne_min', 'attente_mediane_min', 'attente_p90_min', 'service_moyen_min', 'service_median_min', 'service_p90_min', 'taux_absence'],
+    ...buckets.map((bucket) => [bucket.periodStart, bucket.periodEnd, bucket.volume.registered, bucket.volume.walkin, bucket.volume.appointments, bucket.volume.served, bucket.volume.noShow, bucket.volume.cancelled, bucket.volume.expired, bucket.timing.averageWaitMinutes ?? '', bucket.timing.medianWaitMinutes ?? '', bucket.timing.p90WaitMinutes ?? '', bucket.timing.averageServiceMinutes ?? '', bucket.timing.medianServiceMinutes ?? '', bucket.timing.p90ServiceMinutes ?? '', bucket.rates.noShowRate ?? '']),
+  ] : [];
+  return [...summarySection, ...queueSection, ...timelineSection].map((row) => row.map(escape).join(',')).join('\n');
 }
