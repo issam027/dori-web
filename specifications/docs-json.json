@@ -3449,8 +3449,8 @@
                         "user_queue_assign"
                     ]
                 },
-                "summary": "Assigner un opérateur à la file",
-                "description": "Donne l'autorisation à un utilisateur d'opérer les guichets de cette file.",
+                "summary": "Assigner un opérateur ou une borne à la file",
+                "description": "Affecte un opérateur ou une borne à la file et garantit également son affectation au site parent.",
                 "parameters": [
                     {
                         "name": "queueId",
@@ -3611,8 +3611,8 @@
                         "user_queue_assign"
                     ]
                 },
-                "summary": "Retirer un opérateur de la file",
-                "description": "Révoque l'affectation d'un opérateur sur cette file d'attente.",
+                "summary": "Retirer un opérateur ou une borne de la file",
+                "description": "Révoque l'affectation à la file. L'affectation au site parent est aussi retirée si l'utilisateur n'est affecté à aucune autre file de ce site.",
                 "parameters": [
                     {
                         "name": "queueId",
@@ -16462,7 +16462,7 @@
                 "properties": {
                     "userId": {
                         "type": "number",
-                        "description": "ID de l'opérateur à affecter",
+                        "description": "ID de l'opérateur ou de la borne à affecter",
                         "example": 3,
                         "minimum": 1
                     }
@@ -17996,10 +17996,36 @@
                         "example": "waiting",
                         "description": "Statut du ticket"
                     },
+                    "registrationStatus": {
+                        "type": "string",
+                        "enum": [
+                            "waiting",
+                            "in_progress",
+                            "served",
+                            "no_show",
+                            "cancelled",
+                            "expired"
+                        ],
+                        "example": "served",
+                        "description": "Statut métier réel de l'inscription, y compris après sa clôture"
+                    },
                     "counterNumber": {
                         "type": "number",
                         "example": 2,
                         "description": "Numéro du guichet si appelé"
+                    },
+                    "counterName": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "Guichet 04",
+                        "description": "Nom complet du guichet ayant appelé le client"
+                    },
+                    "calledAt": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "date-time",
+                        "example": "2026-10-15T09:42:18.000Z",
+                        "description": "Date et heure de l'appel du client"
                     },
                     "queueName": {
                         "type": "string",
@@ -18008,7 +18034,8 @@
                     }
                 },
                 "required": [
-                    "status"
+                    "status",
+                    "registrationStatus"
                 ]
             },
             "QueueCandidatePersonItemDto": {
@@ -18132,6 +18159,12 @@
                         "format": "date-time",
                         "description": "Valeur du champ « last seen at »."
                     },
+                    "counterName": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "Guichet 04",
+                        "description": "Valeur du champ « counter name »."
+                    },
                     "inactiveMinutes": {
                         "type": "number",
                         "minimum": 0,
@@ -18242,6 +18275,12 @@
                         "minimum": 1,
                         "description": "Valeur du champ « thread number »."
                     },
+                    "counterName": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "Guichet 04",
+                        "description": "Valeur du champ « counter name »."
+                    },
                     "userId": {
                         "type": "number",
                         "minimum": 1,
@@ -18333,6 +18372,13 @@
             "OpenQueueSessionDto": {
                 "type": "object",
                 "properties": {
+                    "counterName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "example": "Guichet 04",
+                        "description": "Nom complet et libre du point de service, par exemple Bureau A, Guichet 04 ou Cabinet 2"
+                    },
                     "threadNumber": {
                         "type": "number",
                         "minimum": 1,

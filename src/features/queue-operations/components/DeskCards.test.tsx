@@ -33,7 +33,7 @@ describe('desk cockpit cards', () => {
     const { container } = render(
       <QueueDeskCard
         queue={{ queueId: 1, queueName: 'Accueil' } as never}
-        session={{ sessionId: 4, threadNumber: 1 } as never}
+        session={{ sessionId: 4, threadNumber: 1, counterName: 'Bureau A' } as never}
         active
         waitingCount={2}
         estimatedWaitMinutes={6}
@@ -45,6 +45,7 @@ describe('desk cockpit cards', () => {
       />,
     );
     expect(container.querySelector('.queue-desk-card')).toHaveClass('has-open-desk');
+    expect(screen.getByText('Bureau A')).toBeVisible();
     await user.click(screen.getByRole('button', { name: /appeler le suivant/i }));
     expect(onCallNext).toHaveBeenCalledOnce();
   });

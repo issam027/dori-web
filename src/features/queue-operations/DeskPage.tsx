@@ -5,6 +5,8 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { FormField } from '@/design-system/components/FormField';
+import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
@@ -37,6 +39,12 @@ export function DeskPage() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [notesOpen, setNotesOpen] = useState(false);
+  const [deskToOpen, setDeskToOpen] = useState<{
+    queueId: number;
+    queueName: string;
+    occupiedThread?: number;
+  }>();
+  const [counterName, setCounterName] = useState('');
   const queues = useQueues({ siteId, isActive: true });
   const allowed =
     queues.data?.data.items.filter(
@@ -164,7 +172,12 @@ export function DeskPage() {
       notify({ tone: 'success', title: t('notifications.desk.released'), message: queueName });
       await refresh();
     });
-  const occupyDesk = (queueId: number, queueName: string, occupiedThread?: number) => {
+  const occupyDesk = (
+    queueId: number,
+    queueName: string,
+    counterNameValue: string,
+    occupiedThread?: number,
+  ) => {
     const takeOver =
       occupiedThread !== undefined &&
       window.confirm(t('queue-operations.desk.ceGuichetEstOccupeConfirmerLaReprise'));
@@ -172,13 +185,20 @@ export function DeskPage() {
     void execute(async () => {
       await openSession.execute({
         queueId,
-        dto: { mode: 'active', threadNumber: occupiedThread ?? 1, takeOver },
+        dto: {
+          mode: 'active',
+          counterName: counterNameValue.trim(),
+          threadNumber: occupiedThread ?? 1,
+          takeOver,
+        },
       });
       notify({
         tone: 'success',
         title: takeOver ? t('notifications.desk.takenOver') : t('notifications.desk.opened'),
         message: queueName,
       });
+      setDeskToOpen(undefined);
+      setCounterName('');
       await refresh();
     });
   };
@@ -273,7 +293,12 @@ export function DeskPage() {
                   if (mine) releaseDesk(queue.queueId, mine.sessionId, queue.queueName);
                 }}
                 onOccupy={() => {
-                  occupyDesk(queue.queueId, queue.queueName, occupied?.threadNumber ?? undefined);
+                  setCounterName(occupied?.counterName ?? '');
+                  setDeskToOpen({
+                    queueId: queue.queueId,
+                    queueName: queue.queueName,
+                    occupiedThread: occupied?.threadNumber ?? undefined,
+                  });
                 }}
                 onCallNext={() => {
                   callFromQueue(queue.queueId, queue.queueName);
@@ -291,6 +316,58 @@ export function DeskPage() {
         />
       ) : null}
       <DeskPassages passages={passages} siteName={site.data?.data.siteName} />
+      <Modal
+        open={Boolean(deskToOpen)}
+        onOpenChange={(open) => {
+          if (!open && !pending) {
+            setDeskToOpen(undefined);
+            setCounterName('');
+          }
+        }}
+        title={t('desk.openCounterTitle')}
+        description={deskToOpen?.queueName}
+        actions={
+          <button
+            className="button button-primary"
+            type="button"
+            disabled={pending || !counterName.trim()}
+            onClick={() => {
+              if (!deskToOpen) return;
+              occupyDesk(
+                deskToOpen.queueId,
+                deskToOpen.queueName,
+                counterName,
+                deskToOpen.occupiedThread,
+              );
+            }}
+          >
+            {t('desk.openCounterAction')}
+          </button>
+        }
+      >
+        <FormField label={t('desk.counterName')} hint={t('desk.counterNameHint')} required>
+          <input
+            autoFocus
+            maxLength={100}
+            value={counterName}
+            placeholder={t('desk.counterNamePlaceholder')}
+            onChange={(event) => {
+              setCounterName(event.target.value);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && counterName.trim() && deskToOpen && !pending) {
+                event.preventDefault();
+                occupyDesk(
+                  deskToOpen.queueId,
+                  deskToOpen.queueName,
+                  counterName,
+                  deskToOpen.occupiedThread,
+                );
+              }
+            }}
+          />
+        </FormField>
+      </Modal>
     </div>
   );
 }

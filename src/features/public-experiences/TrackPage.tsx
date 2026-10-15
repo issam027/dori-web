@@ -1,9 +1,28 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
+import { CheckCircle2, Clock3, RefreshCw, TriangleAlert, XCircle } from 'lucide-react';
+import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
 import { usePublicTracking } from './hooks/usePublicExperiences';
+
+type TrackingPhase = 'far' | 'near' | 'next' | 'called' | 'completed';
+
+const terminalStatuses = new Set(['served', 'no_show', 'cancelled', 'expired']);
+
+function trackingPhase(position?: RegistrationPositionResponseDto): TrackingPhase {
+  if (position && terminalStatuses.has(position.registrationStatus)) return 'completed';
+  if (
+    position?.status === 'called' ||
+    position?.counterName ||
+    position?.counterNumber !== undefined
+  )
+    return 'called';
+  if (position?.position === 1) return 'next';
+  if (position?.position !== undefined && position.position < 5) return 'near';
+  return 'far';
+}
 
 export function TrackPage({ preview = false }: { preview?: boolean }) {
   const { t: __t } = useTranslation();
@@ -11,19 +30,19 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const [initialToken] = useState(() => consumeOrRestoreOpaqueToken(location.search, history));
   const [trackingId, setTrackingId] = useState(initialToken);
   const [token, setToken] = useState(initialToken);
-  const {
-    gateway,
-    position,
-    setPosition,
-    error: trackingError,
-    setError: setTrackingError,
-  } = usePublicTracking(token);
+  const { gateway, position, setPosition, error: trackingError, setError } =
+    usePublicTracking(token);
   const [consent, setConsent] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const previousStatus = useRef('');
+  const phase = trackingPhase(position);
+  const called = phase === 'called';
+  const completed = phase === 'completed';
+
   useEffect(() => {
     if (!gateway) return;
     const unsubscribe = gateway.subscribe((snapshot) => {
-      setTrackingError(undefined);
+      setError(undefined);
       setPosition(snapshot);
     });
     void gateway.connect().catch(() => undefined);
@@ -31,9 +50,8 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
       unsubscribe();
       gateway.disconnect();
     };
-  }, [gateway, setPosition, setTrackingError]);
+  }, [gateway, setError, setPosition]);
 
-  const called = position?.status === 'called' || position?.counterNumber !== undefined;
   useEffect(() => {
     if (!consent || !called || previousStatus.current === 'called') {
       previousStatus.current = called ? 'called' : (position?.status ?? '');
@@ -43,6 +61,18 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     playChime();
     if ('vibrate' in navigator) navigator.vibrate([250, 100, 250]);
   }, [called, consent, position?.status]);
+
+  const refresh = async () => {
+    if (!gateway || refreshing) return;
+    setRefreshing(true);
+    try {
+      await gateway.refresh();
+    } catch {
+      // The gateway maps transport errors to the dedicated tracking error screen.
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (!token && !preview)
     return (
@@ -54,6 +84,18 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     );
 
   const progress = trackingProgress(position?.position);
+  const status = position?.registrationStatus ?? position?.status ?? 'waiting';
+  const calledAt = position?.calledAt
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+        new Date(position.calledAt),
+      )
+    : null;
+  const destination =
+    position?.counterName?.trim() ||
+    (position?.counterNumber !== undefined
+      ? __t('tracking.counterFallback', { counter: String(position.counterNumber) })
+      : __t('tracking.counterPending'));
+
   return (
     <div className={preview ? 'tracking-preview-layout' : 'tracking-public-layout'}>
       {preview && user ? (
@@ -63,7 +105,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
             event.preventDefault();
             const nextToken = trackingId.trim();
             setPosition(undefined);
-            setTrackingError(undefined);
+            setError(undefined);
             previousStatus.current = '';
             setToken(nextToken);
           }}
@@ -71,9 +113,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
           <div>
             <div>
               <strong>{__t('public-experiences.track.testerUnSuiviReel')}</strong>
-              <span>
-                {__t('public-experiences.track.ceChampEstVisibleUniquementDansLApercuIn')}
-              </span>
+              <span>{__t('public-experiences.track.ceChampEstVisibleUniquementDansLApercuIn')}</span>
             </div>
             <label htmlFor="tracking-id">{__t('public-experiences.track.trackingId')}</label>
           </div>
@@ -95,9 +135,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
         </form>
       ) : null}
       <section
-        className={
-          called && consent ? 'tracking-screen is-called has-alert-consent' : 'tracking-screen'
-        }
+        className={`tracking-screen tracking-phase-${phase} tracking-status-${status}${called && consent ? ' has-alert-consent' : ''}`}
       >
         <div className="tracking-device-notch" aria-hidden="true" />
         {!token ? (
@@ -107,7 +145,13 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
             <p>{__t('public-experiences.track.utilisezLeChampDeTestSitueAuDessusDuTel')}</p>
           </div>
         ) : trackingError ? (
-          <div className="tracking-placeholder tracking-error" role="alert">
+          <div
+            className={`tracking-placeholder tracking-error tracking-error-${trackingError}`}
+            role="alert"
+          >
+            <span className="tracking-error-icon" aria-hidden="true">
+              {trackingError === 'expired' ? <Clock3 /> : <TriangleAlert />}
+            </span>
             <span className="tracking-brand">{__t('app.name')}</span>
             <h1>{__t(`tracking.error.${trackingError}Title`)}</h1>
             <p>{__t(`tracking.error.${trackingError}Text`)}</p>
@@ -117,24 +161,54 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
             <header>
               <div className="tracking-brand-row">
                 <span className="tracking-brand">{__t('app.name')}</span>
-                <span className="tracking-live">
-                  <i aria-hidden="true" /> {__t('common.enDirect')}
-                </span>
+                {!completed ? (
+                  <span className="tracking-live">
+                    <i aria-hidden="true" /> {__t('common.enDirect')}
+                  </span>
+                ) : null}
               </div>
               <span>{__t('public-experiences.track.votreTicket')}</span>
               <strong>{position?.ticketNumber ?? '—'}</strong>
+              <span className="tracking-queue-badge">
+                {position?.queueName ?? __t('public-experiences.track.votreFile')}
+              </span>
             </header>
-            {called ? (
+
+            {completed ? (
+              <div className="tracking-completed" role="status">
+                <span className="tracking-completed-icon" aria-hidden="true">
+                  {status === 'served' ? <CheckCircle2 /> : <XCircle />}
+                </span>
+                <h1>{__t(`tracking.completed.${status}.title`)}</h1>
+                <p>{__t(`tracking.completed.${status}.text`)}</p>
+                {calledAt ? (
+                  <dl className="tracking-call-details">
+                    <div>
+                      <dt>{__t('tracking.calledAt')}</dt>
+                      <dd>{calledAt}</dd>
+                    </div>
+                    {position?.counterName || position?.counterNumber !== undefined ? (
+                      <div>
+                        <dt>{__t('tracking.calledAtCounter')}</dt>
+                        <dd>{destination}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                ) : null}
+              </div>
+            ) : called ? (
               <div className="tracking-called" role="alert">
                 <span>{__t('public-experiences.track.cEstVotreTour')}</span>
-                <h1>
-                  {__t('common.guichet')}
-                  {position.counterNumber ?? '—'}
-                </h1>
+                <h1>{destination}</h1>
                 <p>{__t('public-experiences.track.merciDeVousPresenterAuPosteIndique')}</p>
+                {calledAt ? <time>{__t('tracking.calledAtValue', { date: calledAt })}</time> : null}
               </div>
             ) : (
               <>
+                <div className={`tracking-proximity tracking-proximity-${phase}`}>
+                  <strong>{__t(`tracking.waiting.${phase}.title`)}</strong>
+                  <span>{__t(`tracking.waiting.${phase}.text`)}</span>
+                </div>
                 <div
                   className="tracking-gauge"
                   role="progressbar"
@@ -157,39 +231,34 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                       })
                     : __t('public-experiences.track.estimationEnCours')}
                 </h1>
-                <p className="tracking-queue">
-                  {position?.queueName ?? __t('public-experiences.track.votreFile')}
-                </p>
               </>
             )}
-            <div className="tracking-guidance">
-              <strong>
-                {called
-                  ? __t('public-experiences.track.rejoignezVotreGuichet')
-                  : __t('public-experiences.track.restezAttentif')}
-              </strong>
-              <p>
-                {called
-                  ? __t('public-experiences.track.votreNumeroVientDEtreAppele')
-                  : __t('public-experiences.track.cettePageVousIndiqueraVotreGuichetDes')}
-              </p>
-            </div>
-            <p className="tracking-status">
-              {__t('public-experiences.track.statut')}
-              {position?.status ?? __t('public-experiences.track.chargement')}
-            </p>
-            <button
-              type="button"
-              className="button button-primary tracking-consent"
-              aria-pressed={consent}
-              onClick={() => {
-                setConsent((value) => !value);
-              }}
-            >
-              {consent
-                ? __t('public-experiences.track.sonEtVibrationActives')
-                : __t('public-experiences.track.activerSonEtVibration')}
-            </button>
+
+            {!completed ? (
+              <div className="tracking-actions">
+                <button
+                  type="button"
+                  className="button tracking-refresh"
+                  disabled={refreshing}
+                  onClick={() => void refresh()}
+                >
+                  <RefreshCw className={refreshing ? 'is-spinning' : undefined} aria-hidden="true" />
+                  {refreshing ? __t('tracking.refreshing') : __t('tracking.refresh')}
+                </button>
+                <button
+                  type="button"
+                  className="button button-primary tracking-consent"
+                  aria-pressed={consent}
+                  onClick={() => {
+                    setConsent((value) => !value);
+                  }}
+                >
+                  {consent
+                    ? __t('public-experiences.track.sonEtVibrationActives')
+                    : __t('public-experiences.track.activerSonEtVibration')}
+                </button>
+              </div>
+            ) : null}
           </>
         )}
       </section>

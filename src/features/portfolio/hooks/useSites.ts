@@ -4,12 +4,20 @@ import { queryKeys } from '@/api/client/query-keys';
 import { changeActiveSite } from '@/core/auth/session-actions';
 import { useScopeStore } from '@/core/scope/scope-store';
 import type { UserScopeDto } from '@/api/generated/models';
-import { findSite, findSites } from '../api/sites-api';
+import { findAllSites, findSite, findSites } from '../api/sites-api';
 
-export function useSites(usage: 'portfolio' | 'context-switcher', enabled = true) {
+export function useSites(
+  usage: 'portfolio' | 'context-switcher',
+  enabled = true,
+  includeInactive = false,
+) {
   return useQuery({
-    queryKey: usage === 'portfolio' ? queryKeys.sites.portfolio : queryKeys.sites.contextSwitcher,
-    queryFn: ({ signal }) => findSites(signal),
+    queryKey:
+      usage === 'portfolio'
+        ? [...queryKeys.sites.portfolio, { includeInactive }]
+        : queryKeys.sites.contextSwitcher,
+    queryFn: ({ signal }) =>
+      usage === 'portfolio' && includeInactive ? findAllSites(signal) : findSites(signal),
     enabled,
   });
 }

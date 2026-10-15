@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
-import { CalendarCheck2, Clock3, Search, Ticket, UserRound } from 'lucide-react';
+import { CalendarCheck2, Check, Clock3, Search, Ticket, UserRound } from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
@@ -27,6 +27,7 @@ import {
 } from './KioskSteps';
 import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 import { trackingUrlFromToken } from '../../tracking-url';
+import { useSite } from '@/features/portfolio/hooks/useSites';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
   trackingUrl: string | null;
   queueName?: string;
@@ -36,6 +37,7 @@ export function KioskWizard() {
   const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
+  const site = useSite(activeSiteId);
   const [{ flow, walkinStep }, dispatch] = useReducer(kioskWizardReducer, initialKioskWizardState);
   const [queueId, setQueueId] = useState<number>();
   const [tier, setTier] = useState<QueueTierResponseDto>();
@@ -624,7 +626,7 @@ export function KioskWizard() {
         <KioskTicketResult>
           <div className="kiosk-result-heading">
             <span className="kiosk-result-check" aria-hidden="true">
-              ✓
+              <Check />
             </span>
             <div>
               <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
@@ -664,6 +666,7 @@ export function KioskWizard() {
           </div>
           <KioskTicketPrintDocument
             ticketNumber={result.ticketNumber}
+            siteName={site.data?.data.siteName}
             queueName={result.queueName}
             trackingUrl={result.trackingUrl}
             onReady={handlePrintReady}

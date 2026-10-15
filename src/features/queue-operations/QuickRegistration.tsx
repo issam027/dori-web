@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Check, Plus, TicketCheck } from 'lucide-react';
+import { ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -23,6 +23,7 @@ import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { findPersons } from '@/features/persons/api/persons-api';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
+import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
 
 const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
@@ -42,6 +43,7 @@ export function QuickRegistration({
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
   const [result, setResult] = useState<CreateRegistrationResponseDto>();
+  const [printReady, setPrintReady] = useState(false);
   const [pending, setPending] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const submissionInFlight = useRef(false);
@@ -65,8 +67,7 @@ export function QuickRegistration({
   });
   const availability = useQuery({
     queryKey: queryKeys.availability(queueId, appointmentDate),
-    queryFn: () =>
-      getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
+    queryFn: () => getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
     enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
   });
   const availableSlots =
@@ -94,14 +95,23 @@ export function QuickRegistration({
       try {
         response = await registerPerson(dto);
       } catch (error) {
-        if (!(error instanceof NormalizedApiError) || error.status !== 409 || choice.kind !== 'new') throw error;
-        const people = await findPersons({ siteId, search: choice.person.phoneNumber, page: 1, pageSize: 100 });
+        if (!(error instanceof NormalizedApiError) || error.status !== 409 || choice.kind !== 'new')
+          throw error;
+        const people = await findPersons({
+          siteId,
+          search: choice.person.phoneNumber,
+          page: 1,
+          pageSize: 100,
+        });
         const phone = choice.person.phoneNumber.replaceAll(' ', '');
-        const existing = people.data.items.find((person) => person.phoneNumber?.replaceAll(' ', '') === phone);
+        const existing = people.data.items.find(
+          (person) => person.phoneNumber?.replaceAll(' ', '') === phone,
+        );
         if (!existing) throw error;
         response = await registerPerson({ ...dto, person: undefined, personId: existing.personId });
       }
       setResult(response.data);
+      setPrintReady(false);
       setStep(3);
       await invalidateQueueOperations(queryClient);
       notify({
@@ -142,6 +152,7 @@ export function QuickRegistration({
     setAppointmentTime('');
     setSubmitError('');
     setResult(undefined);
+    setPrintReady(false);
   };
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -218,16 +229,35 @@ export function QuickRegistration({
               </>
             ) : null}
             {step === 3 ? (
-              <button
-                className="button button-primary"
-                type="button"
-                onClick={() => {
-                  handleOpenChange(false);
-                }}
-              >
-                <Check aria-hidden="true" />
-                {__t('common.terminer')}
-              </button>
+              <>
+                <button
+                  className="button"
+                  type="button"
+                  disabled={!printReady}
+                  onClick={() => {
+                    document.body.dataset.printKioskTicket = 'true';
+                    const cleanup = () => {
+                      delete document.body.dataset.printKioskTicket;
+                    };
+                    window.addEventListener('afterprint', cleanup, { once: true });
+                    window.print();
+                    window.setTimeout(cleanup, 30_000);
+                  }}
+                >
+                  <Printer aria-hidden="true" />
+                  {__t('public-experiences.kiosk.imprimerMonTicket')}
+                </button>
+                <button
+                  className="button button-primary"
+                  type="button"
+                  onClick={() => {
+                    handleOpenChange(false);
+                  }}
+                >
+                  <Check aria-hidden="true" />
+                  {__t('common.terminer')}
+                </button>
+              </>
             ) : null}
           </>
         }
@@ -380,13 +410,42 @@ export function QuickRegistration({
                   </FormField>
                 ) : null}
               </div>
-              {submitError ? <p className="field-error quick-registration-submit-error" role="alert">{submitError}</p> : null}
+              {submitError ? (
+                <p className="field-error quick-registration-submit-error" role="alert">
+                  {submitError}
+                </p>
+              ) : null}
             </section>
           ) : null}
           {step === 3 && result ? (
             <section className="quick-registration-result" role="status">
-              <div className="quick-registration-result-details"><span className="quick-registration-success" aria-hidden="true">✓</span><p className="eyebrow">{__t('common.registrationConfirmed')}</p><h3>{personName}</h3><strong>{result.ticketNumber}</strong><p>{queues.find((queue) => queue.queueId === queueId)?.queueName} · {entryType === 'appointment' ? __t('queue-operations.quickRegistration.rendezVousReserve') : __t('common.enAttente')}</p></div>
-              <div className="quick-registration-tracking"><TrackingQr value={trackingUrlFromToken(result.registrationTrackingToken)} /><p>{__t('quickRegistration.trackingQrHelp')}</p></div>
+              <div className="quick-registration-result-details">
+                <span className="quick-registration-success" aria-hidden="true">
+                  <Check />
+                </span>
+                <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
+                <h3>{personName}</h3>
+                <strong>{result.ticketNumber}</strong>
+                <p>
+                  {queues.find((queue) => queue.queueId === queueId)?.queueName} ·{' '}
+                  {entryType === 'appointment'
+                    ? __t('queue-operations.quickRegistration.rendezVousReserve')
+                    : __t('common.enAttente')}
+                </p>
+              </div>
+              <div className="quick-registration-tracking">
+                <TrackingQr value={trackingUrlFromToken(result.registrationTrackingToken)} />
+                <p>{__t('quickRegistration.trackingQrHelp')}</p>
+              </div>
+              <KioskTicketPrintDocument
+                ticketNumber={result.ticketNumber}
+                siteName={site.data?.data.siteName}
+                queueName={queues.find((queue) => queue.queueId === queueId)?.queueName}
+                trackingUrl={trackingUrlFromToken(result.registrationTrackingToken)}
+                onReady={() => {
+                  setPrintReady(true);
+                }}
+              />
             </section>
           ) : null}
         </div>

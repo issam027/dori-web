@@ -23,6 +23,7 @@ import {
   serviceTiersControllerGetQueueTiers,
   serviceTiersControllerGetRules,
 } from '@/api/generated/tiers/tiers';
+import { queueEngineControllerGetActiveSessions } from '@/api/generated/queue-engine/queue-engine';
 import { queryKeys } from '@/api/client/query-keys';
 import { PollingRealtimeGateway } from '@/core/realtime/realtime-gateway';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
@@ -92,7 +93,20 @@ export function useDisplaySnapshot(options: {
       refetchInterval: 5_000,
     })),
   });
-  return { queues, allowedQueues, displays };
+  const sessions = useQueries({
+    queries: allowedQueues.map((queue) => ({
+      queryKey: queryKeys.queueSessions.byQueue(queue.queueId),
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        queueEngineControllerGetActiveSessions(
+          queue.queueId,
+          { page: 1, pageSize: 100 },
+          undefined,
+          signal,
+        ),
+      refetchInterval: 5_000,
+    })),
+  });
+  return { queues, allowedQueues, displays, sessions };
 }
 
 export function useKioskCatalog(
@@ -177,6 +191,5 @@ export function useKioskRegistration(options: {
   });
   return { register, lookup, checkIn };
 }
-
 
 export type KioskTier = QueueTierResponseDto;

@@ -48,7 +48,7 @@
 }
 .kiosk-screen button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgb(16 42 67 / 12%);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 .kiosk-screen button:disabled {
   cursor: not-allowed;
@@ -115,8 +115,8 @@
   gap: var(--space-4);
   padding: var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--color-navy);
-  color: white;
+  color: var(--color-background);
+  background: var(--color-ink);
   box-shadow: var(--shadow-lg);
 }
 .kiosk-result {
@@ -282,8 +282,12 @@
   align-content: center;
   padding: clamp(1.25rem, 4vw, 2.5rem);
   border-radius: 18px;
-  background: linear-gradient(155deg, #f8fffe, #e9f6f6);
-  color: #102a43;
+  color: var(--color-ink);
+  background: linear-gradient(
+    155deg,
+    var(--color-surface),
+    color-mix(in srgb, var(--color-primary-soft) 72%, var(--color-background))
+  );
 }
 .kiosk-header {
   display: flex;
@@ -301,7 +305,7 @@
 }
 .kiosk-brand {
   gap: 0.75rem;
-  color: #102a43;
+  color: var(--color-ink);
 }
 .kiosk-brand > span {
   display: grid;
@@ -309,8 +313,8 @@
   height: 42px;
   place-items: center;
   border-radius: 13px;
-  background: #c5f4ef;
-  color: #0d5960;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
   font-size: 1.2rem;
   font-weight: 900;
 }
@@ -322,7 +326,7 @@
   letter-spacing: 0.12em;
 }
 .kiosk-brand small {
-  color: #627d98;
+  color: var(--color-muted);
 }
 .kiosk-session {
   gap: 0.65rem;
@@ -330,10 +334,10 @@
 .kiosk-session > span {
   gap: 0.4rem;
   padding: 0.45rem 0.7rem;
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--color-line);
   border-radius: 999px;
-  background: rgb(255 255 255 / 70%);
-  color: #486581;
+  color: var(--color-muted);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -341,7 +345,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #1f9d72;
+  background: var(--color-success);
 }
 .kiosk-session svg {
   width: 0.9rem;
@@ -351,7 +355,7 @@
   text-align: center;
 }
 .kiosk-welcome > span {
-  color: #0f8b8d;
+  color: var(--color-primary);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -364,7 +368,7 @@
 .kiosk-welcome p,
 .kiosk-privacy {
   margin: 0;
-  color: #627d98;
+  color: var(--color-muted);
 }
 .kiosk-choices {
   max-width: 720px;
@@ -374,19 +378,19 @@
   min-height: 150px;
   align-content: center;
   gap: 0.45rem;
-  border-color: #dbe6eb;
-  background: #fff;
-  color: #102a43;
-  box-shadow: 0 8px 24px rgb(16 42 67 / 5%);
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-ink) 7%, transparent);
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
     box-shadow 160ms ease;
 }
 .kiosk-choices button:hover {
-  border-color: #0f8b8d;
-  background: #e9f8f6;
-  box-shadow: 0 12px 30px rgb(16 42 67 / 10%);
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 .kiosk-panel h1 {
   margin-bottom: 0;
@@ -402,18 +406,18 @@
   height: 6px;
   flex: 1;
   border-radius: 99px;
-  background: #d9e5e8;
+  background: color-mix(in srgb, var(--color-muted) 32%, var(--color-surface));
   transition: background-color 180ms ease;
 }
 .kiosk-progress span.done {
-  background: #0f8b8d;
+  background: var(--color-primary);
 }
 .kiosk-stage-title {
   width: 100%;
   text-align: center;
 }
 .kiosk-stage-title > span {
-  color: #0f8b8d;
+  color: var(--color-primary);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -424,7 +428,7 @@
 }
 .kiosk-stage-title p {
   margin: 0;
-  color: #627d98;
+  color: var(--color-muted);
 }
 .kiosk-form-grid {
   display: grid;
@@ -438,41 +442,41 @@
   align-content: start;
   gap: 0.5rem;
   font-weight: 750;
-  color: #102a43;
+  color: var(--color-ink);
 }
 .kiosk-screen input,
 .kiosk-screen select,
 .kiosk-screen textarea {
-  border-color: #cbd9e2;
-  background: #fff;
-  color: #102a43;
-  color-scheme: light;
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  color-scheme: inherit;
 }
 .kiosk-screen input::placeholder,
 .kiosk-screen textarea::placeholder {
-  color: #627d98;
+  color: var(--color-muted);
   opacity: 1;
 }
 .kiosk-screen select option {
-  background: #fff;
-  color: #102a43;
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 .kiosk-form-grid small {
-  color: #627d98;
+  color: var(--color-muted);
   font-weight: 500;
 }
 .kiosk-screen .international-phone-input {
-  background: #fff;
-  border-color: #bcccdc;
-  color: #102a43;
+  border-color: var(--color-line);
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 .kiosk-screen .international-phone-input select,
 .kiosk-screen .international-phone-input input {
-  color: #102a43;
+  color: var(--color-ink);
 }
 .kiosk-screen .phone-country-trigger,
 .kiosk-screen .phone-country-menu button {
-  color: #102a43;
+  color: var(--color-ink);
 }
 .kiosk-screen .phone-country-trigger:hover:not(:disabled),
 .kiosk-screen .phone-country-menu button:hover:not(:disabled) {
@@ -488,7 +492,7 @@
   gap: 5px;
   margin: 8px 0 0;
   padding: 0;
-  color: #627d98;
+  color: var(--color-muted);
   font-size: 0.78rem;
   list-style: none;
 }
@@ -497,7 +501,7 @@
   margin-inline-end: 6px;
 }
 .kiosk-tier-benefits li.included {
-  color: #18794e;
+  color: var(--color-success);
 }
 .kiosk-tier-benefits li.included::before {
   content: '✓';
@@ -508,9 +512,11 @@
   width: min(620px, 100%);
   margin: 0 auto;
   overflow: hidden;
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--color-line);
   border-radius: 15px;
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
 .kiosk-review table {
   width: 100%;
@@ -524,10 +530,10 @@
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(7rem, 0.8fr) 1.2fr;
-  border-bottom: 1px solid #e7edf2;
+  border-bottom: 1px solid var(--color-line);
 }
 .kiosk-review tr:nth-child(odd) {
-  border-inline-end: 1px solid #e7edf2;
+  border-inline-end: 1px solid var(--color-line);
 }
 .kiosk-review th,
 .kiosk-review td {
@@ -537,8 +543,10 @@
 }
 .kiosk-review th {
   width: 42%;
-  color: #627d98;
+  color: color-mix(in srgb, var(--color-muted) 72%, var(--color-ink));
+  background: color-mix(in srgb, var(--color-primary-soft) 52%, var(--color-surface));
   font-size: 0.78rem;
+  font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -546,17 +554,22 @@
   border-top: 0;
 }
 .kiosk-review tr:nth-child(even) {
-  background: #f8fafc;
+  background: var(--color-surface-muted);
+}
+.kiosk-review td {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  font-weight: 650;
 }
 .kiosk-error {
   width: min(620px, 100%);
   margin: 0 auto;
   padding: 1rem 1.1rem;
-  border: 1px solid #f2b8b5;
-  border-inline-start: 5px solid #c0392b;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 48%, var(--color-line));
+  border-inline-start: 5px solid var(--color-danger);
   border-radius: 14px;
-  color: #7a271a;
-  background: #fff4f2;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 .kiosk-error strong,
 .kiosk-error span {
@@ -567,23 +580,24 @@
 }
 .kiosk-tiles button {
   border-radius: 15px;
-  box-shadow: 0 6px 18px rgb(16 42 67 / 5%);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-ink) 7%, transparent);
 }
 .kiosk-tiles button.selected {
   outline: 0;
-  border-color: #0f8b8d;
-  background: #e9f8f6;
-  box-shadow: 0 0 0 3px rgb(15 139 141 / 8%);
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 .kiosk-result {
   width: min(780px, 100%);
   margin: auto;
   gap: 0.75rem;
   padding: 1.15rem 1.35rem;
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--color-line);
   border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 24px 60px rgb(16 42 67 / 13%);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--color-ink) 14%, transparent);
 }
 .kiosk-result-heading {
   display: flex;
@@ -606,10 +620,17 @@
   height: 58px;
   place-items: center;
   border-radius: 50%;
-  color: white;
-  background: #18794e;
+  color: var(--color-success-contrast);
+  background: var(--color-success);
   font-size: 1.7rem;
   font-weight: 900;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.kiosk-result-check svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 3;
 }
 .kiosk-ticket-result {
   display: grid;
@@ -618,9 +639,10 @@
   align-items: center;
   gap: 1.25rem;
   padding: 1.2rem;
-  border: 1px dashed #9fb3c8;
+  border: 1px dashed color-mix(in srgb, var(--color-muted) 72%, var(--color-line));
   border-radius: 18px;
-  background: #f8fafc;
+  color: var(--color-ink);
+  background: var(--color-surface-muted);
 }
 .kiosk-ticket-result > div {
   display: grid;
@@ -629,7 +651,7 @@
 }
 .kiosk-ticket-result > div > strong {
   font-size: clamp(3.5rem, 8vw, 5.75rem);
-  color: #102a43;
+  color: var(--color-ink);
   letter-spacing: 0.08em;
 }
 .kiosk-ticket-result .tracking-qr-image {
@@ -641,7 +663,7 @@
 }
 .kiosk-result-guidance {
   max-width: 32rem;
-  color: #627d98;
+  color: var(--color-muted);
 }
 .kiosk-result-actions {
   display: grid;
@@ -949,14 +971,14 @@
   .public-kiosk
   .kiosk-screen
   button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-accent) 70%, white);
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 70%, var(--color-ink));
   outline-offset: 3px;
 }
 :root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-screen button.primary,
 :root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-choices button {
   border-color: var(--color-accent);
-  color: #061b24;
-  background: #55d6ce;
+  color: var(--color-primary-contrast);
+  background: var(--color-accent);
 }
 :root:is([data-theme='dark'], [data-theme='soft-dark'])
   .public-kiosk
@@ -966,12 +988,12 @@
   .public-kiosk
   .kiosk-choices
   button:hover:not(:disabled) {
-  border-color: #8cf0e9;
-  color: #04171f;
-  background: #78e4dd;
+  border-color: color-mix(in srgb, var(--color-accent) 72%, var(--color-ink));
+  color: var(--color-primary-contrast);
+  background: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
 }
 :root:is([data-theme='dark'], [data-theme='soft-dark']) .public-kiosk .kiosk-tiles button.selected {
-  border-color: #78e4dd;
+  border-color: var(--color-accent);
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-accent) 24%, var(--color-surface));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 35%, transparent);

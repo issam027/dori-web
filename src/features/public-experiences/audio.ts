@@ -22,7 +22,7 @@ export function playChime() {
   }, 800);
 }
 
-export function speakTicket(ticket: string, counter: number, locale: string) {
+export function speakTicket(ticket: string, counter: string | number, locale: string) {
   if (!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(

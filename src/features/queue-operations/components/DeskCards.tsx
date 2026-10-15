@@ -169,7 +169,8 @@ export function QueueDeskCard({
         <>
           <StatusBadge tone={active ? 'success' : 'neutral'}>
             {active
-              ? t('common.counterNumber', {
+              ? session.counterName ||
+                t('common.counterNumber', {
                   value0: String(session.threadNumber),
                 })
               : t('queue-operations.desk.consultation')}

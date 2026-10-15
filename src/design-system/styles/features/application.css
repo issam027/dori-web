@@ -1410,6 +1410,11 @@
   font-size: 1.75rem;
   font-weight: 900;
 }
+.quick-registration-success svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 3;
+}
 .ticket-confirmation {
   margin: 0;
   padding: 14px;

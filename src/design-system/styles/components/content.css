@@ -110,8 +110,28 @@
   font-weight: 600;
 }
 .site-card {
+  position: relative;
   display: grid;
   gap: var(--space-4);
+}
+.site-card-has-deactivate .site-card-heading {
+  padding-inline-end: 7.5rem;
+}
+.site-deactivate-button {
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: 1;
+  border-color: transparent;
+  color: var(--color-text-muted);
+  background: transparent;
+  box-shadow: none;
+}
+.site-deactivate-button:not(:disabled):hover {
+  border-color: color-mix(in srgb, #9f1d20 35%, var(--color-border));
+  color: #9f1d20;
+  background: color-mix(in srgb, #9f1d20 7%, var(--color-surface));
+  box-shadow: none;
 }
 .site-card-heading h2 {
   margin: var(--space-3) 0 var(--space-1);
@@ -122,6 +142,102 @@
 }
 .site-card-active {
   outline: 2px solid var(--color-primary);
+}
+.portfolio-filter-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.portfolio-filter-card > div:first-child {
+  display: grid;
+  gap: var(--space-1);
+}
+.portfolio-filter-card small {
+  color: var(--color-text-muted);
+}
+.portfolio-status-filter {
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+}
+.portfolio-status-filter button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+.portfolio-status-filter button span {
+  display: grid;
+  min-width: 1.55rem;
+  height: 1.55rem;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-border) 65%, transparent);
+  font-size: 0.75rem;
+}
+.portfolio-status-filter button.is-active {
+  color: var(--color-primary-contrast);
+  background: var(--color-accent);
+  box-shadow: 0 5px 12px rgb(16 42 67 / 14%);
+}
+.site-card-inactive {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-border));
+}
+.site-card-inactive .site-card-heading h2,
+.site-card-inactive .detail-list {
+  opacity: 0.78;
+}
+.site-card-statuses,
+.site-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.site-card-actions {
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+.site-card-actions .button:first-child {
+  flex: 1 1 auto;
+}
+@media (max-width: 42rem) {
+  .portfolio-filter-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .portfolio-status-filter {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+  }
+  .portfolio-status-filter button {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+  .site-card-has-deactivate .site-card-heading {
+    padding-inline-end: 2.75rem;
+  }
+  .site-deactivate-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }
 .experience-preview-header .status-badge {
   white-space: nowrap;

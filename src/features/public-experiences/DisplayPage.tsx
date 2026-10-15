@@ -12,18 +12,36 @@ export function DisplayPage() {
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
   const queryQueue = Number(new URLSearchParams(location.search).get('queueId'));
-  const { queues, allowedQueues, displays } = useDisplaySnapshot({
+  const { queues, allowedQueues, displays, sessions } = useDisplaySnapshot({
     siteId: activeSiteId,
     allowedQueueIds: user?.scope.queueIds ?? [],
     isGlobal: user?.scope.isGlobal ?? false,
     selectedQueueId: Number.isInteger(queryQueue) && queryQueue > 0 ? queryQueue : undefined,
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
+  const counterNames = new Map(
+    sessions.flatMap((query, index) =>
+      (query.data?.data.items ?? []).map(
+        (session) =>
+          [
+            `${String(allowedQueues[index]?.queueId)}:${String(session.threadNumber)}`,
+            session.counterName?.trim() || undefined,
+          ] as const,
+      ),
+    ),
+  );
   const activeCalls = snapshots
     .flatMap((snapshot) =>
       snapshot.activeThreads
         .filter((thread) => thread.currentTicket)
-        .map((thread) => ({ ...thread, queueId: snapshot.queueId, queueName: snapshot.queueName })),
+        .map((thread) => ({
+          ...thread,
+          queueId: snapshot.queueId,
+          queueName: snapshot.queueName,
+          counterName: counterNames.get(
+            `${String(snapshot.queueId)}:${String(thread.threadNumber)}`,
+          ),
+        })),
     )
     .sort(
       (left, right) =>
@@ -70,7 +88,7 @@ export function DisplayPage() {
   }, [activePageCount, nextPageCount]);
   useEffect(() => {
     const key = current?.currentTicket
-      ? `${current.currentTicket}:${String(current.threadNumber)}:${String(current.queueId)}`
+      ? `${current.currentTicket}:${String(current.threadNumber)}:${current.counterName ?? ''}:${String(current.queueId)}`
       : '';
     if (!key || key === previousCall.current) return;
     previousCall.current = key;
@@ -82,14 +100,14 @@ export function DisplayPage() {
       playChime();
       speakTicket(
         current?.currentTicket ?? '',
-        current?.threadNumber ?? 0,
+        current?.counterName || `${__t('common.guichet')} ${String(current?.threadNumber ?? 0)}`,
         document.documentElement.lang || 'fr',
       );
     }
     return () => {
       window.clearTimeout(timer);
     };
-  }, [audio, current]);
+  }, [__t, audio, current]);
 
   if (!queues.isPending && activeSiteId && allowedQueues.length === 0)
     return (
@@ -163,7 +181,7 @@ export function DisplayPage() {
                   <div className="display-destination">
                     <small>{__t('public-experiences.display.veuillezRejoindre')}</small>
                     <b>
-                      {__t('common.guichet')} {call.threadNumber}
+                      {call.counterName || `${__t('common.guichet')} ${String(call.threadNumber)}`}
                     </b>
                     <span>
                       {call.queueName ??

@@ -5,6 +5,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { getAccessToken } from './access-token';
 import {
   clearSession,
+  clearActiveSiteContext,
   changeActiveSite,
   expireSession,
   getRememberedUsername,
@@ -204,5 +205,20 @@ describe('changeActiveSite cockpit preservation', () => {
 
     expect(useOperationStore.getState().activeCall).toBeNull();
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+  });
+
+  it('clears the site context and site-bound state without dropping the sites cache', async () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(['sites', 'portfolio'], { items: [] });
+    queryClient.setQueryData(['queues', 'site', 12], { items: [] });
+    useBrandStore.setState({ name: 'Site test', logoUrl: null });
+
+    await clearActiveSiteContext(queryClient);
+
+    expect(useScopeStore.getState().activeSiteId).toBeNull();
+    expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(useBrandStore.getState().name).toBe('DORIFY');
+    expect(queryClient.getQueryData(['sites', 'portfolio'])).toEqual({ items: [] });
+    expect(queryClient.getQueryData(['queues', 'site', 12])).toBeUndefined();
   });
 });

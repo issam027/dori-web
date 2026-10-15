@@ -4,11 +4,13 @@ import { TrackingQr } from '../../TrackingQr';
 
 export function KioskTicketPrintDocument({
   ticketNumber,
+  siteName,
   queueName,
   trackingUrl,
   onReady,
 }: {
   ticketNumber: string;
+  siteName?: string;
   queueName?: string;
   trackingUrl?: string | null;
   onReady: () => void;
@@ -18,8 +20,7 @@ export function KioskTicketPrintDocument({
   return createPortal(
     <article className="kiosk-ticket-print-document" aria-hidden="true">
       <header>
-        <strong>{t('app.name')}</strong>
-        <span>{t('kiosk.print.title')}</span>
+        <strong>{siteName || t('app.name')}</strong>
       </header>
       <main>
         <small>{t('kiosk.ticket.numberHeading')}</small>

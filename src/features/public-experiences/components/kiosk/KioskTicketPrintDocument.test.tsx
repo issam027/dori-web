@@ -14,6 +14,7 @@ describe('KioskTicketPrintDocument', () => {
     render(
       <KioskTicketPrintDocument
         ticketNumber="A042"
+        siteName="Agence Centre"
         queueName="Accueil général"
         trackingUrl="https://dorify.example/track?token=test"
         onReady={onReady}
@@ -22,6 +23,7 @@ describe('KioskTicketPrintDocument', () => {
 
     expect(document.body.querySelector('.kiosk-ticket-print-document')).toBeInTheDocument();
     expect(screen.getByText('A042')).toBeInTheDocument();
+    expect(screen.getByText('Agence Centre')).toBeInTheDocument();
     expect(screen.getByText('Accueil général')).toBeInTheDocument();
     expect(await screen.findByRole('img', { hidden: true })).toHaveAccessibleName(
       'QR code permettant d’ouvrir le suivi du ticket',

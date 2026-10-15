@@ -85,3 +85,13 @@ export async function changeActiveSite(
   const response = await sitesControllerFindSite(siteId);
   useBrandStore.getState().applySite(response.data);
 }
+
+export async function clearActiveSiteContext(queryClient: QueryClient): Promise<void> {
+  await queryClient.cancelQueries();
+  useScopeStore.getState().clear();
+  useBrandStore.getState().reset();
+  useOperationStore.getState().reset();
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] !== 'sites',
+  });
+}
