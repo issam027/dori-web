@@ -14,13 +14,6 @@ import {
   UserX,
 } from 'lucide-react';
 import type { UserSummaryItemDto, UsersControllerFindUsersParams } from '@/api/generated/models';
-import {
-  usersControllerFindUsers,
-  usersControllerSetUserPassword,
-  usersControllerUpdateUser,
-  usersControllerUpdateUserStatus,
-} from '@/api/generated/users/users';
-import { authControllerLogout } from '@/api/generated/authentification/authentification';
 import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -31,6 +24,13 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useSettingsData } from './hooks/useSettingsData';
+import {
+  findUsers,
+  logoutUserSessions,
+  setUserPassword,
+  updateUser,
+  updateUserStatus,
+} from './api/onboarding-api';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
@@ -50,7 +50,7 @@ export function UsersAdminPage() {
   const users = useQuery({
     queryKey: ['admin', 'users-page', page, filters],
     queryFn: ({ signal }) =>
-      usersControllerFindUsers(
+      findUsers(
         {
           page,
           pageSize: PAGE_SIZE,
@@ -77,7 +77,7 @@ export function UsersAdminPage() {
     if (!editing) return;
     setPending(true);
     try {
-      await usersControllerUpdateUser(editing.userId, {
+      await updateUser(editing.userId, {
         email: editForm.email || undefined,
         languagePreference: editForm.language,
       });
@@ -219,7 +219,7 @@ export function UsersAdminPage() {
                         type="button"
                         title={user.isActive ? t('admin.users.suspend') : t('common.activate')}
                         onClick={() =>
-                          void usersControllerUpdateUserStatus(user.userId, {
+                          void updateUserStatus(user.userId, {
                             isActive: !user.isActive,
                           })
                             .then(refresh)
@@ -238,7 +238,7 @@ export function UsersAdminPage() {
                         type="button"
                         title={t('onboarding.settings.reinitialiserMdp')}
                         onClick={() =>
-                          void usersControllerSetUserPassword(user.userId, {
+                          void setUserPassword(user.userId, {
                             newPassword: 'Root@123456',
                           })
                             .then(() =>
@@ -354,7 +354,7 @@ export function UsersAdminPage() {
               onClick={() => {
                 if (!disconnecting) return;
                 setPending(true);
-                void authControllerLogout({ userId: disconnecting.userId })
+                void logoutUserSessions({ userId: disconnecting.userId })
                   .then(() => {
                     notify({
                       tone: 'success',

@@ -7,12 +7,6 @@ import type {
   TranslationResponseDto,
   TranslationsControllerFindTranslationsParams,
 } from '@/api/generated/models';
-import {
-  translationsControllerCreateTranslation,
-  translationsControllerDeleteTranslation,
-  translationsControllerFindTranslations,
-  translationsControllerUpdateTranslation,
-} from '@/api/generated/translations/translations';
 import { Card } from '@/design-system/components/Card';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -20,6 +14,12 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { loadTranslationBundle } from '@/core/i18n/i18n';
+import {
+  createTranslation,
+  deleteTranslation,
+  findTranslations,
+  updateTranslation,
+} from './api/onboarding-api';
 
 const PAGE_SIZE = 10;
 type Form = {
@@ -56,7 +56,7 @@ export function TranslationsAdminPage() {
   const translations = useQuery({
     queryKey: ['admin', 'translations-page', page, filters],
     queryFn: ({ signal }) =>
-      translationsControllerFindTranslations(
+      findTranslations(
         {
           page,
           pageSize: PAGE_SIZE,
@@ -99,7 +99,7 @@ export function TranslationsAdminPage() {
       .filter(Boolean);
     try {
       if (editing)
-        await translationsControllerUpdateTranslation(editing.translationId, {
+        await updateTranslation(editing.translationId, {
           content: form.content,
           expectedParams,
           isActive: form.active,
@@ -107,7 +107,7 @@ export function TranslationsAdminPage() {
       else
         await Promise.all(
           (['fr', 'en', 'ar'] as const).map((locale) =>
-            translationsControllerCreateTranslation({
+            createTranslation({
               translationKey: form.key.trim(),
               category: form.category,
               locale,
@@ -145,7 +145,7 @@ export function TranslationsAdminPage() {
     if (!deleting) return;
     setPending(true);
     try {
-      await translationsControllerDeleteTranslation(deleting.translationId);
+      await deleteTranslation(deleting.translationId);
       await queryClient.invalidateQueries({ queryKey: ['admin', 'translations-page'] });
       const activeLocale = (i18n.resolvedLanguage ?? i18n.language).split('-')[0] ?? 'fr';
       if (deleting.category === 'ihm' && deleting.locale === activeLocale) {

@@ -16,7 +16,7 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react';
-import type { CreatePersonDto, PersonResponseDto, UpdatePersonDto } from '@/api/generated/models';
+import type { CreatePersonDto, PersonResponseDto, PersonsControllerFindPersonsSort, UpdatePersonDto } from '@/api/generated/models';
 import { queryKeys } from '@/api/client/query-keys';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { notifyError } from '@/core/notifications/error-presentation';
@@ -40,6 +40,10 @@ export function PersonsPage() {
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
   const [search, setSearch] = useState('');
+  const [statusDraft, setStatusDraft] = useState<'all' | 'active' | 'inactive'>('active');
+  const [status, setStatus] = useState<'all' | 'active' | 'inactive'>('active');
+  const [sortDraft, setSortDraft] = useState<PersonsControllerFindPersonsSort>('lastName:asc');
+  const [sort, setSort] = useState<PersonsControllerFindPersonsSort>('lastName:asc');
   const [viewing, setViewing] = useState<PersonResponseDto>();
   const [editing, setEditing] = useState<PersonResponseDto>();
   const [notesPerson, setNotesPerson] = useState<PersonResponseDto>();
@@ -47,7 +51,7 @@ export function PersonsPage() {
   const [pending, setPending] = useState(false);
 
   const persons = useQuery({
-    queryKey: queryKeys.persons.search(siteId, search, page, PAGE_SIZE, 'admin-page'),
+    queryKey: [...queryKeys.persons.search(siteId, search, page, PAGE_SIZE, 'admin-page'), { status, sort }],
     queryFn: ({ signal }) => {
       if (!siteId) throw new Error('An active site is required');
       return findPersons(
@@ -55,7 +59,8 @@ export function PersonsPage() {
           siteId,
           page,
           pageSize: PAGE_SIZE,
-          sort: 'lastName:asc',
+          sort,
+          isActive: status === 'all' ? undefined : status === 'active',
           search: search || undefined,
         },
         signal,
@@ -119,11 +124,13 @@ export function PersonsPage() {
             <small>{t('persons.admin.searchHint')}</small>
           </summary>
           <form
-            className="admin-filter-grid admin-filter-grid-single"
+            className="admin-filter-grid persons-filter-grid"
             onSubmit={(event) => {
               event.preventDefault();
               setPage(1);
               setSearch(searchDraft.trim());
+              setStatus(statusDraft);
+              setSort(sortDraft);
             }}
           >
             <label>
@@ -136,6 +143,27 @@ export function PersonsPage() {
                 }}
               />
             </label>
+            <label>
+              {t('persons.admin.statusFilter')}
+              <select value={statusDraft} onChange={(event) => { setStatusDraft(event.target.value as 'all' | 'active' | 'inactive'); }}>
+                <option value="all">{t('persons.admin.allStatuses')}</option>
+                <option value="active">{t('common.active')}</option>
+                <option value="inactive">{t('common.inactive')}</option>
+              </select>
+            </label>
+            <label>
+              {t('persons.admin.sort')}
+              <select value={sortDraft} onChange={(event) => { setSortDraft(event.target.value as PersonsControllerFindPersonsSort); }}>
+                <option value="lastName:asc">{t('persons.admin.sort.lastNameAsc')}</option>
+                <option value="lastName:desc">{t('persons.admin.sort.lastNameDesc')}</option>
+                <option value="firstName:asc">{t('persons.admin.sort.firstNameAsc')}</option>
+                <option value="firstName:desc">{t('persons.admin.sort.firstNameDesc')}</option>
+                <option value="createdAt:desc">{t('persons.admin.sort.newest')}</option>
+                <option value="createdAt:asc">{t('persons.admin.sort.oldest')}</option>
+                <option value="email:asc">{t('persons.admin.sort.email')}</option>
+                <option value="phoneNumber:asc">{t('persons.admin.sort.phone')}</option>
+              </select>
+            </label>
             <div className="admin-filter-actions">
               <button
                 className="button"
@@ -143,6 +171,10 @@ export function PersonsPage() {
                 onClick={() => {
                   setSearchDraft('');
                   setSearch('');
+                  setStatusDraft('active');
+                  setStatus('active');
+                  setSortDraft('lastName:asc');
+                  setSort('lastName:asc');
                   setPage(1);
                 }}
               >

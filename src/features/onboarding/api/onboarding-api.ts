@@ -19,10 +19,13 @@ export {
   usersControllerFindUsers as findUsers,
   usersControllerGetRoles as findRoles,
   usersControllerSetUserPassword as setUserPassword,
+  usersControllerUpdateUser as updateUser,
   usersControllerUpdateUserStatus as updateUserStatus,
 } from '@/api/generated/users/users';
 export {
   translationsControllerCreateTranslation as createTranslation,
+  translationsControllerDeleteTranslation as deleteTranslation,
   translationsControllerFindTranslations as findTranslations,
+  translationsControllerUpdateTranslation as updateTranslation,
 } from '@/api/generated/translations/translations';
 export { authControllerLogout as logoutUserSessions } from '@/api/generated/authentification/authentification';

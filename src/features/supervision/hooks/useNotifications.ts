@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { SendManualNotificationDto } from '@/api/generated/models';
+import type { NotificationsControllerFindNotificationsParams, SendManualNotificationDto } from '@/api/generated/models';
 import {
   notificationsControllerFindNotificationById,
   notificationsControllerFindNotifications,
@@ -11,26 +11,18 @@ import { invalidateNotifications } from '@/api/client/query-invalidations';
 import { registrationsControllerFindRegistrations } from '@/api/generated/registrations/registrations';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
 
-export function useNotifications(filters: {
-  page: number;
-  channel?: string;
-  status?: string;
-  date?: string;
-}) {
+export function useNotifications(filters: NotificationsControllerFindNotificationsParams & { page: number }) {
   return useQuery({
     queryKey: queryKeys.notifications.list(filters),
     queryFn: ({ signal }) =>
       notificationsControllerFindNotifications(
         {
+          ...filters,
           page: filters.page,
           pageSize: 25,
-          sort: 'createdAt:desc',
-          channel: filters.channel ? (filters.channel as 'sms' | 'email') : undefined,
-          status: filters.status
-            ? (filters.status as 'pending' | 'processing' | 'sent' | 'delivered' | 'failed')
-            : undefined,
-          dateFrom: filters.date,
-          dateTo: filters.date,
+          sort: filters.sort ?? 'createdAt:desc',
+          dateFrom: filters.dateFrom && filters.dateTo ? filters.dateFrom : undefined,
+          dateTo: filters.dateFrom && filters.dateTo ? filters.dateTo : undefined,
         },
         undefined,
         signal,

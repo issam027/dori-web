@@ -23,6 +23,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
   const activeSiteId = useScopeStore((s) => s.activeSiteId);
   const [selectedSiteId, setSelectedSiteId] = useState<number | null>(activeSiteId);
+  const [queueStatus, setQueueStatus] = useState<'active' | 'inactive' | 'all'>('active');
   const {
     sites: ss,
     queues: qs,
@@ -31,7 +32,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     managers,
     refreshManagers,
     refresh: refreshData,
-  } = useSettingsData(selectedSiteId ?? activeSiteId);
+  } = useSettingsData(selectedSiteId ?? activeSiteId, queueStatus);
   const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
@@ -78,6 +79,8 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         {section === 'queues' ? (
           <QueuesPanel
             items={qs}
+            status={queueStatus}
+            onStatusChange={setQueueStatus}
             create={() => {
               setEditQueue(undefined);
               setQueueOpen(true);
@@ -259,12 +262,16 @@ function SitesPanel({
 }
 function QueuesPanel({
   items,
+  status,
+  onStatusChange,
   create,
   edit,
   refresh,
   assign,
 }: {
   items: QueueResponseDto[];
+  status: 'active' | 'inactive' | 'all';
+  onStatusChange: (status: 'active' | 'inactive' | 'all') => void;
   create: () => void;
   edit: (q: QueueResponseDto) => void;
   refresh: () => void;
@@ -280,6 +287,14 @@ function QueuesPanel({
         action={create}
         label={__t('onboarding.settings.nouvelleFile')}
       />
+      <Card className="admin-filter-card settings-queue-filter">
+        <details>
+          <summary><span>{__t('settings.queueFilters')}</span><small>{__t('settings.queueFiltersHelp')}</small></summary>
+          <div className="admin-filter-grid admin-filter-grid-single">
+            <label>{__t('settings.queueStatus')}<select value={status} onChange={(event) => { onStatusChange(event.target.value as 'active' | 'inactive' | 'all'); pagination.setPage(1); }}><option value="active">{__t('common.active')}</option><option value="inactive">{__t('common.inactive')}</option><option value="all">{__t('common.all')}</option></select></label>
+          </div>
+        </details>
+      </Card>
       <div className="table-wrap admin-table-wrap">
         <table>
           <thead>

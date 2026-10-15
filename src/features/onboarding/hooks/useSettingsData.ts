@@ -4,7 +4,7 @@ import { invalidateAdmin } from '@/api/client/query-invalidations';
 import { findQueues, findRoles, findSites, findTiers } from '../api/onboarding-api';
 import { sitesControllerGetManagers } from '@/api/generated/sites/sites';
 
-export function useSettingsData(siteId: number | null) {
+export function useSettingsData(siteId: number | null, queueStatus: 'active' | 'inactive' | 'all' = 'active') {
   const queryClient = useQueryClient();
   const sites = useQuery({
     queryKey: queryKeys.admin.sites,
@@ -24,9 +24,13 @@ export function useSettingsData(siteId: number | null) {
     },
   });
   const queues = useQuery({
-    queryKey: queryKeys.admin.queues(siteId),
-    queryFn: ({ signal }) =>
-      findQueues({ page: 1, pageSize: 100, siteId: siteId ?? undefined }, undefined, signal),
+    queryKey: [...queryKeys.admin.queues(siteId), queueStatus],
+    queryFn: async ({ signal }) => {
+      const load = (isActive: boolean) => findQueues({ page: 1, pageSize: 100, siteId: siteId ?? undefined, isActive }, undefined, signal);
+      if (queueStatus !== 'all') return load(queueStatus === 'active');
+      const [active, inactive] = await Promise.all([load(true), load(false)]);
+      return { ...active, data: { ...active.data, items: [...active.data.items, ...inactive.data.items], total: active.data.total + inactive.data.total } };
+    },
     enabled: siteId !== null,
   });
   const roles = useQuery({
