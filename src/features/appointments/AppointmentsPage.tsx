@@ -36,6 +36,7 @@ export function AppointmentsPage() {
   const [queueId, setQueueId] = useState(0);
   const [editor, setEditor] = useState<{ date: string; time?: string } | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [expandedSlots, setExpandedSlots] = useState<Set<string>>(() => new Set());
   const queues = useQueues({ siteId, isActive: true, usage: 'appointments' });
   const site = useSite(siteId);
   const availableQueues =
@@ -47,21 +48,54 @@ export function AppointmentsPage() {
     () => (view === 'week' ? weekDates(anchor) : monthDates(anchor)),
     [anchor, view],
   );
-  const daily = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
+  const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
+  const appointments = useMemo(
+    () => appointmentsQuery.data ?? [],
+    [appointmentsQuery.data],
+  );
   const selected = useAppointment(selectedId);
-  const appointmentPersonIds = [
-    ...new Set(
-      daily.flatMap((result) => result.data?.data.items.map((item) => item.personId) ?? []),
-    ),
-  ];
+  const appointmentPersonIds = useMemo(
+    () => [...new Set(appointments.map((item) => item.personId))],
+    [appointments],
+  );
   const appointmentPeople = usePersonsByIds(appointmentPersonIds);
   const personName = (personId: number) => {
     const person = appointmentPeople[appointmentPersonIds.indexOf(personId)]?.data?.data;
     if (!person) return __t('appointments.calendar.unknownPerson');
     return [person.firstName, person.lastName].filter((part) => part.trim().length > 0).join(' ');
   };
+
+  const appointmentsByDate = useMemo(() => {
+    const map = new Map<string, RegistrationResponseDto[]>();
+    for (const item of appointments) {
+      const itemDate = item.scheduledTime
+        ? appointmentLocalParts(item.scheduledTime, timeZone).date
+        : item.businessDate;
+      const current = map.get(itemDate);
+      if (current) {
+        current.push(item);
+      } else {
+        map.set(itemDate, [item]);
+      }
+    }
+    return map;
+  }, [appointments, timeZone]);
+
   const byDate = (date: string): RegistrationResponseDto[] =>
-    daily[dates.indexOf(date)]?.data?.data.items ?? [];
+    appointmentsByDate.get(date) ?? [];
+
+  const toggleSlot = (key: string) => {
+    setExpandedSlots((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
   const hours = selectedQueue
     ? Array.from(
         {
@@ -181,64 +215,104 @@ export function AppointmentsPage() {
                       time >= selectedQueue.breakStart.slice(0, 5) &&
                       time < selectedQueue.breakEnd.slice(0, 5),
                     );
-                    const appointments = byDate(date).filter(
+                    const slotAppointments = byDate(date).filter(
                       (item) =>
                         item.scheduledTime &&
                         appointmentLocalParts(item.scheduledTime, timeZone).time.slice(0, 2) ===
                           time.slice(0, 2),
                     );
+                    const slotKey = `${date}_${time}`;
+                    const isExpanded = expandedSlots.has(slotKey);
+                    const visibleAppointments = isExpanded
+                      ? slotAppointments
+                      : slotAppointments.slice(0, 2);
+                    const hasMore = slotAppointments.length > 2;
+
                     return (
                       <div
                         key={time}
                         className={
                           isBreak
                             ? 'calendar-slot calendar-break'
-                            : appointments.length
+                            : slotAppointments.length
                               ? 'calendar-slot'
                               : 'calendar-slot calendar-slot-empty'
                         }
-                        role={!isBreak && !appointments.length ? 'button' : undefined}
-                        tabIndex={!isBreak && !appointments.length ? 0 : undefined}
+                        role={!isBreak ? 'button' : undefined}
+                        tabIndex={!isBreak ? 0 : undefined}
                         onClick={() => {
-                          if (!isBreak && !appointments.length) setEditor({ date, time });
+                          if (!isBreak) setEditor({ date, time });
                         }}
                         onKeyDown={(event) => {
-                          if (
-                            !isBreak &&
-                            !appointments.length &&
-                            (event.key === 'Enter' || event.key === ' ')
-                          ) {
+                          if (!isBreak && (event.key === 'Enter' || event.key === ' ')) {
                             event.preventDefault();
                             setEditor({ date, time });
                           }
                         }}
                       >
-                        <span>{time}</span>
+                        <div className="calendar-slot-header">
+                          <span className="calendar-slot-time">{time}</span>
+                          {slotAppointments.length > 0 && (
+                            <span className="calendar-slot-count">
+                              {slotAppointments.length}
+                            </span>
+                          )}
+                        </div>
                         {isBreak ? (
                           <em>{__t('appointments.appointments.pause')}</em>
-                        ) : appointments.length ? (
-                          appointments.map((item) => (
-                            <button
-                              className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
-                              key={item.registrationId}
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                setSelectedId(item.registrationId);
-                              }}
-                            >
-                              <strong>{personName(item.personId)}</strong>
-                              <small>
-                                {item.scheduledTime
+                        ) : slotAppointments.length ? (
+                          <>
+                            <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
+                              {visibleAppointments.map((item) => {
+                                const name = personName(item.personId);
+                                const itemTime = item.scheduledTime
                                   ? appointmentLocalParts(item.scheduledTime, timeZone).time
-                                  : time}{' '}
-                                · {item.ticketNumber}
-                              </small>
-                              <span className="appointment-event-status">
-                                {__t(appointmentStatusKey(item))}
-                              </span>
-                            </button>
-                          ))
+                                  : time;
+                                const statusText = __t(appointmentStatusKey(item));
+                                return (
+                                  <button
+                                    className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
+                                    key={item.registrationId}
+                                    type="button"
+                                    title={`${name} (${itemTime}) · ${statusText}`}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setSelectedId(item.registrationId);
+                                    }}
+                                  >
+                                    <span className="appointment-status-dot" aria-hidden="true" />
+                                    <span className="appointment-event-name">{name}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            {hasMore && (
+                              <button
+                                type="button"
+                                className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleSlot(slotKey);
+                                }}
+                              >
+                                {isExpanded ? (
+                                  <>
+                                    <span>{__t('appointments.calendar.collapse')}</span>
+                                    <span aria-hidden="true">▴</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>
+                                      {__t('appointments.calendar.moreCount', {
+                                        count: slotAppointments.length - 2,
+                                      })}
+                                    </span>
+                                    <span aria-hidden="true">▾</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </>
                         ) : null}
                       </div>
                     );
@@ -248,49 +322,98 @@ export function AppointmentsPage() {
             </div>
           ) : (
             <div className="month-calendar">
-              {dates.map((date) => (
-                <section
-                  key={date}
-                  className="month-day"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    setEditor({ date });
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') setEditor({ date });
-                  }}
-                >
-                  <button
-                    className="calendar-date-button"
-                    type="button"
+              {dates.map((date) => {
+                const dayAppointments = byDate(date);
+                const dayKey = date;
+                const isExpanded = expandedSlots.has(dayKey);
+                const visibleAppointments = isExpanded
+                  ? dayAppointments
+                  : dayAppointments.slice(0, 3);
+                const hasMore = dayAppointments.length > 3;
+
+                return (
+                  <section
+                    key={date}
+                    className="month-day"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       setEditor({ date });
                     }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') setEditor({ date });
+                    }}
                   >
-                    <strong>{date.slice(-2)}</strong>
-                  </button>
-                  {byDate(date).map((item) => (
-                    <button
-                      className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
-                      key={item.registrationId}
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setSelectedId(item.registrationId);
-                      }}
-                    >
-                      {item.scheduledTime
-                        ? appointmentLocalParts(item.scheduledTime, timeZone).time
-                        : '—'}{' '}
-                      · {personName(item.personId)}
-                      <span className="appointment-event-status">
-                        {__t(appointmentStatusKey(item))}
-                      </span>
-                    </button>
-                  ))}
-                </section>
-              ))}
+                    <div className="month-day-header">
+                      <button
+                        className="calendar-date-button"
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setEditor({ date });
+                        }}
+                      >
+                        <strong>{date.slice(-2)}</strong>
+                      </button>
+                      {dayAppointments.length > 0 && (
+                        <span className="calendar-slot-count">
+                          {dayAppointments.length}
+                        </span>
+                      )}
+                    </div>
+                    <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
+                      {visibleAppointments.map((item) => {
+                        const name = personName(item.personId);
+                        const itemTime = item.scheduledTime
+                          ? appointmentLocalParts(item.scheduledTime, timeZone).time
+                          : '—';
+                        const statusText = __t(appointmentStatusKey(item));
+                        return (
+                          <button
+                            className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
+                            key={item.registrationId}
+                            type="button"
+                            title={`${name} (${itemTime}) · ${statusText}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedId(item.registrationId);
+                            }}
+                          >
+                            <span className="appointment-status-dot" aria-hidden="true" />
+                            <span className="appointment-event-name">{name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {hasMore && (
+                      <button
+                        type="button"
+                        className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleSlot(dayKey);
+                        }}
+                      >
+                        {isExpanded ? (
+                          <>
+                            <span>{__t('appointments.calendar.collapse')}</span>
+                            <span aria-hidden="true">▴</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {__t('appointments.calendar.moreCount', {
+                                count: dayAppointments.length - 3,
+                              })}
+                            </span>
+                            <span aria-hidden="true">▾</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </section>
+                );
+              })}
             </div>
           )}
         </>

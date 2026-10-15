@@ -121,8 +121,9 @@ export function AppointmentActionDialog({
     mode === 'summary' ? (
       <>
         <button
-          className="button button-primary"
+          className="button button-small button-primary"
           type="button"
+          title={t('appointments.actions.markPresent')}
           disabled={!checkInAllowed || pending}
           onClick={() => {
             void perform({
@@ -132,40 +133,49 @@ export function AppointmentActionDialog({
           }}
         >
           <UserCheck aria-hidden="true" />
-          {t('appointments.actions.markPresent')}
+          <span className="button-label">{t('appointments.actions.markPresent')}</span>
         </button>
         <button
-          className="button"
+          className="button button-small"
           type="button"
+          title={t('appointments.actions.reschedule')}
           disabled={!manageable || pending}
           onClick={() => {
             setMode('reschedule');
           }}
         >
           <CalendarClock aria-hidden="true" />
-          {t('appointments.actions.reschedule')}
+          <span className="button-label">{t('appointments.actions.reschedule')}</span>
         </button>
         <button
-          className="button button-danger"
+          className="button button-small button-danger"
           type="button"
+          title={t('appointments.actions.cancelAppointment')}
           disabled={!manageable || pending}
           onClick={() => {
             setMode('cancel');
           }}
         >
           <Ban aria-hidden="true" />
-          {t('appointments.actions.cancelAppointment')}
+          <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
         </button>
       </>
     ) : mode === 'cancel' ? (
       <>
-        <button className="button" type="button" disabled={pending} onClick={goBack}>
+        <button
+          className="button button-small"
+          type="button"
+          title={t('common.previous')}
+          disabled={pending}
+          onClick={goBack}
+        >
           <ArrowLeft aria-hidden="true" />
-          {t('common.previous')}
+          <span className="button-label">{t('common.previous')}</span>
         </button>
         <button
-          className="button button-danger"
+          className="button button-small button-danger"
           type="button"
+          title={t('appointments.actions.confirmCancellation')}
           disabled={!cancellationReason.trim() || pending}
           onClick={() => {
             void perform({
@@ -181,18 +191,27 @@ export function AppointmentActionDialog({
           }}
         >
           <Ban aria-hidden="true" />
-          {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
+          <span className="button-label">
+            {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
+          </span>
         </button>
       </>
     ) : (
       <>
-        <button className="button" type="button" disabled={pending} onClick={goBack}>
+        <button
+          className="button button-small"
+          type="button"
+          title={t('common.previous')}
+          disabled={pending}
+          onClick={goBack}
+        >
           <ArrowLeft aria-hidden="true" />
-          {t('common.previous')}
+          <span className="button-label">{t('common.previous')}</span>
         </button>
         <button
-          className="button button-primary"
+          className="button button-small button-primary"
           type="button"
+          title={t('appointments.actions.confirmReschedule')}
           disabled={!time || pending}
           onClick={() => {
             void perform({
@@ -213,7 +232,9 @@ export function AppointmentActionDialog({
           }}
         >
           <Save aria-hidden="true" />
-          {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
+          <span className="button-label">
+            {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
+          </span>
         </button>
       </>
     );

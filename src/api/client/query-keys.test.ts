@@ -14,6 +14,12 @@ describe('queryKeys', () => {
     expect(queryKeys.reports.daily(1, '2026-10-01', '2026-10-07', [10])).not.toEqual(
       queryKeys.reports.daily(1, '2026-10-01', '2026-10-07', [11]),
     );
+    expect(queryKeys.appointments.byQueueRange(1, '2026-10-01', '2026-10-07')).not.toEqual(
+      queryKeys.appointments.byQueueRange(1, '2026-10-08', '2026-10-14'),
+    );
+    expect(queryKeys.appointments.byQueueRange(1, '2026-10-01', '2026-10-07')).not.toEqual(
+      queryKeys.appointments.byQueueRange(2, '2026-10-01', '2026-10-07'),
+    );
   });
 
   it('invalidates every queue-operation resource through one policy', async () => {

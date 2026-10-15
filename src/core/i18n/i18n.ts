@@ -77,6 +77,7 @@ const fallbackResources = {
       'bootstrap.title': 'Socle de l’application initialisé',
       'bootstrap.description':
         'Les modules métier sont ajoutés dans l’ordre défini par le handover.',
+      'common.hashIdentifier': '#{{value0}}',
       'common.loading': 'Chargement…',
       'phone.countryCode': 'Indicatif pays',
       'kiosk.print.title': 'Ticket d’accueil',
@@ -87,6 +88,9 @@ const fallbackResources = {
       'desk.activeSessionDescription':
         'Votre guichet est actif. Vous pouvez appeler la prochaine personne dès que vous êtes prêt.',
       'appointments.calendar.unknownPerson': 'Réservation',
+      'appointments.calendar.moreCount': '+{{count}} autre',
+      'appointments.calendar.moreCount_plural': '+{{count}} autres',
+      'appointments.calendar.collapse': 'Réduire',
       'appointments.status.scheduled': 'Planifié',
       'appointments.status.confirmed': 'Confirmé',
       'appointments.status.present': 'Présent',
@@ -591,6 +595,9 @@ const fallbackResources = {
       'desk.activeSessionDescription':
         'Your desk is active. You can call the next person whenever you are ready.',
       'appointments.calendar.unknownPerson': 'Reservation',
+      'appointments.calendar.moreCount': '+{{count}} more',
+      'appointments.calendar.moreCount_plural': '+{{count}} more',
+      'appointments.calendar.collapse': 'Collapse',
       'appointments.status.scheduled': 'Scheduled',
       'appointments.status.confirmed': 'Confirmed',
       'appointments.status.present': 'Present',
@@ -1035,6 +1042,70 @@ const fallbackResources = {
       'kiosk.print.footer': 'DORIFY · إدارة الطوابير والاستقبال',
       'loading.slogan': 'قوائم الانتظار تحت السيطرة. يمكنك أن تتنفس الآن.',
       'desk.activeSessionDescription': 'شباكك نشط. يمكنك استدعاء الشخص التالي عندما تكون مستعدًا.',
+      'appointments.calendar.unknownPerson': 'حجز',
+      'appointments.calendar.moreCount': '+{{count}} إضافي',
+      'appointments.calendar.moreCount_plural': '+{{count}} إضافية',
+      'appointments.calendar.collapse': 'طي',
+      'appointments.status.scheduled': 'مجدول',
+      'appointments.status.confirmed': 'مؤكد',
+      'appointments.status.present': 'حاضر',
+      'appointments.status.in-progress': 'قيد الإجراء',
+      'appointments.status.served': 'مكتمل',
+      'appointments.status.no-show': 'غائب',
+      'appointments.status.cancelled': 'ملغى',
+      'appointments.actions.title': 'موعد {{ticket}}',
+      'appointments.actions.description':
+        'اطّلع على الموعد واختر الإجراء المناسب.',
+      'appointments.actions.cancelStepDescription':
+        'الخطوة 2 من 2 · حدد السبب قبل تأكيد الإلغاء.',
+      'appointments.actions.rescheduleStepDescription':
+        'الخطوة 2 من 2 · اختر تاريخاً جديداً ثم موعداً متاحاً.',
+      'appointments.actions.person': 'الشخص المعني',
+      'appointments.actions.noContact': 'لا توجد بيانات اتصال',
+      'appointments.actions.date': 'التاريخ',
+      'appointments.actions.time': 'الوقت',
+      'appointments.actions.service': 'الخدمة',
+      'appointments.actions.ticket': 'التذكرة',
+      'appointments.actions.markPresent': 'تسجيل الحضور',
+      'appointments.actions.presentHint':
+        'يمكن تسجيل الحضور في يوم الموعد طالما سمحت حالته بذلك.',
+      'appointments.actions.presentSuccess': 'تم تسجيل الحضور بنجاح.',
+      'appointments.actions.reschedule': 'إعادة جدولة',
+      'appointments.actions.rescheduleEyebrow': 'موعد جديد',
+      'appointments.actions.chooseSlot': 'اختر تاريخاً وموعداً متاحاً',
+      'appointments.actions.newDate': 'تاريخ جديد',
+      'appointments.actions.noSlots': 'لا توجد فترات متاحة في هذا التاريخ.',
+      'appointments.actions.remaining': '{{count}} مكان/أماكن',
+      'appointments.actions.confirmReschedule': 'تأكيد إعادة الجدولة',
+      'appointments.actions.rescheduleSuccess': 'تمت إعادة جدولة الموعد بنجاح.',
+      'appointments.actions.cancelAppointment': 'إلغاء الموعد',
+      'appointments.actions.cancelConfirmTitle': 'تأكيد الإلغاء',
+      'appointments.actions.cancelConfirmText':
+        'سيتم إلغاء موعد {{name}} المجدول في {{date}} الساعة {{time}}. لا يمكن التراجع عن هذا الإجراء من هذه الشاشة.',
+      'appointments.actions.cancellationReason': 'سبب الإلغاء',
+      'appointments.actions.cancellationReasonPlaceholder':
+        'مثال: تعذر حضور الشخص، طلب عبر الهاتف…',
+      'appointments.actions.cancellationNoteHint':
+        'ستتم إضافة السبب تلقائياً إلى ملاحظات الشخص.',
+      'appointments.actions.confirmCancellation': 'تأكيد الإلغاء',
+      'appointments.actions.cancelSuccess': 'تم إلغاء الموعد بنجاح.',
+      'appointments.actions.slotConflict':
+        'تم حجز هذه الفترة للتو. تم تحديث الأوقات المتاحة.',
+      'appointments.actions.failed': 'تعذر تنفيذ الإجراء.',
+      'appointments.actions.rescheduleGuidance':
+        'الأوقات المقترحة مستمدة من التوفر الفعلي للخدمة.',
+      'appointments.actions.rescheduleNoteHint':
+        'ستتم إضافة تغيير الموعد تلقائياً إلى ملاحظات الشخص.',
+      'appointments.actions.noteFailedTitle': 'تم تعديل الموعد، ولكن لم تُحفظ الملاحظة',
+      'appointments.actions.noteFailedText':
+        'نجح الإجراء على الموعد، لكن تعذرت إضافة ملاحظة المتابعة.',
+      'appointments.notes.cancelled':
+        'إلغاء الموعد {{ticket}} المجدول في {{date}} عند {{time}}. السبب: {{reason}}',
+      'appointments.notes.rescheduled':
+        'إعادة جدولة الموعد {{ticket}}: كان مقرراً في {{oldDate}} عند {{oldTime}}، ونُقل إلى {{newDate}} عند {{newTime}}.',
+      'notifications.appointment.updated': 'تم تحديث الموعد',
+      'notifications.appointment.created': 'تم إنشاء الموعد',
+      'notifications.appointment.createdMessage': 'تم تسجيل الموعد بنجاح.',
       'common.retry': 'إعادة المحاولة',
       'states.empty': 'لا توجد بيانات متاحة.',
       'states.error': 'تعذر تحميل البيانات.',

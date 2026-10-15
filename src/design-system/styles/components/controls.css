@@ -185,7 +185,6 @@ textarea:disabled {
 .calendar-toolbar select {
   width: min(100%, 22rem);
 }
-.calendar-event-button,
 .calendar-add-button,
 .calendar-date-button {
   width: 100%;
@@ -197,7 +196,6 @@ textarea:disabled {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
   cursor: pointer;
 }
-.calendar-event-button:hover,
 .calendar-add-button:hover,
 .calendar-date-button:hover {
   border-color: var(--color-accent);
@@ -209,18 +207,131 @@ textarea:disabled {
   font-weight: 800;
 }
 .calendar-event-button {
-  display: grid;
-  gap: 2px;
+  width: 100%;
+  min-height: 24px;
+  height: 24px;
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 6px;
+  padding: 0 6px;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   text-align: start;
-}
-.calendar-event-button small {
-  color: var(--color-text-muted);
-}
-.calendar-event-button[class*='appointment-status-'] {
-  position: relative;
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
   overflow: hidden;
-  border-left-width: 4px;
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--color-ink) 7%, transparent);
+  box-sizing: border-box;
+}
+.calendar-event-button:hover {
+  transform: translateY(-1px);
+}
+.calendar-event-button .appointment-event-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.calendar-event-button .appointment-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.calendar-event-button.appointment-status-scheduled {
+  border-color: color-mix(in srgb, #2563eb 28%, var(--color-line));
+  border-left-color: #2563eb;
+  background: color-mix(in srgb, #2563eb 10%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-scheduled:hover {
+  border-color: #2563eb;
+  background: color-mix(in srgb, #2563eb 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-scheduled .appointment-status-dot {
+  background-color: #2563eb;
+}
+.calendar-event-button.appointment-status-confirmed {
+  border-color: color-mix(in srgb, #7c3aed 28%, var(--color-line));
+  border-left-color: #7c3aed;
+  background: color-mix(in srgb, #7c3aed 10%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-confirmed:hover {
+  border-color: #7c3aed;
+  background: color-mix(in srgb, #7c3aed 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-confirmed .appointment-status-dot {
+  background-color: #7c3aed;
+}
+.calendar-event-button.appointment-status-present {
+  border-color: color-mix(in srgb, #059669 28%, var(--color-line));
+  border-left-color: #059669;
+  background: color-mix(in srgb, #059669 11%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-present:hover {
+  border-color: #059669;
+  background: color-mix(in srgb, #059669 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-present .appointment-status-dot {
+  background-color: #059669;
+}
+.calendar-event-button.appointment-status-in-progress {
+  border-color: color-mix(in srgb, #d97706 28%, var(--color-line));
+  border-left-color: #d97706;
+  background: color-mix(in srgb, #d97706 11%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-in-progress:hover {
+  border-color: #d97706;
+  background: color-mix(in srgb, #d97706 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-in-progress .appointment-status-dot {
+  background-color: #d97706;
+}
+.calendar-event-button.appointment-status-served {
+  border-color: color-mix(in srgb, #0284c7 28%, var(--color-line));
+  border-left-color: #0284c7;
+  background: color-mix(in srgb, #0284c7 10%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-served:hover {
+  border-color: #0284c7;
+  background: color-mix(in srgb, #0284c7 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-served .appointment-status-dot {
+  background-color: #0284c7;
+}
+.calendar-event-button.appointment-status-no-show {
+  border-color: color-mix(in srgb, #dc2626 28%, var(--color-line));
+  border-left-color: #dc2626;
+  background: color-mix(in srgb, #dc2626 10%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-no-show:hover {
+  border-color: #dc2626;
+  background: color-mix(in srgb, #dc2626 18%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-no-show .appointment-status-dot {
+  background-color: #dc2626;
+}
+.calendar-event-button.appointment-status-cancelled {
+  border-color: color-mix(in srgb, #6b7280 20%, var(--color-line));
+  border-left-color: #6b7280;
+  background: color-mix(in srgb, #6b7280 8%, var(--color-surface));
+  color: var(--color-muted);
+  opacity: 0.72;
+}
+.calendar-event-button.appointment-status-cancelled:hover {
+  border-color: #6b7280;
+  background: color-mix(in srgb, #6b7280 14%, var(--color-surface));
+}
+.calendar-event-button.appointment-status-cancelled .appointment-status-dot {
+  background-color: #6b7280;
+}
+.calendar-event-button.appointment-status-cancelled .appointment-event-name {
+  text-decoration: line-through;
 }
 .appointment-action-grid .button {
   min-height: 48px;
@@ -313,6 +424,16 @@ select:focus-visible {
   border-color: color-mix(in srgb, #9f1d20 72%, var(--color-surface));
   color: color-mix(in srgb, #ffffff 86%, var(--color-surface));
   background: color-mix(in srgb, #9f1d20 72%, var(--color-surface));
+}
+.button-small {
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 13px;
+  gap: 6px;
+}
+.button-small > svg {
+  width: 16px;
+  height: 16px;
 }
 .icon-button {
   width: 44px;

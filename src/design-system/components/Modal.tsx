@@ -28,9 +28,9 @@ export function Modal({ open, onOpenChange, title, description, children, action
           <div className="dialog-body">{children}</div>
           <footer className="dialog-actions">
             <Dialog.Close asChild>
-              <button className="button" type="button">
+              <button className="button" type="button" title={t('common.cancel')}>
                 <X aria-hidden="true" />
-                {t('common.cancel')}
+                <span className="button-label">{t('common.cancel')}</span>
               </button>
             </Dialog.Close>
             {actions}

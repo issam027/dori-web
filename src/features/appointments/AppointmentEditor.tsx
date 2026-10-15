@@ -238,7 +238,7 @@ export function AppointmentEditor({
                   {slots.map((slot) => (
                     <option key={slot.time} value={slotTime(slot.time)}>
                       {slotTime(slot.time)} ({slot.available}{' '}
-                      {__t('appointments.appointmentEditor.placeS')}
+                      {__t('appointments.appointmentEditor.placeS')})
                     </option>
                   ))}
                 </select>

@@ -1096,11 +1096,12 @@
   font-size: var(--font-size-sm);
 }
 .calendar-slot {
-  min-height: 3.5rem;
-  padding: var(--space-2);
+  min-height: 4.25rem;
+  padding: 6px 8px;
   border-top: 1px solid var(--color-border);
-  display: grid;
-  gap: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .calendar-slot-empty {
   cursor: pointer;
@@ -1113,6 +1114,68 @@
   outline: none;
   background: color-mix(in srgb, var(--color-accent) 9%, var(--color-surface));
   box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+.calendar-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.calendar-slot-time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+.calendar-slot-count {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+.calendar-slot-events {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.calendar-slot-events.is-expanded {
+  max-height: 13rem;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.calendar-slot-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 22px;
+  height: 22px;
+  width: 100%;
+  padding: 0 6px;
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 40%, var(--color-line));
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.calendar-slot-more:hover {
+  border-style: solid;
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+}
+.calendar-slot-more.is-expanded {
+  color: var(--color-muted);
+  border-color: var(--color-line);
+}
+.calendar-slot-more.is-expanded:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ink) 6%, var(--color-surface));
 }
 .appointment-action-track {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1259,12 +1322,19 @@
   border: 1px solid var(--color-border);
   overflow-x: auto;
 }
+.month-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 2px;
+}
 .month-day {
   min-height: 8rem;
-  padding: var(--space-2);
-  display: grid;
-  align-content: start;
-  gap: var(--space-1);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   border: 0;
 }
 

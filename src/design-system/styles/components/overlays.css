@@ -30,11 +30,67 @@
 }
 .dialog-content:has(.appointment-details-dialog) {
   width: min(760px, calc(100vw - 32px));
+  container-type: inline-size;
 }
 .dialog-content:has(.appointment-details-dialog) .dialog-actions {
-  flex-wrap: wrap;
-  overflow: visible;
-  white-space: normal;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 13px;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.dialog-content:has(.appointment-details-dialog) .dialog-actions .button svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+@container (max-width: 680px) {
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+    font-size: 0;
+  }
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button .button-label {
+    display: none;
+  }
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+    font-size: 0;
+  }
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button .button-label {
+    display: none;
+  }
+  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 .dialog-overlay {
   position: fixed;
