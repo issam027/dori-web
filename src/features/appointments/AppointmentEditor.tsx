@@ -232,7 +232,7 @@ export function AppointmentEditor({
                 <select
                   value={effectiveTime}
                   onChange={(e) => {
-                    setTime(e.target.value.slice(11, 16));
+                    setTime(slotTime(e.target.value));
                   }}
                 >
                   {slots.map((slot) => (
