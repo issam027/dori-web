@@ -64,7 +64,7 @@ export function NotificationsPage() {
   const items = journal.data?.data.items ?? [];
 
   return (
-    <div className="page-stack">
+    <div className="page-stack admin-page notifications-page">
       <PageHeader
         eyebrow={t('common.notifications')}
         title={t('common.notifications')}
@@ -99,7 +99,7 @@ export function NotificationsPage() {
           </div>
         </details>
       </Card>
-      <Card>
+      <Card className="settings-card notification-journal-card">
         <DataTable
           caption={t('supervision.notifications.journalDesNotifications')}
           rows={items}

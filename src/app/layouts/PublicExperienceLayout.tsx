@@ -44,12 +44,10 @@ export function PublicExperienceLayout({
 
   return (
     <div className={`public-layout public-${mode}`}>
-      {mode !== 'display' ? (
-        <header className="public-header">
+      <header className={`public-header${mode === 'display' ? ' public-header-display' : ''}`}>
           <strong>{t('app.name')}</strong>
           <LocaleSwitcher />
-        </header>
-      ) : null}
+      </header>
       <main>{children}</main>
       {mode !== 'display' ? (
         <footer>

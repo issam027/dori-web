@@ -240,7 +240,12 @@ table td small {
 }
 
 .admin-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--color-line);
   border-radius: 14px;
   background: var(--color-surface);
@@ -875,6 +880,23 @@ table td small {
 .notification-filter-grid .admin-filter-actions { grid-column: 4; }
 .settings-queue-filter { margin-bottom: 1rem; }
 
+.notifications-page,
+.notification-journal-card,
+.notification-journal-card .table-scroll {
+  min-width: 0;
+}
+
+.notification-journal-card .table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.notification-journal-card .table-scroll table {
+  min-width: 760px;
+}
+
 .person-detail-list dt {
   display: flex;
   align-items: center;
@@ -894,4 +916,42 @@ table td small {
   .persons-filter-grid { grid-template-columns: 1fr; }
   .notification-filter-grid { grid-template-columns: 1fr; }
   .notification-filter-grid .admin-filter-actions { grid-column: auto; }
+
+  .admin-page,
+  .admin-page > *,
+  .settings-card,
+  .admin-filter-card {
+    min-width: 0;
+  }
+
+  .admin-table-wrap,
+  .table-wrap,
+  .table-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table-wrap table,
+  .persons-admin-page .table-wrap table,
+  .notification-journal-card .table-scroll table {
+    min-width: 44rem;
+  }
+
+  .admin-filter-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-filter-actions .button {
+    min-width: min(100%, 9rem);
+  }
+}
+
+[dir='rtl'] .translation-language-tabs button,
+[dir='rtl'] .admin-filter-card summary,
+[dir='rtl'] .site-card {
+  text-align: start;
 }

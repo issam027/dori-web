@@ -22,7 +22,7 @@ export function HealthPage() {
   const data = health.data;
   const healthy = data?.status === 'ok' && data.checks.database === 'up';
   return (
-    <div className="page-stack">
+    <div className="page-stack health-page">
       <PageHeader
         eyebrow={__t('nav.health')}
         title={__t('health.health.santeDeLaPlateforme')}
@@ -73,7 +73,7 @@ export function HealthPage() {
           <div className="card-heading">
             <div>
               <h2>{__t('health.health.memoireDuProcessus')}</h2>
-              <p>{__t('common.valeursExposeesParLeProcessusApiAuDernier')}</p>
+              <p>{__t('health.health.valeursExposeesParLeProcessusApiAuDernier')}</p>
             </div>
             <span className="status-badge status-accent">{__t('health.health.tempsReel')}</span>
           </div>
@@ -125,7 +125,7 @@ export function HealthPage() {
           </div>
         </Card>
       </div>
-      <Card>
+      <Card className="health-contract-card">
         <div className="card-heading">
           <div>
             <h2>{__t('health.health.contratDeReponse')}</h2>
@@ -144,38 +144,48 @@ export function HealthPage() {
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td data-label={__t('health.health.champApi')}>
                   <code>{__t('health.health.status')}</code>
                 </td>
-                <td>{data?.status ?? '—'}</td>
-                <td>{__t('health.health.etatGlobalDuService')}</td>
+                <td data-label={__t('common.valeur')}>{data?.status ?? '—'}</td>
+                <td data-label={__t('health.health.interpretation')}>
+                  {__t('health.health.etatGlobalDuService')}
+                </td>
               </tr>
               <tr>
-                <td>
+                <td data-label={__t('health.health.champApi')}>
                   <code>{__t('health.health.checksDatabase')}</code>
                 </td>
-                <td>{data?.checks.database ?? '—'}</td>
-                <td>{__t('health.health.connectivitePostgresql')}</td>
+                <td data-label={__t('common.valeur')}>{data?.checks.database ?? '—'}</td>
+                <td data-label={__t('health.health.interpretation')}>
+                  {__t('health.health.connectivitePostgresql')}
+                </td>
               </tr>
               <tr>
-                <td>
+                <td data-label={__t('health.health.champApi')}>
                   <code>{__t('health.health.uptime')}</code>
                 </td>
-                <td>
+                <td data-label={__t('common.valeur')}>
                   {data
                     ? __t('health.durationSeconds', {
                         value0: String(data.uptime),
                       })
                     : '—'}
                 </td>
-                <td>{__t('health.health.dureeDeVieDuProcessus')}</td>
+                <td data-label={__t('health.health.interpretation')}>
+                  {__t('health.health.dureeDeVieDuProcessus')}
+                </td>
               </tr>
               <tr>
-                <td>
+                <td data-label={__t('health.health.champApi')}>
                   <code>{__t('health.health.checksMemoryusage')}</code>
                 </td>
-                <td>{data ? __t('health.counterCount') : '—'}</td>
-                <td>{__t('health.health.memoireNodeJsBrute')}</td>
+                <td data-label={__t('common.valeur')}>
+                  {data ? __t('health.counterCount') : '—'}
+                </td>
+                <td data-label={__t('health.health.interpretation')}>
+                  {__t('health.health.memoireNodeJsBrute')}
+                </td>
               </tr>
             </tbody>
           </table>

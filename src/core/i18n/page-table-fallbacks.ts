@@ -350,6 +350,8 @@ export const pageTableFallbackEn: Record<string, string> = {
 };
 
 export const pageTableFallbackAr: Record<string, string> = {
+  'common.absent': 'غائب',
+  'common.min': 'دقيقة',
   'admin.translations.pageDescription': 'إدارة ترجمات الواجهة والقيم المنشورة.',
   'admin.users.pageDescription': 'إدارة الحسابات والصلاحيات وتفضيلات المستخدمين.',
   'admin.users.utilisateurs': 'المستخدمون',

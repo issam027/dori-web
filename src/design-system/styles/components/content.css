@@ -238,6 +238,25 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
+  .site-grid,
+  .site-card,
+  .site-card-heading,
+  .site-card-actions {
+    min-width: 0;
+  }
+  .site-card-actions .button {
+    flex: 1 1 100%;
+    white-space: normal;
+  }
+  .detail-list div {
+    align-items: start;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .detail-list dd {
+    width: 100%;
+    text-align: start;
+  }
 }
 .experience-preview-header .status-badge {
   white-space: nowrap;
@@ -312,6 +331,8 @@
   }
 }
 .card {
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--color-line);
   border-radius: 16px;
   padding: 20px;
@@ -418,7 +439,13 @@
   background: var(--color-danger-soft);
 }
 .table-scroll {
-  overflow: auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--color-line);
   border-radius: 12px;
   background: var(--color-surface);

@@ -4,6 +4,7 @@ import { translationsControllerGetBundle } from '@/api/generated/translations/tr
 import { legacyUiKeyAliases, uiFallbackFr } from './ui-fallback.fr';
 import { pageTableFallbackAr, pageTableFallbackEn } from './page-table-fallbacks';
 import { generatedArabicFallback } from './arabic-fallback.generated';
+import { targetedFallbackAr, targetedFallbackEn } from './targeted-fallbacks';
 
 const partialFallbackResources = {
   fr: {
@@ -522,6 +523,7 @@ const partialFallbackResources = {
   en: {
     fallback: {
       ...pageTableFallbackEn,
+      ...targetedFallbackEn,
       'app.name': 'DORIFY',
       'settings.queueFilters': 'Filter queues',
       'settings.queueFiltersHelp': 'Display active, inactive or all configured queues.',
@@ -1024,6 +1026,7 @@ const partialFallbackResources = {
     fallback: {
       ...generatedArabicFallback,
       ...pageTableFallbackAr,
+      ...targetedFallbackAr,
       'app.name': 'دوريفاي',
       'bootstrap.eyebrow': 'دوريفاي',
       'bootstrap.title': 'تم إعداد أساس التطبيق',

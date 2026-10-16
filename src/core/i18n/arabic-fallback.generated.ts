@@ -28,7 +28,7 @@ export const generatedArabicFallback: Record<string, string> = {
   "common.saving": "إنقاذ...",
   "common.search": "البحث",
   "common.searching": "أبحث...",
-  "common.servi": "الخدمة",
+  "common.servi": "تمت خدمته",
   "common.terminer": "كامل",
   "common.todayAppointments": "اليوم",
   "common.updatedAt": "تحديث في",

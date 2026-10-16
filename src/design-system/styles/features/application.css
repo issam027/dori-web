@@ -538,7 +538,11 @@
 .form-stack,
 .page-stack {
   display: grid;
+  min-width: 0;
   gap: var(--space-5);
+}
+.page-stack > * {
+  min-width: 0;
 }
 .page-stack > * {
   animation: ui-reveal 0.3s ease-out both;
@@ -1030,6 +1034,103 @@
   .appointment-person-recap {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .health-page .page-header .cluster {
+    width: 100%;
+    align-items: stretch;
+  }
+  .health-page .page-header .status-badge {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+  .health-page .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .health-page .metric-card {
+    min-height: 0;
+  }
+  .health-page .metric-value {
+    overflow-wrap: anywhere;
+    font-size: 1.12rem;
+  }
+  .health-page .card-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .health-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-3);
+  }
+  .health-grid dd {
+    text-align: end;
+  }
+  .health-check-list > div {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .health-check-list > div > .status-badge {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: center;
+  }
+  .health-contract-card .table-scroll {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .health-contract-card .table-scroll table,
+  .health-contract-card .table-scroll tbody,
+  .health-contract-card .table-scroll tr,
+  .health-contract-card .table-scroll td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .health-contract-card .table-scroll thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .health-contract-card .table-scroll tbody {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .health-contract-card .table-scroll tbody tr {
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-subtle);
+  }
+  .health-contract-card .table-scroll td {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-3);
+    padding: var(--space-3);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .health-contract-card .table-scroll td::before {
+    content: attr(data-label);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 390px) {
+  .health-page .metric-grid {
+    grid-template-columns: 1fr;
+  }
+  .health-page .card {
+    padding: var(--space-4);
   }
 }
 
@@ -2445,7 +2546,7 @@
 @keyframes report-grow { from { transform: scaleX(0); } }
 @keyframes report-spin { from { transform: rotate(-80deg) scale(.8); opacity: 0; } }
 @keyframes report-reveal { from { transform: translateY(8px); opacity: 0; } }
-@media (max-width: 760px) { .report-visual-toolbar, .report-donut-layout { align-items: stretch; flex-direction: column; } .report-donut-grid { grid-template-columns: 1fr; } .report-donut { align-self: center; } .segmented-control { overflow-x: auto; } .report-comparison-row, .report-comparison-controls { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .report-visual-toolbar, .report-donut-layout { align-items: stretch; flex-direction: column; } .report-donut-grid { grid-template-columns: 1fr; } .report-donut { width: min(15rem, 76vw); align-self: center; } .segmented-control { width: 100%; overflow-x: auto; } .segmented-control button { flex: 1 0 auto; } .report-comparison-row, .report-comparison-controls { grid-template-columns: 1fr; } .report-chart-canvas { width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; } .report-chart-canvas svg { width: 46rem; max-width: none; } .report-legend { min-width: max-content; justify-content: flex-start; } .report-donut-legend strong { padding-inline-start: 1rem; } }
 @media (max-width: 70rem) { .report-insight-grid { grid-template-columns: repeat(2, 1fr); } .report-analysis-grid { grid-template-columns: 1fr 1fr; } .report-outcomes-card { grid-column: 1 / -1; } }
 @media (max-width: 70rem) { .control-room-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 48rem) { .control-room-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .queue-choice-list { flex-wrap: nowrap; overflow-x: auto; padding-bottom: .35rem; } .queue-choice-list button { flex: 0 0 auto; } .control-room-filter-row { align-items: stretch; flex-direction: column; } .control-room-filter-row > .muted:first-of-type { margin-left: 0; } }
