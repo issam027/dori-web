@@ -15,7 +15,7 @@ const commands = [
   {
     id: 'person',
     labelKey: 'commands.person',
-    path: '/my-queues',
+    path: '/persons',
     permissions: ['registration_view'],
   },
   {

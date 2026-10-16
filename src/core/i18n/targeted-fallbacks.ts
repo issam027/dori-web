@@ -240,6 +240,21 @@ export const targetedFallbackAr: Record<string, string> = {
 };
 
 Object.assign(targetedFallbackEn, {
+  'auth.login.bienvenueSurVotreEspace': 'Welcome to your workspace',
+  'auth.login.chaqueProfilUtiliseLeParcoursNormalDeLAp': 'Each profile uses the application’s standard sign-in flow.',
+  'auth.login.connectezVousAvecVotreIdentifiantDori': 'Sign in with your DORIFY username and password.',
+  'auth.login.connexion': 'Signing in…',
+  'auth.login.connexionRapide': 'Quick sign-in',
+  'auth.login.connexionSecurisee': 'Secure sign-in',
+  'auth.login.signingIn': 'Signing in…',
+  'auth.login.emailOuNomUtilisateur': 'Email or username',
+  'auth.login.identifiantOuMotDePasseIncorrect': 'Incorrect username or password.',
+  'auth.login.memoriserMonIdentifiant': 'Remember my username',
+  'auth.login.modeDemonstration': 'Demo mode',
+  'auth.login.motDePasse': 'Password',
+  'auth.login.motDePasseOublie': 'Forgot password',
+  'auth.login.plateformeDeGestionDesFlux': 'Customer flow management platform',
+  'auth.login.seConnecter': 'Sign in',
   'queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe': 'Non-fiscal document · Data confirmed by the service',
   'queue-operations.desk.ceJustificatifEstImprimeALaDemandeDuClie': 'This receipt is printed at the customer’s request.',
   'health.health.santeDeLaPlateforme': 'Platform health',
@@ -278,6 +293,21 @@ Object.assign(targetedFallbackEn, {
 });
 
 Object.assign(targetedFallbackAr, {
+  'auth.login.bienvenueSurVotreEspace': 'مرحباً بك في مساحة العمل',
+  'auth.login.chaqueProfilUtiliseLeParcoursNormalDeLAp': 'يستخدم كل ملف شخصي مسار تسجيل الدخول المعتاد للتطبيق.',
+  'auth.login.connectezVousAvecVotreIdentifiantDori': 'سجّل الدخول باستخدام اسم مستخدم دوريفاي وكلمة المرور.',
+  'auth.login.connexion': 'جارٍ تسجيل الدخول…',
+  'auth.login.connexionRapide': 'تسجيل دخول سريع',
+  'auth.login.connexionSecurisee': 'تسجيل دخول آمن',
+  'auth.login.signingIn': 'جارٍ تسجيل الدخول…',
+  'auth.login.emailOuNomUtilisateur': 'البريد الإلكتروني أو اسم المستخدم',
+  'auth.login.identifiantOuMotDePasseIncorrect': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
+  'auth.login.memoriserMonIdentifiant': 'تذكّر اسم المستخدم',
+  'auth.login.modeDemonstration': 'الوضع التجريبي',
+  'auth.login.motDePasse': 'كلمة المرور',
+  'auth.login.motDePasseOublie': 'نسيت كلمة المرور',
+  'auth.login.plateformeDeGestionDesFlux': 'منصة إدارة تدفق العملاء',
+  'auth.login.seConnecter': 'تسجيل الدخول',
   'queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe': 'مستند غير مالي · بيانات مؤكدة من الخدمة',
   'queue-operations.desk.ceJustificatifEstImprimeALaDemandeDuClie': 'طُبع هذا الإيصال بناءً على طلب العميل.',
   'health.health.santeDeLaPlateforme': 'صحة المنصة',

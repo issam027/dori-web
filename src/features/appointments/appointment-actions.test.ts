@@ -12,6 +12,8 @@ import {
   appointmentVisualStatus,
   canCheckIn,
   canManageAppointment,
+  isTerminalAppointment,
+  monthDates,
   weekDates,
 } from './appointment-rules';
 
@@ -59,10 +61,24 @@ it('allows check-in only today for a compatible appointment', () => {
     businessDate: '2026-10-08',
     appointmentStatus: 'confirmed',
     status: 'waiting',
+    isActive: true,
   } as RegistrationResponseDto;
   expect(canCheckIn(appointment, '2026-10-08')).toBe(true);
   expect(canCheckIn({ ...appointment, businessDate: '2026-10-09' }, '2026-10-08')).toBe(false);
   expect(canCheckIn({ ...appointment, status: 'served' }, '2026-10-08')).toBe(false);
+  expect(
+    canCheckIn(
+      {
+        ...appointment,
+        status: 'booked',
+        appointmentStatus: 'rescheduled',
+        businessDate: '2026-10-07T22:00:00.000Z',
+        isActive: true,
+      },
+      '2026-10-08',
+      '2026-10-08',
+    ),
+  ).toBe(true);
 });
 
 it('builds a complete Monday-to-Sunday week', () => {
@@ -75,6 +91,15 @@ it('builds a complete Monday-to-Sunday week', () => {
     '2026-10-10',
     '2026-10-11',
   ]);
+});
+
+it('builds the exact calendar grid around a month', () => {
+  const dates = monthDates(new Date('2026-10-16T00:00:00Z'));
+  expect(dates).toHaveLength(35);
+  expect(dates[0]).toBe('2026-09-28');
+  expect(dates.at(-1)).toBe('2026-11-01');
+  expect(dates).toContain('2026-10-01');
+  expect(dates).toContain('2026-10-31');
 });
 
 it('maps appointment lifecycle states to stable visual states', () => {
@@ -90,7 +115,22 @@ it('maps appointment lifecycle states to stable visual states', () => {
     'present',
   );
   expect(appointmentVisualStatus({ ...appointment, status: 'in_progress' })).toBe('in-progress');
+  expect(appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'booked' })).toBe('booked');
+  expect(appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'rescheduled' })).toBe('booked');
+  expect(appointmentVisualStatus({ ...appointment, appointmentStatus: 'expired' })).toBe('expired');
   expect(appointmentVisualStatus({ ...appointment, status: 'cancelled' })).toBe('cancelled');
   expect(canManageAppointment(appointment)).toBe(true);
   expect(canManageAppointment({ ...appointment, status: 'served' })).toBe(false);
+  expect(canManageAppointment({ ...appointment, status: 'no_show' })).toBe(false);
+  expect(canManageAppointment({ ...appointment, status: 'cancelled' })).toBe(false);
+  expect(canManageAppointment({ ...appointment, appointmentStatus: 'expired' })).toBe(false);
+  expect(canManageAppointment({ ...appointment, appointmentStatus: 'cancelled' })).toBe(false);
+  expect(isTerminalAppointment({ ...appointment, status: 'served' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, status: 'no_show' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, status: 'cancelled' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, appointmentStatus: 'expired' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, appointmentStatus: 'checked_in' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, appointmentStatus: 'present' })).toBe(true);
+  expect(isTerminalAppointment({ ...appointment, appointmentStatus: 'arrived' })).toBe(true);
+  expect(isTerminalAppointment(appointment)).toBe(false);
 });

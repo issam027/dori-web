@@ -23,6 +23,11 @@ describe('translation bundles', () => {
     );
     expect(untranslatedArabic).toEqual([]);
 
+    const loginKeys = [...allKeys].filter((key) => key.startsWith('auth.login.'));
+    expect(loginKeys.length).toBeGreaterThan(0);
+    expect(loginKeys.filter((key) => catalogs.en[key] === catalogs.fr[key])).toEqual([]);
+    expect(loginKeys.filter((key) => catalogs.ar[key] === catalogs.fr[key])).toEqual([]);
+
     const parameters = (value: string) =>
       [...value.matchAll(/{{\s*([^},\s]+)[^}]*}}/g)]
         .map((match) => match[1])

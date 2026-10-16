@@ -1,12 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Ban, CalendarClock, Save, UserCheck } from 'lucide-react';
-import type { RegistrationResponseDto } from '@/api/generated/models';
+import { ArrowLeft, Ban, CalendarClock, CalendarPlus, Check, CheckCircle2, Printer, Save, UserCheck } from 'lucide-react';
+import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated/models';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
+import { TrackingQr } from '@/features/public-experiences/TrackingQr';
+import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
+import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
 import { useAddPersonNote, usePerson } from '@/features/persons/hooks/usePersons';
 import {
   appointmentLocalParts,
@@ -17,6 +20,7 @@ import {
   canManageAppointment,
   dateInTimeZone,
   isSlotAvailable,
+  isTerminalAppointment,
   slotTime,
 } from './appointment-rules';
 import {
@@ -31,17 +35,25 @@ type ActionMode = 'summary' | 'reschedule' | 'cancel';
 export function AppointmentActionDialog({
   appointment,
   queueName,
+  siteName,
   open,
   onOpenChange,
   timeZone,
+  onCreateFollowUp,
 }: {
   appointment: RegistrationResponseDto;
   queueName?: string;
+  siteName?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   timeZone: string;
+  onCreateFollowUp?: (context: {
+    person: PersonResponseDto;
+    queueId: number;
+    tierId: number;
+  }) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const person = usePerson(appointment.personId);
   const addNote = useAddPersonNote(appointment.personId);
@@ -54,18 +66,28 @@ export function AppointmentActionDialog({
   const [cancellationReason, setCancellationReason] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
-  const availability = useAvailability(appointment.queueId, date);
+  const [checkedIn, setCheckedIn] = useState<RegistrationResponseDto>();
+  const [printReady, setPrintReady] = useState(false);
+  const availability = useAvailability(appointment.queueId, date, mode === 'reschedule');
   const serviceTimeZone = availability.data?.data.timezone || timeZone;
   const day =
     availability.data?.data.days.find((d) => d.businessDate === date) ??
     availability.data?.data.days[0];
   const slots = day?.slots?.filter(isSlotAvailable) ?? [];
   const manageable = canManageAppointment(appointment);
-  const checkInAllowed = canCheckIn(appointment, dateInTimeZone(timeZone));
+  const checkInAllowed = canCheckIn(appointment, dateInTimeZone(timeZone), initial.date);
   const details = person.data?.data;
   const personName = details
     ? [details.firstName, details.lastName].filter((part) => part.trim().length > 0).join(' ')
     : t('appointments.calendar.unknownPerson');
+  const checkedInTrackingUrl = trackingUrlFromToken(
+    checkedIn?.registrationTrackingToken || appointment.registrationTrackingToken,
+  );
+  const treatmentCompletedAt = new Intl.DateTimeFormat(i18n.resolvedLanguage ?? i18n.language, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone,
+  }).format(new Date(appointment.updatedAt));
 
   const perform = async ({
     action,
@@ -122,48 +144,115 @@ export function AppointmentActionDialog({
     setMode('summary');
   };
 
+  const checkIn = async () => {
+    setPending(true);
+    setError('');
+    try {
+      const response = await checkInAppointment(appointment.registrationId);
+      await invalidateAppointments(queryClient);
+      setCheckedIn(response.data);
+      notify({
+        tone: 'success',
+        title: t('notifications.appointment.updated'),
+        message: t('appointments.actions.presentSuccess'),
+      });
+    } catch (cause) {
+      notifyError(cause);
+      setError(t('appointments.actions.failed'));
+    } finally {
+      setPending(false);
+    }
+  };
+
   const actions =
-    mode === 'summary' ? (
+    checkedIn ? (
       <>
-        <button
-          className="button button-small button-primary"
-          type="button"
-          title={t('appointments.actions.markPresent')}
-          disabled={!checkInAllowed || pending}
-          onClick={() => {
-            void perform({
-              action: () => checkInAppointment(appointment.registrationId),
-              successMessage: t('appointments.actions.presentSuccess'),
-            });
-          }}
-        >
-          <UserCheck aria-hidden="true" />
-          <span className="button-label">{t('appointments.actions.markPresent')}</span>
-        </button>
         <button
           className="button button-small"
           type="button"
-          title={t('appointments.actions.reschedule')}
-          disabled={!manageable || pending}
+          disabled={!printReady}
           onClick={() => {
-            setMode('reschedule');
+            document.body.dataset.printKioskTicket = 'true';
+            const cleanup = () => {
+              delete document.body.dataset.printKioskTicket;
+            };
+            window.addEventListener('afterprint', cleanup, { once: true });
+            window.print();
+            window.setTimeout(cleanup, 30_000);
           }}
         >
-          <CalendarClock aria-hidden="true" />
-          <span className="button-label">{t('appointments.actions.reschedule')}</span>
+          <Printer aria-hidden="true" />
+          <span className="button-label">{t('public-experiences.kiosk.imprimerMonTicket')}</span>
         </button>
         <button
-          className="button button-small button-danger"
+          className="button button-small button-primary"
           type="button"
-          title={t('appointments.actions.cancelAppointment')}
-          disabled={!manageable || pending}
           onClick={() => {
-            setMode('cancel');
+            onOpenChange(false);
           }}
         >
-          <Ban aria-hidden="true" />
-          <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
+          <Check aria-hidden="true" />
+          <span className="button-label">{t('common.terminer')}</span>
         </button>
+      </>
+    ) : mode === 'summary' ? (
+      <>
+        {manageable ? (
+          <>
+            <button
+              className="button button-small button-primary"
+              type="button"
+              title={t('appointments.actions.markPresent')}
+              disabled={!checkInAllowed || pending}
+              onClick={() => {
+                void checkIn();
+              }}
+            >
+              <UserCheck aria-hidden="true" />
+              <span className="button-label">{t('appointments.actions.markPresent')}</span>
+            </button>
+            <button
+              className="button button-small"
+              type="button"
+              title={t('appointments.actions.reschedule')}
+              disabled={pending}
+              onClick={() => {
+                setMode('reschedule');
+              }}
+            >
+              <CalendarClock aria-hidden="true" />
+              <span className="button-label">{t('appointments.actions.reschedule')}</span>
+            </button>
+            <button
+              className="button button-small button-danger"
+              type="button"
+              title={t('appointments.actions.cancelAppointment')}
+              disabled={pending}
+              onClick={() => {
+                setMode('cancel');
+              }}
+            >
+              <Ban aria-hidden="true" />
+              <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
+            </button>
+          </>
+        ) : null}
+        {isTerminalAppointment(appointment) && details && onCreateFollowUp ? (
+          <button
+            className="button button-small button-primary"
+            type="button"
+            onClick={() => {
+              onCreateFollowUp({
+                person: details,
+                queueId: appointment.queueId,
+                tierId: appointment.tierId,
+              });
+            }}
+          >
+            <CalendarPlus aria-hidden="true" />
+            <span className="button-label">{t('appointments.actions.createFollowUp')}</span>
+          </button>
+        ) : null}
       </>
     ) : mode === 'cancel' ? (
       <>
@@ -250,12 +339,15 @@ export function AppointmentActionDialog({
       onOpenChange={onOpenChange}
       title={t('appointments.actions.title', { ticket: appointment.ticketNumber })}
       description={
-        mode === 'summary'
+        checkedIn
+          ? t('appointments.actions.checkInConfirmedDescription')
+          : mode === 'summary'
           ? t('appointments.actions.description')
           : mode === 'cancel'
             ? t('appointments.actions.cancelStepDescription')
             : t('appointments.actions.rescheduleStepDescription')
       }
+      hideDismissAction={Boolean(checkedIn)}
       actions={actions}
     >
       <div className="appointment-details-dialog">
@@ -264,7 +356,34 @@ export function AppointmentActionDialog({
           <span className={mode === 'summary' ? '' : 'done'} />
         </div>
 
-        {mode === 'summary' ? (
+        {checkedIn ? (
+          <section className="quick-registration-result" role="status">
+            <div className="quick-registration-result-details">
+              <span className="quick-registration-success" aria-hidden="true">
+                <Check />
+              </span>
+              <p className="eyebrow">{t('common.registrationConfirmed')}</p>
+              <h3>{personName}</h3>
+              <strong>{checkedIn.ticketNumber}</strong>
+              <p>
+                {queueName} · {t('common.enAttente')}
+              </p>
+            </div>
+            <div className="quick-registration-tracking">
+              <TrackingQr value={checkedInTrackingUrl} />
+              <p>{t('quickRegistration.trackingQrHelp')}</p>
+            </div>
+            <KioskTicketPrintDocument
+              ticketNumber={checkedIn.ticketNumber}
+              siteName={siteName}
+              queueName={queueName}
+              trackingUrl={checkedInTrackingUrl}
+              onReady={() => {
+                setPrintReady(true);
+              }}
+            />
+          </section>
+        ) : mode === 'summary' ? (
           <section className="appointment-record-panel">
             <div className="note-mode-heading appointment-record-heading">
               <span className="appointment-avatar" aria-hidden="true">
@@ -278,11 +397,16 @@ export function AppointmentActionDialog({
                     t('appointments.actions.noContact')}
                 </p>
               </div>
-              <span
-                className={`appointment-status-pill appointment-status-${appointmentVisualStatus(appointment)}`}
-              >
-                {t(appointmentStatusKey(appointment))}
-              </span>
+              <div className="appointment-record-badges">
+                <span
+                  className={`appointment-status-pill appointment-status-${appointmentVisualStatus(appointment)}`}
+                >
+                  {t(appointmentStatusKey(appointment))}
+                </span>
+                {appointment.tierName ? (
+                  <span className="status-badge status-info">{appointment.tierName}</span>
+                ) : null}
+              </div>
             </div>
             <dl className="appointment-details-list">
               <div>
@@ -302,6 +426,31 @@ export function AppointmentActionDialog({
                 <dd>{appointment.ticketNumber}</dd>
               </div>
             </dl>
+            {appointment.status === 'served' ? (
+              <div className="appointment-treatment-summary">
+                <CheckCircle2 aria-hidden="true" />
+                <div>
+                  <strong>{t('appointments.actions.treatmentCompleted')}</strong>
+                  <span>{t('appointments.actions.treatmentCompletedAt', { date: treatmentCompletedAt })}</span>
+                </div>
+                <small>
+                  {[
+                    appointment.servedByUserId
+                      ? t('appointments.actions.servedByOperator', {
+                          id: appointment.servedByUserId,
+                        })
+                      : null,
+                    appointment.servedBySessionId
+                      ? t('appointments.actions.servedBySession', {
+                          id: appointment.servedBySessionId,
+                        })
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </small>
+              </div>
+            ) : null}
             {!checkInAllowed && manageable ? (
               <p className="appointment-action-hint">{t('appointments.actions.presentHint')}</p>
             ) : null}

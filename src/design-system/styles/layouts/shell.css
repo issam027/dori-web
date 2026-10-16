@@ -13,6 +13,18 @@
 .public-public .public-header {
   justify-content: flex-end;
 }
+.public-public:has(.legal-page) .public-header {
+  justify-content: space-between;
+  border-bottom: 1px solid color-mix(in srgb, white 18%, transparent);
+  background: color-mix(in srgb, #091d2f 88%, transparent);
+}
+.public-public:has(.legal-page) .public-header > strong {
+  visibility: visible;
+}
+.public-public:has(.legal-page) > footer {
+  border-top: 1px solid color-mix(in srgb, white 16%, transparent);
+  background: #091d2f;
+}
 .public-layout.public-device {
   color: var(--color-ink);
   background:
@@ -307,6 +319,11 @@
   }
 }
 @media (max-width: 620px) {
+  .public-public:has(.legal-page) .public-header,
+  .public-public:has(.legal-page) > footer {
+    min-height: 56px;
+    padding-inline: 16px;
+  }
   .app-shell {
     display: block;
   }

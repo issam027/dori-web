@@ -668,6 +668,23 @@ table td small {
   width: 20px;
   height: 20px;
 }
+.persons-directory-heading {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+.persons-directory-heading .translation-heading-icon {
+  flex: 0 0 auto;
+  float: none;
+  margin: 0;
+}
+.persons-directory-heading > div {
+  min-width: 0;
+}
+.persons-directory-heading h2,
+.persons-directory-heading p {
+  white-space: nowrap;
+}
 .translation-content-cell {
   max-width: 32rem;
   color: var(--color-text-muted);

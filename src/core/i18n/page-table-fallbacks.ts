@@ -96,7 +96,7 @@ export const pageTableFallbackEn: Record<string, string> = {
   'onboarding.settings.traductions': 'Translations',
   'persons.admin.description': 'View and update people attached to the active site.',
   'persons.admin.person': 'Person',
-  'persons.admin.title': 'People',
+  'persons.admin.title': 'People directory',
   'persons.personPickerOrCreate.birthDate': 'Date of birth',
   'portfolio.portfolio.portefeuilleDeSites': 'Site portfolio',
   'portfolio.portfolio.selectionnezLeSiteSurLequelVousSouhaitezT':
@@ -239,7 +239,7 @@ export const pageTableFallbackEn: Record<string, string> = {
   'persons.admin.newPerson': 'New person',
   'persons.admin.notes': 'Notes',
   'persons.admin.personReference': 'Person record #{{id}}',
-  'persons.admin.resultCount': '{{count}} person(s) in this scope',
+  'persons.admin.resultCount': '{{count}} people',
   'persons.admin.searchHint': 'First name, last name, email or phone number',
   'persons.admin.searchPlaceholder': 'Enter a name, email or phone number',
   'persons.admin.searchTitle': 'Search for a person',
@@ -448,7 +448,7 @@ export const pageTableFallbackAr: Record<string, string> = {
   'onboarding.settings.traductions': 'الترجمات',
   'persons.admin.description': 'عرض وتحديث الأشخاص المرتبطين بالموقع النشط.',
   'persons.admin.person': 'الشخص',
-  'persons.admin.title': 'الأشخاص',
+  'persons.admin.title': 'دليل الأشخاص',
   'persons.personPickerOrCreate.birthDate': 'تاريخ الميلاد',
   'portfolio.portfolio.portefeuilleDeSites': 'محفظة المواقع',
   'portfolio.portfolio.selectionnezLeSiteSurLequelVousSouhaitezT':

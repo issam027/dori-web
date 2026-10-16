@@ -1,40 +1,38 @@
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
-import type { RegistrationResponseDto } from '@/api/generated/models';
+import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated/models';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { AppointmentActionDialog } from './AppointmentActionDialog';
 import { AppointmentEditor } from './AppointmentEditor';
 import {
+  dateInTimeZone,
   appointmentLocalParts,
   appointmentStatusKey,
   appointmentVisualStatus,
-  isoDate,
+  monthDates,
   weekDates,
 } from './appointment-rules';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
-import { usePersonsByIds } from '@/features/persons/hooks/usePersons';
 import { useAppointment, useAppointments } from './hooks/useAppointments';
 
-function monthDates(anchor: Date): string[] {
-  const first = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1));
-  const start = new Date(first);
-  start.setUTCDate(first.getUTCDate() - ((first.getUTCDay() + 6) % 7));
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(start);
-    date.setUTCDate(start.getUTCDate() + index);
-    return isoDate(date);
-  });
-}
+const appointmentTierVariant = (tierId: number) => Math.abs(tierId - 1) % 6;
 
 export function AppointmentsPage() {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [view, setView] = useState<'week' | 'month'>('week');
   const [anchor, setAnchor] = useState(() => new Date());
   const [queueId, setQueueId] = useState(0);
-  const [editor, setEditor] = useState<{ date: string; time?: string } | null>(null);
+  const [editor, setEditor] = useState<{
+    date: string;
+    time?: string;
+    person?: PersonResponseDto;
+    queueId?: number;
+    tierId?: number;
+    startAtServiceStep?: boolean;
+  } | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(() => new Set());
   const queues = useQueues({ siteId, isActive: true, usage: 'appointments' });
@@ -44,6 +42,12 @@ export function AppointmentsPage() {
   const selectedQueue =
     availableQueues.find((queue) => queue.queueId === queueId) ?? availableQueues[0];
   const timeZone = site.data?.data.timezone ?? 'UTC';
+  const displayedMonth = `${String(anchor.getUTCFullYear())}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}`;
+  const displayedMonthLabel = new Intl.DateTimeFormat(i18n.language, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(anchor);
   const dates = useMemo(
     () => (view === 'week' ? weekDates(anchor) : monthDates(anchor)),
     [anchor, view],
@@ -54,16 +58,14 @@ export function AppointmentsPage() {
     [appointmentsQuery.data],
   );
   const selected = useAppointment(selectedId);
-  const appointmentPersonIds = useMemo(
-    () => [...new Set(appointments.map((item) => item.personId))],
-    [appointments],
-  );
-  const appointmentPeople = usePersonsByIds(appointmentPersonIds);
-  const personName = (personId: number) => {
-    const person = appointmentPeople[appointmentPersonIds.indexOf(personId)]?.data?.data;
-    if (!person) return __t('appointments.calendar.unknownPerson');
-    return [person.firstName, person.lastName].filter((part) => part.trim().length > 0).join(' ');
-  };
+  const personName = (appointment: RegistrationResponseDto) =>
+    [appointment.firstName, appointment.lastName]
+      .filter((part): part is string => Boolean(part?.trim()))
+      .join(' ') || __t('appointments.calendar.unknownPerson');
+  const weekday = (date: string) =>
+    new Intl.DateTimeFormat(i18n.language, { weekday: 'long', timeZone: 'UTC' }).format(
+      new Date(`${date}T00:00:00Z`),
+    );
 
   const appointmentsByDate = useMemo(() => {
     const map = new Map<string, RegistrationResponseDto[]>();
@@ -111,7 +113,12 @@ export function AppointmentsPage() {
     : [];
   const move = (amount: number) => {
     const next = new Date(anchor);
-    next.setUTCDate(next.getUTCDate() + amount * (view === 'week' ? 7 : 30));
+    if (view === 'week') {
+      next.setUTCDate(next.getUTCDate() + amount * 7);
+    } else {
+      next.setUTCDate(1);
+      next.setUTCMonth(next.getUTCMonth() + amount);
+    }
     setAnchor(next);
   };
   return (
@@ -191,7 +198,9 @@ export function AppointmentsPage() {
               {__t('appointments.appointments.precedent')}
             </button>
             <strong>
-              {dates[0]} — {dates.at(-1)}
+              {view === 'month'
+                ? displayedMonthLabel
+                : [dates[0], dates.at(-1)].filter(Boolean).join(' — ')}
             </strong>
             <button
               className="button"
@@ -207,7 +216,10 @@ export function AppointmentsPage() {
             <div className="week-calendar">
               {dates.map((date) => (
                 <section key={date} className="calendar-day">
-                  <h2>{date}</h2>
+                  <h2>
+                    <span className="calendar-day-name">{weekday(date)}</span>
+                    <span className="calendar-day-date">{date}</span>
+                  </h2>
                   {hours.map((time) => {
                     const isBreak = Boolean(
                       selectedQueue?.breakStart &&
@@ -264,17 +276,17 @@ export function AppointmentsPage() {
                           <>
                             <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
                               {visibleAppointments.map((item) => {
-                                const name = personName(item.personId);
+                                const name = personName(item);
                                 const itemTime = item.scheduledTime
                                   ? appointmentLocalParts(item.scheduledTime, timeZone).time
                                   : time;
                                 const statusText = __t(appointmentStatusKey(item));
                                 return (
                                   <button
-                                    className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
+                                    className={`calendar-event-button appointment-tier-${String(appointmentTierVariant(item.tierId))} appointment-status-${appointmentVisualStatus(item)}`}
                                     key={item.registrationId}
                                     type="button"
-                                    title={`${name} (${itemTime}) · ${statusText}`}
+                                    title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}
                                     onClick={(event) => {
                                       event.stopPropagation();
                                       setSelectedId(item.registrationId);
@@ -322,6 +334,11 @@ export function AppointmentsPage() {
             </div>
           ) : (
             <div className="month-calendar">
+              {dates.slice(0, 7).map((date) => (
+                <div className="month-weekday-header" key={`weekday-${date}`}>
+                  {weekday(date)}
+                </div>
+              ))}
               {dates.map((date) => {
                 const dayAppointments = byDate(date);
                 const dayKey = date;
@@ -334,7 +351,7 @@ export function AppointmentsPage() {
                 return (
                   <section
                     key={date}
-                    className="month-day"
+                    className={`month-day${date.startsWith(displayedMonth) ? '' : ' is-outside-month'}`}
                     role="button"
                     tabIndex={0}
                     onClick={() => {
@@ -363,17 +380,17 @@ export function AppointmentsPage() {
                     </div>
                     <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
                       {visibleAppointments.map((item) => {
-                        const name = personName(item.personId);
+                        const name = personName(item);
                         const itemTime = item.scheduledTime
                           ? appointmentLocalParts(item.scheduledTime, timeZone).time
                           : '—';
                         const statusText = __t(appointmentStatusKey(item));
                         return (
                           <button
-                            className={`calendar-event-button appointment-status-${appointmentVisualStatus(item)}`}
+                            className={`calendar-event-button appointment-tier-${String(appointmentTierVariant(item.tierId))} appointment-status-${appointmentVisualStatus(item)}`}
                             key={item.registrationId}
                             type="button"
-                            title={`${name} (${itemTime}) · ${statusText}`}
+                            title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}
                             onClick={(event) => {
                               event.stopPropagation();
                               setSelectedId(item.registrationId);
@@ -381,6 +398,9 @@ export function AppointmentsPage() {
                           >
                             <span className="appointment-status-dot" aria-hidden="true" />
                             <span className="appointment-event-name">{name}</span>
+                            <time className="appointment-event-time" dateTime={item.scheduledTime}>
+                              {itemTime}
+                            </time>
                           </button>
                         );
                       })}
@@ -429,6 +449,10 @@ export function AppointmentsPage() {
           initialDate={editor.date}
           initialTime={editor.time}
           timeZone={timeZone}
+          initialPerson={editor.person}
+          initialQueueId={editor.queueId}
+          initialTierId={editor.tierId}
+          startAtServiceStep={editor.startAtServiceStep}
         />
       ) : null}
       {selected.data ? (
@@ -437,8 +461,19 @@ export function AppointmentsPage() {
           queueName={
             availableQueues.find((queue) => queue.queueId === selected.data.data.queueId)?.queueName
           }
+          siteName={site.data?.data.siteName}
           timeZone={timeZone}
           open
+          onCreateFollowUp={(context) => {
+            setSelectedId(null);
+            setEditor({
+              date: dateInTimeZone(timeZone),
+              person: context.person,
+              queueId: context.queueId,
+              tierId: context.tierId,
+              startAtServiceStep: true,
+            });
+          }}
           onOpenChange={(open) => {
             if (!open) setSelectedId(null);
           }}

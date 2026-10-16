@@ -52,7 +52,7 @@ describe('appointment timezone rules', () => {
     expect(isSlotAvailable({ available: 1, isAvailable: false })).toBe(true);
     expect(isSlotAvailable({ available: -1 })).toBe(false);
     // Fallback when available is undefined
-    expect(isSlotAvailable({ isAvailable: true })).toBe(true);
+    expect(isSlotAvailable({ isAvailable: true })).toBe(false);
     expect(isSlotAvailable({ isAvailable: false })).toBe(false);
   });
 });

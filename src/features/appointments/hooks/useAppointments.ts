@@ -64,7 +64,7 @@ export function useAppointment(registrationId: number | null) {
   });
 }
 
-export function useAvailability(queueId: number, date: string) {
+export function useAvailability(queueId: number, date: string, enabled = true) {
   return useQuery({
     queryKey: queryKeys.availability(queueId, date),
     queryFn: ({ signal }) =>
@@ -74,7 +74,7 @@ export function useAvailability(queueId: number, date: string) {
         undefined,
         signal,
       ),
-    enabled: queueId > 0 && date.length > 0,
+    enabled: enabled && queueId > 0 && date.length > 0,
   });
 }
 

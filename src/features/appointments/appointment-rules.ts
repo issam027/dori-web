@@ -1,21 +1,27 @@
 import type { RegistrationResponseDto } from '@/api/generated/models';
 
 export type AppointmentVisualStatus =
-  'scheduled' | 'confirmed' | 'present' | 'in-progress' | 'served' | 'no-show' | 'cancelled';
+  'booked' | 'scheduled' | 'confirmed' | 'present' | 'in-progress' | 'served' | 'no-show' | 'expired' | 'cancelled';
 
 export function appointmentVisualStatus(
   registration: RegistrationResponseDto,
 ): AppointmentVisualStatus {
-  if (registration.status === 'cancelled') return 'cancelled';
+  if (registration.status === 'cancelled' || registration.appointmentStatus === 'cancelled') return 'cancelled';
   if (registration.status === 'served') return 'served';
   if (registration.status === 'no_show') return 'no-show';
   if (registration.status === 'in_progress') return 'in-progress';
+  if (registration.appointmentStatus === 'expired') return 'expired';
   if (
     registration.status === 'waiting' &&
     ['checked_in', 'present', 'arrived'].includes(registration.appointmentStatus ?? '')
   )
     return 'present';
   if (registration.appointmentStatus === 'confirmed') return 'confirmed';
+  if (
+    registration.status === 'booked' ||
+    ['booked', 'rescheduled'].includes(registration.appointmentStatus ?? '')
+  )
+    return 'booked';
   return 'scheduled';
 }
 
@@ -23,16 +29,32 @@ export function appointmentStatusKey(registration: RegistrationResponseDto): str
   return `appointments.status.${appointmentVisualStatus(registration)}`;
 }
 
-export function canManageAppointment(registration: RegistrationResponseDto): boolean {
-  return !['served', 'no_show', 'cancelled'].includes(registration.status);
+export function isTerminalAppointment(registration: RegistrationResponseDto): boolean {
+  return (
+    ['served', 'no_show', 'cancelled'].includes(registration.status) ||
+    ['checked_in', 'present', 'arrived', 'expired', 'cancelled'].includes(
+      registration.appointmentStatus ?? '',
+    )
+  );
 }
 
-export function canCheckIn(registration: RegistrationResponseDto, today: string): boolean {
+export function canManageAppointment(registration: RegistrationResponseDto): boolean {
+  return !isTerminalAppointment(registration);
+}
+
+export function canCheckIn(
+  registration: RegistrationResponseDto,
+  today: string,
+  appointmentDate = registration.businessDate.slice(0, 10),
+): boolean {
   return (
     registration.entryType === 'appointment' &&
-    registration.businessDate === today &&
-    ['scheduled', 'confirmed'].includes(registration.appointmentStatus ?? '') &&
-    registration.status === 'waiting'
+    registration.isActive &&
+    appointmentDate === today &&
+    ['scheduled', 'booked', 'confirmed', 'rescheduled'].includes(
+      registration.appointmentStatus ?? '',
+    ) &&
+    ['booked', 'waiting'].includes(registration.status)
   );
 }
 
@@ -116,9 +138,21 @@ export function slotTime(value: string, timeZone?: string): string {
 }
 
 export function isSlotAvailable(slot: { available?: number; isAvailable?: boolean }): boolean {
-  if (typeof slot.available === 'number') {
-    return slot.available > 0;
-  }
-  return Boolean(slot.isAvailable);
+  return typeof slot.available === 'number' && slot.available > 0;
+}
+
+export function monthDates(anchor: Date): string[] {
+  const first = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1));
+  const last = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + 1, 0));
+  const start = new Date(first);
+  start.setUTCDate(first.getUTCDate() - ((first.getUTCDay() + 6) % 7));
+  const end = new Date(last);
+  end.setUTCDate(last.getUTCDate() + ((7 - last.getUTCDay()) % 7));
+  const dayCount = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1;
+  return Array.from({ length: dayCount }, (_, index) => {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + index);
+    return isoDate(date);
+  });
 }
 

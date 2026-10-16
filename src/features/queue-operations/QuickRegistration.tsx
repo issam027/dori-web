@@ -189,6 +189,7 @@ export function QuickRegistration({
               ? __t('queue-operations.quickRegistration.stepTicket')
               : __t('queue-operations.quickRegistration.stepComplete')
         }
+        hideDismissAction={step === 3}
         actions={
           <>
             {step === 1 ? (

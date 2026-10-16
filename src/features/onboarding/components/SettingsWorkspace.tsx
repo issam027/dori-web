@@ -22,7 +22,6 @@ import { QueueServiceSettings } from './QueueServiceSettings';
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
   const activeSiteId = useScopeStore((s) => s.activeSiteId);
-  const [selectedSiteId, setSelectedSiteId] = useState<number | null>(activeSiteId);
   const [queueStatus, setQueueStatus] = useState<'active' | 'inactive' | 'all'>('active');
   const {
     sites: ss,
@@ -32,7 +31,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     managers,
     refreshManagers,
     refresh: refreshData,
-  } = useSettingsData(selectedSiteId ?? activeSiteId, queueStatus);
+  } = useSettingsData(activeSiteId, queueStatus);
   const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
@@ -43,21 +42,6 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         eyebrow={__t('nav.administration')}
         title={__t('onboarding.settings.configurationDuService')}
         description={__t('onboarding.settings.gerezLesRessourcesReellementProposeesParDo')}
-        actions={
-          <label className="settings-site-picker">
-            <span>{__t('onboarding.settings.scope')}</span>
-            <select
-              value={selectedSiteId ?? activeSiteId ?? ''}
-              onChange={(event) => { setSelectedSiteId(Number(event.target.value)); }}
-            >
-              {ss.map((site) => (
-                <option key={site.siteId} value={site.siteId}>
-                  {site.siteName}{site.isActive ? '' : ` · ${__t('common.inactive')}`}
-                </option>
-              ))}
-            </select>
-          </label>
-        }
       />
       <div className="metrics-grid">
         <MetricCard
@@ -74,7 +58,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
       <Card className="settings-card">
         <SettingsNavigation active={section} />
         {section === 'sites' ? (
-          <SitesPanel items={ss.filter((site) => site.siteId === (selectedSiteId ?? activeSiteId))} managers={managers} refresh={refresh} assign={setAssignmentTarget} />
+          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} managers={managers} refresh={refresh} assign={setAssignmentTarget} />
         ) : null}
         {section === 'queues' ? (
           <QueuesPanel
@@ -102,7 +86,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         initial={editQueue}
         onSave={async (v) => {
           if (editQueue) await updateQueue(editQueue.queueId, v);
-          else if (selectedSiteId ?? activeSiteId) await createQueueForSite((selectedSiteId ?? activeSiteId) as number, v);
+          else if (activeSiteId) await createQueueForSite(activeSiteId, v);
           refresh();
         }}
       />
@@ -287,13 +271,37 @@ function QueuesPanel({
         action={create}
         label={__t('onboarding.settings.nouvelleFile')}
       />
-      <Card className="admin-filter-card settings-queue-filter">
-        <details>
-          <summary><span>{__t('settings.queueFilters')}</span><small>{__t('settings.queueFiltersHelp')}</small></summary>
-          <div className="admin-filter-grid admin-filter-grid-single">
-            <label>{__t('settings.queueStatus')}<select value={status} onChange={(event) => { onStatusChange(event.target.value as 'active' | 'inactive' | 'all'); pagination.setPage(1); }}><option value="active">{__t('common.active')}</option><option value="inactive">{__t('common.inactive')}</option><option value="all">{__t('common.all')}</option></select></label>
-          </div>
-        </details>
+      <Card className="portfolio-filter-card settings-queue-filter">
+        <div>
+          <strong>{__t('settings.displayQueues')}</strong>
+          <small>{__t('settings.queueFiltersHelp')}</small>
+        </div>
+        <div
+          className="portfolio-status-filter"
+          role="group"
+          aria-label={__t('settings.displayQueues')}
+        >
+          {(
+            [
+              ['active', __t('common.active')],
+              ['inactive', __t('common.inactive')],
+              ['all', __t('common.all')],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={status === value ? 'is-active' : ''}
+              aria-pressed={status === value}
+              onClick={() => {
+                onStatusChange(value);
+                pagination.setPage(1);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </Card>
       <div className="table-wrap admin-table-wrap">
         <table>

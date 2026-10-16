@@ -22,10 +22,18 @@ const statusMessageKeys: Record<number, string> = {
   504: 'errors.http.timeout',
 };
 
+const codeTitleKeys: Record<string, string> = {
+  DUPLICATE_ACTIVE_REGISTRATION: 'apiErrorTitles.DUPLICATE_ACTIVE_REGISTRATION',
+};
+
 function translatedMessage(error: NormalizedApiError): string | undefined {
-  if (!error.translationKey || !i18n.exists(error.translationKey)) return undefined;
-  const translated = i18n.t(error.translationKey, error.translationParams);
-  return translated === error.translationKey ? undefined : translated;
+  const keys = [error.translationKey, `apiErrors.${error.code}`].filter(Boolean);
+  for (const key of keys) {
+    if (!i18n.exists(key)) continue;
+    const translated = i18n.t(key, error.translationParams);
+    if (translated !== key) return translated;
+  }
+  return undefined;
 }
 
 export function presentError(error: unknown): ErrorPresentation {
@@ -38,7 +46,10 @@ export function presentError(error: unknown): ErrorPresentation {
         ? i18n.t('errors.networkOffline')
         : i18n.t('errors.actionFailedWithSupport'));
     return {
-      title: i18n.t(error.status === 409 ? 'errors.staleData' : 'errors.actionImpossible'),
+      title: i18n.t(
+        codeTitleKeys[error.code] ??
+          (error.status === 409 ? 'errors.staleData' : 'errors.actionImpossible'),
+      ),
       message,
       correlationId: error.correlationId,
     };

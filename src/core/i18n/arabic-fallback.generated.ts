@@ -54,7 +54,7 @@ export const generatedArabicFallback: Record<string, string> = {
   "persons.admin.identity": "هوية و تفاصيل الاتصال",
   "persons.admin.newPerson": "شخص جديد",
   "persons.admin.personReference": "سجل الشخص #{{id}}",
-  "persons.admin.resultCount": "شخص {{count}} في هذا المجال",
+  "persons.admin.resultCount": "{{count}} شخصًا",
   "persons.admin.searchHint": "الاسم الأول والاسم الأخير ورقم البريد الإلكتروني أو الهاتف",
   "persons.admin.searchPlaceholder": "إدخال اسم أو رقم بريد إلكتروني أو هاتف",
   "persons.admin.searchTitle": "البحث عن شخص",

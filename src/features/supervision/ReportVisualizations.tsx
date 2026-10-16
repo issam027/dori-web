@@ -3,6 +3,7 @@ import type { QueueResponseDto, ReportBucketDto, ReportGroupDto, ReportMetricsDt
 import { BarChart3, ChartPie, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/design-system/components/Card';
+import { formatReportNumber } from './report-number';
 
 type View = 'trend' | 'comparison' | 'distribution';
 type Metric = 'registered' | 'served' | 'walkin' | 'appointments' | 'noShow' | 'cancelled' | 'expired' | 'averageWaitMinutes' | 'medianWaitMinutes' | 'p90WaitMinutes' | 'averageServiceMinutes' | 'medianServiceMinutes' | 'p90ServiceMinutes' | 'noShowRate';
@@ -11,6 +12,7 @@ type Series = { id: string; label: string; color: string; values: number[] };
 const palette = ['#5b8def', '#64c7a5', '#f3ad55', '#ef6b73', '#9678d3', '#44b4c6', '#d66fb4', '#7f9f45', '#e17c45', '#5f72c9', '#2fa08f', '#b36a5e', '#7b8794', '#c28b2c'];
 
 function Chart({ buckets, series, showLegend = true }: { buckets: readonly ReportBucketDto[]; series: readonly Series[]; showLegend?: boolean }) {
+  const { i18n } = useTranslation();
   const [hovered, setHovered] = useState<number>();
   const values = series.flatMap((item) => item.values);
   const max = Math.max(...values, 1);
@@ -21,12 +23,12 @@ function Chart({ buckets, series, showLegend = true }: { buckets: readonly Repor
   const band = buckets.length <= 1 ? width : width / Math.max(buckets.length - 1, 1);
   return <div className="report-chart-canvas">
     <svg viewBox="0 0 780 315" role="img">
-      {[0, 1, 2, 3, 4].map((line) => { const value = max - (max * line) / 4; const py = 20 + (height * line) / 4; return <g key={line}><line x1="45" x2="745" y1={py} y2={py} className="report-grid-line" /><text x="36" y={py + 4} textAnchor="end" className="report-axis-label">{value < 10 ? value.toFixed(1) : Math.round(value)}</text></g>; })}
+      {[0, 1, 2, 3, 4].map((line) => { const value = max - (max * line) / 4; const py = 20 + (height * line) / 4; return <g key={line}><line x1="45" x2="745" y1={py} y2={py} className="report-grid-line" /><text x="36" y={py + 4} textAnchor="end" className="report-axis-label">{formatReportNumber(value, i18n.language)}</text></g>; })}
       <line x1="45" x2="45" y1="20" y2="250" className="report-axis" /><line x1="45" x2="745" y1="250" y2="250" className="report-axis" />
       {series.map((item) => <g key={item.id}><polyline points={item.values.map((value, index) => `${String(x(index))},${String(y(value))}`).join(' ')} className="report-line" style={{ stroke: item.color }} />{item.values.map((value, index) => <circle key={index} cx={x(index)} cy={y(value)} r="4" className="report-point" style={{ fill: item.color }} />)}</g>)}
       {buckets.map((bucket, index) => <rect key={bucket.periodStart} x={Math.max(45, x(index) - band / 2)} y="20" width={Math.min(band, 745 - Math.max(45, x(index) - band / 2))} height="230" className="report-hover-band" tabIndex={0} onPointerEnter={() => { setHovered(index); }} onPointerMove={() => { setHovered(index); }} onPointerLeave={() => { setHovered(undefined); }} onFocus={() => { setHovered(index); }} onBlur={() => { setHovered(undefined); }} />)}
       {buckets.filter((_, index) => index === 0 || index === buckets.length - 1 || index === Math.floor(buckets.length / 2)).map((bucket) => { const index = buckets.indexOf(bucket); return <text key={bucket.periodStart} x={x(index)} y="276" textAnchor="middle" className="report-axis-label">{bucket.periodStart.slice(0, 10)}</text>; })}
-      {hovered !== undefined && buckets[hovered] ? <g className="report-chart-tooltip" transform={`translate(${String(Math.min(x(hovered) + 8, 545))},28)`}><rect width="190" height={36 + series.length * 20} rx="9" /><text x="12" y="20">{buckets[hovered].periodStart.slice(0, 10)}</text>{series.map((item, index) => <text key={item.id} x="12" y={42 + index * 20}>{item.label}: {item.values[hovered]?.toFixed((item.values[hovered] ?? 0) < 10 ? 1 : 0)}</text>)}</g> : null}
+      {hovered !== undefined && buckets[hovered] ? <g className="report-chart-tooltip" transform={`translate(${String(Math.min(x(hovered) + 8, 545))},28)`}><rect width="190" height={36 + series.length * 20} rx="9" /><text x="12" y="20">{buckets[hovered].periodStart.slice(0, 10)}</text>{series.map((item, index) => <text key={item.id} x="12" y={42 + index * 20}>{item.label}: {formatReportNumber(item.values[hovered] ?? 0, i18n.language)}</text>)}</g> : null}
     </svg>
     {showLegend ? <div className="report-legend">{series.map((item) => <span key={item.id}><i style={{ background: item.color }} />{item.label}</span>)}</div> : null}
   </div>;
@@ -85,20 +87,21 @@ function ComparisonChart({ groups, queues }: { groups: readonly ReportGroupDto[]
 }
 
 function DonutPanel({ title, description, values, labels, center, centerLabel, suffix = '', highlights = [] }: { title: string; description: string; values: readonly number[]; labels: readonly string[]; center: string; centerLabel: string; suffix?: string; highlights?: readonly { label: string; value: string }[] }) {
+  const { i18n } = useTranslation();
   const total = Math.max(values.reduce((sum, value) => sum + value, 0), 1);
   const gradient = values.map((value, index) => { const start = values.slice(0, index).reduce((sum, item) => sum + item, 0) / total * 100; const end = start + (value / total) * 100; return `${palette[index] ?? '#5b8def'} ${String(start)}% ${String(end)}%`; }).join(',');
-  return <article className="report-donut-panel"><header><h3>{title}</h3><p>{description}</p></header>{highlights.length ? <dl className="report-donut-highlights">{highlights.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl> : null}<div className="report-donut-layout"><div className="report-donut" style={{ background: `conic-gradient(${gradient})` }}><span><strong>{center}</strong>{centerLabel}</span></div><div className="report-donut-legend">{labels.map((label, index) => <span key={label}><i style={{ background: palette[index] }} />{label}<strong>{values[index]?.toFixed(suffix ? 1 : 0)}{suffix} <small>{((values[index] ?? 0) / total * 100).toFixed(0)}%</small></strong></span>)}</div></div></article>;
+  return <article className="report-donut-panel"><header><h3>{title}</h3><p>{description}</p></header>{highlights.length ? <dl className="report-donut-highlights">{highlights.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl> : null}<div className="report-donut-layout"><div className="report-donut" style={{ background: `conic-gradient(${gradient})` }}><span><strong>{center}</strong>{centerLabel}</span></div><div className="report-donut-legend">{labels.map((label, index) => <span key={label}><i style={{ background: palette[index] }} />{label}<strong>{formatReportNumber(values[index] ?? 0, i18n.language)}{suffix} <small>{formatReportNumber((values[index] ?? 0) / total * 100, i18n.language)}%</small></strong></span>)}</div></div></article>;
 }
 
 function DonutCharts({ metrics }: { metrics: ReportMetricsDto }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const outcomes = [metrics.volume.served, metrics.volume.noShow, metrics.volume.cancelled, metrics.volume.expired];
   const completed = outcomes.reduce((sum, value) => sum + value, 0);
   const wait = metrics.timing.averageWaitMinutes ?? 0;
   const service = metrics.timing.averageServiceMinutes ?? 0;
   return <div className="report-donut-grid">
     <DonutPanel title={t('reports.visual.flowDistribution')} description={t('reports.visual.flowDistributionHelp')} values={outcomes} labels={[t('reports.visual.served'), t('common.noShow'), t('common.cancelled'), t('common.expired')]} center={String(completed)} centerLabel={t('reports.visual.completedOutcomes')} highlights={[{ label: t('reports.visual.registrations'), value: String(metrics.volume.registered) }, { label: t('reports.visual.appointments'), value: String(metrics.volume.appointments) }, { label: t('reports.analytics.walkins'), value: String(metrics.volume.walkin) }]} />
-    <DonutPanel title={t('reports.visual.timeDistribution')} description={t('reports.visual.timeDistributionHelp')} values={[wait, service]} labels={[t('reports.averageWaitAbbreviation'), t('reports.averageServiceAbbreviation')]} center={(wait + service).toFixed(1)} centerLabel={t('reports.visual.minutesTotal')} suffix={` ${t('common.min')}`} highlights={[{ label: t('reports.p90Wait'), value: `${(metrics.timing.p90WaitMinutes ?? 0).toFixed(1)} ${t('common.min')}` }, { label: t('reports.p90Service'), value: `${(metrics.timing.p90ServiceMinutes ?? 0).toFixed(1)} ${t('common.min')}` }]} />
+    <DonutPanel title={t('reports.visual.timeDistribution')} description={t('reports.visual.timeDistributionHelp')} values={[wait, service]} labels={[t('reports.averageWaitAbbreviation'), t('reports.averageServiceAbbreviation')]} center={formatReportNumber(wait + service, i18n.language)} centerLabel={t('reports.visual.minutesTotal')} suffix={` ${t('common.min')}`} highlights={[{ label: t('reports.p90Wait'), value: `${formatReportNumber(metrics.timing.p90WaitMinutes ?? 0, i18n.language)} ${t('common.min')}` }, { label: t('reports.p90Service'), value: `${formatReportNumber(metrics.timing.p90ServiceMinutes ?? 0, i18n.language)} ${t('common.min')}` }]} />
   </div>;
 }
 

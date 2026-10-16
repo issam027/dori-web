@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Save } from 'lucide-react';
 import type { CreateQueueDto, QueueResponseDto } from '@/api/generated/models';
 import { Modal } from '@/design-system/components/Modal';
+import { presentError } from '@/core/notifications/error-presentation';
+import { notify } from '@/core/notifications/notification-store';
 
 const defaults: CreateQueueDto = {
   queueCode: '',
@@ -12,6 +14,34 @@ const defaults: CreateQueueDto = {
   currency: null,
   locale: null,
 };
+
+const normalizeTime = (value?: string) => value?.slice(0, 5);
+
+function queuePayload(value: CreateQueueDto): CreateQueueDto {
+  return {
+    queueCode: value.queueCode.trim().toUpperCase(),
+    queueName: value.queueName,
+    averageWaitTime: value.averageWaitTime,
+    threadCount: value.threadCount,
+    currency: value.currency,
+    locale: value.locale,
+    appointmentsEnabled: value.appointmentsEnabled,
+    appointmentSlotDuration: value.appointmentSlotDuration,
+    slotCapacity: value.slotCapacity,
+    workingHoursStart: normalizeTime(value.workingHoursStart),
+    workingHoursEnd: normalizeTime(value.workingHoursEnd),
+    breakStart: normalizeTime(value.breakStart),
+    breakEnd: normalizeTime(value.breakEnd),
+    lateToleranceMinutes: value.lateToleranceMinutes,
+    baseWeightWalkin: value.baseWeightWalkin,
+    baseWeightAppointment: value.baseWeightAppointment,
+    escalationRateWalkin: value.escalationRateWalkin,
+    escalationRateAppointment: value.escalationRateAppointment,
+    carryOverWaiting: value.carryOverWaiting,
+    dailyResetMode: value.dailyResetMode,
+    dailyResetTime: normalizeTime(value.dailyResetTime),
+  };
+}
 
 export function QueueEditor({
   open,
@@ -25,9 +55,20 @@ export function QueueEditor({
   onSave: (value: CreateQueueDto) => Promise<void> | void;
 }) {
   const { t: __t } = useTranslation();
-  const [value, setValue] = useState<CreateQueueDto>(() => ({ ...defaults, ...initial }));
+  const [value, setValue] = useState<CreateQueueDto>(() => {
+    const source = { ...defaults, ...initial };
+    return {
+      ...source,
+      workingHoursStart: normalizeTime(source.workingHoursStart),
+      workingHoursEnd: normalizeTime(source.workingHoursEnd),
+      breakStart: normalizeTime(source.breakStart),
+      breakEnd: normalizeTime(source.breakEnd),
+      dailyResetTime: normalizeTime(source.dailyResetTime),
+    };
+  });
   const [advanced, setAdvanced] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const field = <K extends keyof CreateQueueDto>(key: K, next: CreateQueueDto[K]) => {
     setValue((current) => ({ ...current, [key]: next }));
   };
@@ -45,9 +86,14 @@ export function QueueEditor({
           onClick={() => {
             void (async () => {
               setSaving(true);
+              setSaveError('');
               try {
-                await onSave({ ...value, queueCode: value.queueCode.trim().toUpperCase() });
+                await onSave(queuePayload(value));
                 onOpenChange(false);
+              } catch (cause) {
+                const presentation = presentError(cause);
+                setSaveError(presentation.message);
+                notify({ tone: 'error', ...presentation });
               } finally {
                 setSaving(false);
               }
@@ -94,7 +140,7 @@ export function QueueEditor({
           {__t('queues.queueEditor.attenteMoyenne')}
           <input
             type="number"
-            min="0"
+            min="1"
             value={value.averageWaitTime ?? 0}
             onChange={(e) => {
               field('averageWaitTime', Number(e.target.value));
@@ -217,6 +263,11 @@ export function QueueEditor({
             />
           </label>
         </div>
+      ) : null}
+      {saveError ? (
+        <p className="field-error" role="alert">
+          {saveError}
+        </p>
       ) : null}
     </Modal>
   );

@@ -10,9 +10,18 @@ interface ModalProps {
   description?: ReactNode;
   children: ReactNode;
   actions?: ReactNode;
+  hideDismissAction?: boolean;
 }
 
-export function Modal({ open, onOpenChange, title, description, children, actions }: ModalProps) {
+export function Modal({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  actions,
+  hideDismissAction = false,
+}: ModalProps) {
   const { t } = useTranslation();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -27,12 +36,14 @@ export function Modal({ open, onOpenChange, title, description, children, action
           </header>
           <div className="dialog-body">{children}</div>
           <footer className="dialog-actions">
-            <Dialog.Close asChild>
-              <button className="button" type="button" title={t('common.cancel')}>
-                <X aria-hidden="true" />
-                <span className="button-label">{t('common.cancel')}</span>
-              </button>
-            </Dialog.Close>
+            {!hideDismissAction ? (
+              <Dialog.Close asChild>
+                <button className="button" type="button" title={t('common.cancel')}>
+                  <X aria-hidden="true" />
+                  <span className="button-label">{t('common.cancel')}</span>
+                </button>
+              </Dialog.Close>
+            ) : null}
             {actions}
           </footer>
         </Dialog.Content>

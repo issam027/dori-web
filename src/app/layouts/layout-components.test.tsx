@@ -76,6 +76,23 @@ describe('application layout', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
+  it('can omit the default cancel action for a completed modal state', () => {
+    render(
+      <Modal
+        open
+        hideDismissAction
+        onOpenChange={vi.fn()}
+        title="Opération terminée"
+        actions={<button type="button">Terminer</button>}
+      >
+        Résultat
+      </Modal>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Terminer' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: /annuler|cancel|common.cancel/i })).not.toBeInTheDocument();
+  });
+
   it('groups profile, language and logout in the compact account menu', async () => {
     useSessionStore.getState().authenticate(operator);
     const logout = vi.fn();

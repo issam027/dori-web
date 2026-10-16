@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, CalendarPlus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import type { QueueResponseDto } from '@/api/generated/models';
+import type { PersonResponseDto, QueueResponseDto } from '@/api/generated/models';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { createAppointment } from './appointment-actions';
-import { appointmentUtcIso, isSlotAvailable, slotTime } from './appointment-rules';
+import { appointmentUtcIso, dateInTimeZone, isSlotAvailable, slotTime } from './appointment-rules';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
@@ -20,6 +20,10 @@ export function AppointmentEditor({
   initialDate,
   initialTime,
   timeZone,
+  initialPerson,
+  initialQueueId,
+  initialTierId,
+  startAtServiceStep = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,13 +32,19 @@ export function AppointmentEditor({
   initialDate: string;
   initialTime?: string;
   timeZone: string;
+  initialPerson?: PersonResponseDto;
+  initialQueueId?: number;
+  initialTierId?: number;
+  startAtServiceStep?: boolean;
 }) {
   const { t: __t } = useTranslation();
   const queryClient = useQueryClient();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [person, setPerson] = useState<PersonChoice | null>(null);
-  const [queueId, setQueueId] = useState(queues[0]?.queueId ?? 0);
-  const [tierId, setTierId] = useState(0);
+  const [step, setStep] = useState<1 | 2>(startAtServiceStep && initialPerson ? 2 : 1);
+  const [person, setPerson] = useState<PersonChoice | null>(
+    initialPerson ? { kind: 'existing', person: initialPerson } : null,
+  );
+  const [queueId, setQueueId] = useState(initialQueueId ?? queues[0]?.queueId ?? 0);
+  const [tierId, setTierId] = useState(initialTierId ?? 0);
   const [date, setDate] = useState(initialDate);
   const [time, setTime] = useState(initialTime ?? '09:00');
   const [error, setError] = useState('');
@@ -223,6 +233,7 @@ export function AppointmentEditor({
                 {__t('common.date')}
                 <input
                   type="date"
+                  min={dateInTimeZone(timeZone)}
                   value={date}
                   onChange={(e) => {
                     setDate(e.target.value);

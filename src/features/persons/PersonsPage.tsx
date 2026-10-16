@@ -188,11 +188,11 @@ export function PersonsPage() {
         </details>
       </Card>
       <Card className="settings-card">
-        <div className="card-heading">
+        <div className="card-heading persons-directory-heading">
+          <span className="translation-heading-icon">
+            <UsersRound aria-hidden="true" />
+          </span>
           <div>
-            <span className="translation-heading-icon">
-              <UsersRound aria-hidden="true" />
-            </span>
             <h2>{t('persons.admin.directory')}</h2>
             <p>{t('persons.admin.resultCount', { count: total })}</p>
           </div>

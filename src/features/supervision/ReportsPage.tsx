@@ -25,11 +25,13 @@ import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useReports } from './hooks/useReports';
 import { ReportVisualizations } from './ReportVisualizations';
 import { ReportAnalyticsSections } from './ReportAnalyticsSections';
+import { formatReportNumber, formatReportPercent } from './report-number';
 
 const fallbackTimeZone = 'UTC';
 
 export function ReportsPage() {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
+  const number = (value: number) => formatReportNumber(value, i18n.language);
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -136,17 +138,17 @@ export function ReportsPage() {
           { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
           {
             label: __t('reports.averageWaitAbbreviation'),
-            value: totals?.timing.averageWaitMinutes == null ? '—' : `${totals.timing.averageWaitMinutes.toFixed(1)} ${__t('common.min')}`,
+            value: totals?.timing.averageWaitMinutes == null ? '—' : `${number(totals.timing.averageWaitMinutes)} ${__t('common.min')}`,
             icon: Timer,
           },
           {
             label: __t('reports.averageServiceAbbreviation'),
-            value: totals?.timing.averageServiceMinutes == null ? '—' : `${totals.timing.averageServiceMinutes.toFixed(1)} ${__t('common.min')}`,
+            value: totals?.timing.averageServiceMinutes == null ? '—' : `${number(totals.timing.averageServiceMinutes)} ${__t('common.min')}`,
             icon: Gauge,
           },
           {
             label: __t('common.noShow'),
-            value: totals?.rates.noShowRate == null ? '—' : `${(totals.rates.noShowRate * 100).toFixed(1)} %`,
+            value: totals?.rates.noShowRate == null ? '—' : formatReportPercent(totals.rates.noShowRate, i18n.language),
             icon: UserX,
           },
         ].map(({ label, value, icon: Icon }) => (
@@ -158,10 +160,10 @@ export function ReportsPage() {
       ) : null}
       {totals ? (
         <div className="metric-grid report-percentiles">
-          <MetricCard label={__t('reports.medianWait')} value={totals.timing.medianWaitMinutes == null ? '—' : `${totals.timing.medianWaitMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Timer />} />
-          <MetricCard label={__t('reports.p90Wait')} value={totals.timing.p90WaitMinutes == null ? '—' : `${totals.timing.p90WaitMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Timer />} />
-          <MetricCard label={__t('reports.medianService')} value={totals.timing.medianServiceMinutes == null ? '—' : `${totals.timing.medianServiceMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Gauge />} />
-          <MetricCard label={__t('reports.p90Service')} value={totals.timing.p90ServiceMinutes == null ? '—' : `${totals.timing.p90ServiceMinutes.toFixed(1)} ${__t('common.min')}`} icon={<Gauge />} />
+          <MetricCard label={__t('reports.medianWait')} value={totals.timing.medianWaitMinutes == null ? '—' : `${number(totals.timing.medianWaitMinutes)} ${__t('common.min')}`} icon={<Timer />} />
+          <MetricCard label={__t('reports.p90Wait')} value={totals.timing.p90WaitMinutes == null ? '—' : `${number(totals.timing.p90WaitMinutes)} ${__t('common.min')}`} icon={<Timer />} />
+          <MetricCard label={__t('reports.medianService')} value={totals.timing.medianServiceMinutes == null ? '—' : `${number(totals.timing.medianServiceMinutes)} ${__t('common.min')}`} icon={<Gauge />} />
+          <MetricCard label={__t('reports.p90Service')} value={totals.timing.p90ServiceMinutes == null ? '—' : `${number(totals.timing.p90ServiceMinutes)} ${__t('common.min')}`} icon={<Gauge />} />
         </div>
       ) : null}
       {totals && queueItems.length ? <ReportAnalyticsSections summary={totals} buckets={reports.data?.data.buckets ?? []} queues={queueItems} /> : null}
@@ -202,19 +204,19 @@ export function ReportsPage() {
                 key: 'wait',
                 header: __t('reports.averageWaitAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${row.timing.averageWaitMinutes.toFixed(1)} ${__t('common.min')}`,
+                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${number(row.timing.averageWaitMinutes)} ${__t('common.min')}`,
               },
               {
                 key: 'service',
                 header: __t('reports.averageServiceAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${row.timing.averageServiceMinutes.toFixed(1)} ${__t('common.min')}`,
+                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${number(row.timing.averageServiceMinutes)} ${__t('common.min')}`,
               },
               {
                 key: 'noShow',
                 header: __t('common.noShow'),
                 align: 'end',
-                render: (row) => row.rates.noShowRate == null ? '—' : `${(row.rates.noShowRate * 100).toFixed(1)} %`,
+                render: (row) => row.rates.noShowRate == null ? '—' : formatReportPercent(row.rates.noShowRate, i18n.language),
               },
               {
                 key: 'chart',
