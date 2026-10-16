@@ -16,6 +16,8 @@ import {
   canCheckIn,
   canManageAppointment,
   dateInTimeZone,
+  isSlotAvailable,
+  slotTime,
 } from './appointment-rules';
 import {
   cancelAppointment,
@@ -25,7 +27,6 @@ import {
 import { useAvailability } from './hooks/useAppointments';
 
 type ActionMode = 'summary' | 'reschedule' | 'cancel';
-const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
 export function AppointmentActionDialog({
   appointment,
@@ -54,7 +55,11 @@ export function AppointmentActionDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const availability = useAvailability(appointment.queueId, date);
-  const slots = availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
+  const serviceTimeZone = availability.data?.data.timezone || timeZone;
+  const day =
+    availability.data?.data.days.find((d) => d.businessDate === date) ??
+    availability.data?.data.days[0];
+  const slots = day?.slots?.filter(isSlotAvailable) ?? [];
   const manageable = canManageAppointment(appointment);
   const checkInAllowed = canCheckIn(appointment, dateInTimeZone(timeZone));
   const details = person.data?.data;
@@ -217,7 +222,7 @@ export function AppointmentActionDialog({
             void perform({
               action: () =>
                 rescheduleAppointment(appointment.registrationId, {
-                  scheduledTime: appointmentUtcIso(date, time, timeZone),
+                  scheduledTime: appointmentUtcIso(date, time, serviceTimeZone),
                 }),
               successMessage: t('appointments.actions.rescheduleSuccess'),
               note: t('appointments.notes.rescheduled', {
@@ -363,13 +368,14 @@ export function AppointmentActionDialog({
             ) : null}
             <div className="appointment-slot-grid">
               {slots.map((slot) => {
-                const value = slotTime(slot.time);
+                const value = slotTime(slot.time, serviceTimeZone);
                 return (
                   <button
                     className="button"
                     aria-pressed={time === value}
                     type="button"
                     key={slot.time}
+                    disabled={!isSlotAvailable(slot)}
                     onClick={() => {
                       setTime(value);
                     }}

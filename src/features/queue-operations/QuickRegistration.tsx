@@ -18,14 +18,12 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { appointmentUtcIso } from '@/features/appointments/appointment-rules';
+import { appointmentUtcIso, isSlotAvailable, slotTime } from '@/features/appointments/appointment-rules';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { findPersons } from '@/features/persons/api/persons-api';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
-
-const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
 export function QuickRegistration({
   siteId,
@@ -70,8 +68,10 @@ export function QuickRegistration({
     queryFn: () => getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
     enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
   });
+  const serviceTimeZone =
+    availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
   const availableSlots =
-    availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
+    availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
   const submit = async () => {
     if (!choice || !queueId || !tierId || submissionInFlight.current) return;
     submissionInFlight.current = true;
@@ -85,7 +85,7 @@ export function QuickRegistration({
         entryType,
         scheduledTime:
           entryType === 'appointment'
-            ? appointmentUtcIso(appointmentDate, appointmentTime, site.data?.data.timezone ?? 'UTC')
+            ? appointmentUtcIso(appointmentDate, appointmentTime, serviceTimeZone)
             : undefined,
         ...(choice.kind === 'existing'
           ? { personId: choice.person.personId }
@@ -400,12 +400,15 @@ export function QuickRegistration({
                       <option value="">
                         {__t('queue-operations.quickRegistration.choisirUneHeure')}
                       </option>
-                      {availableSlots.map((slot) => (
-                        <option key={slot.time} value={slotTime(slot.time)}>
-                          {slotTime(slot.time)} · {slot.available}{' '}
-                          {__t('queue-operations.quickRegistration.placeS')}
-                        </option>
-                      ))}
+                      {availableSlots.map((slot) => {
+                        const value = slotTime(slot.time, serviceTimeZone);
+                        return (
+                          <option key={slot.time} value={value}>
+                            {value} · {slot.available}{' '}
+                            {__t('queue-operations.quickRegistration.placeS')}
+                          </option>
+                        );
+                      })}
                     </select>
                   </FormField>
                 ) : null}

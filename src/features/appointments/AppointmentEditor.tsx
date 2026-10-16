@@ -6,13 +6,11 @@ import type { QueueResponseDto } from '@/api/generated/models';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { createAppointment } from './appointment-actions';
-import { appointmentUtcIso } from './appointment-rules';
+import { appointmentUtcIso, isSlotAvailable, slotTime } from './appointment-rules';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
-
-const slotTime = (value: string) => (value.includes('T') ? value.slice(11, 16) : value.slice(0, 5));
 
 export function AppointmentEditor({
   open,
@@ -42,6 +40,7 @@ export function AppointmentEditor({
   const [error, setError] = useState('');
   const tiers = useAppointmentTiers('appointment-editor');
   const availability = useAvailability(queueId, date);
+  const serviceTimeZone = availability.data?.data.timezone || timeZone;
   const submit = async () => {
     if (!person || !queueId || !tierId) return;
     setError('');
@@ -50,7 +49,7 @@ export function AppointmentEditor({
         queueId,
         tierId,
         entryType: 'appointment',
-        scheduledTime: appointmentUtcIso(date, effectiveTime, timeZone),
+        scheduledTime: appointmentUtcIso(date, effectiveTime, serviceTimeZone),
         ...(person.kind === 'existing'
           ? { personId: person.person.personId }
           : { person: person.person }),
@@ -70,8 +69,11 @@ export function AppointmentEditor({
       } else setError(__t('appointments.appointmentEditor.creationImpossible'));
     }
   };
-  const slots = availability.data?.data.days[0]?.slots?.filter((slot) => slot.isAvailable) ?? [];
-  const availableTimes = slots.map((slot) => slotTime(slot.time));
+  const day =
+    availability.data?.data.days.find((d) => d.businessDate === date) ??
+    availability.data?.data.days[0];
+  const slots = day?.slots?.filter(isSlotAvailable) ?? [];
+  const availableTimes = slots.map((slot) => slotTime(slot.time, serviceTimeZone));
   const effectiveTime =
     availableTimes.find((candidate) => candidate === time) ??
     availableTimes.find((candidate) => candidate.slice(0, 2) === time.slice(0, 2)) ??
@@ -232,15 +234,18 @@ export function AppointmentEditor({
                 <select
                   value={effectiveTime}
                   onChange={(e) => {
-                    setTime(slotTime(e.target.value));
+                    setTime(e.target.value);
                   }}
                 >
-                  {slots.map((slot) => (
-                    <option key={slot.time} value={slotTime(slot.time)}>
-                      {slotTime(slot.time)} ({slot.available}{' '}
-                      {__t('appointments.appointmentEditor.placeS')})
-                    </option>
-                  ))}
+                  {slots.map((slot) => {
+                    const value = slotTime(slot.time, serviceTimeZone);
+                    return (
+                      <option key={slot.time} value={value}>
+                        {value} ({slot.available}{' '}
+                        {__t('appointments.appointmentEditor.placeS')})
+                      </option>
+                    );
+                  })}
                 </select>
               </label>
             </div>

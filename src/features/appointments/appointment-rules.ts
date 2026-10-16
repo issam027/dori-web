@@ -99,3 +99,26 @@ export function weekDates(anchor: Date): string[] {
     return isoDate(date);
   });
 }
+
+export function slotTime(value: string, timeZone?: string): string {
+  if (!value) return '';
+  if (timeZone && (value.includes('T') || value.endsWith('Z'))) {
+    const normalizedIso =
+      !value.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(value)
+        ? `${value}Z`
+        : value;
+    const parts = appointmentLocalParts(normalizedIso, timeZone);
+    if (parts.time && parts.time !== 'NaN:NaN') {
+      return parts.time;
+    }
+  }
+  return value.includes('T') ? value.slice(11, 16) : value.slice(0, 5);
+}
+
+export function isSlotAvailable(slot: { available?: number; isAvailable?: boolean }): boolean {
+  if (typeof slot.available === 'number') {
+    return slot.available > 0;
+  }
+  return Boolean(slot.isAvailable);
+}
+
