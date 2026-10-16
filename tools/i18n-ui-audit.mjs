@@ -197,6 +197,60 @@ for (const file of filesIn(sourceRoot)) {
   visit(ast);
 }
 
+function declaredTranslationKeys(source) {
+  return [...source.matchAll(/^\s*(['"])(.*?)\1\s*:/gm)].map((match) => match[2]);
+}
+
+function reportDuplicateKeys(label, keys) {
+  const seen = new Set();
+  for (const key of keys) {
+    if (seen.has(key)) findings.add(`i18n:${label}: duplicate translation key "${key}"`);
+    seen.add(key);
+  }
+  return seen;
+}
+
+const i18nSource = fs.readFileSync(path.join(sourceRoot, 'core', 'i18n', 'i18n.ts'), 'utf8');
+const frenchSource = fs.readFileSync(
+  path.join(sourceRoot, 'core', 'i18n', 'ui-fallback.fr.ts'),
+  'utf8',
+);
+const tableSource = fs.readFileSync(
+  path.join(sourceRoot, 'core', 'i18n', 'page-table-fallbacks.ts'),
+  'utf8',
+);
+const generatedArabicSource = fs.readFileSync(
+  path.join(sourceRoot, 'core', 'i18n', 'arabic-fallback.generated.ts'),
+  'utf8',
+);
+const englishStart = i18nSource.indexOf('  en: {');
+const arabicStart = i18nSource.indexOf('  ar: {');
+const aliasStart = frenchSource.indexOf('export const legacyUiKeyAliases');
+const arabicTableStart = tableSource.indexOf('export const pageTableFallbackAr');
+const directCatalogs = {
+  fr: i18nSource.slice(0, englishStart),
+  en: i18nSource.slice(englishStart, arabicStart),
+  ar: i18nSource.slice(arabicStart, i18nSource.indexOf('} as const;')),
+};
+const layeredCatalogs = {
+  fr: frenchSource.slice(0, aliasStart),
+  en: tableSource.slice(0, arabicTableStart),
+  ar: `${tableSource.slice(arabicTableStart)}\n${generatedArabicSource}`,
+};
+
+for (const locale of ['fr', 'en', 'ar']) {
+  const directKeys = reportDuplicateKeys(`${locale}:direct`, declaredTranslationKeys(directCatalogs[locale]));
+  const layeredKeys = reportDuplicateKeys(
+    `${locale}:layered`,
+    declaredTranslationKeys(layeredCatalogs[locale]),
+  );
+  for (const key of directKeys) {
+    if (layeredKeys.has(key)) {
+      findings.add(`i18n:${locale}: key "${key}" is declared in both local catalog layers`);
+    }
+  }
+}
+
 if (findings.size) {
   console.error(`Hard-coded visible UI strings detected (${String(findings.size)}):`);
   console.error([...findings].join('\n'));

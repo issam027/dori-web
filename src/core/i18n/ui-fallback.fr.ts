@@ -1,5 +1,8 @@
 // Semantic French UI fallbacks. Remote ihm entries override these values.
 export const uiFallbackFr: Record<string, string> = {
+  'common.deviseLocale': 'Devise du site',
+  'common.counterNumber': 'Numéro du guichet',
+  'common.guichetLabel': 'Guichet {{value0}}',
   'app.name': 'DORIFY',
   'appointments.appointmentActionDialog.actionImpossible': 'Action impossible.',
   'appointments.appointmentActionDialog.annulerCeRendezVous': 'Annuler ce rendez-vous ?',

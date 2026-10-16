@@ -123,7 +123,7 @@ export function MyQueuesPage() {
                     setPage(1);
                   }}
                 >
-                  <RotateCcw aria-hidden="true" /> {__t('admin.translations.reinitialiser')}
+                  <RotateCcw aria-hidden="true" /> {__t('common.reset')}
                 </button>
                 <button className="button button-primary" type="submit">
                   <Search aria-hidden="true" /> {__t('common.search')}
