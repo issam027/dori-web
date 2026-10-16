@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { i18n, loadTranslationBundle } from '@/core/i18n/i18n';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
 
 export function PreferenceSynchronizer() {
+  const location = useLocation();
   const locale = usePreferencesStore((state) => state.locale);
   const theme = usePreferencesStore((state) => state.theme);
   const accentColor = usePreferencesStore((state) => state.accentColor);
@@ -13,8 +15,10 @@ export function PreferenceSynchronizer() {
     document.documentElement.dir = ['ar', 'fa', 'he', 'ur'].includes(locale.split('-')[0] ?? '')
       ? 'rtl'
       : 'ltr';
-    void loadTranslationBundle(locale, 'ihm').catch(() => i18n.changeLanguage(locale));
-  }, [locale]);
+    const publicExperiencePaths = new Set(['/kiosk', '/display', '/track']);
+    const category = publicExperiencePaths.has(location.pathname) ? 'public_ihm' : 'ihm';
+    void loadTranslationBundle(locale, category).catch(() => i18n.changeLanguage(locale));
+  }, [locale, location.pathname]);
 
   useEffect(() => {
     const root = document.documentElement;

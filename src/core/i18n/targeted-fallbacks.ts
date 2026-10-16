@@ -1,5 +1,6 @@
 // Reviewed fallbacks for the public and administration screens that must never fall back to French.
 export const targetedFallbackEn: Record<string, string> = {
+  'common.enDirect': 'Live',
   'public-experiences.deviceMode.borneDAccueil': 'Reception kiosk',
   'public-experiences.deviceMode.configurationDeLAppareil': 'Device setup',
   'public-experiences.deviceMode.choisissezLUsageDeCetAppareilVousPourrez': 'Choose how this device will be used. You can return here after signing in again.',
@@ -11,6 +12,7 @@ export const targetedFallbackEn: Record<string, string> = {
   'public-experiences.deviceMode.quelEcranSouhaitezVousAfficher': 'Which screen would you like to display?',
   'public-experiences.display.accueilEtOrientationBsalw': 'Reception and guidance',
   'public-experiences.display.activerLeSon': 'Enable sound',
+  'public-experiences.display.filesAffichees': '{{count}} queues',
   'public-experiences.display.aucunTicketEnAttente': 'No tickets are waiting.',
   'public-experiences.display.aVenir': 'Coming up',
   'public-experiences.display.ceSiteNeDisposeActuellementDAucuneFileAc': 'This site currently has no authorized active queue.',
@@ -120,6 +122,7 @@ export const targetedFallbackEn: Record<string, string> = {
 };
 
 export const targetedFallbackAr: Record<string, string> = {
+  'common.enDirect': 'مباشر',
   'public-experiences.deviceMode.borneDAccueil': 'كشك الاستقبال',
   'public-experiences.deviceMode.configurationDeLAppareil': 'إعداد الجهاز',
   'public-experiences.deviceMode.choisissezLUsageDeCetAppareilVousPourrez': 'اختر طريقة استخدام هذا الجهاز. يمكنك العودة إلى هذه الصفحة بعد تسجيل الدخول مجدداً.',
@@ -131,6 +134,7 @@ export const targetedFallbackAr: Record<string, string> = {
   'public-experiences.deviceMode.quelEcranSouhaitezVousAfficher': 'أي شاشة تريد عرضها؟',
   'public-experiences.display.accueilEtOrientationBsalw': 'الاستقبال والتوجيه',
   'public-experiences.display.activerLeSon': 'تفعيل الصوت',
+  'public-experiences.display.filesAffichees': '{{count}} قوائم انتظار',
   'public-experiences.display.aucunTicketEnAttente': 'لا توجد تذاكر في الانتظار.',
   'public-experiences.display.aVenir': 'التالي',
   'public-experiences.display.ceSiteNeDisposeActuellementDAucuneFileAc': 'لا توجد حالياً أي قائمة انتظار نشطة ومصرح بها لهذا الموقع.',

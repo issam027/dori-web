@@ -9,7 +9,22 @@ type View = 'trend' | 'comparison' | 'distribution';
 type Metric = 'registered' | 'served' | 'walkin' | 'appointments' | 'noShow' | 'cancelled' | 'expired' | 'averageWaitMinutes' | 'medianWaitMinutes' | 'p90WaitMinutes' | 'averageServiceMinutes' | 'medianServiceMinutes' | 'p90ServiceMinutes' | 'noShowRate';
 type Series = { id: string; label: string; color: string; values: number[] };
 
-const palette = ['#5b8def', '#64c7a5', '#f3ad55', '#ef6b73', '#9678d3', '#44b4c6', '#d66fb4', '#7f9f45', '#e17c45', '#5f72c9', '#2fa08f', '#b36a5e', '#7b8794', '#c28b2c'];
+const palette = [
+  'var(--color-primary)',
+  'var(--color-success)',
+  'var(--color-warning)',
+  'var(--color-danger)',
+  'color-mix(in srgb, var(--color-primary) 72%, #8b5cf6)',
+  'color-mix(in srgb, var(--color-primary) 68%, #06b6d4)',
+  'color-mix(in srgb, var(--color-primary) 64%, #ec4899)',
+  'color-mix(in srgb, var(--color-primary) 58%, #84cc16)',
+  'color-mix(in srgb, var(--color-primary) 54%, #f97316)',
+  'color-mix(in srgb, var(--color-primary) 78%, var(--color-text))',
+  'color-mix(in srgb, var(--color-primary) 60%, var(--color-success))',
+  'color-mix(in srgb, var(--color-primary) 55%, var(--color-warning))',
+  'color-mix(in srgb, var(--color-primary) 42%, var(--color-text-muted))',
+  'color-mix(in srgb, var(--color-primary) 50%, #eab308)',
+];
 
 function Chart({ buckets, series, showLegend = true }: { buckets: readonly ReportBucketDto[]; series: readonly Series[]; showLegend?: boolean }) {
   const { i18n } = useTranslation();

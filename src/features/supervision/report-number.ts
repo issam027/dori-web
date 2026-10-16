@@ -2,7 +2,7 @@ export function formatReportNumber(value: number, locale: string): string {
   if (!Number.isFinite(value)) return String(value);
   return new Intl.NumberFormat(locale, {
     useGrouping: false,
-    maximumFractionDigits: 20,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

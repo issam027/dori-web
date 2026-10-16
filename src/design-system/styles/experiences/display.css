@@ -67,6 +67,16 @@
   background: #071827;
   color: #fff;
 }
+.public-layout.public-display > .public-header-display {
+  display: none;
+}
+.public-layout.public-display > main {
+  display: grid;
+  min-height: 0;
+  height: 100dvh;
+  place-items: center;
+  overflow: hidden;
+}
 .display-screen {
   width: 100vw;
   max-width: none;
@@ -319,21 +329,24 @@
   aspect-ratio: auto;
   box-sizing: border-box;
   grid-template: auto minmax(0, 1fr) auto / 1fr;
-  gap: clamp(0.8rem, 1.6vw, 1.5rem);
-  padding: clamp(1rem, 2vw, 2rem);
+  gap: clamp(0.65rem, 1vw, 1rem);
+  padding: clamp(0.75rem, 1.25vw, 1.25rem);
 }
 .display-board {
   display: grid;
   min-height: 0;
   grid-template-columns: minmax(0, 2.25fr) minmax(16rem, 0.75fr);
-  gap: clamp(0.8rem, 1.6vw, 1.5rem);
+  gap: clamp(0.65rem, 1vw, 1rem);
 }
 .display-active-zone,
 .display-next-zone {
+  display: grid;
   min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(0.4rem, 0.65vw, 0.65rem);
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 22px;
-  padding: clamp(1rem, 2vw, 1.8rem);
+  padding: clamp(0.75rem, 1.15vw, 1.15rem);
   background: rgb(255 255 255 / 7%);
 }
 .display-section-heading {
@@ -341,7 +354,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: clamp(0.8rem, 1.4vw, 1.35rem);
+  margin-bottom: 0;
 }
 .display-section-heading span {
   color: #9cf2e7;
@@ -352,7 +365,7 @@
 }
 .display-section-heading h2 {
   margin: 0.25rem 0 0;
-  font-size: clamp(1.3rem, 2.1vw, 2.5rem);
+  font-size: clamp(1.15rem, 1.55vw, 1.9rem);
 }
 .display-section-heading > strong {
   display: grid;
@@ -366,8 +379,9 @@
 }
 .display-active-grid {
   display: grid;
+  height: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.7rem, 1.2vw, 1.2rem);
+  gap: clamp(0.5rem, 0.75vw, 0.8rem);
 }
 .display-active-ticket {
   position: relative;
@@ -376,7 +390,7 @@
   align-items: center;
   gap: 1rem;
   overflow: hidden;
-  padding: clamp(1rem, 1.8vw, 1.65rem);
+  padding: clamp(0.65rem, 0.85vw, 0.9rem);
   border: 1px solid rgb(255 255 255 / 15%);
   border-radius: 18px;
   background: rgb(255 255 255 / 9%);
@@ -394,13 +408,13 @@
   margin-top: 0.2rem;
   color: #fff;
   overflow-wrap: anywhere;
-  font-size: clamp(2.5rem, 4.3vw, 5.3rem);
+  font-size: clamp(1.8rem, 2.7vw, 3.25rem);
   line-height: 0.95;
   letter-spacing: 0.04em;
 }
 .display-destination {
   min-width: 0;
-  padding: clamp(0.8rem, 1.4vw, 1.3rem);
+  padding: clamp(0.55rem, 0.75vw, 0.8rem);
   border-radius: 15px;
   background: #9cf2e7;
   color: #103b45;
@@ -412,7 +426,7 @@
 .display-destination b {
   display: block;
   margin: 0.15rem 0;
-  font-size: clamp(1.2rem, 2vw, 2.2rem);
+  font-size: clamp(1rem, 1.35vw, 1.55rem);
 }
 .display-active-ticket.is-calling {
   border-color: #9cf2e7;
@@ -421,7 +435,8 @@
 }
 .display-no-call {
   display: grid;
-  min-height: 55%;
+  min-height: 0;
+  height: 100%;
   place-content: center;
   text-align: center;
 }
@@ -438,7 +453,9 @@
 }
 .display-next-zone ol {
   display: grid;
-  gap: 0.65rem;
+  height: 100%;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: clamp(0.35rem, 0.55vh, 0.55rem);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -447,7 +464,7 @@
   display: flex;
   align-items: center;
   gap: 0.9rem;
-  padding: clamp(0.65rem, 1.2vw, 1rem);
+  padding: clamp(0.4rem, 0.65vw, 0.65rem);
   border-radius: 13px;
   background: rgb(255 255 255 / 8%);
 }
@@ -457,7 +474,7 @@
   font-weight: 900;
 }
 .display-next-zone li strong {
-  font-size: clamp(1.25rem, 2.3vw, 2.6rem);
+  font-size: clamp(1.05rem, 1.55vw, 1.8rem);
 }
 .display-next-zone li div {
   min-width: 0;
@@ -487,8 +504,8 @@
 }
 .display-active-grid {
   min-height: 0;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  animation: display-page-enter 360ms ease both;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  animation: display-elevator-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .display-active-ticket {
   min-width: 0;
@@ -497,7 +514,7 @@
 .display-next-zone ol {
   min-height: 0;
   overflow: hidden;
-  animation: display-page-enter 360ms ease both;
+  animation: display-elevator-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .display-section-count {
   display: grid;
@@ -568,4 +585,236 @@
   border-color: var(--color-line);
   color: var(--color-ink);
   background: var(--color-surface);
+}
+
+/* The waiting-room display is a fixed TV canvas: content can animate inside it,
+ * but it must never increase the document height. */
+.public-layout.public-display .display-screen {
+  width: min(100vw, 177.7778dvh);
+  height: min(100dvh, 56.25vw);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+@keyframes display-elevator-enter {
+  from {
+    opacity: 0;
+    transform: translateY(75%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .display-active-grid,
+  .display-next-zone ol {
+    animation: none;
+  }
+}
+
+/* Waiting-room TV layout. Keep this final block authoritative: older display
+ * styles above are also used by embedded previews and must not size the live
+ * room screen. */
+.public-layout.public-display {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.public-layout.public-display > main {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-screen {
+  width: min(100vw, 177.7778dvh);
+  height: min(100dvh, 56.25vw);
+  min-width: 0;
+  min-height: 0;
+  margin: auto;
+  padding: clamp(0.55rem, 0.85vw, 1rem);
+  grid-template: clamp(3.5rem, 7.5vh, 5.25rem) minmax(0, 1fr) / minmax(0, 1fr);
+  gap: clamp(0.45rem, 0.65vw, 0.75rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-screen > header {
+  min-width: 0;
+  min-height: 0;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-brand {
+  margin: 0;
+  font-size: clamp(0.75rem, 0.95vw, 1.05rem);
+}
+
+.public-layout.public-display .display-screen > header > div > span {
+  font-size: clamp(0.62rem, 0.75vw, 0.82rem);
+}
+
+.public-layout.public-display .display-screen > header h1 {
+  overflow: hidden;
+  margin: 0.05rem 0 0;
+  font-size: clamp(1rem, 1.45vw, 1.65rem);
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-layout.public-display .display-screen time {
+  font-size: clamp(1.35rem, 2.25vw, 2.5rem);
+  line-height: 1;
+}
+
+.public-layout.public-display .display-audio {
+  min-height: 2.2rem;
+  padding: 0.35rem 0.75rem;
+  font-size: clamp(0.68rem, 0.8vw, 0.85rem);
+  white-space: nowrap;
+}
+
+.public-layout.public-display .display-board {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 3fr) minmax(14rem, 1fr);
+  gap: clamp(0.45rem, 0.65vw, 0.75rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-active-zone,
+.public-layout.public-display .display-next-zone {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(0.5rem, 0.7vw, 0.8rem);
+  gap: clamp(0.3rem, 0.45vw, 0.5rem);
+  border-radius: clamp(0.65rem, 1vw, 1rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-section-heading span {
+  font-size: clamp(0.58rem, 0.68vw, 0.72rem);
+}
+
+.public-layout.public-display .display-section-heading h2 {
+  margin-top: 0.1rem;
+  font-size: clamp(0.85rem, 1.05vw, 1.15rem);
+  line-height: 1.1;
+}
+
+.public-layout.public-display .display-section-count > strong {
+  width: clamp(1.75rem, 2.35vw, 2.6rem);
+  font-size: clamp(0.78rem, 1.05vw, 1.1rem);
+}
+
+.public-layout.public-display .display-section-count small,
+.public-layout.public-display .display-page-indicator {
+  font-size: clamp(0.58rem, 0.68vw, 0.72rem);
+}
+
+.public-layout.public-display .display-active-grid {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, clamp(4.5rem, 12vh, 7.5rem));
+  align-content: start;
+  gap: clamp(0.35rem, 0.5vw, 0.55rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-active-ticket {
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(0.35rem, 0.55vw, 0.6rem);
+  padding: clamp(0.4rem, 0.58vw, 0.65rem);
+  border-radius: clamp(0.55rem, 0.8vw, 0.85rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-active-ticket small,
+.public-layout.public-display .display-active-ticket span {
+  overflow: hidden;
+  font-size: clamp(0.58rem, 0.66vw, 0.72rem);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-layout.public-display .display-active-ticket > div > strong {
+  margin-top: 0.1rem;
+  overflow: hidden;
+  font-size: clamp(1.05rem, 1.5vw, 1.65rem);
+  line-height: 1;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-layout.public-display .display-destination {
+  overflow: hidden;
+  padding: clamp(0.35rem, 0.5vw, 0.55rem);
+  border-radius: clamp(0.45rem, 0.65vw, 0.7rem);
+}
+
+.public-layout.public-display .display-destination b {
+  overflow: hidden;
+  margin: 0.1rem 0;
+  font-size: clamp(0.78rem, 1vw, 1.08rem);
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-layout.public-display .display-next-zone ol {
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: clamp(0.2rem, 0.32vh, 0.32rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-next-zone li {
+  min-width: 0;
+  min-height: 0;
+  gap: clamp(0.35rem, 0.5vw, 0.55rem);
+  padding: clamp(0.22rem, 0.35vw, 0.38rem);
+  border-radius: clamp(0.4rem, 0.55vw, 0.6rem);
+  overflow: hidden;
+}
+
+.public-layout.public-display .display-next-zone li span,
+.public-layout.public-display .display-next-zone li small {
+  font-size: clamp(0.55rem, 0.62vw, 0.68rem);
+}
+
+.public-layout.public-display .display-next-zone li strong {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(0.82rem, 1.05vw, 1.15rem);
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-aspect-ratio: 4 / 3) {
+  .public-layout.public-display .display-board {
+    grid-template-columns: minmax(0, 2.4fr) minmax(12rem, 1fr);
+  }
+
+  .public-layout.public-display .display-active-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, clamp(4.25rem, 11vh, 6.5rem));
+  }
 }

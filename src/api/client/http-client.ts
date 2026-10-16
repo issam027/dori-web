@@ -44,6 +44,10 @@ function isAuthenticationOperation(url?: string): boolean {
   return Boolean(url?.includes('/api/v1/auth/login') || url?.includes('/api/v1/auth/refresh'));
 }
 
+function isPublicOperation(url?: string): boolean {
+  return Boolean(url?.includes('/api/v1/public/'));
+}
+
 async function refreshAccessToken(): Promise<string> {
   if (!refreshPromise) {
     refreshPromise = refreshClient
@@ -70,7 +74,7 @@ export function onAuthenticationExpired(listener: AuthenticationExpiredListener)
 
 httpClient.interceptors.request.use((config) => {
   const token = getAccessToken();
-  if (token) config.headers.set('Authorization', `Bearer ${token}`);
+  if (token && !isPublicOperation(config.url)) config.headers.set('Authorization', `Bearer ${token}`);
   if (!config.headers.has('X-Correlation-Id')) {
     config.headers.set('X-Correlation-Id', createCorrelationId());
   }
@@ -86,7 +90,8 @@ httpClient.interceptors.response.use(
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      !isAuthenticationOperation(originalRequest.url)
+      !isAuthenticationOperation(originalRequest.url) &&
+      !isPublicOperation(originalRequest.url)
     ) {
       originalRequest._retry = true;
 

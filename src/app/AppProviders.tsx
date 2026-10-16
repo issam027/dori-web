@@ -18,6 +18,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrationStarted.current) return;
     hydrationStarted.current = true;
+    if (window.location.pathname === '/track') return;
     void hydrateSession().catch(() => {
       // An absent/expired refresh cookie is the normal anonymous startup path.
     });

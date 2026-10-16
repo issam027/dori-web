@@ -174,12 +174,14 @@ export function useKioskRegistration(options: {
     },
   });
   const lookup = useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: () => registrationsControllerLookup(options.lookupDto()),
     onSuccess: ({ data }) => {
       options.onLookup(data);
     },
   });
   const checkIn = useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: () => {
       const registration = options.selectedRegistration();
       if (!registration) throw new Error('Appointment is required');

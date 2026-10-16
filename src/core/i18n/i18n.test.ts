@@ -39,6 +39,60 @@ describe('translation bundles', () => {
     }
   });
 
+  it('provides complete localized copy for the kiosk journey', () => {
+    const catalogs = Object.fromEntries(
+      ['fr', 'en', 'ar'].map((locale) => [
+        locale,
+        i18n.getResourceBundle(locale, 'fallback') as Record<string, string>,
+      ]),
+    ) as Record<'fr' | 'en' | 'ar', Record<string, string>>;
+    const kioskKeys = [
+      'kiosk.queue.waitEstimate',
+      'kiosk.tier.name',
+      'kiosk.ticket.numberHeading',
+      'kiosk.phone.savedNumber',
+      'kiosk.walkIn.totalSteps',
+      'kiosk.walkIn.steps.service.title',
+      'kiosk.walkIn.steps.identity.title',
+      'kiosk.walkIn.steps.tier.title',
+      'kiosk.walkIn.steps.review.title',
+      'kiosk.walkIn.steps.service.description',
+      'kiosk.walkIn.steps.identity.description',
+      'kiosk.walkIn.steps.tier.description',
+      'kiosk.walkIn.steps.review.description',
+      'kiosk.errors.phoneAlreadyExists',
+      'public-experiences.kiosk.commentPouvonsNousVousAccueillir',
+      'public-experiences.kiosk.jeViensSansRendezVous',
+      'public-experiences.kiosk.jAiUnRendezVous',
+      'public-experiences.kiosk.retrouverMonRendezVous',
+      'public-experiences.kiosk.creerMonTicket',
+      'public-experiences.kiosk.confirmerMaPresence',
+      'public-experiences.kiosk.imprimerMonTicket',
+      'public-experiences.kiosk.votreTicketEstPret',
+    ];
+
+    for (const key of kioskKeys) {
+      expect(catalogs.en[key], `${key} (en)`).toBeTruthy();
+      expect(catalogs.ar[key], `${key} (ar)`).toBeTruthy();
+      expect(catalogs.en[key], `${key} must not fall back to French in English`).not.toBe(
+        catalogs.fr[key],
+      );
+      expect(catalogs.ar[key], `${key} must not fall back to French in Arabic`).not.toBe(
+        catalogs.fr[key],
+      );
+    }
+
+    const publicKioskKeys = Object.keys(catalogs.fr).filter((key) =>
+      key.startsWith('public-experiences.kiosk.'),
+    );
+    for (const key of publicKioskKeys) {
+      expect(catalogs.ar[key], `${key} must be localized in Arabic`).not.toBe(catalogs.fr[key]);
+      if (key !== 'public-experiences.kiosk.service') {
+        expect(catalogs.en[key], `${key} must be localized in English`).not.toBe(catalogs.fr[key]);
+      }
+    }
+  });
+
   it('loads and versions a remote bundle by locale and category', async () => {
     mockServer.use(
       http.get('http://localhost:3000/api/v1/translations/bundle', ({ request }) => {

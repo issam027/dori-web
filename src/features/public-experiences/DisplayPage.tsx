@@ -6,6 +6,9 @@ import { useBrandStore } from '@/core/theme/brand-store';
 import { playChime, speakTicket } from './audio';
 import { useDisplaySnapshot } from './hooks/usePublicExperiences';
 
+const activeTicketsPerPage = 6;
+const upcomingTicketsPerPage = 8;
+
 export function DisplayPage() {
   const { t: __t } = useTranslation();
   const user = useSessionStore((state) => state.user);
@@ -61,12 +64,18 @@ export function DisplayPage() {
   const [nextPage, setNextPage] = useState(0);
   const previousCall = useRef('');
   const current = activeCalls[0];
-  const activePageCount = Math.max(1, Math.ceil(activeCalls.length / 4));
-  const nextPageCount = Math.max(1, Math.ceil(nextTickets.length / 5));
+  const activePageCount = Math.max(1, Math.ceil(activeCalls.length / activeTicketsPerPage));
+  const nextPageCount = Math.max(1, Math.ceil(nextTickets.length / upcomingTicketsPerPage));
   const currentActivePage = activePage % activePageCount;
   const currentNextPage = nextPage % nextPageCount;
-  const visibleActiveCalls = activeCalls.slice(currentActivePage * 4, currentActivePage * 4 + 4);
-  const visibleNextTickets = nextTickets.slice(currentNextPage * 5, currentNextPage * 5 + 5);
+  const visibleActiveCalls = activeCalls.slice(
+    currentActivePage * activeTicketsPerPage,
+    currentActivePage * activeTicketsPerPage + activeTicketsPerPage,
+  );
+  const visibleNextTickets = nextTickets.slice(
+    currentNextPage * upcomingTicketsPerPage,
+    currentNextPage * upcomingTicketsPerPage + upcomingTicketsPerPage,
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -92,6 +101,7 @@ export function DisplayPage() {
       : '';
     if (!key || key === previousCall.current) return;
     previousCall.current = key;
+    setActivePage(0);
     setAttention(true);
     const timer = window.setTimeout(() => {
       setAttention(false);
@@ -127,13 +137,17 @@ export function DisplayPage() {
   const scopeTitle =
     allowedQueues.length === 1
       ? allowedQueues[0]?.queueName
-      : `${String(allowedQueues.length)} files`;
+      : __t('public-experiences.display.filesAffichees', {
+          count: allowedQueues.length,
+        });
+  const displayBrandName =
+    !brandName || brandName.trim().toUpperCase() === 'DORIFY' ? __t('app.name') : brandName;
 
   return (
     <section className="display-screen">
       <header>
         <div>
-          <strong className="display-brand">{brandName || __t('app.name')}</strong>
+          <strong className="display-brand">{displayBrandName}</strong>
           <span>{__t('public-experiences.display.accueilEtOrientationBsalw')}</span>
           <h1>{scopeTitle}</h1>
         </div>

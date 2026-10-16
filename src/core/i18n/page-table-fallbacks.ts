@@ -284,7 +284,7 @@ export const pageTableFallbackEn: Record<string, string> = {
   'common.aucuneFileConfiguree': 'No queue configured',
   'common.businessDate': 'Business date',
   'common.counterNumber': 'Desk number',
-  'common.creation': 'Created',
+  'common.creation': 'Creating…',
   'common.enAttente': 'Waiting',
   'common.entryType': 'Entry type',
   'common.fullName': 'Full name',

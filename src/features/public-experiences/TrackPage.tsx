@@ -9,10 +9,14 @@ import { usePublicTracking } from './hooks/usePublicExperiences';
 
 type TrackingPhase = 'far' | 'near' | 'next' | 'called' | 'completed';
 
-const terminalStatuses = new Set(['served', 'no_show', 'cancelled', 'expired']);
+const terminalStatuses = new Set(['served', 'no_show', 'cancelled', 'expired', 'closed']);
 
 function trackingPhase(position?: RegistrationPositionResponseDto): TrackingPhase {
-  if (position && terminalStatuses.has(position.registrationStatus)) return 'completed';
+  if (
+    position &&
+    (terminalStatuses.has(position.registrationStatus) || terminalStatuses.has(position.status))
+  )
+    return 'completed';
   if (
     position?.status === 'called' ||
     position?.counterName ||
@@ -41,11 +45,25 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
 
   useEffect(() => {
     if (!gateway) return;
+    let terminalSnapshotReceived = false;
     const unsubscribe = gateway.subscribe((snapshot) => {
       setError(undefined);
       setPosition(snapshot);
+      if (
+        terminalStatuses.has(snapshot.registrationStatus) ||
+        terminalStatuses.has(snapshot.status)
+      ) {
+        terminalSnapshotReceived = true;
+        gateway.disconnect();
+      }
     });
-    void gateway.connect().catch(() => undefined);
+    void gateway
+      .connect()
+      .then(() => {
+        // The first snapshot is fetched before the polling timer is installed.
+        if (terminalSnapshotReceived) gateway.disconnect();
+      })
+      .catch(() => undefined);
     return () => {
       unsubscribe();
       gateway.disconnect();
@@ -241,9 +259,10 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                   className="button tracking-refresh"
                   disabled={refreshing}
                   onClick={() => void refresh()}
+                  aria-busy={refreshing}
                 >
                   <RefreshCw className={refreshing ? 'is-spinning' : undefined} aria-hidden="true" />
-                  {refreshing ? __t('tracking.refreshing') : __t('tracking.refresh')}
+                  {__t('tracking.refresh')}
                 </button>
                 <button
                   type="button"

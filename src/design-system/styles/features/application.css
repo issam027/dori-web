@@ -277,6 +277,10 @@
 .tracking-qr-logo b:last-child {
   color: #0f8b8d;
 }
+.tracking-qr-logo.is-arabic {
+  line-height: 1;
+  letter-spacing: 0;
+}
 
 /* Public experiences inherit the selected application theme. */
 @keyframes display-ripple {

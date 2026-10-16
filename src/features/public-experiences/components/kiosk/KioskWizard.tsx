@@ -1,6 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
-import { CalendarCheck2, Check, Clock3, Search, Ticket, UserRound } from 'lucide-react';
+import {
+  CalendarCheck2,
+  CalendarX2,
+  Check,
+  Clock3,
+  LockKeyhole,
+  Search,
+  Ticket,
+  TriangleAlert,
+  UserRound,
+} from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
   QueueTierResponseDto,
@@ -118,11 +128,18 @@ export function KioskWizard() {
     },
     selectedRegistration: () => found,
     onCheckedIn: (data) => {
-      const trackingUrl = trackingUrlFromToken(data.registrationTrackingToken);
+      const ticketNumber = data.ticketNumber || found?.ticketNumber || '';
+      const trackingToken =
+        data.registrationTrackingToken || found?.registrationTrackingToken || '';
+      const resolvedQueueId = data.queueId || found?.queueId;
+      const trackingUrl = trackingUrlFromToken(trackingToken);
       setResult({
-        ticketNumber: data.ticketNumber,
+        ticketNumber,
         trackingUrl,
-        queueName: queues.data?.data.items.find((item) => item.queueId === data.queueId)?.queueName,
+        queueName:
+          data.queueName ||
+          found?.queueName ||
+          queues.data?.data.items.find((item) => item.queueId === resolvedQueueId)?.queueName,
       });
       dispatch({ type: 'SHOW_RESULT' });
     },
@@ -132,11 +149,42 @@ export function KioskWizard() {
       ? __t('kiosk.errors.phoneAlreadyExists')
       : presentError(register.error).message
     : '';
+  const appointmentError = lookup.error ?? checkIn.error;
+  const appointmentErrorCode =
+    appointmentError instanceof NormalizedApiError ? appointmentError.code.toUpperCase() : '';
+  const appointmentFeedback = appointmentError
+    ? appointmentErrorCode === 'REGISTRATION_NOT_FOUND'
+      ? {
+          title: __t('kiosk.appointment.notFoundTitle'),
+          message: __t('kiosk.appointment.notFoundMessage'),
+          icon: CalendarX2,
+        }
+      : appointmentErrorCode === 'REGISTRATION_CLOSED'
+        ? {
+            title: __t('kiosk.appointment.closedTitle'),
+            message: __t('kiosk.appointment.closedMessage'),
+            icon: LockKeyhole,
+          }
+        : {
+            title: __t('kiosk.appointment.lookupErrorTitle'),
+            message: presentError(appointmentError).message,
+            icon: TriangleAlert,
+          }
+    : null;
+  const AppointmentFeedbackIcon = appointmentFeedback?.icon;
+  const clearAppointmentState = () => {
+    setFound(undefined);
+    lookup.reset();
+    checkIn.reset();
+  };
+  const clearRegistrationError = () => {
+    register.reset();
+  };
   if (!validScope)
     return (
       <section className="kiosk-screen">
         <h1>{__t('public-experiences.kiosk.borneIndisponible')}</h1>
-        <p>{__t('common.selectionnezUnSiteActifPourUtiliserCetteE')}</p>
+        <p>{__t('public-experiences.kiosk.selectionnezUnSiteActifPourUtiliserCetteE')}</p>
       </section>
     );
   if (!queues.isPending && queues.data?.data.items.length === 0)
@@ -178,6 +226,7 @@ export function KioskWizard() {
             <button
               type="button"
               onClick={() => {
+                clearRegistrationError();
                 dispatch({ type: 'START_WALKIN' });
               }}
             >
@@ -186,6 +235,7 @@ export function KioskWizard() {
             <button
               type="button"
               onClick={() => {
+                clearAppointmentState();
                 dispatch({ type: 'START_APPOINTMENT' });
               }}
             >
@@ -481,18 +531,26 @@ export function KioskWizard() {
             </KioskReviewStep>
           ) : null}
           {registrationError ? (
-            <div className="kiosk-error" role="alert">
-              <strong>{__t('public-experiences.kiosk.inscriptionImpossible')}</strong>
-              <p>{registrationError}</p>
-              <span>
-                {__t('public-experiences.kiosk.verifiezVosInformationsOuDemandezDeLAide')}
+            <Card
+              className="kiosk-appointment-found kiosk-appointment-feedback"
+              role="alert"
+              aria-live="polite"
+            >
+              <span className="kiosk-result-check is-error" aria-hidden="true">
+                <TriangleAlert />
               </span>
-            </div>
+              <div>
+                <h2>{__t('public-experiences.kiosk.inscriptionImpossible')}</h2>
+                <p>{registrationError}</p>
+                <p>{__t('public-experiences.kiosk.verifiezVosInformationsOuDemandezDeLAide')}</p>
+              </div>
+            </Card>
           ) : null}
           <div className="kiosk-actions">
             <button
               type="button"
               onClick={() => {
+                clearRegistrationError();
                 if (walkinStep === 1) purge();
                 else dispatch({ type: 'BACK' });
               }}
@@ -571,8 +629,14 @@ export function KioskWizard() {
             </section>
           </div>
           <div className="kiosk-appointment-actions">
-            <button type="button" onClick={purge}>
-              {__t('common.retourALAccueil')}
+            <button
+              type="button"
+              onClick={() => {
+                clearAppointmentState();
+                purge();
+              }}
+            >
+              {__t('public-experiences.kiosk.retourALAccueil')}
             </button>
             <button
               type="button"
@@ -581,6 +645,7 @@ export function KioskWizard() {
                 (!ticket.trim() && (!lastName.trim() || !scheduledTime)) || lookup.isPending
               }
               onClick={() => {
+                clearAppointmentState();
                 lookup.mutate();
               }}
             >
@@ -588,7 +653,7 @@ export function KioskWizard() {
               {__t('common.search')}
             </button>
           </div>
-          {found ? (
+          {found && !appointmentFeedback ? (
             <Card className="kiosk-appointment-found">
               <span className="kiosk-result-check" aria-hidden="true">
                 ✓
@@ -613,11 +678,27 @@ export function KioskWizard() {
                 className="button button-primary"
                 disabled={checkIn.isPending}
                 onClick={() => {
+                  checkIn.reset();
                   checkIn.mutate();
                 }}
               >
                 {__t('public-experiences.kiosk.confirmerMaPresence')}
               </button>
+            </Card>
+          ) : null}
+          {appointmentFeedback && AppointmentFeedbackIcon ? (
+            <Card
+              className="kiosk-appointment-found kiosk-appointment-feedback"
+              role="alert"
+              aria-live="polite"
+            >
+              <span className="kiosk-result-check is-error" aria-hidden="true">
+                <AppointmentFeedbackIcon />
+              </span>
+              <div>
+                <h2>{appointmentFeedback.title}</h2>
+                <p>{appointmentFeedback.message}</p>
+              </div>
             </Card>
           ) : null}
         </div>

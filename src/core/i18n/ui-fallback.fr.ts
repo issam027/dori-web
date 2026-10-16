@@ -166,6 +166,7 @@ export const uiFallbackFr: Record<string, string> = {
   'common.en': 'en',
   'common.enAttente': 'en attente',
   'common.enDirect': 'En direct',
+  'public-experiences.display.filesAffichees': '{{count}} files',
   'common.english': 'English',
   'common.etape': 'Étape',
   'common.etat': 'État',

@@ -171,7 +171,7 @@ export function PersonPickerOrCreate({
               }}
             />
           </FormField>
-          <FormField label={__t('persons.personPickerOrCreate.languagePreference')}>
+          <FormField label={__t('common.language')}>
             <select
               value={draft.languagePreference ?? ''}
               onChange={(e) => {
@@ -179,8 +179,8 @@ export function PersonPickerOrCreate({
               }}
             >
               <option value="fr">{__t('locale.fr')}</option>
-              <option value="en">{__t('persons.personPickerOrCreate.language.en')}</option>
-              <option value="ar">{__t('persons.personPickerOrCreate.language.ar')}</option>
+              <option value="en">{__t('locale.en')}</option>
+              <option value="ar">{__t('locale.ar')}</option>
             </select>
           </FormField>
           <p

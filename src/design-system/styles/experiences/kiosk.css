@@ -937,6 +937,16 @@
 .kiosk-appointment-found p {
   margin: 0.15rem 0;
 }
+.kiosk-appointment-feedback {
+  grid-template-columns: auto minmax(0, 1fr);
+  border-color: color-mix(in srgb, var(--color-danger) 45%, var(--color-line));
+  color: var(--color-ink);
+  background: var(--color-danger-soft);
+}
+.kiosk-result-check.is-error {
+  color: var(--color-danger-contrast);
+  background: var(--color-danger);
+}
 @media (max-width: 700px) {
   .kiosk-appointment-searches {
     grid-template-columns: 1fr;

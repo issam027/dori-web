@@ -4,7 +4,7 @@ import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 
 vi.mock('qrcode', () => ({
   default: {
-    toString: vi.fn().mockResolvedValue('<svg viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>'),
+    toDataURL: vi.fn().mockResolvedValue('data:image/png;base64,dGVzdA=='),
   },
 }));
 
