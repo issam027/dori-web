@@ -14,6 +14,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { queryKeys } from '@/api/client/query-keys';
 import { UserPlus } from 'lucide-react';
+import { getUserDisplayName, getUserInitials } from './user-display';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -95,7 +96,7 @@ export function UserAssignmentModal({
         tone: 'success',
         title: t('settings.assignmentDone'),
         message: t('settings.assignmentDoneMessage', {
-          username: selectedUser.username,
+          username: getUserDisplayName(selectedUser),
           resource: target.label,
         }),
       });
@@ -166,10 +167,10 @@ export function UserAssignmentModal({
                     setRoleId(0);
                   }}
                 >
-                  <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
+                  <span className="profile-avatar">{getUserInitials(user)}</span>
                   <span>
-                    <strong>{user.username}</strong>
-                    <small>{user.email ?? t('settings.noEmail')}</small>
+                    <strong>{getUserDisplayName(user)}</strong>
+                    <small>{user.fullName ? `@${user.username} · ` : ''}{user.email ?? t('settings.noEmail')}</small>
                   </span>
                   <span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>
                     {user.isActive ? t('settings.active') : t('settings.inactive')}
@@ -187,7 +188,7 @@ export function UserAssignmentModal({
         {selectedUser ? (
           <section className="assignment-role-step">
             <span className="eyebrow">{t('settings.assignmentStepRole')}</span>
-            <strong>{selectedUser.username}</strong>
+            <strong>{getUserDisplayName(selectedUser)}</strong>
             <label>
               {t('settings.role')}
               <select

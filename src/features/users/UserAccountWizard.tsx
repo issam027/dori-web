@@ -28,6 +28,7 @@ export function UserAccountWizard({
   const [step, setStep] = useState(1);
   const [f, setF] = useState({
     username: '',
+    fullName: '',
     email: '',
     password: 'Root@123456',
     language: 'fr',
@@ -50,6 +51,7 @@ export function UserAccountWizard({
     }
     const result = await usersControllerCreateUser({
       username: f.username,
+      fullName: f.fullName.trim() || undefined,
       email: f.email || undefined,
       password: f.password,
       languagePreference: f.language,
@@ -92,6 +94,17 @@ export function UserAccountWizard({
     >
       {step === 1 ? (
         <div className="form-grid">
+          <label>
+            {__t('common.fullName')}
+            <input
+              autoComplete="name"
+              maxLength={150}
+              value={f.fullName}
+              onChange={(e) => {
+                setF({ ...f, fullName: e.target.value });
+              }}
+            />
+          </label>
           <label>
             {__t('users.userAccountWizard.nomDUtilisateur')}
             <input

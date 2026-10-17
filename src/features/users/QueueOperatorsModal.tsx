@@ -11,6 +11,7 @@ import { usersControllerFindUsers } from '@/api/generated/users/users';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
+import { getUserDisplayName } from './user-display';
 
 export function QueueOperatorsModal({
   queue,
@@ -80,8 +81,8 @@ export function QueueOperatorsModal({
           <label>{t('settings.queueOperators.addTitle')}<span className="input-with-icon"><Search aria-hidden="true" /><input type="search" value={search} placeholder={t('settings.searchUserPlaceholder')} onChange={(event) => { setSearch(event.target.value); }} /></span></label>
           <ul className="manager-list">{candidates.map((user) => (
             <li key={user.userId}>
-              <div><strong>{user.username}</strong><span>{user.email ?? t('settings.noEmail')}</span></div>
-              <button className="button button-small" type="button" disabled={pendingId === user.userId} onClick={() => void assign(user.userId, user.username)}>
+              <div><strong>{getUserDisplayName(user)}</strong><span>{user.fullName ? `@${user.username} · ` : ''}{user.email ?? t('settings.noEmail')}</span></div>
+              <button className="button button-small" type="button" disabled={pendingId === user.userId} onClick={() => void assign(user.userId, getUserDisplayName(user))}>
                 <UserPlus aria-hidden="true" /> {t('common.add')}
               </button>
             </li>

@@ -5,6 +5,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { LocaleSwitcher } from '@/design-system/components/LocaleSwitcher';
 import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
 import { LogOut, Menu, RefreshCw, UserRound } from 'lucide-react';
+import { getUserInitials } from '@/features/users/user-display';
 
 export function Topbar({
   sites,
@@ -29,7 +30,7 @@ export function Topbar({
   const user = useSessionStore((state) => state.user);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
-  const initials = user?.username.slice(0, 2).toUpperCase() ?? 'D';
+  const initials = user ? getUserInitials(user) : 'D';
   const routeLabel =
     (
       {

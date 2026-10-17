@@ -21,6 +21,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
+import { getUserDisplayName } from '@/features/users/user-display';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
@@ -52,7 +53,7 @@ export function UsersAdminPage() {
   const [editing, setEditing] = useState<UserSummaryItemDto>();
   const [viewingId, setViewingId] = useState<number>();
   const [deleting, setDeleting] = useState<UserSummaryItemDto>();
-  const [editForm, setEditForm] = useState({ email: '', language: 'fr' });
+  const [editForm, setEditForm] = useState({ fullName: '', email: '', language: 'fr' });
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [pending, setPending] = useState(false);
   const users = useQuery({
@@ -84,18 +85,19 @@ export function UsersAdminPage() {
   const refresh = async () => queryClient.invalidateQueries({ queryKey: ['admin', 'users-page'] });
   const edit = (user: UserSummaryItemDto) => {
     setEditing(user);
-    setEditForm({ email: user.email ?? '', language: user.languagePreference });
+    setEditForm({ fullName: user.fullName ?? '', email: user.email ?? '', language: user.languagePreference });
   };
   const saveEdit = async () => {
     if (!editing) return;
     setPending(true);
     try {
       await updateUser(editing.userId, {
+        fullName: editForm.fullName.trim() || undefined,
         email: editForm.email || undefined,
         languagePreference: editForm.language,
       });
       await refresh();
-      notify({ tone: 'success', title: t('admin.users.updateSuccess'), message: editing.username });
+      notify({ tone: 'success', title: t('admin.users.updateSuccess'), message: getUserDisplayName(editing) });
       setEditing(undefined);
     } catch (error) {
       notifyError(error);
@@ -206,8 +208,8 @@ export function UsersAdminPage() {
               {items.map((user) => (
                 <tr key={user.userId}>
                   <td>
-                    <b>{user.username}</b>
-                    <small>{user.email ?? t('settings.noEmail')}</small>
+                    <b>{getUserDisplayName(user)}</b>
+                    <small>{user.fullName ? `@${user.username} · ` : ''}{user.email ?? t('settings.noEmail')}</small>
                   </td>
                   <td>
                     <span className="status-badge status-info">{user.userType}</span>
@@ -260,7 +262,7 @@ export function UsersAdminPage() {
                               notify({
                                 tone: 'success',
                                 title: t('admin.users.passwordResetSuccess'),
-                                message: user.username,
+                                message: getUserDisplayName(user),
                               }),
                             )
                             .catch(notifyError)
@@ -298,13 +300,13 @@ export function UsersAdminPage() {
         currentRoleRank={rank}
         onCreated={() => void refresh()}
       />
-      <Modal open={Boolean(viewingId)} onOpenChange={(open) => { if (!open) setViewingId(undefined); }} title={t('admin.users.detailsTitle')} description={userDetail.data?.data.username}>
+      <Modal open={Boolean(viewingId)} onOpenChange={(open) => { if (!open) setViewingId(undefined); }} title={t('admin.users.detailsTitle')} description={userDetail.data ? getUserDisplayName(userDetail.data.data) : undefined}>
         {userDetail.data ? <UserDetail user={userDetail.data.data} t={t} /> : <p className="muted">{t('common.loading')}</p>}
       </Modal>
-      <Modal open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }} title={t('admin.users.deleteTitle')} description={deleting?.username} actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
+      <Modal open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }} title={t('admin.users.deleteTitle')} description={deleting ? getUserDisplayName(deleting) : undefined} actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
         if (!deleting) return;
         setPending(true);
-        void deleteUser(deleting.userId).then(async () => { await refresh(); notify({ tone: 'success', title: t('admin.users.deleteSuccess'), message: deleting.username }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
+        void deleteUser(deleting.userId).then(async () => { await refresh(); notify({ tone: 'success', title: t('admin.users.deleteSuccess'), message: getUserDisplayName(deleting) }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
       }}><Trash2 />{t('common.delete')}</button>}><p className="admin-message">{t('admin.users.deleteDescription')}</p></Modal>
       <Modal
         open={Boolean(editing)}
@@ -312,7 +314,7 @@ export function UsersAdminPage() {
           if (!next && !pending) setEditing(undefined);
         }}
         title={t('admin.users.modifierLUtilisateur')}
-        description={editing?.username}
+        description={editing ? getUserDisplayName(editing) : undefined}
         actions={
           <>
             <button
@@ -331,11 +333,15 @@ export function UsersAdminPage() {
             <Pencil />
           </span>
           <div>
-            <strong>{editing?.username}</strong>
+            <strong>{editing ? getUserDisplayName(editing) : ''}</strong>
             <small>{t('admin.users.identiteEtPreferencesDuCompte')}</small>
           </div>
         </div>
         <div className="form-grid">
+          <label>
+            {t('common.fullName')}
+            <input autoComplete="name" maxLength={150} value={editForm.fullName} onChange={(event) => { setEditForm({ ...editForm, fullName: event.target.value }); }} />
+          </label>
           <label>
             {t('common.email')}
             <input
@@ -367,7 +373,7 @@ export function UsersAdminPage() {
           if (!next && !pending) setDisconnecting(undefined);
         }}
         title={t('admin.users.deconnecterToutesLesSessions')}
-        description={disconnecting?.username}
+        description={disconnecting ? getUserDisplayName(disconnecting) : undefined}
         actions={
           <>
             <button
@@ -382,7 +388,7 @@ export function UsersAdminPage() {
                     notify({
                       tone: 'success',
                       title: t('settings.userDisconnected'),
-                      message: disconnecting.username,
+                      message: getUserDisplayName(disconnecting),
                     });
                     setDisconnecting(undefined);
                   })
@@ -407,7 +413,7 @@ export function UsersAdminPage() {
 
 function UserDetail({ user, t }: { user: UserResponseDto; t: (key: string, options?: Record<string, unknown>) => string }) {
   return <div className="user-detail-panel">
-    <dl className="detail-list"><dt>{t('common.email')}</dt><dd>{user.email ?? t('settings.noEmail')}</dd><dt>{t('common.status')}</dt><dd>{t(user.isActive ? 'common.active' : 'common.inactive')}</dd><dt>{t('common.language')}</dt><dd>{user.languagePreference.toUpperCase()}</dd><dt>{t('admin.users.lastLogin')}</dt><dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</dd></dl>
+    <dl className="detail-list"><dt>{t('common.fullName')}</dt><dd>{getUserDisplayName(user)}</dd><dt>{t('users.userAccountWizard.nomDUtilisateur')}</dt><dd>{user.username}</dd><dt>{t('common.email')}</dt><dd>{user.email ?? t('settings.noEmail')}</dd><dt>{t('common.status')}</dt><dd>{t(user.isActive ? 'common.active' : 'common.inactive')}</dd><dt>{t('common.language')}</dt><dd>{user.languagePreference.toUpperCase()}</dd><dt>{t('admin.users.lastLogin')}</dt><dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</dd></dl>
     <section><h3>{t('onboarding.settings.roles')}</h3><div className="badge-row">{user.roles.map((role) => <span className="status-badge status-info" key={role.roleId}>{role.roleName}</span>)}</div></section>
     <section><h3>{t('sites.plural')}</h3><p>{user.sites.map((site) => site.siteName).join(', ') || t('common.none')}</p></section>
     <section><h3>{t('queues.plural')}</h3><p>{user.queues.map((queue) => queue.queueName).join(', ') || t('common.none')}</p></section>

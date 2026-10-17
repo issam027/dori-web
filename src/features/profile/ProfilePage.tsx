@@ -15,9 +15,11 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
+import { getUserDisplayName, getUserInitials } from '@/features/users/user-display';
 
 const createSchema = (t: TFunction) =>
   z.object({
+    fullName: z.string().max(150),
     email: z.union([z.literal(''), z.email(t('validation.emailInvalid'))]),
     languagePreference: z.string().min(2),
   });
@@ -48,7 +50,7 @@ export function ProfilePage() {
     formState: { errors, isSubmitting },
   } = useForm<ProfileForm>({
     resolver: zodResolver(createSchema(__t)),
-    values: { email: user?.email ?? '', languagePreference: user?.languagePreference ?? 'fr' },
+    values: { fullName: user?.fullName ?? '', email: user?.email ?? '', languagePreference: user?.languagePreference ?? 'fr' },
   });
   const {
     register: registerPassword,
@@ -61,6 +63,7 @@ export function ProfilePage() {
     setSaved(false);
     try {
       await updateUser(user.userId, {
+        fullName: values.fullName.trim() || undefined,
         email: values.email || undefined,
         languagePreference: values.languagePreference,
       });
@@ -92,8 +95,9 @@ export function ProfilePage() {
       <div className="profile-layout">
         <Card className="profile-identity-card">
           <div className="profile-portrait">
-            <span className="profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
-            <h2>{user.username}</h2>
+            <span className="profile-avatar">{getUserInitials(user)}</span>
+            <h2>{getUserDisplayName(user)}</h2>
+            {user.fullName ? <small>@{user.username}</small> : null}
             <p>{user.roles.join(' · ') || __t('profile.profile.compteUtilisateur')}</p>
             <span className="status-badge status-success">
               {__t('profile.profile.compteActif')}
@@ -142,6 +146,9 @@ export function ProfilePage() {
               void submit(e);
             }}
           >
+            <FormField label={__t('common.fullName')} error={errors.fullName?.message}>
+              <input autoComplete="name" maxLength={150} {...register('fullName')} />
+            </FormField>
             <FormField label={__t('common.email')} error={errors.email?.message}>
               <input type="email" autoComplete="email" {...register('email')} />
             </FormField>
