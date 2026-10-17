@@ -26,14 +26,62 @@ function CountryFlag({ locale }: { locale: (typeof locales)[number] }) {
     );
   }
   return (
-    <svg viewBox="0 0 30 20" aria-hidden="true">
-      <path fill="#e70013" d="M0 0h30v20H0z" />
-      <circle cx="15" cy="10" r="6" fill="#fff" />
-      <circle cx="16.5" cy="10" r="4.5" fill="#e70013" />
-      <circle cx="18" cy="10" r="3.5" fill="#fff" />
+    <svg
+      viewBox="0 0 30 20"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {/* Fond rouge */}
+      <rect
+        width="30"
+        height="20"
+        fill="#E70013"
+      />
+
+      {/* Disque blanc exactement centré dans le drapeau */}
+      <circle
+        cx="15"
+        cy="10"
+        r="5"
+        fill="#FFFFFF"
+      />
+
+      {/* Croissant rouge : deux cercles décalés */}
+      <circle
+        cx="15"
+        cy="10"
+        r="3.75"
+        fill="#E70013"
+      />
+
+      <circle
+        cx="16"
+        cy="10"
+        r="3"
+        fill="#FFFFFF"
+      />
+
+      {/*
+        Étoile rouge à cinq branches.
+        Centre : (16, 10), légèrement à droite du centre du disque.
+        Pointe principale dirigée vers la gauche.
+        Le tracé est défini explicitement pour maîtriser son orientation.
+      */}
       <path
-        fill="#e70013"
-        d="m18.2 6.7.8 2.1 2.2.1-1.7 1.4.6 2.2-1.9-1.2-1.9 1.2.6-2.2-1.7-1.4 2.2-.1z"
+        fill="#E70013"
+        d="
+          M 13.75 10
+          L 15.25 10.545
+          L 15.305 12.141
+          L 16.286 10.882
+          L 17.82 11.322
+          L 16.927 10
+          L 17.82 8.678
+          L 16.286 9.118
+          L 15.305 7.859
+          L 15.25 9.455
+          Z
+        "
       />
     </svg>
   );
