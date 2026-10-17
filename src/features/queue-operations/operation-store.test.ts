@@ -17,21 +17,22 @@ function call(registrationId: number): CallNextRegistrationResponseDto {
   };
 }
 
-describe('operator call lock', () => {
+describe('operator call lock by queue', () => {
   afterEach(() => {
     useOperationStore.getState().reset();
   });
 
-  it('blocks calls without an active session and across every queue while handling a person', () => {
-    expect(canCallNext(false, null, false)).toBe(false);
-    expect(canCallNext(true, null, false)).toBe(true);
-    useOperationStore.getState().startCall(call(1));
-    expect(canCallNext(true, useOperationStore.getState().activeCall, false)).toBe(false);
+  it('blocks only the queue that already has an active call', () => {
+    expect(canCallNext(false, undefined, false)).toBe(false);
+    expect(canCallNext(true, undefined, false)).toBe(true);
+    useOperationStore.getState().startCall(10, call(1));
+    expect(canCallNext(true, useOperationStore.getState().activeCalls[10], false)).toBe(false);
+    expect(canCallNext(true, useOperationStore.getState().activeCalls[11], false)).toBe(true);
   });
 
   it('keeps only the four latest confirmed calls', () => {
     [1, 2, 3, 4, 5].forEach((id) => {
-      useOperationStore.getState().startCall(call(id));
+      useOperationStore.getState().startCall(id, call(id));
     });
     expect(useOperationStore.getState().recentCalls.map((item) => item.registrationId)).toEqual([
       5, 4, 3, 2,
@@ -39,7 +40,7 @@ describe('operator call lock', () => {
   });
 
   it('keeps completed passages while clearing the active call', () => {
-    useOperationStore.getState().startCall(call(8));
+    useOperationStore.getState().startCall(10, call(8));
     useOperationStore.getState().addPassage({
       registrationId: 8,
       ticketNumber: 'A8',
@@ -49,9 +50,9 @@ describe('operator call lock', () => {
       threadNumber: 1,
       outcome: 'served',
     });
-    useOperationStore.getState().closeCall();
+    useOperationStore.getState().closeCall(10);
 
-    expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(useOperationStore.getState().activeCalls[10]).toBeUndefined();
     expect(useOperationStore.getState().passages).toHaveLength(1);
   });
 });

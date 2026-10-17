@@ -4,6 +4,7 @@ import type {
   PersonsControllerFindPersonsParams,
   PersonsControllerGetNotesParams,
   UpdatePersonDto,
+  UpdatePersonNoteDto,
 } from '@/api/generated/models';
 import {
   personsControllerCreatePerson,
@@ -11,6 +12,9 @@ import {
   personsControllerFindOne,
   personsControllerFindPersons,
   personsControllerGetNotes,
+  personsControllerDeleteNote,
+  personsControllerDeletePerson,
+  personsControllerUpdateNote,
   personsControllerUpdatePerson,
 } from '@/api/generated/persons/persons';
 
@@ -33,3 +37,11 @@ export const findPersonNotes = (
 
 export const createPersonNote = (personId: number, dto: CreatePersonNoteDto) =>
   personsControllerCreateNote(personId, dto);
+
+export const updatePersonNote = (personId: number, noteId: number, dto: UpdatePersonNoteDto) =>
+  personsControllerUpdateNote(personId, noteId, dto);
+
+export const deletePersonNote = (personId: number, noteId: number) =>
+  personsControllerDeleteNote(personId, noteId);
+
+export const deletePerson = (personId: number) => personsControllerDeletePerson(personId);

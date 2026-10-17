@@ -6,8 +6,8 @@ import {
   Check,
   Clock3,
   LockKeyhole,
+  Phone,
   Search,
-  Ticket,
   TriangleAlert,
   UserRound,
 } from 'lucide-react';
@@ -55,7 +55,6 @@ export function KioskWizard() {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [ticket, setTicket] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [found, setFound] = useState<RegistrationResponseDto>();
   const [result, setResult] = useState<Result>();
@@ -71,7 +70,6 @@ export function KioskWizard() {
     setFirstName('');
     setEmail('');
     setPhone('');
-    setTicket('');
     setScheduledTime('');
     setFound(undefined);
     setResult(undefined);
@@ -120,9 +118,9 @@ export function KioskWizard() {
       dispatch({ type: 'SHOW_RESULT' });
     },
     lookupDto: () =>
-      ticket
-        ? { ticketNumber: ticket }
-        : { lastName, scheduledTime: new Date(scheduledTime).toISOString() },
+      phone.trim()
+        ? { phoneNumber: phone }
+        : { lastName: lastName.trim(), scheduledTime: new Date(scheduledTime).toISOString() },
     onLookup: (data) => {
       setFound(data);
     },
@@ -591,16 +589,26 @@ export function KioskWizard() {
           <div className="kiosk-appointment-searches">
             <section>
               <div className="kiosk-appointment-option-title">
-                <Ticket aria-hidden="true" />
-                <strong>{__t('public-experiences.kiosk.numeroDeTicket')}</strong>
+                <Phone aria-hidden="true" />
+                <strong>{__t('common.phone')}</strong>
               </div>
-              <input
-                autoComplete="off"
-                value={ticket}
-                onChange={(event) => {
-                  setTicket(event.target.value);
+              <InternationalPhoneInput
+                value={phone}
+                onChange={(value) => {
+                  setPhone(value);
+                  if (value) {
+                    setLastName('');
+                    setScheduledTime('');
+                  }
                 }}
+                countryLabel={__t('public-experiences.kiosk.indicatifPays')}
+                phoneLabel={__t('common.phone')}
               />
+              <small className={phone && !phoneValid ? 'field-error' : 'field-hint'}>
+                {phoneValid
+                  ? __t('kiosk.phone.savedNumber', { value0: phone })
+                  : __t('public-experiences.kiosk.choisissezLePaysPuisSaisissezLeNumero')}
+              </small>
             </section>
             <span className="kiosk-appointment-or">{__t('public-experiences.kiosk.ou')}</span>
             <section>
@@ -613,6 +621,7 @@ export function KioskWizard() {
                 value={lastName}
                 onChange={(event) => {
                   setLastName(event.target.value);
+                  if (event.target.value) setPhone('');
                 }}
               />
               <label className="kiosk-appointment-time">
@@ -623,6 +632,7 @@ export function KioskWizard() {
                   value={scheduledTime}
                   onChange={(event) => {
                     setScheduledTime(event.target.value);
+                    if (event.target.value) setPhone('');
                   }}
                 />
               </label>
@@ -641,9 +651,7 @@ export function KioskWizard() {
             <button
               type="button"
               className="primary"
-              disabled={
-                (!ticket.trim() && (!lastName.trim() || !scheduledTime)) || lookup.isPending
-              }
+              disabled={(!phoneValid && (!lastName.trim() || !scheduledTime)) || lookup.isPending}
               onClick={() => {
                 clearAppointmentState();
                 lookup.mutate();

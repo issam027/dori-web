@@ -7,6 +7,7 @@ import type {
   TranslationResponseDto,
   TranslationsControllerFindTranslationsParams,
 } from '@/api/generated/models';
+import { CreateTranslationDtoCategory } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -22,6 +23,7 @@ import {
 } from './api/onboarding-api';
 
 const PAGE_SIZE = 10;
+const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
 type Form = {
   key: string;
   category: CreateTranslationDto['category'];
@@ -53,6 +55,8 @@ export function TranslationsAdminPage() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [createLocale, setCreateLocale] = useState<'fr' | 'en' | 'ar'>('fr');
+  const categoryLabel = (category: CreateTranslationDto['category']) =>
+    t(`admin.translations.categories.${category}`);
   const translations = useQuery({
     queryKey: ['admin', 'translations-page', page, filters],
     queryFn: ({ signal }) =>
@@ -209,9 +213,9 @@ export function TranslationsAdminPage() {
                 }}
               >
                 <option value="">{t('profile.profile.toutes')}</option>
-                <option value="ihm">{t('admin.translations.ihm')}</option>
-                <option value="sms">{t('common.sms')}</option>
-                <option value="error">{t('admin.translations.erreur')}</option>
+                {TRANSLATION_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>{categoryLabel(category)}</option>
+                ))}
               </select>
             </label>
             <label>
@@ -274,7 +278,7 @@ export function TranslationsAdminPage() {
                     <code>{item.translationKey}</code>
                   </td>
                   <td>
-                    <span className="status-badge status-info">{item.category}</span>
+                    <span className="status-badge status-info">{categoryLabel(item.category)}</span>
                   </td>
                   <td>{item.locale.toUpperCase()}</td>
                   <td className="translation-content-cell">{item.content}</td>
@@ -391,9 +395,9 @@ export function TranslationsAdminPage() {
                 setForm({ ...form, category: event.target.value as Form['category'] });
               }}
             >
-              <option value="ihm">{t('admin.translations.ihm')}</option>
-              <option value="sms">{t('common.sms')}</option>
-              <option value="error">{t('admin.translations.erreur')}</option>
+              {TRANSLATION_CATEGORIES.map((category) => (
+                <option key={category} value={category}>{categoryLabel(category)}</option>
+              ))}
             </select>
           </label>
           {editing ? (

@@ -36,10 +36,10 @@ it('commits an irreversible call only after server confirmation', async () => {
     }),
   );
   const request = callNextAndCommit(4);
-  expect(useOperationStore.getState().activeCall).toBeNull();
+  expect(useOperationStore.getState().activeCalls[4]).toBeUndefined();
   confirm();
   await expect(request).resolves.toBe('called');
-  expect(useOperationStore.getState().activeCall?.registrationId).toBe(9);
+  expect(useOperationStore.getState().activeCalls[4]?.registrationId).toBe(9);
 });
 
 it('treats an empty queue as a normal outcome and keeps local state unchanged', async () => {
@@ -55,7 +55,7 @@ it('treats an empty queue as a normal outcome and keeps local state unchanged', 
   );
 
   await expect(callNextAndCommit(4)).resolves.toBe('empty');
-  expect(useOperationStore.getState().activeCall).toBeNull();
+  expect(useOperationStore.getState().activeCalls[4]).toBeUndefined();
 });
 
 it('keeps local state unchanged on a 409 conflict', async () => {
@@ -73,5 +73,5 @@ it('keeps local state unchanged on a 409 conflict', async () => {
     ),
   );
   await expect(callNextAndCommit(4)).rejects.toMatchObject({ status: 409 });
-  expect(useOperationStore.getState().activeCall).toBeNull();
+  expect(useOperationStore.getState().activeCalls[4]).toBeUndefined();
 });

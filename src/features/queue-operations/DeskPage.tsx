@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -10,7 +10,8 @@ import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { usePerson, usePersonNotes } from '@/features/persons/hooks/usePersons';
+import { queryKeys } from '@/api/client/query-keys';
+import { registrationsControllerFindOne } from '@/api/generated/registrations/registrations';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
@@ -23,9 +24,8 @@ import {
   useMarkNoShow,
   useMarkServed,
   useOpenDeskSession,
-  useRegistration,
 } from './hooks/useQueueOperations';
-import { ActiveCallCard, EligiblePreviewCard, QueueDeskCard } from './components/DeskCards';
+import { EligiblePreviewCard, QueueDeskCard } from './components/DeskCards';
 import { DeskPassages } from './components/DeskPassages';
 
 export function DeskPage() {
@@ -34,11 +34,11 @@ export function DeskPage() {
   const user = useSessionStore((state) => state.user);
   const siteId = useScopeStore((state) => state.activeSiteId);
   const site = useSite(siteId);
-  const activeCall = useOperationStore((state) => state.activeCall);
+  const activeCalls = useOperationStore((state) => state.activeCalls);
   const passages = useOperationStore((state) => state.passages);
-  const [pending, setPending] = useState(false);
+  const [pendingQueueIds, setPendingQueueIds] = useState<ReadonlySet<number>>(new Set());
   const [error, setError] = useState('');
-  const [notesOpen, setNotesOpen] = useState(false);
+  const [notesPersonId, setNotesPersonId] = useState<number>();
   const [deskToOpen, setDeskToOpen] = useState<{
     queueId: number;
     queueName: string;
@@ -55,14 +55,6 @@ export function DeskPage() {
     allowed.map((queue) => queue.queueId),
   );
   const statuses = useQueueStatuses(allowed.map((queue) => queue.queueId));
-  const activeRegistration = useRegistration(activeCall?.registrationId, activeCall !== null);
-  const activePersonId = activeRegistration.data?.data.personId;
-  const activePerson = usePerson(activePersonId);
-  const activePersonNotes = usePersonNotes(activePersonId ?? 0, {
-    enabled: Boolean(activePersonId),
-    pageSize: 1,
-    usage: 'count',
-  });
   const callNext = useCallNext();
   const markServed = useMarkServed();
   const markNoShow = useMarkNoShow();
@@ -81,44 +73,48 @@ export function DeskPage() {
         sessions[index]?.data?.data.items.some((session) => session.mode === 'active') ?? false;
       return Number(active(right.index)) - Number(active(left.index));
     });
-  const serverCurrent = threads
-    .flatMap((query) => query.data?.data.items ?? [])
-    .find(
-      (thread) =>
-        thread.session?.userId === user?.userId && Boolean(thread.session?.currentRegistrationId),
-    );
-  const serverRegistrationId = serverCurrent?.session?.currentRegistrationId ?? null;
-  const serverRegistration = useRegistration(serverRegistrationId);
+  const serverCurrents = threads.flatMap((query, index) =>
+    (query.data?.data.items ?? [])
+      .filter(
+        (thread) =>
+          thread.session?.userId === user?.userId && Boolean(thread.session?.currentRegistrationId),
+      )
+      .map((thread) => ({ queueId: allowed[index]?.queueId, thread })),
+  );
+  const serverRegistrations = useQueries({
+    queries: serverCurrents.map(({ thread }) => ({
+      queryKey: queryKeys.registrations.detail(thread.session?.currentRegistrationId),
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        registrationsControllerFindOne(thread.session?.currentRegistrationId ?? 0, undefined, signal),
+      enabled: Boolean(thread.session?.currentRegistrationId),
+    })),
+  });
 
   useEffect(() => {
-    if (
-      activeCall ||
-      !serverCurrent ||
-      !serverRegistrationId ||
-      passages.some((item) => item.registrationId === serverRegistrationId)
-    )
-      return;
-    const data = serverRegistration.data?.data;
-    if (!data || !['called', 'in_progress'].includes(data.status) || !serverCurrent.session) return;
-    useOperationStore.getState().startCall({
-      registrationId: data.registrationId,
-      ticketNumber: data.ticketNumber,
-      entryType: data.entryType,
-      scheduledTime: data.scheduledTime,
-      calledEarly: false,
-      tier: { tierId: data.tierId },
-      status: data.status,
-      sessionId: serverCurrent.session.sessionId,
-      threadNumber: serverCurrent.threadNumber,
-      priorityScore: 0,
-      calledAt: data.updatedAt,
-      person: { personId: data.personId },
+    serverCurrents.forEach(({ queueId, thread }, index) => {
+      if (!queueId || activeCalls[queueId] || !thread.session) return;
+      const data = serverRegistrations[index]?.data?.data;
+      if (!data || !['called', 'in_progress'].includes(data.status)) return;
+      useOperationStore.getState().startCall(queueId, {
+        registrationId: data.registrationId,
+        ticketNumber: data.ticketNumber,
+        entryType: data.entryType,
+        scheduledTime: data.scheduledTime,
+        calledEarly: false,
+        tier: { tierId: data.tierId },
+        status: data.status,
+        sessionId: thread.session.sessionId,
+        threadNumber: thread.threadNumber,
+        priorityScore: 0,
+        calledAt: data.updatedAt,
+        person: { personId: data.personId },
+      });
     });
-  }, [activeCall, passages, serverCurrent, serverRegistration.data, serverRegistrationId]);
+  }, [activeCalls, serverCurrents, serverRegistrations]);
 
   const refresh = () => invalidateQueueOperations(queryClient);
-  const execute = async (command: () => Promise<void>) => {
-    setPending(true);
+  const execute = async (queueId: number, command: () => Promise<void>) => {
+    setPendingQueueIds((current) => new Set(current).add(queueId));
     setError('');
     try {
       await command();
@@ -131,26 +127,31 @@ export function DeskPage() {
       );
       await refresh();
     } finally {
-      setPending(false);
+      setPendingQueueIds((current) => {
+        const next = new Set(current);
+        next.delete(queueId);
+        return next;
+      });
     }
   };
-  const finishCall = (outcome: 'served' | 'no_show') => {
-    if (!activeCall) return;
-    const call = activeCall;
-    const registration = activeRegistration.data?.data;
-    const personName = [activePerson.data?.data.firstName, activePerson.data?.data.lastName]
-      .filter((part): part is string => Boolean(part?.trim()))
-      .join(' ');
-    void execute(async () => {
+  const finishCall = (
+    queueId: number,
+    outcome: 'served' | 'no_show',
+    registration: Parameters<React.ComponentProps<typeof QueueDeskCard>['onFinishCall']>[1],
+    personName: string,
+  ) => {
+    const call = activeCalls[queueId];
+    if (!call) return;
+    void execute(queueId, async () => {
       if (outcome === 'served') await markServed.execute(call.registrationId);
       else await markNoShow.execute(call.registrationId);
-      useOperationStore.getState().closeCall();
+      useOperationStore.getState().closeCall(queueId);
       useOperationStore.getState().addPassage({
         registrationId: call.registrationId,
         ticketNumber: call.ticketNumber,
         personName: personName || t('queue-operations.desk.personneNonRenseignee'),
-        firstName: activePerson.data?.data.firstName ?? undefined,
-        lastName: activePerson.data?.data.lastName ?? undefined,
+        firstName: registration?.firstName,
+        lastName: registration?.lastName,
         arrivedAt: registration?.createdAt,
         calledAt: call.calledAt,
         closedAt: new Date().toISOString(),
@@ -167,7 +168,7 @@ export function DeskPage() {
     });
   };
   const releaseDesk = (queueId: number, sessionId: number, queueName: string) =>
-    void execute(async () => {
+    void execute(queueId, async () => {
       await closeSession.execute({ queueId, sessionId });
       notify({ tone: 'success', title: t('notifications.desk.released'), message: queueName });
       await refresh();
@@ -182,7 +183,7 @@ export function DeskPage() {
       occupiedThread !== undefined &&
       window.confirm(t('queue-operations.desk.ceGuichetEstOccupeConfirmerLaReprise'));
     if (occupiedThread !== undefined && !takeOver) return;
-    void execute(async () => {
+    void execute(queueId, async () => {
       await openSession.execute({
         queueId,
         dto: {
@@ -203,7 +204,7 @@ export function DeskPage() {
     });
   };
   const callFromQueue = (queueId: number, queueName: string) =>
-    void execute(async () => {
+    void execute(queueId, async () => {
       const outcome = await callNext.execute(queueId);
       notify(
         outcome === 'empty'
@@ -216,10 +217,6 @@ export function DeskPage() {
       );
       await refresh();
     });
-  const personName = [activePerson.data?.data.firstName, activePerson.data?.data.lastName]
-    .filter((part): part is string => Boolean(part?.trim()))
-    .join(' ');
-
   return (
     <div className="page-stack">
       <PageHeader
@@ -250,26 +247,6 @@ export function DeskPage() {
       {allowed.length > 0 ? (
         <div className="desk-card-grid">
           <EligiblePreviewCard items={previews.data?.data ?? []} />
-          <ActiveCallCard
-            call={activeCall}
-            registration={activeRegistration.data?.data}
-            personName={personName}
-            noteCount={activePersonNotes.data?.data.total ?? 0}
-            pending={pending}
-            onServed={() => {
-              finishCall('served');
-            }}
-            onNoShow={() => {
-              finishCall('no_show');
-            }}
-            onNotes={
-              activePersonId
-                ? () => {
-                    setNotesOpen(true);
-                  }
-                : undefined
-            }
-          />
           {rankedQueues.map(({ queue, index }) => {
             const mine = sessions[index]?.data?.data.items.find(
               (item) => item.userId === user?.userId,
@@ -287,8 +264,8 @@ export function DeskPage() {
                 active={active}
                 waitingCount={statuses[index]?.data?.data.waitingCount}
                 estimatedWaitMinutes={statuses[index]?.data?.data.estimatedWaitMinutes}
-                pending={pending}
-                hasActiveCall={Boolean(activeCall)}
+                pending={pendingQueueIds.has(queue.queueId)}
+                activeCall={activeCalls[queue.queueId]}
                 onRelease={() => {
                   if (mine) releaseDesk(queue.queueId, mine.sessionId, queue.queueName);
                 }}
@@ -303,23 +280,29 @@ export function DeskPage() {
                 onCallNext={() => {
                   callFromQueue(queue.queueId, queue.queueName);
                 }}
+                onFinishCall={(outcome, registration, personName) => {
+                  finishCall(queue.queueId, outcome, registration, personName);
+                }}
+                onNotes={setNotesPersonId}
               />
             );
           })}
         </div>
       ) : null}
-      {notesOpen && activeRegistration.data ? (
+      {notesPersonId ? (
         <PersonNotesViewer
-          personId={activeRegistration.data.data.personId}
+          personId={notesPersonId}
           open
-          onOpenChange={setNotesOpen}
+          onOpenChange={(open) => {
+            if (!open) setNotesPersonId(undefined);
+          }}
         />
       ) : null}
       <DeskPassages passages={passages} siteName={site.data?.data.siteName} />
       <Modal
         open={Boolean(deskToOpen)}
         onOpenChange={(open) => {
-          if (!open && !pending) {
+          if (!open && !pendingQueueIds.size) {
             setDeskToOpen(undefined);
             setCounterName('');
           }
@@ -330,7 +313,7 @@ export function DeskPage() {
           <button
             className="button button-primary"
             type="button"
-            disabled={pending || !counterName.trim()}
+            disabled={Boolean(pendingQueueIds.size) || !counterName.trim()}
             onClick={() => {
               if (!deskToOpen) return;
               occupyDesk(
@@ -355,7 +338,7 @@ export function DeskPage() {
               setCounterName(event.target.value);
             }}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && counterName.trim() && deskToOpen && !pending) {
+              if (event.key === 'Enter' && counterName.trim() && deskToOpen && !pendingQueueIds.size) {
                 event.preventDefault();
                 occupyDesk(
                   deskToOpen.queueId,

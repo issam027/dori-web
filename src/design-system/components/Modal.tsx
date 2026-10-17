@@ -11,6 +11,7 @@ interface ModalProps {
   children: ReactNode;
   actions?: ReactNode;
   hideDismissAction?: boolean;
+  className?: string;
 }
 
 export function Modal({
@@ -21,13 +22,14 @@ export function Modal({
   children,
   actions,
   hideDismissAction = false,
+  className,
 }: ModalProps) {
   const { t } = useTranslation();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className="dialog-content">
+        <Dialog.Content className={`dialog-content${className ? ` ${className}` : ''}`}>
           <header className="dialog-header">
             <div>
               <Dialog.Title>{title}</Dialog.Title>

@@ -16,11 +16,11 @@ export interface PassageSummary {
 }
 
 interface OperationState {
-  activeCall: CallNextRegistrationResponseDto | null;
+  activeCalls: Record<number, CallNextRegistrationResponseDto>;
   recentCalls: CallNextRegistrationResponseDto[];
   passages: PassageSummary[];
-  startCall: (call: CallNextRegistrationResponseDto) => void;
-  closeCall: () => void;
+  startCall: (queueId: number, call: CallNextRegistrationResponseDto) => void;
+  closeCall: (queueId: number) => void;
   addPassage: (passage: PassageSummary) => void;
   reset: () => void;
 }
@@ -28,20 +28,24 @@ interface OperationState {
 export const useOperationStore = create<OperationState>()(
   persist(
     (set) => ({
-      activeCall: null,
+      activeCalls: {},
       recentCalls: [],
       passages: [],
-      startCall: (call) => {
+      startCall: (queueId, call) => {
         set((state) => ({
-          activeCall: call,
+          activeCalls: { ...state.activeCalls, [queueId]: call },
           recentCalls: [
             call,
             ...state.recentCalls.filter((item) => item.registrationId !== call.registrationId),
           ].slice(0, 4),
         }));
       },
-      closeCall: () => {
-        set({ activeCall: null });
+      closeCall: (queueId) => {
+        set((state) => ({
+          activeCalls: Object.fromEntries(
+            Object.entries(state.activeCalls).filter(([key]) => Number(key) !== queueId),
+          ),
+        }));
       },
       addPassage: (passage) => {
         set((state) => ({
@@ -52,14 +56,14 @@ export const useOperationStore = create<OperationState>()(
         }));
       },
       reset: () => {
-        set({ activeCall: null, recentCalls: [], passages: [] });
+        set({ activeCalls: {}, recentCalls: [], passages: [] });
       },
     }),
     {
       name: 'dori:operator-session',
       storage: createJSONStorage(() => sessionStorage),
-      partialize: ({ activeCall, recentCalls, passages }) => ({
-        activeCall,
+      partialize: ({ activeCalls, recentCalls, passages }) => ({
+        activeCalls,
         recentCalls,
         passages,
       }),
@@ -69,7 +73,7 @@ export const useOperationStore = create<OperationState>()(
 
 export function canCallNext(
   hasActiveSession: boolean,
-  activeCall: CallNextRegistrationResponseDto | null,
+  activeCall: CallNextRegistrationResponseDto | undefined,
   pending: boolean,
 ): boolean {
   return hasActiveSession && !activeCall && !pending;

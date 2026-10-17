@@ -10,6 +10,6 @@ export async function callNextAndCommit(queueId: number): Promise<CallNextOutcom
   // Do not attempt to commit its null payload as an active call.
   if (response.code === 'QUEUE_EMPTY' || registration === null) return 'empty';
 
-  useOperationStore.getState().startCall(registration);
+  useOperationStore.getState().startCall(queueId, registration);
   return 'called';
 }

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   KeyRound,
+  Eye,
   LogOut,
   Pencil,
   Plus,
@@ -12,8 +13,9 @@ import {
   UserCheck,
   Users,
   UserX,
+  Trash2,
 } from 'lucide-react';
-import type { UserSummaryItemDto, UsersControllerFindUsersParams } from '@/api/generated/models';
+import type { UserResponseDto, UserSummaryItemDto, UsersControllerFindUsersParams } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -21,10 +23,13 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useSessionStore } from '@/core/auth/session-store';
+import { hasAnyPermission } from '@/core/permissions/permissions';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useSettingsData } from './hooks/useSettingsData';
 import {
+  deleteUser,
+  findUserById,
   findUsers,
   logoutUserSessions,
   setUserPassword,
@@ -38,12 +43,15 @@ export function UsersAdminPage() {
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const current = useSessionStore((state) => state.user);
+  const canDeleteUsers = hasAnyPermission(current, ['user_manage_kiosk', 'user_manage_operator', 'user_manage_manager', 'user_manage_admin']);
   const { sites, queues, roles } = useSettingsData(siteId);
   const [page, setPage] = useState(1);
   const [draft, setDraft] = useState({ search: '', userType: '' });
   const [filters, setFilters] = useState(draft);
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<UserSummaryItemDto>();
+  const [viewingId, setViewingId] = useState<number>();
+  const [deleting, setDeleting] = useState<UserSummaryItemDto>();
   const [editForm, setEditForm] = useState({ email: '', language: 'fr' });
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [pending, setPending] = useState(false);
@@ -61,6 +69,11 @@ export function UsersAdminPage() {
         undefined,
         signal,
       ),
+  });
+  const userDetail = useQuery({
+    queryKey: ['admin', 'user-detail', viewingId],
+    queryFn: ({ signal }) => findUserById(viewingId ?? 0, undefined, signal),
+    enabled: Boolean(viewingId),
   });
   const items = users.data?.data.items ?? [];
   const totalPages = Math.max(1, users.data?.data.totalPages ?? 1);
@@ -204,6 +217,7 @@ export function UsersAdminPage() {
                   <td>{user.languagePreference.toUpperCase()}</td>
                   <td>
                     <div className="table-actions responsive-table-actions">
+                      <button className="button button-small" type="button" title={t('common.view')} onClick={() => { setViewingId(user.userId); }}><Eye />{t('common.view')}</button>
                       <button
                         className="button button-small"
                         type="button"
@@ -214,6 +228,7 @@ export function UsersAdminPage() {
                       >
                         <Pencil /> {t('common.edit')}
                       </button>
+                      {canDeleteUsers ? <button className="button button-small button-danger" type="button" title={t('common.delete')} disabled={current?.userId === user.userId} onClick={() => { setDeleting(user); }}><Trash2 />{t('common.delete')}</button> : null}
                       <button
                         className="button button-small"
                         type="button"
@@ -283,6 +298,14 @@ export function UsersAdminPage() {
         currentRoleRank={rank}
         onCreated={() => void refresh()}
       />
+      <Modal open={Boolean(viewingId)} onOpenChange={(open) => { if (!open) setViewingId(undefined); }} title={t('admin.users.detailsTitle')} description={userDetail.data?.data.username}>
+        {userDetail.data ? <UserDetail user={userDetail.data.data} t={t} /> : <p className="muted">{t('common.loading')}</p>}
+      </Modal>
+      <Modal open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }} title={t('admin.users.deleteTitle')} description={deleting?.username} actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
+        if (!deleting) return;
+        setPending(true);
+        void deleteUser(deleting.userId).then(async () => { await refresh(); notify({ tone: 'success', title: t('admin.users.deleteSuccess'), message: deleting.username }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
+      }}><Trash2 />{t('common.delete')}</button>}><p className="admin-message">{t('admin.users.deleteDescription')}</p></Modal>
       <Modal
         open={Boolean(editing)}
         onOpenChange={(next) => {
@@ -380,4 +403,13 @@ export function UsersAdminPage() {
       </Modal>
     </div>
   );
+}
+
+function UserDetail({ user, t }: { user: UserResponseDto; t: (key: string, options?: Record<string, unknown>) => string }) {
+  return <div className="user-detail-panel">
+    <dl className="detail-list"><dt>{t('common.email')}</dt><dd>{user.email ?? t('settings.noEmail')}</dd><dt>{t('common.status')}</dt><dd>{t(user.isActive ? 'common.active' : 'common.inactive')}</dd><dt>{t('common.language')}</dt><dd>{user.languagePreference.toUpperCase()}</dd><dt>{t('admin.users.lastLogin')}</dt><dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</dd></dl>
+    <section><h3>{t('onboarding.settings.roles')}</h3><div className="badge-row">{user.roles.map((role) => <span className="status-badge status-info" key={role.roleId}>{role.roleName}</span>)}</div></section>
+    <section><h3>{t('sites.plural')}</h3><p>{user.sites.map((site) => site.siteName).join(', ') || t('common.none')}</p></section>
+    <section><h3>{t('queues.plural')}</h3><p>{user.queues.map((queue) => queue.queueName).join(', ') || t('common.none')}</p></section>
+  </div>;
 }

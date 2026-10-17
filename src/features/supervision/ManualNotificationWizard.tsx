@@ -90,6 +90,7 @@ export function ManualNotificationWizard({
       onOpenChange={close}
       title={t('supervision.notifications.nouvelleNotification')}
       description={t('wizard.progress', { step: stepNumber[step], stepCount: 3 })}
+      className="notification-wizard-dialog"
       actions={
         <>
           {step !== 'audience' ? (
@@ -101,7 +102,7 @@ export function ManualNotificationWizard({
               }}
             >
               <ArrowLeft aria-hidden="true" />
-              {t('common.previous')}
+              <span className="button-label">{t('common.previous')}</span>
             </button>
           ) : null}
           {step !== 'content' ? (
@@ -113,7 +114,7 @@ export function ManualNotificationWizard({
                 setStep(transitionNotificationWizard(step, 'next'));
               }}
             >
-              {t('common.next')}
+              <span className="button-label">{t('common.next')}</span>
               <ArrowRight aria-hidden="true" />
             </button>
           ) : (
@@ -127,9 +128,11 @@ export function ManualNotificationWizard({
               }}
             >
               <Send aria-hidden="true" />
-              {send.isPending
-                ? t('supervision.notifications.envoiEnCours')
-                : t('supervision.notifications.envoyerLaNotification')}
+              <span className="button-label">
+                {send.isPending
+                  ? t('supervision.notifications.envoiEnCours')
+                  : t('supervision.notifications.envoyerLaNotification')}
+              </span>
             </button>
           )}
         </>
@@ -213,8 +216,8 @@ function NotificationAudienceStep({
           <p>{t('supervision.notifications.recherchezLaPersonneConcerneeParSonNomOu')}</p>
         </div>
       </div>
-      <label>
-        {t('common.rechercherUnePersonne')}
+      <label className="form-field">
+        <span>{t('common.rechercherUnePersonne')}</span>
         <input
           value={search}
           onChange={(event) => {
@@ -297,7 +300,10 @@ function NotificationRegistrationStep({
               {item.ticketNumber}
             </strong>
             <span>
-              {item.businessDate} · {item.status}
+              {new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
+                new Date(item.businessDate),
+              )}{' '}
+              · {t(`common.${item.status}`, { defaultValue: item.status })}
             </span>
           </button>
         ))}

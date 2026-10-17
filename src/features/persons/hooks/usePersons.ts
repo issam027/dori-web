@@ -1,7 +1,7 @@
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidatePersonNotes } from '@/api/client/query-invalidations';
-import { createPersonNote, findPerson, findPersonNotes, findPersons } from '../api/persons-api';
+import { createPersonNote, deletePersonNote, findPerson, findPersonNotes, findPersons, updatePersonNote } from '../api/persons-api';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
 
 export function usePersonsSearch(options: {
@@ -78,6 +78,25 @@ export function useAddPersonNote(personId: number) {
   return useBusinessMutation({
     mutationFn: (content: string) => createPersonNote(personId, { content }),
     expectedErrorStatuses: [400, 404, 422],
+    invalidate: () => invalidatePersonNotes(queryClient, personId),
+  });
+}
+
+export function useUpdatePersonNote(personId: number) {
+  const queryClient = useQueryClient();
+  return useBusinessMutation({
+    mutationFn: ({ noteId, content }: { noteId: number; content: string }) =>
+      updatePersonNote(personId, noteId, { content }),
+    expectedErrorStatuses: [400, 404, 422],
+    invalidate: () => invalidatePersonNotes(queryClient, personId),
+  });
+}
+
+export function useDeletePersonNote(personId: number) {
+  const queryClient = useQueryClient();
+  return useBusinessMutation({
+    mutationFn: (noteId: number) => deletePersonNote(personId, noteId),
+    expectedErrorStatuses: [404, 409, 422],
     invalidate: () => invalidatePersonNotes(queryClient, personId),
   });
 }

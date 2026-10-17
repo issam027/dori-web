@@ -1,5 +1,11 @@
 // Reviewed fallbacks for the public and administration screens that must never fall back to French.
 export const targetedFallbackEn: Record<string, string> = {
+  'supervision.controlRoom.confirmReset': 'Confirm queue reset',
+  'supervision.controlRoom.confirmResetAction': 'Reset queue',
+  'supervision.controlRoom.resetDescription': 'The queue “{{queue}}” will be reset. Today’s waiting registrations will be closed according to the server configuration. This action cannot be undone.',
+  'supervision.controlRoom.resetQueue': 'Reset',
+  'supervision.controlRoom.resetQueueNamed': 'Reset the {{queue}} queue',
+  'supervision.controlRoom.resetting': 'Resetting…',
   'common.enDirect': 'Live',
   'public-experiences.deviceMode.borneDAccueil': 'Reception kiosk',
   'public-experiences.deviceMode.configurationDeLAppareil': 'Device setup',
@@ -122,6 +128,12 @@ export const targetedFallbackEn: Record<string, string> = {
 };
 
 export const targetedFallbackAr: Record<string, string> = {
+  'supervision.controlRoom.confirmReset': 'تأكيد إعادة ضبط قائمة الانتظار',
+  'supervision.controlRoom.confirmResetAction': 'إعادة ضبط القائمة',
+  'supervision.controlRoom.resetDescription': 'ستتم إعادة ضبط قائمة الانتظار «{{queue}}». ستُغلق تسجيلات الانتظار لهذا اليوم وفق إعدادات الخادم. لا يمكن التراجع عن هذا الإجراء.',
+  'supervision.controlRoom.resetQueue': 'إعادة الضبط',
+  'supervision.controlRoom.resetQueueNamed': 'إعادة ضبط قائمة الانتظار {{queue}}',
+  'supervision.controlRoom.resetting': 'جارٍ إعادة الضبط…',
   'common.enDirect': 'مباشر',
   'public-experiences.deviceMode.borneDAccueil': 'كشك الاستقبال',
   'public-experiences.deviceMode.configurationDeLAppareil': 'إعداد الجهاز',
@@ -347,4 +359,37 @@ Object.assign(targetedFallbackAr, {
   'onboarding.onboarding.parcoursDeConfiguration': 'مراحل الإعداد', 'onboarding.onboarding.precedent': 'السابق →',
   'onboarding.onboarding.activerLeSite': 'تفعيل الموقع', 'onboarding.onboarding.termine': 'مكتمل',
   'onboarding.totalSteps': 'من 6', 'onboarding.onboarding.configurationPrete': 'الإعداد جاهز',
+});
+
+Object.assign(targetedFallbackEn, {
+  'admin.translations.categories.ihm': 'Internal interface',
+  'admin.translations.categories.public_ihm': 'Public interface',
+  'admin.translations.categories.sms': 'SMS',
+  'admin.translations.categories.email': 'Email',
+  'admin.translations.categories.error': 'Errors',
+  'settings.queueOperators.title': 'Queue operators', 'settings.queueOperators.button': 'Assignments',
+  'settings.queueOperators.assignedTitle': 'Assigned operators', 'settings.queueOperators.addTitle': 'Add an operator',
+  'settings.queueOperators.empty': 'No operator is assigned to this queue.', 'settings.queueOperators.assigned': 'Operator assigned',
+  'settings.queueOperators.removed': 'Assignment removed', 'persons.notes.editTitle': 'Edit note',
+  'persons.notes.updated': 'Note updated', 'persons.notes.deleted': 'Note deleted',
+  'persons.admin.deleteTitle': 'Delete this person?', 'persons.admin.deleteDescription': 'Deletion will be handled by the service and will include associated notes.',
+  'persons.admin.deleted': 'Person deleted', 'admin.users.detailsTitle': 'User details',
+  'admin.users.deleteTitle': 'Delete this user?', 'admin.users.deleteDescription': 'The account will be deleted and its active sessions revoked.',
+  'admin.users.deleteSuccess': 'User deleted', 'admin.users.lastLogin': 'Last login',
+});
+Object.assign(targetedFallbackAr, {
+  'admin.translations.categories.ihm': 'الواجهة الداخلية',
+  'admin.translations.categories.public_ihm': 'الواجهة العامة',
+  'admin.translations.categories.sms': 'رسائل SMS',
+  'admin.translations.categories.email': 'البريد الإلكتروني',
+  'admin.translations.categories.error': 'الأخطاء',
+  'settings.queueOperators.title': 'مشغلو قائمة الانتظار', 'settings.queueOperators.button': 'التعيينات',
+  'settings.queueOperators.assignedTitle': 'المشغلون المعيّنون', 'settings.queueOperators.addTitle': 'إضافة مشغل',
+  'settings.queueOperators.empty': 'لا يوجد مشغل معيّن لهذه القائمة.', 'settings.queueOperators.assigned': 'تم تعيين المشغل',
+  'settings.queueOperators.removed': 'تمت إزالة التعيين', 'persons.notes.editTitle': 'تعديل الملاحظة',
+  'persons.notes.updated': 'تم تعديل الملاحظة', 'persons.notes.deleted': 'تم حذف الملاحظة',
+  'persons.admin.deleteTitle': 'حذف هذا الشخص؟', 'persons.admin.deleteDescription': 'ستتم معالجة الحذف بواسطة الخدمة مع الملاحظات المرتبطة.',
+  'persons.admin.deleted': 'تم حذف الشخص', 'admin.users.detailsTitle': 'تفاصيل المستخدم',
+  'admin.users.deleteTitle': 'حذف هذا المستخدم؟', 'admin.users.deleteDescription': 'سيتم حذف الحساب وإلغاء جلساته النشطة.',
+  'admin.users.deleteSuccess': 'تم حذف المستخدم', 'admin.users.lastLogin': 'آخر تسجيل دخول',
 });

@@ -23,7 +23,7 @@ export const notificationRuleSchema = z
 
 export const translationSchema = z.object({
   key: z.string().trim().min(1),
-  category: z.enum(['ihm', 'sms', 'error']),
+  category: z.enum(['ihm', 'public_ihm', 'sms', 'email', 'error']),
   locale: z.string().trim().min(2),
   content: z.string().trim().min(1),
   params: z.string(),

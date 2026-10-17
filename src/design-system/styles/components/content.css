@@ -525,6 +525,59 @@
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
 }
+.queue-desk-card.has-active-call {
+  border-color: color-mix(in srgb, var(--color-primary) 62%, var(--color-line));
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
+      var(--color-surface) 58%
+    );
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+.queue-desk-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.queue-desk-summary > div {
+  min-width: 0;
+}
+.queue-desk-summary h2,
+.queue-desk-summary p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.queue-desk-summary p {
+  margin-top: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+.queue-card-active-call {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 26%, var(--color-line));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+}
+.queue-card-person {
+  overflow: hidden;
+  max-width: 55%;
+  font-weight: 800;
+  text-align: end;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.queue-card-call-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.queue-card-call-actions .button {
+  flex: 1 1 auto;
+}
 .queue-desk-card.no-open-desk {
   opacity: 0.68;
   filter: saturate(0.65);

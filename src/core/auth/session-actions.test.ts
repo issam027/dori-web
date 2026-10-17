@@ -184,7 +184,7 @@ describe('changeActiveSite cockpit preservation', () => {
       ),
     );
     useScopeStore.getState().setActiveSite(12, scope);
-    useOperationStore.getState().startCall(activeCall);
+    useOperationStore.getState().startCall(4, activeCall);
   });
 
   afterEach(() => {
@@ -194,7 +194,7 @@ describe('changeActiveSite cockpit preservation', () => {
 
   it('keeps the active call when the same site context is reapplied', async () => {
     await changeActiveSite(new QueryClient(), 12, scope);
-    expect(useOperationStore.getState().activeCall?.registrationId).toBe(9);
+    expect(useOperationStore.getState().activeCalls[4]?.registrationId).toBe(9);
   });
 
   it('purges the active call when the operator really changes site', async () => {
@@ -203,7 +203,7 @@ describe('changeActiveSite cockpit preservation', () => {
 
     await changeActiveSite(queryClient, 13, scope);
 
-    expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(useOperationStore.getState().activeCalls).toEqual({});
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 
@@ -216,7 +216,7 @@ describe('changeActiveSite cockpit preservation', () => {
     await clearActiveSiteContext(queryClient);
 
     expect(useScopeStore.getState().activeSiteId).toBeNull();
-    expect(useOperationStore.getState().activeCall).toBeNull();
+    expect(useOperationStore.getState().activeCalls).toEqual({});
     expect(useBrandStore.getState().name).toBe('DORIFY');
     expect(queryClient.getQueryData(['sites', 'portfolio'])).toEqual({ items: [] });
     expect(queryClient.getQueryData(['queues', 'site', 12])).toBeUndefined();

@@ -16,6 +16,8 @@ export {
   serviceTiersControllerFindTiers as findTiers,
 } from '@/api/generated/tiers/tiers';
 export {
+  usersControllerDeleteUser as deleteUser,
+  usersControllerFindUserById as findUserById,
   usersControllerFindUsers as findUsers,
   usersControllerGetRoles as findRoles,
   usersControllerSetUserPassword as setUserPassword,

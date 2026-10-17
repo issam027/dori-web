@@ -7,25 +7,44 @@ import {
   Clock3,
   ListChecks,
   MonitorUp,
+  RotateCcw,
   UsersRound,
 } from 'lucide-react';
+import { useSessionStore } from '@/core/auth/session-store';
+import { hasPermission } from '@/core/permissions/permissions';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { ConfirmDialog } from '@/design-system/components/Modal';
+import { notify } from '@/core/notifications/notification-store';
 import { slaTone } from './sla';
 import { useDashboardQueueLoad } from './hooks/useReports';
 import { useQueueStatuses } from '@/features/queues/hooks/useQueues';
 import { useDeskSession } from '@/features/queue-operations/hooks/useQueueOperations';
+import { useResetQueue } from './hooks/useControlRoom';
 
 type PressureFilter = 'all' | 'danger' | 'warning' | 'healthy';
 
 export function ControlRoomPage() {
   const { t } = useTranslation();
+  const user = useSessionStore((state) => state.user);
   const siteId = useScopeStore((state) => state.activeSiteId);
+  const canResetQueue = hasPermission(user, 'queue_reset');
   const [selectedQueueIds, setSelectedQueueIds] = useState<number[]>([]);
   const [pressure, setPressure] = useState<PressureFilter>('all');
+  const [resetTarget, setResetTarget] = useState<{ queueId: number; queueName: string }>();
+  const resetQueue = useResetQueue(() => {
+    if (resetTarget) {
+      notify({
+        tone: 'success',
+        title: t('notifications.queue.reset'),
+        message: t('notifications.queue.resetMessage', { queue: resetTarget.queueName }),
+      });
+    }
+    setResetTarget(undefined);
+  });
   const load = useDashboardQueueLoad(siteId);
   const items = load.data?.data ?? [];
   const queueIds = items.map((queue) => queue.queueId);
@@ -38,7 +57,10 @@ export function ControlRoomPage() {
     0,
   );
   const totalCounters = threads.reduce((sum, thread) => sum + (thread.data?.data.total ?? 0), 0);
-  const waitingTotal = items.reduce((sum, queue) => sum + queue.waitingCount, 0);
+  const waitingTotal = statuses.reduce(
+    (sum, status) => sum + (status.data?.data.waitingCount ?? 0),
+    0,
+  );
   const appointmentsToday = statuses.reduce(
     (sum, status) => sum + (status.data?.data.nextAppointments.length ?? 0),
     0,
@@ -49,9 +71,10 @@ export function ControlRoomPage() {
     : 0;
   const operational = items.map((queue, index) => {
     const status = statuses[index]?.data?.data;
-    const tone = slaTone(queue.waitingCount, status?.estimatedWaitMinutes ?? 0);
+    const queueWithStatus = { ...queue, waitingCount: status?.waitingCount ?? 0 };
+    const tone = slaTone(queueWithStatus.waitingCount, status?.estimatedWaitMinutes ?? 0);
     return {
-      queue,
+      queue: queueWithStatus,
       status,
       tone,
       queueSessions: sessions[index]?.data?.data.items ?? [],
@@ -185,9 +208,26 @@ export function ControlRoomPage() {
                   <span className="eyebrow">{queue.queueCode}</span>
                   <h2>{queue.queueName}</h2>
                 </div>
-                <StatusBadge tone={tone}>
-                  {status?.estimatedWaitMinutes ?? '—'} {t('common.min')}
-                </StatusBadge>
+                <div className="supervision-card-actions">
+                  <StatusBadge tone={tone}>
+                    {status?.estimatedWaitMinutes ?? '—'} {t('common.min')}
+                  </StatusBadge>
+                  {canResetQueue ? (
+                    <button
+                      className="icon-button queue-reset-button"
+                      type="button"
+                      title={t('supervision.controlRoom.resetQueue')}
+                      aria-label={t('supervision.controlRoom.resetQueueNamed', {
+                        queue: queue.queueName,
+                      })}
+                      onClick={() => {
+                        setResetTarget({ queueId: queue.queueId, queueName: queue.queueName });
+                      }}
+                    >
+                      <RotateCcw aria-hidden="true" />
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <div className="queue-live-stats">
                 <div>
@@ -260,6 +300,25 @@ export function ControlRoomPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(resetTarget)}
+        onOpenChange={(open) => {
+          if (!open && !resetQueue.isPending) setResetTarget(undefined);
+        }}
+        title={t('supervision.controlRoom.confirmReset')}
+        description={t('supervision.controlRoom.resetDescription', {
+          queue: resetTarget?.queueName ?? '',
+        })}
+        confirmLabel={
+          resetQueue.isPending
+            ? t('supervision.controlRoom.resetting')
+            : t('supervision.controlRoom.confirmResetAction')
+        }
+        destructive
+        onConfirm={() => {
+          if (resetTarget && !resetQueue.isPending) resetQueue.run(resetTarget.queueId);
+        }}
+      />
     </div>
   );
 }

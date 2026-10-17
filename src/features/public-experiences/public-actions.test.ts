@@ -30,6 +30,7 @@ describe('specialized public flows', () => {
 
   it('looks up and checks in an appointment', async () => {
     let checkedIn = false;
+    let lookupPhone: string | null = null;
     const registration = {
       registrationId: 7, queueId: 4, personId: 9, ticketNumber: 'A007',
       entryType: 'appointment', status: 'scheduled', businessDate: '2026-10-08',
@@ -37,15 +38,18 @@ describe('specialized public flows', () => {
       createdAt: '2026-10-08T08:00:00Z', updatedAt: '2026-10-08T08:00:00Z', isActive: true,
     };
     mockServer.use(
-      http.get('http://localhost:3000/api/v1/registrations/lookup', () =>
-        HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: registration })),
+      http.get('http://localhost:3000/api/v1/registrations/lookup', ({ request }) => {
+        lookupPhone = new URL(request.url).searchParams.get('phoneNumber');
+        return HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: registration });
+      }),
       http.post('http://localhost:3000/api/v1/registrations/7/check-in', () => {
         checkedIn = true;
         return HttpResponse.json({ code: 'OK', translationKey: null, translationParams: {}, data: { ...registration, status: 'waiting' } });
       }),
     );
-    const found = await registrationsControllerLookup({ ticketNumber: 'A007' });
+    const found = await registrationsControllerLookup({ phoneNumber: '+33612345678' });
     await registrationsControllerCheckIn(found.data.registrationId);
+    expect(lookupPhone).toBe('+33612345678');
     expect(checkedIn).toBe(true);
   });
 

@@ -38,10 +38,11 @@ describe('desk cockpit cards', () => {
         waitingCount={2}
         estimatedWaitMinutes={6}
         pending={false}
-        hasActiveCall={false}
         onRelease={() => undefined}
         onOccupy={() => undefined}
         onCallNext={onCallNext}
+        onFinishCall={() => undefined}
+        onNotes={() => undefined}
       />,
     );
     expect(container.querySelector('.queue-desk-card')).toHaveClass('has-open-desk');

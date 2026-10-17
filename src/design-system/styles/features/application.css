@@ -2622,6 +2622,28 @@
 .control-room-filter-row > .muted:first-of-type { margin-left: auto; }
 .supervision-grid { align-items: start; }
 .supervision-queue-card { position: relative; overflow: hidden; border-top: 3px solid var(--color-border); }
+.supervision-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.queue-reset-button {
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+  border-color: transparent;
+  color: var(--color-text-muted);
+  background: transparent;
+  opacity: 0.62;
+}
+.queue-reset-button:hover,
+.queue-reset-button:focus-visible {
+  border-color: color-mix(in srgb, var(--color-danger) 30%, var(--color-line));
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
+  opacity: 1;
+}
 .supervision-danger { border-top-color: var(--color-danger); }
 .supervision-warning { border-top-color: var(--color-warning); }
 .supervision-success { border-top-color: var(--color-success); }

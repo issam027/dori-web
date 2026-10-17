@@ -13,6 +13,7 @@ import {
   Save,
   Search,
   StickyNote,
+  Trash2,
   UserRound,
   UsersRound,
 } from 'lucide-react';
@@ -26,10 +27,12 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
-import { createPerson, findPersons, updatePerson } from './api/persons-api';
+import { createPerson, deletePerson, findPersons, updatePerson } from './api/persons-api';
 import { PersonFormModal } from './PersonFormModal';
 import { PersonNotesViewer } from './PersonNotesViewer';
 import { displayPersonLanguage, formatPersonDate } from './person-display';
+import { useSessionStore } from '@/core/auth/session-store';
+import { hasPermission } from '@/core/permissions/permissions';
 
 const PAGE_SIZE = 10;
 
@@ -37,6 +40,7 @@ export function PersonsPage() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
+  const canDelete = hasPermission(useSessionStore((state) => state.user), 'registration_delete');
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
   const [search, setSearch] = useState('');
@@ -47,6 +51,7 @@ export function PersonsPage() {
   const [viewing, setViewing] = useState<PersonResponseDto>();
   const [editing, setEditing] = useState<PersonResponseDto>();
   const [notesPerson, setNotesPerson] = useState<PersonResponseDto>();
+  const [deleting, setDeleting] = useState<PersonResponseDto>();
   const [createOpen, setCreateOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -266,6 +271,9 @@ export function PersonsPage() {
                         >
                           <StickyNote aria-hidden="true" /> {t('persons.admin.notes')}
                         </button>
+                        {canDelete ? <button className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
+                          <Trash2 aria-hidden="true" /> {t('common.delete')}
+                        </button> : null}
                       </div>
                     </td>
                   </tr>
@@ -301,6 +309,19 @@ export function PersonsPage() {
           }}
         />
       ) : null}
+      <Modal
+        open={Boolean(deleting)}
+        onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }}
+        title={t('persons.admin.deleteTitle')}
+        description={deleting ? [deleting.firstName, deleting.lastName].filter(Boolean).join(' ') : undefined}
+        actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
+          if (!deleting) return;
+          setPending(true);
+          void deletePerson(deleting.personId).then(async () => { await refresh(); notify({ tone: 'success', title: t('persons.admin.deleted') }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
+        }}><Trash2 aria-hidden="true" />{t('common.delete')}</button>}
+      >
+        <p className="admin-message">{t('persons.admin.deleteDescription')}</p>
+      </Modal>
       <Modal
         open={Boolean(viewing)}
         onOpenChange={(open) => {

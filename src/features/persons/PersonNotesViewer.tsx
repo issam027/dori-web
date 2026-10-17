@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Save, StickyNote } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Pencil, Plus, Save, StickyNote, Trash2 } from 'lucide-react';
 import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { useAddPersonNote, usePerson, usePersonNotes } from './hooks/usePersons';
+import { useAddPersonNote, useDeletePersonNote, usePerson, usePersonNotes, useUpdatePersonNote } from './hooks/usePersons';
 import { normalizePersonText } from './person-display';
+import { useSessionStore } from '@/core/auth/session-store';
+import { hasPermission } from '@/core/permissions/permissions';
 
 export function PersonNotesViewer({
   personId,
@@ -19,12 +21,16 @@ export function PersonNotesViewer({
   initialMode?: 'view' | 'add';
 }) {
   const { t: __t } = useTranslation();
+  const canManage = hasPermission(useSessionStore((state) => state.user), 'person_note_manage');
   const [index, setIndex] = useState(0);
   const [adding, setAdding] = useState(initialMode === 'add');
   const [content, setContent] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState<number>();
   const notes = usePersonNotes(personId, { enabled: open });
   const person = usePerson(personId, open);
   const addNote = useAddPersonNote(personId);
+  const updateNote = useUpdatePersonNote(personId);
+  const deleteNote = useDeletePersonNote(personId);
   const personName = person.data
     ? [
         normalizePersonText(person.data.data.firstName),
@@ -51,6 +57,22 @@ export function PersonNotesViewer({
       notifyError(error);
     }
   };
+  const saveEdit = async () => {
+    if (!editingNoteId || !content.trim()) return;
+    try {
+      await updateNote.execute({ noteId: editingNoteId, content: content.trim() });
+      setEditingNoteId(undefined); setContent('');
+      notify({ tone: 'success', title: __t('persons.notes.updated') });
+    } catch (error) { notifyError(error); }
+  };
+  const remove = async () => {
+    if (!current) return;
+    try {
+      await deleteNote.execute(current.noteId);
+      setIndex(Math.max(0, index - 1));
+      notify({ tone: 'success', title: __t('persons.notes.deleted') });
+    } catch (error) { notifyError(error); }
+  };
   return (
     <Modal
       open={open}
@@ -71,7 +93,9 @@ export function PersonNotesViewer({
               {__t('persons.personNotesViewer.retourAuxNotes')}
             </button>
           ) : null}
-          {adding ? (
+          {editingNoteId ? (
+            <button className="button button-primary" type="button" disabled={!content.trim()} onClick={() => void saveEdit()}><Save aria-hidden="true" />{__t('common.save')}</button>
+          ) : adding ? (
             <button
               className="button button-primary"
               type="button"
@@ -96,14 +120,14 @@ export function PersonNotesViewer({
         </>
       }
     >
-      {adding ? (
+      {adding || editingNoteId ? (
         <div className="note-editor-panel">
           <div className="note-mode-heading">
             <span className="note-icon" aria-hidden="true">
               <StickyNote />
             </span>
             <div>
-              <h3>{__t('persons.personNotesViewer.nouvelleNote')}</h3>
+              <h3>{editingNoteId ? __t('persons.notes.editTitle') : __t('persons.personNotesViewer.nouvelleNote')}</h3>
               <p>{__t('persons.personNotesViewer.cetteInformationSeraVisibleLorsDesProchain')}</p>
             </div>
           </div>
@@ -130,6 +154,10 @@ export function PersonNotesViewer({
               })}{' '}
             · {new Date(current.createdAt).toLocaleString()}
           </small>
+          {canManage ? <div className="table-actions">
+            <button className="button button-small" type="button" onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" />{__t('common.edit')}</button>
+            <button className="button button-small button-danger" type="button" onClick={() => void remove()}><Trash2 aria-hidden="true" />{__t('common.delete')}</button>
+          </div> : null}
           {items.length > 1 ? (
             <div className="note-pagination">
               <button

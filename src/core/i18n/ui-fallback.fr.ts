@@ -140,6 +140,9 @@ export const uiFallbackFr: Record<string, string> = {
     'La file « {{queue}} » sera réinitialisée. Les inscriptions en attente du jour seront clôturées selon le mode configuré côté serveur. Cette action ne peut pas être annulée.',
   'supervision.controlRoom.resetting': 'Réinitialisation…',
   'supervision.controlRoom.confirmReset': 'Confirmer la réinitialisation',
+  'supervision.controlRoom.confirmResetAction': 'Réinitialiser la file',
+  'supervision.controlRoom.resetQueue': 'Réinitialiser',
+  'supervision.controlRoom.resetQueueNamed': 'Réinitialiser la file {{queue}}',
   'common.absent': 'Absent',
   'common.actions': 'Actions',
   'common.active': 'Actif',
@@ -960,6 +963,32 @@ export const uiFallbackFr: Record<string, string> = {
   'admin.translations.delete.successTitle': 'Traduction supprimée',
   'admin.translations.delete.successMessage': 'La clé {{key}} a été supprimée.',
 };
+
+Object.assign(uiFallbackFr, {
+  'admin.translations.categories.ihm': 'Interface interne',
+  'admin.translations.categories.public_ihm': 'Interface publique',
+  'admin.translations.categories.sms': 'SMS',
+  'admin.translations.categories.email': 'E-mail',
+  'admin.translations.categories.error': 'Erreurs',
+  'settings.queueOperators.title': 'Opérateurs de la file',
+  'settings.queueOperators.button': 'Affectations',
+  'settings.queueOperators.assignedTitle': 'Opérateurs affectés',
+  'settings.queueOperators.addTitle': 'Ajouter un opérateur',
+  'settings.queueOperators.empty': 'Aucun opérateur affecté à cette file.',
+  'settings.queueOperators.assigned': 'Opérateur affecté',
+  'settings.queueOperators.removed': 'Affectation retirée',
+  'persons.notes.editTitle': 'Modifier la note',
+  'persons.notes.updated': 'Note modifiée',
+  'persons.notes.deleted': 'Note supprimée',
+  'persons.admin.deleteTitle': 'Supprimer cette personne ?',
+  'persons.admin.deleteDescription': 'La suppression sera traitée par le service et inclura les notes associées.',
+  'persons.admin.deleted': 'Personne supprimée',
+  'admin.users.detailsTitle': 'Détails de l’utilisateur',
+  'admin.users.deleteTitle': 'Supprimer cet utilisateur ?',
+  'admin.users.deleteDescription': 'Le compte sera supprimé et ses sessions actives seront révoquées.',
+  'admin.users.deleteSuccess': 'Utilisateur supprimé',
+  'admin.users.lastLogin': 'Dernière connexion',
+});
 
 // Temporary compatibility for remote catalogs created with legacy generated keys.
 export const legacyUiKeyAliases: Record<string, string> = {

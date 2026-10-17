@@ -8,11 +8,14 @@ import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-a
 import type { findSites, findTiers } from '../api/onboarding-api';
 import type { QueueResponseDto } from '@/api/generated/models';
 import { useScopeStore } from '@/core/scope/scope-store';
+import { useSessionStore } from '@/core/auth/session-store';
+import { hasPermission } from '@/core/permissions/permissions';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { type AssignmentTarget, UserAssignmentModal } from '@/features/users/UserAssignmentModal';
+import { QueueOperatorsModal } from '@/features/users/QueueOperatorsModal';
 
 import { type SettingsSection } from '../settings-routes';
 import { useSettingsData } from '../hooks/useSettingsData';
@@ -35,7 +38,8 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
-    [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null);
+    [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null),
+    [operatorsQueue, setOperatorsQueue] = useState<QueueResponseDto | null>(null);
   return (
     <div className="page-stack admin-page">
       <PageHeader
@@ -74,7 +78,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
               setQueueOpen(true);
             }}
             refresh={refresh}
-            assign={setAssignmentTarget}
+            manageOperators={setOperatorsQueue}
           />
         ) : null}
         {section === 'tiers' ? <TiersPanel queues={qs} tiers={ts} /> : null}
@@ -98,6 +102,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         }}
         onAssigned={refresh}
       />
+      <QueueOperatorsModal queue={operatorsQueue} onOpenChange={(open) => { if (!open) setOperatorsQueue(null); }} />
     </div>
   );
 }
@@ -251,7 +256,7 @@ function QueuesPanel({
   create,
   edit,
   refresh,
-  assign,
+  manageOperators,
 }: {
   items: QueueResponseDto[];
   status: 'active' | 'inactive' | 'all';
@@ -259,9 +264,10 @@ function QueuesPanel({
   create: () => void;
   edit: (q: QueueResponseDto) => void;
   refresh: () => void;
-  assign: (target: AssignmentTarget) => void;
+  manageOperators: (queue: QueueResponseDto) => void;
 }) {
   const { t: __t } = useTranslation();
+  const canAssignOperators = hasPermission(useSessionStore((state) => state.user), 'user_queue_assign');
   const pagination = useAdminPagination(items);
   return (
     <section>
@@ -350,17 +356,17 @@ function QueuesPanel({
                       {__t('common.edit')}
                     </button>
 
-                    <button
+                    {canAssignOperators ? <button
                       className="button button-small"
                       type="button"
-                      title={__t('settings.assignUser')}
+                      title={__t('settings.queueOperators.title')}
                       onClick={() => {
-                        assign({ kind: 'queue', id: q.queueId, label: q.queueName });
+                        manageOperators(q);
                       }}
                     >
                       <UserPlus aria-hidden="true" />
-                      {__t('settings.assignUser')}
-                    </button>
+                      {__t('settings.queueOperators.button')}
+                    </button> : null}
                     <button
                       className="button button-small"
                       title={

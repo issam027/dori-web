@@ -46,15 +46,10 @@ export function useDashboardQueueLoad(siteId: number | null) {
       const queues = await queuesControllerFindAll(
         { siteId: siteId ?? undefined, isActive: true, page: 1, pageSize: 100 }, undefined, signal,
       );
-      const statuses = await Promise.all(
-        queues.data.items.map((queue) =>
-          queuesControllerGetStatus(queue.queueId, undefined, signal).then((response) => response.data),
-        ),
-      );
-      return { data: queues.data.items.map((queue, index) => ({
+      return { data: queues.data.items.map((queue) => ({
         ...queue,
         siteName: '',
-        waitingCount: statuses[index]?.waitingCount ?? 0,
+        waitingCount: 0,
         dominantTier: '—',
       })) };
     },

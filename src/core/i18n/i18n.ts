@@ -1097,7 +1097,7 @@ const partialFallbackResources = {
       ...generatedArabicFallback,
       ...pageTableFallbackAr,
       ...targetedFallbackAr,
-      'app.name': 'دوري فاي',
+      'app.name': 'دوريفاي',
       'bootstrap.eyebrow': 'دوريفاي',
       'bootstrap.title': 'تم إعداد أساس التطبيق',
       'bootstrap.description': 'ستُضاف وحدات الأعمال حسب الترتيب المحدد في خطة التسليم.',

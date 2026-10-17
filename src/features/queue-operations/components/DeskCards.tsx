@@ -9,6 +9,8 @@ import type {
 } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { usePerson, usePersonNotes } from '@/features/persons/hooks/usePersons';
+import { useRegistration } from '../hooks/useQueueOperations';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {
   const { t } = useTranslation();
@@ -135,48 +137,72 @@ export function QueueDeskCard({
   session,
   occupied,
   active,
+  activeCall,
   waitingCount,
   estimatedWaitMinutes,
   pending,
-  hasActiveCall,
   onRelease,
   onOccupy,
   onCallNext,
+  onFinishCall,
+  onNotes,
 }: {
   queue: QueueResponseDto;
   session?: QueueSessionResponseDto;
   occupied?: QueueSessionResponseDto;
   active: boolean;
+  activeCall?: CallNextRegistrationResponseDto;
   waitingCount?: number;
   estimatedWaitMinutes?: number;
   pending: boolean;
-  hasActiveCall: boolean;
   onRelease: () => void;
   onOccupy: () => void;
   onCallNext: () => void;
+  onFinishCall: (
+    outcome: 'served' | 'no_show',
+    registration: RegistrationResponseDto | undefined,
+    personName: string,
+  ) => void;
+  onNotes: (personId: number) => void;
 }) {
   const { t } = useTranslation();
   return (
     <Card
-      className={`desk-operational-card queue-desk-card ${active || occupied ? 'has-open-desk' : 'no-open-desk'}`}
+      className={`desk-operational-card queue-desk-card ${active || occupied ? 'has-open-desk' : 'no-open-desk'}${activeCall ? ' has-active-call' : ''}`}
     >
-      <h2>{queue.queueName}</h2>
-      <p>
-        {waitingCount ?? '—'} {t('queue-operations.desk.enAttenteSlaEstime')}{' '}
-        {estimatedWaitMinutes ?? '—'} {t('common.min')}
-      </p>
-      {session ? (
-        <>
+      <div className="queue-desk-summary">
+        <div>
+          <h2>{queue.queueName}</h2>
+          <p>
+            {waitingCount ?? '—'} {t('queue-operations.desk.enAttenteSlaEstime')}{' '}
+            {estimatedWaitMinutes ?? '—'} {t('common.min')}
+          </p>
+        </div>
+        {session ? (
           <StatusBadge tone={active ? 'success' : 'neutral'}>
             {active
               ? session.counterName ||
-                t('common.counterNumber', {
-                  value0: String(session.threadNumber),
-                })
+                t('common.counterNumber', { value0: String(session.threadNumber) })
               : t('queue-operations.desk.consultation')}
           </StatusBadge>
-          <button className="button" disabled={pending || hasActiveCall} onClick={onRelease}>
+        ) : null}
+      </div>
+
+      {activeCall ? (
+        <QueueActiveCall
+          call={activeCall}
+          pending={pending}
+          onFinishCall={onFinishCall}
+          onNotes={onNotes}
+        />
+      ) : session ? (
+        <>
+          <button className="button" disabled={pending} onClick={onRelease}>
             {t('queue-operations.desk.liberer')}
+          </button>
+          <button className="button button-primary" disabled={!active || pending} onClick={onCallNext}>
+            <PhoneCall aria-hidden="true" />
+            <span className="button-label">{t('queue-operations.desk.appelerLeSuivant')}</span>
           </button>
         </>
       ) : (
@@ -186,14 +212,114 @@ export function QueueDeskCard({
             : t('queue-operations.desk.occuperLeGuichet')}
         </button>
       )}
-      <button
-        className="button button-primary"
-        disabled={!active || hasActiveCall || pending}
-        onClick={onCallNext}
-      >
-        <PhoneCall aria-hidden="true" />
-        {t('queue-operations.desk.appelerLeSuivant')}
-      </button>
     </Card>
+  );
+}
+
+function QueueActiveCall({
+  call,
+  pending,
+  onFinishCall,
+  onNotes,
+}: {
+  call: CallNextRegistrationResponseDto;
+  pending: boolean;
+  onFinishCall: (
+    outcome: 'served' | 'no_show',
+    registration: RegistrationResponseDto | undefined,
+    personName: string,
+  ) => void;
+  onNotes: (personId: number) => void;
+}) {
+  const { t } = useTranslation();
+  const registration = useRegistration(call.registrationId);
+  const personId = registration.data?.data.personId;
+  const person = usePerson(personId);
+  const notes = usePersonNotes(personId ?? 0, {
+    enabled: Boolean(personId),
+    pageSize: 1,
+    usage: 'count',
+  });
+  const personName = [person.data?.data.firstName, person.data?.data.lastName]
+    .filter((part): part is string => Boolean(part?.trim()))
+    .join(' ');
+
+  return (
+    <div className="queue-card-active-call">
+      <div className="active-call-heading">
+        <div>
+          <small>{t('queue-operations.desk.ticketEnCours')}</small>
+          <strong>{call.ticketNumber}</strong>
+        </div>
+        <span className="queue-card-person">
+          {personName || t('queue-operations.desk.personneNonRenseignee')}
+        </span>
+      </div>
+      {registration.data?.data ? (
+        <dl className="active-call-metrics">
+          <div>
+            <dt>{t('queue-operations.desk.arrivee')}</dt>
+            <dd>
+              {new Intl.DateTimeFormat(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+              }).format(new Date(registration.data.data.createdAt))}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('queue-operations.desk.attenteAvantAppel')}</dt>
+            <dd>
+              {Math.max(
+                0,
+                Math.floor(
+                  (new Date(call.calledAt).getTime() -
+                    new Date(registration.data.data.createdAt).getTime()) /
+                    60000,
+                ),
+              )}{' '}
+              {t('common.min')}
+            </dd>
+          </div>
+        </dl>
+      ) : null}
+      <div className="queue-card-call-actions">
+        <button
+          className="button button-primary"
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            onFinishCall('served', registration.data?.data, personName);
+          }}
+        >
+          <Check aria-hidden="true" />
+          <span className="button-label">{t('common.servi')}</span>
+        </button>
+        <button
+          className="button button-danger"
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            onFinishCall('no_show', registration.data?.data, personName);
+          }}
+        >
+          <UserX aria-hidden="true" />
+          <span className="button-label">{t('common.absent')}</span>
+        </button>
+        {personId ? (
+          <button
+            className="button"
+            type="button"
+            aria-label={t('persons.notes.count', { count: notes.data?.data.total ?? 0 })}
+            onClick={() => {
+              onNotes(personId);
+            }}
+          >
+            <StickyNote aria-hidden="true" />
+            <span className="button-label">{t('queue-operations.desk.consulterLesNotes')}</span>
+            <span className="note-count">{notes.data?.data.total ?? 0}</span>
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }
