@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
 
 export interface PassageSummary {
@@ -25,9 +24,7 @@ interface OperationState {
   reset: () => void;
 }
 
-export const useOperationStore = create<OperationState>()(
-  persist(
-    (set) => ({
+export const useOperationStore = create<OperationState>()((set) => ({
       activeCalls: {},
       recentCalls: [],
       passages: [],
@@ -52,24 +49,13 @@ export const useOperationStore = create<OperationState>()(
           passages: [
             passage,
             ...state.passages.filter((item) => item.registrationId !== passage.registrationId),
-          ].slice(0, 20),
+          ].slice(0, 10),
         }));
       },
       reset: () => {
         set({ activeCalls: {}, recentCalls: [], passages: [] });
       },
-    }),
-    {
-      name: 'dori:operator-session',
-      storage: createJSONStorage(() => sessionStorage),
-      partialize: ({ activeCalls, recentCalls, passages }) => ({
-        activeCalls,
-        recentCalls,
-        passages,
-      }),
-    },
-  ),
-);
+    }));
 
 export function canCallNext(
   hasActiveSession: boolean,

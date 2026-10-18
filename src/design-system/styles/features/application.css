@@ -854,6 +854,15 @@
   font-size: 1.05rem;
   line-height: 1.65;
 }
+.note-content-block { position: relative; }
+.note-content-block blockquote { overflow-wrap: anywhere; }
+.note-meta-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.note-inline-actions { display: flex; flex: 0 0 auto; gap: 6px; }
+.icon-button { display: inline-grid; width: 32px; height: 32px; padding: 0; place-items: center; border: 1px solid color-mix(in srgb, var(--color-accent) 32%, var(--color-line)); border-radius: 9px; color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 11%, var(--color-surface)); cursor: pointer; }
+.icon-button:hover { color: var(--color-primary-contrast); background: var(--color-accent); }
+.icon-button-danger { color: var(--color-danger); border-color: color-mix(in srgb, var(--color-danger) 32%, var(--color-line)); background: color-mix(in srgb, var(--color-danger) 9%, var(--color-surface)); }
+.icon-button-danger:hover { color: white; background: var(--color-danger); }
+.icon-button svg { width: 15px; height: 15px; }
 .note-meta {
   color: var(--color-muted);
 }
@@ -2106,6 +2115,30 @@
 .passage-summary {
   display: grid;
   gap: 1rem;
+  padding: var(--space-5);
+}
+.passage-summary-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.passage-filter {
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+}
+.passage-filter button {
+  min-height: 34px;
+  padding-inline: var(--space-4);
+  border: 0;
+  border-radius: 9px;
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+.passage-filter button.is-active {
+  color: var(--color-primary-contrast);
+  background: var(--color-accent);
 }
 .passage-summary-grid {
   display: grid;
@@ -2475,7 +2508,7 @@
 
 .queue-customer-search-form {
   display: grid;
-  grid-template-columns: minmax(16rem, 1fr) auto;
+  grid-template-columns: minmax(16rem, 1fr) repeat(2, minmax(11rem, 0.6fr)) auto;
   align-items: end;
   gap: 14px;
   padding: 18px;

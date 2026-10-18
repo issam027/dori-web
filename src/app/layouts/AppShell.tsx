@@ -9,7 +9,7 @@ import { SidebarAccordion } from './SidebarAccordion';
 import { Topbar } from './Topbar';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { AppErrorBoundary } from '@/app/AppErrorBoundary';
-import { useActiveSite, useSites } from '@/features/portfolio/hooks/useSites';
+import { useActiveSite, useSite } from '@/features/portfolio/hooks/useSites';
 import { routeRequiresActiveSite } from './site-context-rules';
 
 const sidebarPreferenceKey = 'dori.sidebar.collapsed';
@@ -35,18 +35,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
   const [mobileViewport, setMobileViewport] = useState(() => mediaMatches('(max-width: 620px)'));
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
-  const sitesQuery = useSites(
-    'context-switcher',
-    Boolean(user && (user.scope.isGlobal || user.scope.siteIds.length > 0)),
-  );
+  const activeSiteQuery = useSite(activeSiteId);
   const sites = useMemo(
-    () =>
-      sitesQuery.data?.data.items
-        .filter((site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId))
-        .map((site) => ({ id: site.siteId, name: site.siteName })) ??
-      user?.scope.siteIds.map((id) => ({ id, name: t('site.fallback', { id }) })) ??
-      [],
-    [sitesQuery.data, t, user],
+    () => {
+      const scoped = user?.scope.siteIds.map((id) => ({
+        id,
+        name: activeSiteQuery.data?.data.siteId === id
+          ? activeSiteQuery.data.data.siteName
+          : t('site.fallback', { id }),
+      })) ?? [];
+      const active = activeSiteQuery.data?.data;
+      return active && !scoped.some((site) => site.id === active.siteId)
+        ? [{ id: active.siteId, name: active.siteName }, ...scoped]
+        : scoped;
+    },
+    [activeSiteQuery.data, t, user],
   );
   useEffect(() => {
     const onlySite = sites.length === 1 ? sites[0] : undefined;
@@ -122,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         />
         <main className="app-content">
           <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
-            {requiresSite && activeSiteId === null && !sitesQuery.isLoading ? (
+            {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
               <div className="site-required-card">
                 <EmptyState
                   title={__t('shell.layouts.appShell.choisissezUnSiteActif')}

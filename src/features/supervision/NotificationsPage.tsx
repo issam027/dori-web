@@ -31,7 +31,8 @@ export function NotificationsPage() {
   const user = useSessionStore((state) => state.user);
   const canSend = hasPermission(user, 'notification_send');
   const siteId = useScopeStore((state) => state.activeSiteId);
-  const queues = useQueues({ siteId });
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const queues = useQueues({ siteId, enabled: filtersOpen });
   const [page, setPage] = useState(1);
   const [channel, setChannel] = useState<'' | 'sms' | 'email'>('');
   const [status, setStatus] = useState<'' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed'>('');
@@ -85,7 +86,7 @@ export function NotificationsPage() {
         }
       />
       <Card className="admin-filter-card notification-filter-card">
-        <details>
+        <details onToggle={(event) => { setFiltersOpen(event.currentTarget.open); }}>
           <summary><span><Search aria-hidden="true" /> {t('notifications.filters.title')}</span><small>{t('notifications.filters.help')}</small></summary>
           <div className="admin-filter-grid notification-filter-grid">
             <label>{t('common.canal')}<select value={channel} onChange={(event) => { setChannel(event.target.value as '' | 'sms' | 'email'); setPage(1); }}><option value="">{t('common.all')}</option><option value="sms">{t('common.sms')}</option><option value="email">{t('common.email')}</option></select></label>

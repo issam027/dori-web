@@ -32,12 +32,16 @@ export function UserAccountWizard({
     email: '',
     password: 'Root@123456',
     language: 'fr',
-    type: 'human',
     roleId: 0,
     siteIds: [] as number[],
     queueIds: [] as number[],
   });
   const allowed = useMemo(() => assignableRoles(roles, currentRoleRank), [roles, currentRoleRank]);
+  const selectedRole = roles.find((role) => role.roleId === f.roleId)?.roleName.toLowerCase() ?? '';
+  const isKiosk = selectedRole.includes('kiosk') || selectedRole.includes('kiosque');
+  const userType: 'human' | 'kiosk' = isKiosk ? 'kiosk' : 'human';
+  const assignsQueues = isKiosk || selectedRole.includes('operat') || selectedRole.includes('hotesse');
+  const assignsSites = !assignsQueues && (selectedRole.includes('admin') || selectedRole.includes('manager'));
   const toggle = (key: 'siteIds' | 'queueIds', id: number) => {
     setF((v) => ({
       ...v,
@@ -55,14 +59,14 @@ export function UserAccountWizard({
       email: f.email || undefined,
       password: f.password,
       languagePreference: f.language,
-      userType: f.type as 'human' | 'kiosk',
+      userType,
       roleId: f.roleId,
     });
     const id = result.data.userId;
     const role = roles.find((r) => r.roleId === f.roleId)?.roleName.toLowerCase() ?? '';
-    if (role.includes('manager'))
+    if (role.includes('manager') || role.includes('admin'))
       for (const siteId of f.siteIds) await sitesControllerAssignManager(siteId, { userId: id });
-    if (role.includes('operator'))
+    if (isKiosk || role.includes('operat') || role.includes('hotesse'))
       for (const queueId of f.queueIds)
         await queuesControllerAssignOperator(queueId, { userId: id });
     onCreated();
@@ -74,6 +78,7 @@ export function UserAccountWizard({
       open={open}
       onOpenChange={onOpenChange}
       title={__t('users.userAccountWizard.creerUnCompte')}
+      className="user-account-wizard-dialog"
       step={step}
       stepCount={3}
       onPrevious={
@@ -89,10 +94,20 @@ export function UserAccountWizard({
           ? Boolean(f.username && f.password.length >= 10)
           : step === 2
             ? Boolean(f.roleId)
-            : true
+            : assignsQueues
+              ? f.queueIds.length > 0
+              : assignsSites
+                ? f.siteIds.length > 0
+                : true
       }
     >
+      <div className="user-account-wizard">
+      <div className="wizard-progress" aria-label={__t('wizard.progress', { step: String(step), stepCount: '3' })}>
+        {[1, 2, 3].map((item) => <span key={item} className={item <= step ? 'is-complete' : undefined} />)}
+      </div>
       {step === 1 ? (
+        <section className="user-wizard-step">
+          <div className="wizard-step-heading"><span>1</span><div><h3>{__t('users.userAccountWizard.creerUnCompte')}</h3><p>{__t('admin.users.identiteEtPreferencesDuCompte')}</p></div></div>
         <div className="form-grid">
           <label>
             {__t('common.fullName')}
@@ -144,31 +159,16 @@ export function UserAccountWizard({
                 setF({ ...f, language: e.target.value });
               }}
             >
-              <option>{__t('common.fr')}</option>
-              <option>{__t('common.ar')}</option>
-              <option>{__t('common.en')}</option>
+              <option value="fr">{__t('common.fr')}</option>
+              <option value="ar">{__t('common.ar')}</option>
+              <option value="en">{__t('common.en')}</option>
             </select>
           </label>
-          <label>
-            {__t('common.type')}
-            <select
-              value={f.type}
-              onChange={(e) => {
-                setF({ ...f, type: e.target.value });
-              }}
-            >
-              <option value="human">{__t('common.humain')}</option>
-              <option value="kiosk">{__t('users.userAccountWizard.kiosqueDisplay')}</option>
-            </select>
-          </label>
-        </div>
+        </div></section>
       ) : null}
       {step === 2 ? (
-        <div>
-          <h3>{__t('users.userAccountWizard.roleInitial')}</h3>
-          <p className="muted">
-            {__t('users.userAccountWizard.lesRolesDeRangSuperieurAuVotreSontMasque')}
-          </p>
+        <section className="user-wizard-step">
+          <div className="wizard-step-heading"><span>2</span><div><h3>{__t('users.userAccountWizard.roleInitial')}</h3><p>{__t('users.userAccountWizard.lesRolesDeRangSuperieurAuVotreSontMasque')}</p></div></div>
           <div className="choice-grid">
             {allowed.map((r) => (
               <button
@@ -187,15 +187,15 @@ export function UserAccountWizard({
               </button>
             ))}
           </div>
-        </div>
+        </section>
       ) : null}
       {step === 3 ? (
-        <div>
-          <h3>{__t('common.perimetre')}</h3>
-          <h4>{__t('sites.plural')}</h4>
+        <section className="user-wizard-step">
+          <div className="wizard-step-heading"><span>3</span><div><h3>{__t('common.perimetre')}</h3><p>{assignsQueues ? __t('settings.queueRoleContract') : __t('settings.siteRoleContract')}</p></div></div>
+          {assignsSites ? <>
           <div className="choice-grid">
             {sites.map((s) => (
-              <label className="check-row" key={s.siteId}>
+              <label className={`role-card assignment-choice-card ${f.siteIds.includes(s.siteId) ? 'selected' : ''}`} key={s.siteId}>
                 {s.siteName}
                 <input
                   type="checkbox"
@@ -206,11 +206,11 @@ export function UserAccountWizard({
                 />
               </label>
             ))}
-          </div>
-          <h4>{__t('queues.plural')}</h4>
+          </div></> : null}
+          {assignsQueues ? <>
           <div className="choice-grid">
             {queues.map((q) => (
-              <label className="check-row" key={q.queueId}>
+              <label className={`role-card assignment-choice-card ${f.queueIds.includes(q.queueId) ? 'selected' : ''}`} key={q.queueId}>
                 {q.queueCode} · {q.queueName}
                 <input
                   type="checkbox"
@@ -221,9 +221,11 @@ export function UserAccountWizard({
                 />
               </label>
             ))}
-          </div>
-        </div>
+            {queues.length === 0 ? <p className="user-wizard-empty">{__t('common.aucuneFileConfiguree')}</p> : null}
+          </div></> : null}
+        </section>
       ) : null}
+      </div>
     </WizardModal>
   );
 }

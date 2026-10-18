@@ -37,7 +37,7 @@ export function QueueOperatorsModal({
   });
   const users = useQuery({
     queryKey: ['queue-operator-candidates', queue?.queueId, debounced],
-    queryFn: ({ signal }) => usersControllerFindUsers({ search: debounced || undefined, userType: 'human', isActive: true, page: 1, pageSize: 20, sort: 'username:asc' }, undefined, signal),
+    queryFn: ({ signal }) => usersControllerFindUsers({ search: debounced || undefined, isActive: true, page: 1, pageSize: 20, sort: 'username:asc' }, undefined, signal),
     enabled: Boolean(queue),
   });
   const assigned = operators.data?.data.items ?? [];

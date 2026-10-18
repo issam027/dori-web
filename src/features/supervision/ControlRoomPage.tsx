@@ -49,7 +49,7 @@ export function ControlRoomPage() {
   const items = load.data?.data ?? [];
   const queueIds = items.map((queue) => queue.queueId);
   const statuses = useQueueStatuses(queueIds);
-  const { threads, sessions } = useDeskSession(null, queueIds);
+  const { threads, sessions } = useDeskSession(null, queueIds, true);
   if (load.isError) return <ErrorState onRetry={() => void load.refetch()} />;
 
   const activeCounters = statuses.reduce(

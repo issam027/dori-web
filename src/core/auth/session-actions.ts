@@ -11,6 +11,7 @@ import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
 import { setAccessToken } from './access-token';
 import { useOperationStore } from '@/features/queue-operations/operation-store';
+import { queryKeys } from '@/api/client/query-keys';
 
 const rememberedUsernameKey = 'dori.rememberedUsername';
 
@@ -67,6 +68,8 @@ export async function expireSession(queryClient: QueryClient): Promise<void> {
   useOperationStore.getState().reset();
   await queryClient.cancelQueries();
   queryClient.clear();
+  localStorage.clear();
+  sessionStorage.clear();
 }
 
 export async function changeActiveSite(
@@ -75,14 +78,15 @@ export async function changeActiveSite(
   scope: UserScopeDto,
 ): Promise<void> {
   const previousSiteId = useScopeStore.getState().activeSiteId;
-  await queryClient.cancelQueries();
   useScopeStore.getState().setActiveSite(siteId, scope);
-  queryClient.removeQueries();
   useBrandStore.getState().reset();
   if (previousSiteId !== null && previousSiteId !== siteId) {
     useOperationStore.getState().reset();
   }
-  const response = await sitesControllerFindSite(siteId);
+  const response = await queryClient.query({
+    queryKey: queryKeys.sites.detail(siteId),
+    queryFn: () => sitesControllerFindSite(siteId),
+  });
   useBrandStore.getState().applySite(response.data);
 }
 

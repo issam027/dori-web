@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers3, ListTree, Pencil, Plus, Power, PowerOff, UserMinus, UserPlus } from 'lucide-react';
 import { sitesControllerRemoveManager } from '@/api/generated/sites/sites';
-import type { SiteManagerResponseDto } from '@/api/generated/models';
+import type { SiteManagerResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-api';
 import type { findSites, findTiers } from '../api/onboarding-api';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -16,11 +16,13 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { QueueEditor } from '@/features/queues/QueueEditor';
 import { type AssignmentTarget, UserAssignmentModal } from '@/features/users/UserAssignmentModal';
 import { QueueOperatorsModal } from '@/features/users/QueueOperatorsModal';
+import { notify } from '@/core/notifications/notification-store';
 
 import { type SettingsSection } from '../settings-routes';
 import { useSettingsData } from '../hooks/useSettingsData';
 import { SettingsNavigation } from './SettingsNavigation';
 import { QueueServiceSettings } from './QueueServiceSettings';
+import { SiteEditor } from './SiteEditor';
 
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
@@ -38,6 +40,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
+    [editSite, setEditSite] = useState<SiteResponseDto | null>(null),
     [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null),
     [operatorsQueue, setOperatorsQueue] = useState<QueueResponseDto | null>(null);
   return (
@@ -62,7 +65,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
       <Card className="settings-card">
         <SettingsNavigation active={section} />
         {section === 'sites' ? (
-          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} managers={managers} refresh={refresh} assign={setAssignmentTarget} />
+          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} managers={managers} refresh={refresh} assign={setAssignmentTarget} edit={setEditSite} />
         ) : null}
         {section === 'queues' ? (
           <QueuesPanel
@@ -83,17 +86,29 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         ) : null}
         {section === 'tiers' ? <TiersPanel queues={qs} tiers={ts} /> : null}
       </Card>
-      <QueueEditor
+      {queueOpen ? <QueueEditor
         key={editQueue?.queueId ?? 'new'}
-        open={queueOpen}
+        open
         onOpenChange={setQueueOpen}
         initial={editQueue}
         onSave={async (v) => {
-          if (editQueue) await updateQueue(editQueue.queueId, v);
-          else if (activeSiteId) await createQueueForSite(activeSiteId, v);
+          if (editQueue) {
+            await updateQueue(editQueue.queueId, v);
+            notify({ tone: 'success', title: __t('settings.queueSaved'), message: editQueue.queueName });
+          } else if (activeSiteId) {
+            await createQueueForSite(activeSiteId, v);
+            notify({ tone: 'success', title: __t('settings.queueCreated'), message: v.queueName });
+          }
           refresh();
         }}
-      />
+      /> : null}
+      {editSite ? <SiteEditor
+        key={editSite.siteId}
+        open
+        site={editSite}
+        onOpenChange={(next) => { if (!next) setEditSite(null); }}
+        onSave={async (value) => { await updateSite(editSite.siteId, value); notify({ tone: 'success', title: __t('settings.siteSaved'), message: value.siteName }); refresh(); }}
+      /> : null}
       <UserAssignmentModal
         target={assignmentTarget}
         roles={rs}
@@ -155,11 +170,13 @@ function SitesPanel({
   managers,
   refresh,
   assign,
+  edit,
 }: {
   items: Sites;
   managers: SiteManagerResponseDto[];
   refresh: () => void;
   assign: (target: AssignmentTarget) => void;
+  edit: (site: SiteResponseDto) => void;
 }) {
   const { t: __t } = useTranslation();
   const pagination = useAdminPagination(items);
@@ -200,6 +217,9 @@ function SitesPanel({
                 </td>
                 <td>
                   <div className="table-actions responsive-table-actions">
+                    <button className="button button-small" type="button" title={__t('common.edit')} onClick={() => { edit(s); }}>
+                      <Pencil aria-hidden="true" />{__t('common.edit')}
+                    </button>
                     <button
                       className="button button-small"
                       type="button"

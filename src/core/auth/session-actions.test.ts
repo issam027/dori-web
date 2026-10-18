@@ -197,14 +197,15 @@ describe('changeActiveSite cockpit preservation', () => {
     expect(useOperationStore.getState().activeCalls[4]?.registrationId).toBe(9);
   });
 
-  it('purges the active call when the operator really changes site', async () => {
+  it('purges the active call but preserves cached page data when the operator changes site', async () => {
     const queryClient = new QueryClient();
     queryClient.setQueryData(['queues', 'site', 12], { siteId: 12 });
 
     await changeActiveSite(queryClient, 13, scope);
 
     expect(useOperationStore.getState().activeCalls).toEqual({});
-    expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+    expect(queryClient.getQueryData(['queues', 'site', 12])).toEqual({ siteId: 12 });
+    expect(queryClient.getQueryData(['sites', 'detail', 13])).toBeDefined();
   });
 
   it('clears the site context and site-bound state without dropping the sites cache', async () => {

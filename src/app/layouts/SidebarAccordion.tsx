@@ -56,31 +56,17 @@ const sections: readonly NavSection[] = [
         icon: ClipboardList,
       },
       {
-        path: '/persons',
-        labelKey: 'nav.persons',
-        permissions: ['registration_view'],
-        icon: UsersRound,
-      },
-      {
         path: '/appointments',
         labelKey: 'nav.appointments',
         permissions: ['appointment_manage', 'appointment_checkin'],
         icon: CalendarDays,
       },
-    ],
-  },
-  {
-    id: 'experiences',
-    labelKey: 'nav.experiences',
-    items: [
       {
-        path: '/kiosk',
-        labelKey: 'nav.kiosk',
-        permissions: [],
-        icon: Store,
+        path: '/persons',
+        labelKey: 'nav.persons',
+        permissions: ['registration_view'],
+        icon: UsersRound,
       },
-      { path: '/display', labelKey: 'nav.display', permissions: [], icon: Monitor },
-      { path: '/track', labelKey: 'nav.tracking', permissions: [], icon: Smartphone },
     ],
   },
   {
@@ -94,17 +80,26 @@ const sections: readonly NavSection[] = [
         icon: Activity,
       },
       {
-        path: '/reports',
-        labelKey: 'nav.reports',
-        permissions: ['report_view'],
-        icon: FileBarChart,
-      },
-      {
         path: '/notifications',
         labelKey: 'nav.notifications',
         permissions: ['notification_view'],
         icon: Bell,
       },
+      {
+        path: '/reports',
+        labelKey: 'nav.reports',
+        permissions: ['report_view'],
+        icon: FileBarChart,
+      },
+    ],
+  },
+  {
+    id: 'experiences',
+    labelKey: 'nav.experiences',
+    items: [
+      { path: '/kiosk', labelKey: 'nav.kiosk', permissions: [], icon: Store },
+      { path: '/display', labelKey: 'nav.display', permissions: [], icon: Monitor },
+      { path: '/track', labelKey: 'nav.tracking', permissions: [], icon: Smartphone },
     ],
   },
   {
@@ -116,12 +111,6 @@ const sections: readonly NavSection[] = [
         labelKey: 'nav.portfolio',
         permissions: ['site_view'],
         icon: BriefcaseBusiness,
-      },
-      {
-        path: '/onboarding',
-        labelKey: 'nav.onboarding',
-        permissions: ['site_create'],
-        icon: Store,
       },
       {
         path: '/settings',
@@ -136,6 +125,18 @@ const sections: readonly NavSection[] = [
         icon: UserCog,
       },
       {
+        path: '/onboarding',
+        labelKey: 'nav.onboarding',
+        permissions: ['site_create'],
+        icon: Store,
+      },
+    ],
+  },
+  {
+    id: 'system',
+    labelKey: 'nav.system',
+    items: [
+      {
         path: '/admin/translations',
         labelKey: 'nav.translations',
         permissions: ['translation_manage'],
@@ -147,7 +148,6 @@ const sections: readonly NavSection[] = [
 ];
 
 export function SidebarAccordion({
-  siteCount,
   collapsed = false,
   mobileOpen = false,
   onToggleCollapsed = () => undefined,
@@ -170,12 +170,11 @@ export function SidebarAccordion({
           ...section,
           items: section.items.filter(
             (item) =>
-              hasAnyPermission(user, item.permissions) &&
-              !(item.path === '/portfolio' && siteCount !== undefined && siteCount <= 1),
+              hasAnyPermission(user, item.permissions),
           ),
         }))
         .filter((section) => section.items.length > 0),
-    [siteCount, user],
+    [user],
   );
   const activeSection = visibleSections.find((section) =>
     section.items.some((item) => location.pathname.startsWith(item.path)),

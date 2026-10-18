@@ -35,6 +35,16 @@ export function PassagePrintDocument({
         </small>
       </header>
       <h1>{t('passageReceipt.title')}</h1>
+      <p className="passage-print-statement">
+        {t('passageReceipt.statement', {
+          name: `${firstName} ${lastName}`.trim(),
+          site: siteName,
+          date: date.format(passageDate),
+          arrival: arrivedAt ? time.format(arrivedAt) : t('passageReceipt.notRecorded'),
+          call: time.format(new Date(passage.calledAt)),
+          departure: time.format(new Date(passage.closedAt)),
+        })}
+      </p>
       <dl>
         <div>
           <dt>{t('passageReceipt.site')}</dt>
@@ -71,12 +81,6 @@ export function PassagePrintDocument({
         <div>
           <dt>{t('passageReceipt.departure')}</dt>
           <dd>{time.format(new Date(passage.closedAt))}</dd>
-        </div>
-        <div>
-          <dt>{t('passageReceipt.outcome')}</dt>
-          <dd>
-            {passage.outcome === 'served' ? t('passageReceipt.served') : t('passageReceipt.noShow')}
-          </dd>
         </div>
       </dl>
       <p className="passage-print-disclaimer">{t('passageReceipt.disclaimer')}</p>

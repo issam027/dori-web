@@ -76,7 +76,15 @@ export function PersonNotesViewer({
   return (
     <Modal
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(next) => {
+        if (!next && (editingNoteId || adding)) {
+          setEditingNoteId(undefined);
+          setAdding(false);
+          setContent('');
+          return;
+        }
+        onOpenChange(next);
+      }}
       title={__t('persons.notes.title', { name: personName })}
       description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
       actions={
@@ -146,7 +154,10 @@ export function PersonNotesViewer({
         </div>
       ) : current ? (
         <article className="note-viewer-panel">
-          <blockquote>{current.content}</blockquote>
+          <div className="note-content-block">
+            <blockquote>{current.content}</blockquote>
+          </div>
+          <div className="note-meta-row">
           <small className="note-meta">
             {current.authorUsername ??
               __t('persons.notes.userReference', {
@@ -154,10 +165,11 @@ export function PersonNotesViewer({
               })}{' '}
             · {new Date(current.createdAt).toLocaleString()}
           </small>
-          {canManage ? <div className="table-actions">
-            <button className="button button-small" type="button" onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" />{__t('common.edit')}</button>
-            <button className="button button-small button-danger" type="button" onClick={() => void remove()}><Trash2 aria-hidden="true" />{__t('common.delete')}</button>
+          {canManage ? <div className="note-inline-actions">
+            <button className="icon-button" type="button" title={__t('common.edit')} aria-label={__t('common.edit')} onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" /></button>
+            <button className="icon-button icon-button-danger" type="button" title={__t('common.delete')} aria-label={__t('common.delete')} onClick={() => void remove()}><Trash2 aria-hidden="true" /></button>
           </div> : null}
+          </div>
           {items.length > 1 ? (
             <div className="note-pagination">
               <button

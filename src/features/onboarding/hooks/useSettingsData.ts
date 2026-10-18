@@ -4,42 +4,38 @@ import { invalidateAdmin } from '@/api/client/query-invalidations';
 import { findQueues, findRoles, findSites, findTiers } from '../api/onboarding-api';
 import { sitesControllerGetManagers } from '@/api/generated/sites/sites';
 
-export function useSettingsData(siteId: number | null, queueStatus: 'active' | 'inactive' | 'all' = 'active') {
+export function useSettingsData(
+  siteId: number | null,
+  queueStatus: 'active' | 'inactive' | 'all' = 'active',
+  enabled: Partial<Record<'sites' | 'queues' | 'roles' | 'tiers' | 'managers' | 'allAccessibleQueues', boolean>> = {},
+) {
   const queryClient = useQueryClient();
   const sites = useQuery({
     queryKey: queryKeys.admin.sites,
     queryFn: async ({ signal }) => {
-      const [active, inactive] = await Promise.all([
-        findSites({ page: 1, pageSize: 100, isActive: true }, undefined, signal),
-        findSites({ page: 1, pageSize: 100, isActive: false }, undefined, signal),
-      ]);
-      return {
-        ...active,
-        data: {
-          ...active.data,
-          items: [...active.data.items, ...inactive.data.items],
-          total: active.data.total + inactive.data.total,
-        },
-      };
+      return findSites({ page: 1, pageSize: 100 }, undefined, signal);
     },
+    enabled: enabled.sites ?? true,
   });
+  const queueSiteId = enabled.allAccessibleQueues ? null : siteId;
   const queues = useQuery({
-    queryKey: [...queryKeys.admin.queues(siteId), queueStatus],
+    queryKey: [...queryKeys.admin.queues(queueSiteId), queueStatus],
     queryFn: async ({ signal }) => {
-      const load = (isActive: boolean) => findQueues({ page: 1, pageSize: 100, siteId: siteId ?? undefined, isActive }, undefined, signal);
+      const load = (isActive: boolean) => findQueues({ page: 1, pageSize: 100, siteId: queueSiteId ?? undefined, isActive }, undefined, signal);
       if (queueStatus !== 'all') return load(queueStatus === 'active');
-      const [active, inactive] = await Promise.all([load(true), load(false)]);
-      return { ...active, data: { ...active.data, items: [...active.data.items, ...inactive.data.items], total: active.data.total + inactive.data.total } };
+      return findQueues({ page: 1, pageSize: 100, siteId: queueSiteId ?? undefined }, undefined, signal);
     },
-    enabled: siteId !== null,
+    enabled: (queueSiteId !== null || enabled.allAccessibleQueues === true) && (enabled.queues ?? true),
   });
   const roles = useQuery({
     queryKey: queryKeys.admin.roles,
     queryFn: ({ signal }) => findRoles({ page: 1, pageSize: 100 }, undefined, signal),
+    enabled: enabled.roles ?? true,
   });
   const tiers = useQuery({
     queryKey: queryKeys.admin.tiers,
     queryFn: ({ signal }) => findTiers({ page: 1, pageSize: 100 }, undefined, signal),
+    enabled: enabled.tiers ?? true,
   });
   const managers = useQuery({
     queryKey: ['admin', 'site-managers', siteId],
@@ -50,7 +46,7 @@ export function useSettingsData(siteId: number | null, queueStatus: 'active' | '
         undefined,
         signal,
       ),
-    enabled: siteId !== null,
+    enabled: siteId !== null && (enabled.managers ?? true),
   });
 
   return {

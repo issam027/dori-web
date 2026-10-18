@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -10,8 +10,6 @@ import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { queryKeys } from '@/api/client/query-keys';
-import { registrationsControllerFindOne } from '@/api/generated/registrations/registrations';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
@@ -24,6 +22,7 @@ import {
   useMarkNoShow,
   useMarkServed,
   useOpenDeskSession,
+  useOperatorRegistrations,
 } from './hooks/useQueueOperations';
 import { EligiblePreviewCard, QueueDeskCard } from './components/DeskCards';
 import { DeskPassages } from './components/DeskPassages';
@@ -35,7 +34,7 @@ export function DeskPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const site = useSite(siteId);
   const activeCalls = useOperationStore((state) => state.activeCalls);
-  const passages = useOperationStore((state) => state.passages);
+  const [historyStatus, setHistoryStatus] = useState<'served' | 'no_show'>('served');
   const [pendingQueueIds, setPendingQueueIds] = useState<ReadonlySet<number>>(new Set());
   const [error, setError] = useState('');
   const [notesPersonId, setNotesPersonId] = useState<number>();
@@ -50,11 +49,15 @@ export function DeskPage() {
     queues.data?.data.items.filter(
       (queue) => user?.scope.isGlobal || user?.scope.queueIds.includes(queue.queueId),
     ) ?? [];
-  const { previews, sessions, threads } = useDeskSession(
+  const { previews, sessions } = useDeskSession(
     siteId,
     allowed.map((queue) => queue.queueId),
   );
   const statuses = useQueueStatuses(allowed.map((queue) => queue.queueId));
+  const currentRegistrations = useOperatorRegistrations(user?.userId, 'in_progress', siteId, 20);
+  const servedHistory = useOperatorRegistrations(user?.userId, 'served', siteId, 10);
+  const noShowHistory = useOperatorRegistrations(user?.userId, 'no_show', siteId, 10);
+  const registrationHistory = historyStatus === 'served' ? servedHistory : noShowHistory;
   const callNext = useCallNext();
   const markServed = useMarkServed();
   const markNoShow = useMarkNoShow();
@@ -73,44 +76,28 @@ export function DeskPage() {
         sessions[index]?.data?.data.items.some((session) => session.mode === 'active') ?? false;
       return Number(active(right.index)) - Number(active(left.index));
     });
-  const serverCurrents = threads.flatMap((query, index) =>
-    (query.data?.data.items ?? [])
-      .filter(
-        (thread) =>
-          thread.session?.userId === user?.userId && Boolean(thread.session?.currentRegistrationId),
-      )
-      .map((thread) => ({ queueId: allowed[index]?.queueId, thread })),
-  );
-  const serverRegistrations = useQueries({
-    queries: serverCurrents.map(({ thread }) => ({
-      queryKey: queryKeys.registrations.detail(thread.session?.currentRegistrationId),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        registrationsControllerFindOne(thread.session?.currentRegistrationId ?? 0, undefined, signal),
-      enabled: Boolean(thread.session?.currentRegistrationId),
-    })),
-  });
-
   useEffect(() => {
-    serverCurrents.forEach(({ queueId, thread }, index) => {
-      if (!queueId || activeCalls[queueId] || !thread.session) return;
-      const data = serverRegistrations[index]?.data?.data;
-      if (!data || !['called', 'in_progress'].includes(data.status)) return;
-      useOperationStore.getState().startCall(queueId, {
+    for (const data of currentRegistrations.data?.data.items ?? []) {
+      if (activeCalls[data.queueId]) continue;
+      const session = sessions
+        .flatMap((query) => query.data?.data.items ?? [])
+        .find((item) => item.sessionId === data.servedBySessionId);
+      useOperationStore.getState().startCall(data.queueId, {
         registrationId: data.registrationId,
         ticketNumber: data.ticketNumber,
         entryType: data.entryType,
-        scheduledTime: data.scheduledTime,
+        scheduledTime: data.scheduledTime ?? null,
         calledEarly: false,
         tier: { tierId: data.tierId },
         status: data.status,
-        sessionId: thread.session.sessionId,
-        threadNumber: thread.threadNumber,
+        sessionId: data.servedBySessionId ?? session?.sessionId ?? 0,
+        threadNumber: session?.threadNumber ?? 0,
         priorityScore: 0,
         calledAt: data.updatedAt,
         person: { personId: data.personId },
       });
-    });
-  }, [activeCalls, serverCurrents, serverRegistrations]);
+    }
+  }, [activeCalls, currentRegistrations.data, sessions]);
 
   const refresh = () => invalidateQueueOperations(queryClient);
   const execute = async (queueId: number, command: () => Promise<void>) => {
@@ -298,7 +285,24 @@ export function DeskPage() {
           }}
         />
       ) : null}
-      <DeskPassages passages={passages} siteName={site.data?.data.siteName} />
+      <DeskPassages
+        passages={(registrationHistory.data?.data.items ?? []).map((item) => ({
+          registrationId: item.registrationId,
+          ticketNumber: item.ticketNumber,
+          personName: [item.firstName, item.lastName].filter(Boolean).join(' ') || t('queue-operations.desk.personneNonRenseignee'),
+          firstName: item.firstName,
+          lastName: item.lastName,
+          arrivedAt: item.createdAt,
+          calledAt: item.updatedAt,
+          closedAt: item.updatedAt,
+          threadNumber: 0,
+          outcome: historyStatus,
+        }))}
+        siteName={site.data?.data.siteName}
+        status={historyStatus}
+        totalCount={(servedHistory.data?.data.total ?? 0) + (noShowHistory.data?.data.total ?? 0)}
+        onStatusChange={setHistoryStatus}
+      />
       <Modal
         open={Boolean(deskToOpen)}
         onOpenChange={(open) => {

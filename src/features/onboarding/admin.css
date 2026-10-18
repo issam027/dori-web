@@ -222,6 +222,36 @@ table td small {
   flex-wrap: nowrap;
 }
 
+.row-actions-menu {
+  position: relative;
+  width: max-content;
+}
+.row-actions-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.row-actions-menu > summary::-webkit-details-marker { display: none; }
+.row-actions-popover {
+  position: absolute;
+  z-index: 20;
+  inset-inline-end: 0;
+  top: calc(100% + 6px);
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: 0 14px 35px rgb(20 42 58 / 18%);
+}
+.row-actions-popover .button { justify-content: flex-start; border-color: transparent; }
+.user-detail-modern { display: grid; gap: var(--space-5); }
+.user-detail-modern > header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); border-radius: 16px; background: color-mix(in srgb, var(--color-accent) 9%, var(--color-surface)); }
+.user-detail-modern > header div { flex: 1; }
+.user-detail-modern h3, .user-detail-modern p { margin: 0; }
+.user-detail-scopes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
+.user-detail-scopes section { padding: var(--space-4); border: 1px solid var(--color-line); border-radius: 14px; }
+
 @media (max-width: 1500px) {
   .responsive-table-actions .button {
     width: 36px;
@@ -764,6 +794,28 @@ table td small {
   gap: 14px;
   padding: 18px;
 }
+.users-admin-page .admin-filter-grid {
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+}
+.row-user-actions { display: flex; align-items: center; gap: 6px; }
+.assignment-choice-card { position: relative; min-height: 92px; }
+.assignment-choice-card input { position: absolute; inset-inline-end: 14px; top: 14px; width: 18px; height: 18px; accent-color: var(--color-accent); }
+.user-account-wizard-dialog { width: min(760px, calc(100vw - 32px)); }
+.user-account-wizard-dialog .dialog-body { padding: 0; background: color-mix(in srgb, var(--color-accent) 3%, var(--color-surface)); }
+.user-account-wizard { display: grid; gap: var(--space-5); padding: var(--space-5); }
+.user-wizard-step { display: grid; gap: var(--space-5); }
+.user-wizard-step .form-grid { padding: 0; }
+.user-wizard-step .choice-grid { align-items: stretch; }
+.user-wizard-step .role-card { min-height: 112px; justify-content: center; transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+.user-wizard-step .role-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-line)); box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.user-wizard-empty { grid-column: 1 / -1; margin: 0; padding: var(--space-5); border: 1px dashed var(--color-line); border-radius: 14px; color: var(--color-text-muted); text-align: center; background: var(--color-surface); }
+.settings-wizard-dialog { width: min(820px, calc(100vw - 32px)); }
+.settings-wizard-dialog .dialog-body { padding: 0; background: color-mix(in srgb, var(--color-accent) 3%, var(--color-surface)); }
+.settings-editor-wizard { display: grid; gap: var(--space-5); padding: var(--space-5); }
+.settings-editor-wizard > section { display: grid; gap: var(--space-5); }
+.settings-editor-wizard .form-grid { padding: 0; }
+.settings-editor-wizard .toggle-field { display: flex; flex-direction: row; align-items: center; gap: 10px; align-self: end; min-height: 44px; }
+.settings-editor-wizard .toggle-field input { width: 18px; height: 18px; accent-color: var(--color-accent); }
 .admin-filter-actions {
   display: flex;
   justify-content: flex-end;
@@ -777,6 +829,7 @@ table td small {
   .admin-filter-grid {
     grid-template-columns: 1fr;
   }
+  .users-admin-page .admin-filter-grid { grid-template-columns: 1fr; }
   .admin-filter-actions {
     justify-content: stretch;
   }

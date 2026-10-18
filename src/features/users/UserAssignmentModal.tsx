@@ -73,7 +73,6 @@ export function UserAssignmentModal({
         search: debouncedSearch,
         page,
         pageSize: 5,
-        userType: 'human',
         sort: 'username:asc',
       }),
     enabled: Boolean(target && debouncedSearch.length >= 4),

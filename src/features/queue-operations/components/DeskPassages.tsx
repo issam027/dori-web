@@ -2,15 +2,22 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Printer } from 'lucide-react';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { Card } from '@/design-system/components/Card';
 import type { PassageSummary } from '../operation-store';
 import { PassagePrintDocument } from '../PassagePrintDocument';
 
 export function DeskPassages({
   passages,
   siteName,
+  status,
+  totalCount,
+  onStatusChange,
 }: {
   passages: readonly PassageSummary[];
   siteName?: string;
+  status: 'served' | 'no_show';
+  totalCount: number;
+  onStatusChange: (status: 'served' | 'no_show') => void;
 }) {
   const { t } = useTranslation();
   const [printingId, setPrintingId] = useState<number | null>(null);
@@ -34,19 +41,23 @@ export function DeskPassages({
     };
   }, [printingPassage]);
 
-  if (passages.length === 0) return null;
+  if (totalCount === 0) return null;
   const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
   const timeFormatter = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
   return (
-    <section className="passage-summary" aria-labelledby="passage-summary-title">
+    <Card className="passage-summary" aria-labelledby="passage-summary-title">
       <div className="passage-summary-heading">
         <div>
           <span className="eyebrow">{t('queue-operations.desk.sessionEnCours')}</span>
           <h2 id="passage-summary-title">{t('queue-operations.desk.recapitulatifDesPassages')}</h2>
         </div>
-        <StatusBadge tone="neutral">
-          {passages.length} {t('queue-operations.desk.passageS')}
-        </StatusBadge>
+        <div className="passage-summary-controls">
+          <div className="segmented-control passage-filter">
+            <button type="button" className={status === 'served' ? 'is-active' : ''} onClick={() => { onStatusChange('served'); }}>{t('common.servedPlural')}</button>
+            <button type="button" className={status === 'no_show' ? 'is-active' : ''} onClick={() => { onStatusChange('no_show'); }}>{t('common.noShow')}</button>
+          </div>
+          <StatusBadge tone="neutral">{passages.length}</StatusBadge>
+        </div>
       </div>
       <div className="passage-summary-grid">
         {passages.map((passage) => (
@@ -57,8 +68,8 @@ export function DeskPassages({
             <header>
               <div>
                 <small>
-                  {passage.ticketNumber} {t('common.guichetLabel')}
-                  {passage.threadNumber}
+                  {passage.ticketNumber}
+                  {passage.threadNumber > 0 ? ` · ${t('common.guichetLabel')}${String(passage.threadNumber)}` : ''}
                 </small>
                 <h3>{passage.personName}</h3>
               </div>
@@ -124,6 +135,6 @@ export function DeskPassages({
       {printingPassage && siteName ? (
         <PassagePrintDocument passage={printingPassage} siteName={siteName} />
       ) : null}
-    </section>
+    </Card>
   );
 }

@@ -47,5 +47,5 @@ it('searches users only from four characters with five results per page', async 
   });
   expect(requests[0]?.searchParams.get('search')).toBe('abcd');
   expect(requests[0]?.searchParams.get('pageSize')).toBe('5');
-  expect(requests[0]?.searchParams.get('userType')).toBe('human');
+  expect(requests[0]?.searchParams.has('userType')).toBe(false);
 });

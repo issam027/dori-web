@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   KeyRound,
   Eye,
   LogOut,
+  MoreHorizontal,
   Pencil,
   Plus,
   RotateCcw,
@@ -45,17 +46,32 @@ export function UsersAdminPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const current = useSessionStore((state) => state.user);
   const canDeleteUsers = hasAnyPermission(current, ['user_manage_kiosk', 'user_manage_operator', 'user_manage_manager', 'user_manage_admin']);
-  const { sites, queues, roles } = useSettingsData(siteId);
   const [page, setPage] = useState(1);
-  const [draft, setDraft] = useState({ search: '', userType: '' });
+  const [draft, setDraft] = useState({ search: '', userType: '', sort: 'username:asc' });
   const [filters, setFilters] = useState(draft);
   const [createOpen, setCreateOpen] = useState(false);
+  const { sites, queues, roles } = useSettingsData(siteId, 'active', {
+    sites: createOpen,
+    queues: createOpen,
+    roles: createOpen,
+    tiers: false,
+    managers: false,
+  });
   const [editing, setEditing] = useState<UserSummaryItemDto>();
   const [viewingId, setViewingId] = useState<number>();
   const [deleting, setDeleting] = useState<UserSummaryItemDto>();
   const [editForm, setEditForm] = useState({ fullName: '', email: '', language: 'fr' });
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
+  const [openActionsUserId, setOpenActionsUserId] = useState<number>();
   const [pending, setPending] = useState(false);
+  useEffect(() => {
+    if (openActionsUserId === undefined) return;
+    const close = (event: PointerEvent) => {
+      if (!(event.target as Element).closest('.row-actions-menu')) setOpenActionsUserId(undefined);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => { document.removeEventListener('pointerdown', close); };
+  }, [openActionsUserId]);
   const users = useQuery({
     queryKey: ['admin', 'users-page', page, filters],
     queryFn: ({ signal }) =>
@@ -63,7 +79,10 @@ export function UsersAdminPage() {
         {
           page,
           pageSize: PAGE_SIZE,
-          sort: 'username:asc',
+          sort: filters.sort as UsersControllerFindUsersParams['sort'],
+          siteIds: current && !current.scope.isGlobal && current.scope.siteIds.length
+            ? current.scope.siteIds.join(',')
+            : undefined,
           search: filters.search || undefined,
           userType: (filters.userType || undefined) as UsersControllerFindUsersParams['userType'],
         },
@@ -162,12 +181,22 @@ export function UsersAdminPage() {
                 <option value="kiosk">{t('admin.users.kiosque')}</option>
               </select>
             </label>
+            <label>
+              {t('notifications.filters.sort')}
+              <select value={draft.sort} onChange={(event) => { setDraft({ ...draft, sort: event.target.value }); }}>
+                <option value="username:asc">{t('common.name')} A-Z</option>
+                <option value="username:desc">{t('common.name')} Z-A</option>
+                <option value="lastLogin:desc">{t('admin.users.lastLogin')} ↓</option>
+                <option value="lastLogin:asc">{t('admin.users.lastLogin')} ↑</option>
+                <option value="createdAt:desc">{t('common.createdAt')} ↓</option>
+              </select>
+            </label>
             <div className="admin-filter-actions">
               <button
                 className="button"
                 type="button"
                 onClick={() => {
-                  const empty = { search: '', userType: '' };
+                  const empty = { search: '', userType: '', sort: 'username:asc' };
                   setDraft(empty);
                   setFilters(empty);
                   setPage(1);
@@ -198,9 +227,8 @@ export function UsersAdminPage() {
               <tr>
                 <th>{t('users.singular')}</th>
                 <th>{t('common.type')}</th>
-                <th>{t('onboarding.settings.roles')}</th>
-                <th>{t('common.perimetre')}</th>
                 <th>{t('common.language')}</th>
+                <th>{t('admin.users.lastLogin')}</th>
                 <th>{t('common.actions')}</th>
               </tr>
             </thead>
@@ -214,11 +242,10 @@ export function UsersAdminPage() {
                   <td>
                     <span className="status-badge status-info">{user.userType}</span>
                   </td>
-                  <td>—</td>
-                  <td>{t('onboarding.settings.affectationsGereesParLAssistant')}</td>
                   <td>{user.languagePreference.toUpperCase()}</td>
+                  <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</td>
                   <td>
-                    <div className="table-actions responsive-table-actions">
+                    <div className="row-user-actions">
                       <button className="button button-small" type="button" title={t('common.view')} onClick={() => { setViewingId(user.userId); }}><Eye />{t('common.view')}</button>
                       <button
                         className="button button-small"
@@ -231,6 +258,9 @@ export function UsersAdminPage() {
                         <Pencil /> {t('common.edit')}
                       </button>
                       {canDeleteUsers ? <button className="button button-small button-danger" type="button" title={t('common.delete')} disabled={current?.userId === user.userId} onClick={() => { setDeleting(user); }}><Trash2 />{t('common.delete')}</button> : null}
+                      <div className="row-actions-menu">
+                      <button className="button button-small" type="button" title={t('common.actions')} aria-label={t('common.actions')} aria-expanded={openActionsUserId === user.userId} onClick={() => { setOpenActionsUserId((currentId) => currentId === user.userId ? undefined : user.userId); }}><MoreHorizontal aria-hidden="true" /></button>
+                      {openActionsUserId === user.userId ? <div className="row-actions-popover">
                       <button
                         className="button button-small"
                         type="button"
@@ -280,6 +310,8 @@ export function UsersAdminPage() {
                       >
                         <LogOut /> {t('admin.users.deconnecter')}
                       </button>
+                      </div> : null}
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -295,7 +327,7 @@ export function UsersAdminPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         roles={roles}
-        sites={sites}
+        sites={sites.filter((site) => current?.scope.isGlobal || current?.scope.siteIds.includes(site.siteId))}
         queues={queues}
         currentRoleRank={rank}
         onCreated={() => void refresh()}
@@ -412,10 +444,9 @@ export function UsersAdminPage() {
 }
 
 function UserDetail({ user, t }: { user: UserResponseDto; t: (key: string, options?: Record<string, unknown>) => string }) {
-  return <div className="user-detail-panel">
-    <dl className="detail-list"><dt>{t('common.fullName')}</dt><dd>{getUserDisplayName(user)}</dd><dt>{t('users.userAccountWizard.nomDUtilisateur')}</dt><dd>{user.username}</dd><dt>{t('common.email')}</dt><dd>{user.email ?? t('settings.noEmail')}</dd><dt>{t('common.status')}</dt><dd>{t(user.isActive ? 'common.active' : 'common.inactive')}</dd><dt>{t('common.language')}</dt><dd>{user.languagePreference.toUpperCase()}</dd><dt>{t('admin.users.lastLogin')}</dt><dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</dd></dl>
-    <section><h3>{t('onboarding.settings.roles')}</h3><div className="badge-row">{user.roles.map((role) => <span className="status-badge status-info" key={role.roleId}>{role.roleName}</span>)}</div></section>
-    <section><h3>{t('sites.plural')}</h3><p>{user.sites.map((site) => site.siteName).join(', ') || t('common.none')}</p></section>
-    <section><h3>{t('queues.plural')}</h3><p>{user.queues.map((queue) => queue.queueName).join(', ') || t('common.none')}</p></section>
+  return <div className="user-detail-panel user-detail-modern">
+    <header><span className="profile-avatar">{getUserDisplayName(user).slice(0, 2).toUpperCase()}</span><div><h3>{getUserDisplayName(user)}</h3><p>@{user.username} · {user.email ?? t('settings.noEmail')}</p></div><span className={`status-badge ${user.isActive ? 'status-success' : 'status-warning'}`}>{t(user.isActive ? 'common.active' : 'common.inactive')}</span></header>
+    <dl className="detail-list"><div><dt>{t('common.language')}</dt><dd>{user.languagePreference.toUpperCase()}</dd></div><div><dt>{t('admin.users.lastLogin')}</dt><dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</dd></div></dl>
+    <div className="user-detail-scopes"><section><h3>{t('onboarding.settings.roles')}</h3><div className="badge-row">{user.roles.map((role) => <span className="status-badge status-info" key={role.roleId}>{role.roleName}</span>)}</div></section><section><h3>{t('sites.plural')}</h3><p>{user.sites.map((site) => site.siteName).join(', ') || t('common.none')}</p></section><section><h3>{t('queues.plural')}</h3><p>{user.queues.map((queue) => queue.queueName).join(', ') || t('common.none')}</p></section></div>
   </div>;
 }

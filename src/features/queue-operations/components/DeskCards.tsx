@@ -9,7 +9,6 @@ import type {
 } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
-import { usePerson, usePersonNotes } from '@/features/persons/hooks/usePersons';
 import { useRegistration } from '../hooks/useQueueOperations';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {
@@ -234,13 +233,8 @@ function QueueActiveCall({
   const { t } = useTranslation();
   const registration = useRegistration(call.registrationId);
   const personId = registration.data?.data.personId;
-  const person = usePerson(personId);
-  const notes = usePersonNotes(personId ?? 0, {
-    enabled: Boolean(personId),
-    pageSize: 1,
-    usage: 'count',
-  });
-  const personName = [person.data?.data.firstName, person.data?.data.lastName]
+  const noteCount = registration.data?.data.activeNoteCount ?? 0;
+  const personName = [registration.data?.data.firstName, registration.data?.data.lastName]
     .filter((part): part is string => Boolean(part?.trim()))
     .join(' ');
 
@@ -309,14 +303,14 @@ function QueueActiveCall({
           <button
             className="button"
             type="button"
-            aria-label={t('persons.notes.count', { count: notes.data?.data.total ?? 0 })}
+            aria-label={t('persons.notes.count', { count: noteCount })}
             onClick={() => {
               onNotes(personId);
             }}
           >
             <StickyNote aria-hidden="true" />
             <span className="button-label">{t('queue-operations.desk.consulterLesNotes')}</span>
-            <span className="note-count">{notes.data?.data.total ?? 0}</span>
+            <span className="note-count">{noteCount}</span>
           </button>
         ) : null}
       </div>

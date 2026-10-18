@@ -1,5 +1,9 @@
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { OpenQueueSessionDto } from '@/api/generated/models';
+import type {
+  OpenQueueSessionDto,
+  RegistrationsControllerFindRegistrationsSort,
+  RegistrationsControllerFindRegistrationsStatus,
+} from '@/api/generated/models';
 import {
   queueEngineControllerCloseSession,
   queueEngineControllerGetActiveSessions,
@@ -26,18 +30,40 @@ export function useRegistration(registrationId: number | null | undefined, enabl
   });
 }
 
+export function useOperatorRegistrations(
+  userId: number | undefined,
+  status: 'in_progress' | 'served' | 'no_show',
+  siteId: number | null,
+  pageSize = 10,
+) {
+  return useQuery({
+    queryKey: ['registrations', 'operator', userId, status, siteId, pageSize],
+    queryFn: ({ signal }) => registrationsControllerFindRegistrations({
+      servedByUserId: userId,
+      siteId: siteId ?? undefined,
+      status,
+      page: 1,
+      pageSize,
+      sort: 'createdAt:desc',
+    }, undefined, signal),
+    enabled: Boolean(userId && siteId),
+  });
+}
+
 export function useWaitingRegistrations(options: {
   siteId: number | null;
   queueId?: number;
   page: number;
   search?: string;
+  status?: RegistrationsControllerFindRegistrationsStatus;
+  sort?: RegistrationsControllerFindRegistrationsSort;
 }) {
   return useQuery({
     queryKey: queryKeys.registrations.list({
       ...options,
-      status: 'waiting',
+      status: options.status,
       pageSize: 10,
-      sort: 'createdAt:asc',
+      sort: options.sort,
       usage: 'my-queues',
     }),
     queryFn: ({ signal }) =>
@@ -45,11 +71,11 @@ export function useWaitingRegistrations(options: {
         {
           siteId: options.siteId ?? undefined,
           queueId: options.queueId,
-          status: 'waiting',
+          status: options.status,
           search: options.search || undefined,
           page: options.page,
           pageSize: 10,
-          sort: 'createdAt:asc',
+          sort: options.sort,
         },
         undefined,
         signal,
@@ -58,7 +84,7 @@ export function useWaitingRegistrations(options: {
   });
 }
 
-export function useDeskSession(siteId: number | null, queueIds: readonly number[]) {
+export function useDeskSession(siteId: number | null, queueIds: readonly number[], includeThreads = false) {
   const previews = useQuery({
     queryKey: queryKeys.queuePreview.bySite(siteId),
     queryFn: ({ signal }) =>
@@ -79,11 +105,11 @@ export function useDeskSession(siteId: number | null, queueIds: readonly number[
     })),
   });
   const threads = useQueries({
-    queries: queueIds.map((queueId) => ({
+    queries: includeThreads ? queueIds.map((queueId) => ({
       queryKey: queryKeys.threads.byQueue(queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         queueEngineControllerGetThreads(queueId, { page: 1, pageSize: 100 }, undefined, signal),
-    })),
+    })) : [],
   });
   return { previews, sessions, threads };
 }

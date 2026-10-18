@@ -269,7 +269,7 @@ export function PersonsPage() {
                             setNotesPerson(person);
                           }}
                         >
-                          <StickyNote aria-hidden="true" /> {t('persons.admin.notes')}
+                          <StickyNote aria-hidden="true" /> {t('persons.admin.notes')} ({person.activeNoteCount})
                         </button>
                         {canDelete ? <button className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
                           <Trash2 aria-hidden="true" /> {t('common.delete')}

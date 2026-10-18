@@ -9,10 +9,13 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
-import { usePersonsByIds, usePersonNotesPresence } from '@/features/persons/hooks/usePersons';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useWaitingRegistrations } from './hooks/useQueueOperations';
 import { RegistrationDetailsModal } from './RegistrationDetailsModal';
+import type {
+  RegistrationsControllerFindRegistrationsSort,
+  RegistrationsControllerFindRegistrationsStatus,
+} from '@/api/generated/models';
 
 export function MyQueuesPage() {
   const { t: __t } = useTranslation();
@@ -23,15 +26,24 @@ export function MyQueuesPage() {
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [searchDraft, setSearchDraft] = useState('');
   const [search, setSearch] = useState('');
+  const [statusDraft, setStatusDraft] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
+  const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
+  const [sortDraft, setSortDraft] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
+  const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
   const [registrationDetails, setRegistrationDetails] = useState<{
     id: number;
     queueName: string;
   } | null>(null);
   const queues = useQueues({ siteId });
-  const registrations = useWaitingRegistrations({ siteId, queueId, page, search });
+  const registrations = useWaitingRegistrations({
+    siteId,
+    queueId,
+    page,
+    search,
+    status: status || undefined,
+    sort,
+  });
   const items = registrations.data?.data.items ?? [];
-  const people = usePersonsByIds(items.map((item) => item.personId));
-  const notes = usePersonNotesPresence(items.map((item) => item.personId));
   return (
     <div className="page-stack">
       <PageHeader
@@ -99,6 +111,8 @@ export function MyQueuesPage() {
               onSubmit={(event) => {
                 event.preventDefault();
                 setSearch(searchDraft.trim());
+                setStatus(statusDraft);
+                setSort(sortDraft);
                 setPage(1);
               }}
             >
@@ -113,6 +127,30 @@ export function MyQueuesPage() {
                   }}
                 />
               </label>
+              <label>
+                {__t('common.status')}
+                <select value={statusDraft} onChange={(event) => { setStatusDraft(event.target.value as '' | RegistrationsControllerFindRegistrationsStatus); }}>
+                  <option value="">{__t('common.all')}</option>
+                  <option value="waiting">{__t('common.waiting')}</option>
+                  <option value="booked">{__t('appointments.status.booked')}</option>
+                  <option value="in_progress">{__t('appointments.status.in-progress')}</option>
+                  <option value="served">{__t('appointments.status.served')}</option>
+                  <option value="no_show">{__t('appointments.status.no-show')}</option>
+                  <option value="cancelled">{__t('appointments.status.cancelled')}</option>
+                  <option value="expired">{__t('appointments.status.expired')}</option>
+                </select>
+              </label>
+              <label>
+                {__t('notifications.filters.sort')}
+                <select value={sortDraft} onChange={(event) => { setSortDraft(event.target.value as RegistrationsControllerFindRegistrationsSort); }}>
+                  <option value="priorityReferenceTime:asc">{__t('common.position')}</option>
+                  <option value="createdAt:desc">{__t('notifications.filters.newest')}</option>
+                  <option value="createdAt:asc">{__t('notifications.filters.oldest')}</option>
+                  <option value="ticketNumber:asc">{__t('common.ticket')} A-Z</option>
+                  <option value="ticketNumber:desc">{__t('common.ticket')} Z-A</option>
+                  <option value="status:asc">{__t('common.status')} A-Z</option>
+                </select>
+              </label>
               <div className="admin-filter-actions">
                 <button
                   className="button"
@@ -120,6 +158,10 @@ export function MyQueuesPage() {
                   onClick={() => {
                     setSearchDraft('');
                     setSearch('');
+                    setStatusDraft('waiting');
+                    setStatus('waiting');
+                    setSortDraft('priorityReferenceTime:asc');
+                    setSort('priorityReferenceTime:asc');
                     setPage(1);
                   }}
                 >
@@ -160,8 +202,7 @@ export function MyQueuesPage() {
               key: 'person',
               header: __t('common.person'),
               render: (item) => {
-                const person = people[items.indexOf(item)]?.data?.data;
-                return person ? `${person.firstName} ${person.lastName}` : '…';
+                return [item.firstName, item.lastName].filter(Boolean).join(' ') || '—';
               },
             },
             { key: 'type', header: __t('common.type'), render: (item) => item.entryType },
@@ -181,8 +222,7 @@ export function MyQueuesPage() {
               key: 'actions',
               header: __t('common.actions'),
               render: (item) => {
-                const index = items.indexOf(item);
-                const noteCount = notes[index]?.data?.data.total ?? 0;
+                const noteCount = item.activeNoteCount;
                 const queueName =
                   queues.data.data.items.find((queue) => queue.queueId === item.queueId)
                     ?.queueName ?? 'File #' + String(item.queueId);

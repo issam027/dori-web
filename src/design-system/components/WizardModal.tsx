@@ -12,6 +12,7 @@ export function WizardModal({
   onPrevious,
   onNext,
   canContinue = true,
+  className,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,6 +23,7 @@ export function WizardModal({
   onPrevious?: () => void;
   onNext: () => void;
   canContinue?: boolean;
+  className?: string;
 }) {
   const { t } = useTranslation();
   return (
@@ -29,6 +31,7 @@ export function WizardModal({
       open={open}
       onOpenChange={onOpenChange}
       title={title}
+      className={className}
       description={t('wizard.progress', { step, stepCount })}
       actions={
         <>
