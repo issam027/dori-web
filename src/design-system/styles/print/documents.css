@@ -3,6 +3,72 @@
 body[data-print-kiosk-ticket] > #root {
   display: none !important;
 }
+
+/* A4 attendance certificate. Kept last to override the former compact receipt rules. */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  body[data-print-passage],
+  body[data-print-passage] #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  body[data-print-passage] > .passage-print-document {
+    position: absolute;
+    inset: 0;
+    display: flex !important;
+    width: 100% !important;
+    min-height: 273mm;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 10mm 11mm 8mm;
+    overflow: hidden;
+    color: #24332f !important;
+    background: #fff !important;
+    font: 9.5pt/1.42 Arial, sans-serif;
+  }
+  body[data-print-passage] > .passage-print-document * { box-sizing: border-box; }
+  .passage-print-document .attestation-header { display: flex !important; align-items: center; justify-content: space-between; gap: 8mm; padding: 0 0 5mm; border-bottom: 1.2mm solid #174c3b; }
+  .passage-print-document .attestation-brand { display: flex !important; align-items: center; gap: 3mm; }
+  .passage-print-document .attestation-brand img { display: block !important; width: 13mm; height: 13mm; object-fit: contain; }
+  .passage-print-document .attestation-brand strong { color: #174c3b !important; font-size: 18pt; letter-spacing: .09em; }
+  .passage-print-document .attestation-brand span { color: #64716d !important; font-size: 7.5pt; }
+  .passage-print-document .attestation-official { max-width: 62mm; color: #45534f !important; font-size: 7.5pt; font-weight: 700; letter-spacing: .08em; text-align: right; }
+  .passage-print-document .attestation-title { padding: 7mm 0 5mm; text-align: center; }
+  .passage-print-document .attestation-title h1 { margin: 0; color: #174c3b !important; font-size: 23pt; letter-spacing: .04em; }
+  .passage-print-document .attestation-title p { margin: 1.5mm 0 0; color: #66736f !important; font-size: 10pt; }
+  .passage-print-document .attestation-establishment { display: grid !important; gap: .8mm; padding: 4mm 5mm; border: .3mm solid #bdcec8; border-radius: 3mm; background: #f1f6f4 !important; }
+  .passage-print-document .attestation-establishment > span,
+  .passage-print-document .attestation-panel h2,
+  .passage-print-document .attestation-timeline h2,
+  .passage-print-document .attestation-purpose h2 { color: #174c3b !important; font-size: 7.5pt; font-weight: 800; letter-spacing: .09em; }
+  .passage-print-document .attestation-establishment strong { font-size: 14pt; }
+  .passage-print-document .attestation-establishment small { color: #66736f !important; }
+  .passage-print-document .attestation-establishment time { font-weight: 700; }
+  .passage-print-document .attestation-introduction { margin: 5mm 0; color: #34443f !important; font-size: 10pt; }
+  .passage-print-document .attestation-two-columns { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .passage-print-document .attestation-panel { padding: 4mm; border: .3mm solid #d3dfdb; border-radius: 2.5mm; break-inside: avoid; }
+  .passage-print-document .attestation-panel h2,
+  .passage-print-document .attestation-timeline h2,
+  .passage-print-document .attestation-purpose h2 { margin: 0 0 3mm; }
+  .passage-print-document .attestation-panel dl { margin: 0; }
+  .passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
+  .passage-print-document .attestation-panel dt { min-width: 0; color: #687570 !important; font-size: 8.5pt; }
+  .passage-print-document .attestation-panel dd { margin: 0; font-size: 10pt; font-weight: 700; overflow-wrap: anywhere; }
+  .passage-print-document .attestation-ticket dd { color: #174c3b !important; font-size: 12pt; }
+  .passage-print-document .attestation-timeline { margin-top: 5mm; }
+  .passage-print-document .attestation-events { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .passage-print-document .attestation-events > div { position: relative; min-height: 27mm; padding: 3.5mm 3mm 3mm 9mm; border: .3mm solid #d3dfdb; border-radius: 2.5mm; background: #fafcfb !important; }
+  .passage-print-document .attestation-events > div > span { position: absolute; top: 3.5mm; left: 3mm; display: grid !important; width: 4.5mm; height: 4.5mm; place-items: center; border-radius: 50%; color: #fff !important; background: #174c3b !important; font-size: 7pt; font-weight: 800; }
+  .passage-print-document .attestation-events small { display: block !important; color: #65736e !important; font-size: 6.8pt; font-weight: 800; letter-spacing: .04em; }
+  .passage-print-document .attestation-events strong { display: block !important; margin: 1mm 0; color: #174c3b !important; font-size: 15pt; }
+  .passage-print-document .attestation-events p { margin: 0; color: #697570 !important; font-size: 7pt; }
+  .passage-print-document .attestation-purpose { margin-top: 5mm; padding: 4mm 5mm; border-left: 1.2mm solid #174c3b; background: #f1f6f4 !important; break-inside: avoid; }
+  .passage-print-document .attestation-purpose p { margin: 0 0 2mm; font-size: 8pt; }
+  .passage-print-document .attestation-purpose p:last-child { margin-bottom: 0; }
+  .passage-print-document .attestation-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 18mm; margin-top: 7mm; break-inside: avoid; }
+  .passage-print-document .attestation-signatures > div { display: flex !important; min-height: 18mm; align-items: flex-end; justify-content: center; border-bottom: .3mm solid #6d7975; }
+  .passage-print-document .attestation-signatures span { transform: translateY(5mm); color: #66736f !important; font-size: 7.5pt; }
+  .passage-print-document .attestation-trace { display: block !important; margin-top: auto; padding-top: 6mm; border-top: .3mm solid #cbd7d3; color: #65716d !important; }
+  .passage-print-document .attestation-trace > div { display: flex !important; justify-content: space-between; gap: 5mm; font-size: 7pt; }
+  .passage-print-document .attestation-trace p { margin: 2mm 0 0; font-size: 6.8pt; line-height: 1.35; }
+}
 body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   position: static;
   display: grid !important;
@@ -430,6 +496,17 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   body[data-print-passage] > .passage-print-document dd {
     font-weight: 700;
   }
+}
+
+@media print {
+  html body[data-print-passage] > .passage-print-document.passage-print-document { display: flex !important; width: 100% !important; min-height: 273mm; flex-direction: column; padding: 10mm 11mm 8mm; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-header { display: flex !important; padding: 0 0 5mm; border-bottom: 1.2mm solid #174c3b; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dt,
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dd { display: block !important; margin: 0; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-events > div { display: block !important; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-signatures { display: grid !important; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-trace { display: block !important; margin-top: auto; }
 }
 
 @media print {

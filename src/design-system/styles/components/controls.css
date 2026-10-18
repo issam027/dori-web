@@ -247,23 +247,58 @@ textarea:disabled {
   font-weight: 700;
   line-height: 1;
 }
-.calendar-event-button.appointment-tier-0 {
+.calendar-event-button.appointment-tier-0,
+.service-tier-badge.appointment-tier-0 {
   --appointment-tier-color: var(--color-accent);
 }
-.calendar-event-button.appointment-tier-1 {
+.calendar-event-button.appointment-tier-1,
+.service-tier-badge.appointment-tier-1 {
   --appointment-tier-color: color-mix(in oklch, var(--color-accent) 58%, var(--color-info));
 }
-.calendar-event-button.appointment-tier-2 {
+.calendar-event-button.appointment-tier-2,
+.service-tier-badge.appointment-tier-2 {
   --appointment-tier-color: color-mix(in oklch, var(--color-accent) 55%, var(--color-success));
 }
-.calendar-event-button.appointment-tier-3 {
+.calendar-event-button.appointment-tier-3,
+.service-tier-badge.appointment-tier-3 {
   --appointment-tier-color: color-mix(in oklch, var(--color-accent) 54%, var(--color-warning));
 }
-.calendar-event-button.appointment-tier-4 {
+.calendar-event-button.appointment-tier-4,
+.service-tier-badge.appointment-tier-4 {
   --appointment-tier-color: color-mix(in oklch, var(--color-accent) 54%, var(--color-danger));
 }
-.calendar-event-button.appointment-tier-5 {
+.calendar-event-button.appointment-tier-5,
+.service-tier-badge.appointment-tier-5 {
   --appointment-tier-color: color-mix(in oklch, var(--color-accent) 62%, var(--color-ink));
+}
+.calendar-event-button.service-tier-free,
+.service-tier-badge.service-tier-free,
+.service-tier-label.service-tier-free { --appointment-tier-color: var(--color-success); }
+.calendar-event-button.service-tier-standard,
+.service-tier-badge.service-tier-standard,
+.service-tier-label.service-tier-standard { --appointment-tier-color: var(--color-info); }
+.calendar-event-button.service-tier-premium,
+.service-tier-badge.service-tier-premium,
+.service-tier-label.service-tier-premium { --appointment-tier-color: var(--color-warning); }
+.service-tier-label {
+  padding-inline-start: 10px;
+  border-inline-start: 4px solid var(--appointment-tier-color, var(--color-accent));
+}
+.service-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 27px;
+  padding: 4px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--appointment-tier-color) 45%, var(--color-line));
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--appointment-tier-color) 72%, var(--color-ink));
+  background: color-mix(in srgb, var(--appointment-tier-color) 13%, var(--color-surface));
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .calendar-event-button .appointment-status-dot {
   width: 6px;

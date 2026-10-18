@@ -13,11 +13,10 @@ import {
   monthDates,
   weekDates,
 } from './appointment-rules';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useAppointment, useAppointments } from './hooks/useAppointments';
-
-const appointmentTierVariant = (tierId: number) => Math.abs(tierId - 1) % 6;
 
 export function AppointmentsPage() {
   const { t: __t, i18n } = useTranslation();
@@ -283,7 +282,7 @@ export function AppointmentsPage() {
                                 const statusText = __t(appointmentStatusKey(item));
                                 return (
                                   <button
-                                    className={`calendar-event-button appointment-tier-${String(appointmentTierVariant(item.tierId))} appointment-status-${appointmentVisualStatus(item)}`}
+                                    className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
                                     key={item.registrationId}
                                     type="button"
                                     title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}
@@ -387,7 +386,7 @@ export function AppointmentsPage() {
                         const statusText = __t(appointmentStatusKey(item));
                         return (
                           <button
-                            className={`calendar-event-button appointment-tier-${String(appointmentTierVariant(item.tierId))} appointment-status-${appointmentVisualStatus(item)}`}
+                            className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
                             key={item.registrationId}
                             type="button"
                             title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}

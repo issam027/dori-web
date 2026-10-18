@@ -16,6 +16,7 @@ import type {
   RegistrationsControllerFindRegistrationsSort,
   RegistrationsControllerFindRegistrationsStatus,
 } from '@/api/generated/models';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 
 export function MyQueuesPage() {
   const { t: __t } = useTranslation();
@@ -216,7 +217,11 @@ export function MyQueuesPage() {
             {
               key: 'tier',
               header: __t('common.tier'),
-              render: (item) => `#${String(item.tierId)}`,
+              render: (item) => (
+                <span className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}>
+                  {item.tierName ?? __t('queue-operations.quickRegistration.serviceFallback', { id: String(item.tierId) })}
+                </span>
+              ),
             },
             {
               key: 'actions',

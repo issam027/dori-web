@@ -51,6 +51,7 @@ export function PersonsPage() {
   const [viewing, setViewing] = useState<PersonResponseDto>();
   const [editing, setEditing] = useState<PersonResponseDto>();
   const [notesPerson, setNotesPerson] = useState<PersonResponseDto>();
+  const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [deleting, setDeleting] = useState<PersonResponseDto>();
   const [createOpen, setCreateOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -264,12 +265,16 @@ export function PersonsPage() {
                         <button
                           className="button button-small"
                           type="button"
-                          title={t('persons.admin.notes')}
+                          title={person.activeNoteCount ? t('queues.myQueues.viewNotes', { count: person.activeNoteCount }) : t('queues.myQueues.addNote')}
                           onClick={() => {
+                            setNotesMode(person.activeNoteCount ? 'view' : 'add');
                             setNotesPerson(person);
                           }}
                         >
-                          <StickyNote aria-hidden="true" /> {t('persons.admin.notes')} ({person.activeNoteCount})
+                          {person.activeNoteCount ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
+                          {person.activeNoteCount
+                            ? t('queues.myQueues.viewNotes', { count: person.activeNoteCount })
+                            : t('queues.myQueues.addNote')}
                         </button>
                         {canDelete ? <button className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
                           <Trash2 aria-hidden="true" /> {t('common.delete')}
@@ -303,6 +308,7 @@ export function PersonsPage() {
         <PersonNotesViewer
           key={notesPerson.personId}
           personId={notesPerson.personId}
+          initialMode={notesMode}
           open
           onOpenChange={(open) => {
             if (!open) setNotesPerson(undefined);

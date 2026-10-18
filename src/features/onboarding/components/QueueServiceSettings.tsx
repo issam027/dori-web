@@ -18,6 +18,7 @@ import {
   serviceTiersControllerUpdateQueueTier,
   serviceTiersControllerUpdateRule,
 } from '@/api/generated/tiers/tiers';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { queryKeys } from '@/api/client/query-keys';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
@@ -249,7 +250,7 @@ function TierConfigurationCard({
             t('onboarding.enableService')
           )}
         </span>
-        <span>
+        <span className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}>
           <strong>{tier.tierName}</strong>
           <small>{tier.description || tier.tierCode}</small>
         </span>

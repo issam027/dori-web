@@ -7,6 +7,7 @@ import { usePerson } from '@/features/persons/hooks/usePersons';
 import { useRegistration } from './hooks/useQueueOperations';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 
 const safeText = (value: unknown, fallback = '—') =>
   typeof value === 'string' || typeof value === 'number' ? String(value) : fallback;
@@ -127,7 +128,7 @@ export function RegistrationDetailsModal({
                 value={formatDate(item.updatedAt)}
               />
               <Detail icon={<Ticket />} label={t('common.entryType')} value={safeText(item.entryType)} />
-              <Detail icon={<Hash />} label={t('common.tier')} value={'#' + String(item.tierId)} />
+              <Detail icon={<Hash />} label={t('common.tier')} value={<span className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}>{item.tierName ?? `#${String(item.tierId)}`}</span>} />
               {item.scheduledTime ? (
                 <Detail
                   icon={<CalendarDays />}
@@ -154,7 +155,7 @@ export function RegistrationDetailsModal({
   );
 }
 
-function Detail({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function Detail({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
   return (
     <div className="registration-detail-value">
       <span aria-hidden="true">{icon}</span>

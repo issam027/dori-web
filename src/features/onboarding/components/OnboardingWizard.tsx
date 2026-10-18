@@ -18,6 +18,7 @@ import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { QueueEditor } from '@/features/queues/QueueEditor';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 import {
   loadOnboardingDraft,
   clearOnboardingDraft,
@@ -868,7 +869,7 @@ function TiersStep({
                           ? __t('onboarding.serviceEnabled')
                           : __t('onboarding.enableService')}
                       </span>
-                      <span>
+                      <span className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}>
                         <strong>{tier.tierName}</strong>
                         <small>{tier.description || tier.tierCode}</small>
                       </span>

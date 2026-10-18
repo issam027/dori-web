@@ -23,6 +23,7 @@ import {
   isTerminalAppointment,
   slotTime,
 } from './appointment-rules';
+import { serviceTierVisualClass } from '@/design-system/service-tier';
 import {
   cancelAppointment,
   checkInAppointment,
@@ -404,7 +405,7 @@ export function AppointmentActionDialog({
                   {t(appointmentStatusKey(appointment))}
                 </span>
                 {appointment.tierName ? (
-                  <span className="status-badge status-info">{appointment.tierName}</span>
+                  <span className={`service-tier-badge ${serviceTierVisualClass(appointment.tierId, appointment.tierName)}`}>{appointment.tierName}</span>
                 ) : null}
               </div>
             </div>

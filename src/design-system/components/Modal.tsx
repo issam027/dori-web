@@ -73,6 +73,7 @@ export function ConfirmDialog({
       onOpenChange={onOpenChange}
       title={title}
       description={description}
+      className="confirmation-dialog"
       actions={
         <>
           <button

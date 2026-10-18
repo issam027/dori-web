@@ -4,17 +4,17 @@ import { Printer } from 'lucide-react';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { Card } from '@/design-system/components/Card';
 import type { PassageSummary } from '../operation-store';
-import { PassagePrintDocument } from '../PassagePrintDocument';
+import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
 
 export function DeskPassages({
   passages,
-  siteName,
+  site,
   status,
   totalCount,
   onStatusChange,
 }: {
   passages: readonly PassageSummary[];
-  siteName?: string;
+  site?: PassageSiteDetails;
   status: 'served' | 'no_show';
   totalCount: number;
   onStatusChange: (status: 'served' | 'no_show') => void;
@@ -114,7 +114,7 @@ export function DeskPassages({
               <button
                 className="button print-hidden"
                 type="button"
-                disabled={!siteName}
+                disabled={!site?.siteName}
                 onClick={() => {
                   setPrintingId(passage.registrationId);
                 }}
@@ -132,8 +132,8 @@ export function DeskPassages({
           </article>
         ))}
       </div>
-      {printingPassage && siteName ? (
-        <PassagePrintDocument passage={printingPassage} siteName={siteName} />
+      {printingPassage && site ? (
+        <PassagePrintDocument passage={printingPassage} site={site} />
       ) : null}
     </Card>
   );

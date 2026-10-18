@@ -6,7 +6,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { FormField } from '@/design-system/components/FormField';
-import { Modal } from '@/design-system/components/Modal';
+import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
@@ -44,6 +44,7 @@ export function DeskPage() {
     occupiedThread?: number;
   }>();
   const [counterName, setCounterName] = useState('');
+  const [confirmTakeOver, setConfirmTakeOver] = useState(false);
   const queues = useQueues({ siteId, isActive: true });
   const allowed =
     queues.data?.data.items.filter(
@@ -166,10 +167,19 @@ export function DeskPage() {
     counterNameValue: string,
     occupiedThread?: number,
   ) => {
-    const takeOver =
-      occupiedThread !== undefined &&
-      window.confirm(t('queue-operations.desk.ceGuichetEstOccupeConfirmerLaReprise'));
-    if (occupiedThread !== undefined && !takeOver) return;
+    if (occupiedThread !== undefined) {
+      setConfirmTakeOver(true);
+      return;
+    }
+    openDesk(queueId, queueName, counterNameValue, occupiedThread, false);
+  };
+  const openDesk = (
+    queueId: number,
+    queueName: string,
+    counterNameValue: string,
+    occupiedThread: number | undefined,
+    takeOver: boolean,
+  ) => {
     void execute(queueId, async () => {
       await openSession.execute({
         queueId,
@@ -298,7 +308,12 @@ export function DeskPage() {
           threadNumber: 0,
           outcome: historyStatus,
         }))}
-        siteName={site.data?.data.siteName}
+        site={site.data?.data ? {
+          siteName: site.data.data.siteName,
+          timezone: site.data.data.timezone,
+          siteLocation: site.data.data.siteLocation,
+          siteLogoUrl: site.data.data.siteLogoUrl,
+        } : undefined}
         status={historyStatus}
         totalCount={(servedHistory.data?.data.total ?? 0) + (noShowHistory.data?.data.total ?? 0)}
         onStatusChange={setHistoryStatus}
@@ -355,6 +370,24 @@ export function DeskPage() {
           />
         </FormField>
       </Modal>
+      <ConfirmDialog
+        open={confirmTakeOver}
+        onOpenChange={setConfirmTakeOver}
+        title={t('desk.takeOverTitle', { defaultValue: 'Reprendre ce guichet ?' })}
+        description={t('queue-operations.desk.ceGuichetEstOccupeConfirmerLaReprise')}
+        confirmLabel={t('desk.takeOverAction', { defaultValue: 'Confirmer la reprise' })}
+        onConfirm={() => {
+          if (!deskToOpen?.occupiedThread) return;
+          setConfirmTakeOver(false);
+          openDesk(
+            deskToOpen.queueId,
+            deskToOpen.queueName,
+            counterName,
+            deskToOpen.occupiedThread,
+            true,
+          );
+        }}
+      />
     </div>
   );
 }
