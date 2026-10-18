@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import type { QueueResponseDto, RoleResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { usersControllerCreateUser } from '@/api/generated/users/users';
-import { sitesControllerAssignManager } from '@/api/generated/sites/sites';
+import { sitesControllerAssignDirectUser } from '@/api/generated/sites/sites';
 import { queuesControllerAssignOperator } from '@/api/generated/queues/queues';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { assignableRoles } from './user-rank';
@@ -65,7 +65,7 @@ export function UserAccountWizard({
     const id = result.data.userId;
     const role = roles.find((r) => r.roleId === f.roleId)?.roleName.toLowerCase() ?? '';
     if (role.includes('manager') || role.includes('admin'))
-      for (const siteId of f.siteIds) await sitesControllerAssignManager(siteId, { userId: id });
+      for (const siteId of f.siteIds) await sitesControllerAssignDirectUser(siteId, { userId: id });
     if (isKiosk || role.includes('operat') || role.includes('hotesse'))
       for (const queueId of f.queueIds)
         await queuesControllerAssignOperator(queueId, { userId: id });

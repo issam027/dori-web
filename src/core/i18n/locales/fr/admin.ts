@@ -127,9 +127,9 @@ export const admin = {
   "settings.confirmAssignment": "Confirmer l’affectation",
   "settings.assignmentDone": "Affectation enregistrée",
   "settings.assignmentDoneMessage": "{{username}} est maintenant affecté à {{resource}}.",
-  "settings.managers": "Managers affectés",
-  "settings.managersHelp": "Responsables autorisés à administrer ce site.",
-  "settings.addManager": "Ajouter un manager",
+  "settings.managers": "Administrateurs et managers affectés",
+  "settings.managersHelp": "Utilisateurs directement autorisés à administrer ce site.",
+  "settings.addManager": "Affecter un utilisateur",
   "settings.removeManager": "Retirer",
-  "settings.noManagers": "Aucun manager affecté à ce site.",
+  "settings.noManagers": "Aucun administrateur ou manager directement affecté.",
 } as const;

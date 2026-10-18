@@ -96,7 +96,7 @@ export const onboarding = {
   "onboarding.settings.scope": "Périmètre :",
   "onboarding.settings.segmentS": "segment(s)",
   "onboarding.settings.seuil": "Seuil",
-  "onboarding.settings.sitesManagers": "Sites & managers",
+  "onboarding.settings.sitesManagers": "Site et utilisateurs directs",
   "onboarding.settings.sms": "SMS",
   "onboarding.settings.suspendre": "Suspendre",
   "onboarding.settings.systeme": "Système",

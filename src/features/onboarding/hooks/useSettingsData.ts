@@ -2,12 +2,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidateAdmin } from '@/api/client/query-invalidations';
 import { findQueues, findRoles, findSites, findTiers } from '../api/onboarding-api';
-import { sitesControllerGetManagers } from '@/api/generated/sites/sites';
+import { sitesControllerGetDirectUsers } from '@/api/generated/sites/sites';
 
 export function useSettingsData(
   siteId: number | null,
   queueStatus: 'active' | 'inactive' | 'all' = 'active',
-  enabled: Partial<Record<'sites' | 'queues' | 'roles' | 'tiers' | 'managers' | 'allAccessibleQueues', boolean>> = {},
+  enabled: Partial<Record<'sites' | 'queues' | 'roles' | 'tiers' | 'directUsers' | 'allAccessibleQueues', boolean>> = {},
 ) {
   const queryClient = useQueryClient();
   const sites = useQuery({
@@ -37,16 +37,16 @@ export function useSettingsData(
     queryFn: ({ signal }) => findTiers({ page: 1, pageSize: 100 }, undefined, signal),
     enabled: enabled.tiers ?? true,
   });
-  const managers = useQuery({
-    queryKey: ['admin', 'site-managers', siteId],
+  const directUsers = useQuery({
+    queryKey: ['admin', 'site-direct-users', siteId],
     queryFn: ({ signal }) =>
-      sitesControllerGetManagers(
+      sitesControllerGetDirectUsers(
         siteId ?? 0,
         { page: 1, pageSize: 100, sort: 'username:asc' },
         undefined,
         signal,
       ),
-    enabled: siteId !== null && (enabled.managers ?? true),
+    enabled: siteId !== null && (enabled.directUsers ?? true),
   });
 
   return {
@@ -54,8 +54,8 @@ export function useSettingsData(
     queues: queues.data?.data.items ?? [],
     roles: roles.data?.data.items ?? [],
     tiers: tiers.data?.data.items ?? [],
-    managers: managers.data?.data.items ?? [],
-    refreshManagers: () => managers.refetch(),
+    directUsers: directUsers.data?.data.items ?? [],
+    refreshDirectUsers: () => directUsers.refetch(),
     refresh: () => invalidateAdmin(queryClient),
   };
 }

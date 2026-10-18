@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { RoleResponseDto, UserSummaryItemDto } from '@/api/generated/models';
 import { queuesControllerAssignOperator } from '@/api/generated/queues/queues';
-import { sitesControllerAssignManager } from '@/api/generated/sites/sites';
+import { sitesControllerAssignDirectUser } from '@/api/generated/sites/sites';
 import {
   usersControllerAssignUserRole,
   usersControllerFindUsers,
@@ -42,7 +42,7 @@ export function UserAssignmentModal({
   const [saving, setSaving] = useState(false);
   const compatibleRoles = roles.filter((role) =>
     target?.kind === 'site'
-      ? role.roleName === 'manager'
+      ? role.roleName === 'manager' || role.roleName === 'admin'
       : role.roleName === 'hotesse' || role.roleName === 'operator',
   );
 
@@ -87,7 +87,7 @@ export function UserAssignmentModal({
     try {
       await usersControllerAssignUserRole(selectedUser.userId, { roleId });
       if (target.kind === 'site') {
-        await sitesControllerAssignManager(target.id, { userId: selectedUser.userId });
+        await sitesControllerAssignDirectUser(target.id, { userId: selectedUser.userId });
       } else {
         await queuesControllerAssignOperator(target.id, { userId: selectedUser.userId });
       }

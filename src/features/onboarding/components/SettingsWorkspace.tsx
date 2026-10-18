@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers3, ListTree, Pencil, Plus, Power, PowerOff, UserMinus, UserPlus } from 'lucide-react';
-import { sitesControllerRemoveManager } from '@/api/generated/sites/sites';
-import type { SiteManagerResponseDto, SiteResponseDto } from '@/api/generated/models';
+import { sitesControllerRemoveDirectUser } from '@/api/generated/sites/sites';
+import type { SiteDirectUserResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-api';
 import type { findSites, findTiers } from '../api/onboarding-api';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -33,11 +33,11 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     queues: qs,
     roles: rs,
     tiers: ts,
-    managers,
-    refreshManagers,
+    directUsers,
+    refreshDirectUsers,
     refresh: refreshData,
   } = useSettingsData(activeSiteId, queueStatus);
-  const refresh = () => { void Promise.all([refreshData(), refreshManagers()]); };
+  const refresh = () => { void Promise.all([refreshData(), refreshDirectUsers()]); };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
     [editSite, setEditSite] = useState<SiteResponseDto | null>(null),
@@ -65,7 +65,7 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
       <Card className="settings-card">
         <SettingsNavigation active={section} />
         {section === 'sites' ? (
-          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} managers={managers} refresh={refresh} assign={setAssignmentTarget} edit={setEditSite} />
+          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} directUsers={directUsers} refresh={refresh} assign={setAssignmentTarget} edit={setEditSite} />
         ) : null}
         {section === 'queues' ? (
           <QueuesPanel
@@ -167,13 +167,13 @@ function useAdminPagination<T>(items: readonly T[]) {
 
 function SitesPanel({
   items,
-  managers,
+  directUsers,
   refresh,
   assign,
   edit,
 }: {
   items: Sites;
-  managers: SiteManagerResponseDto[];
+  directUsers: SiteDirectUserResponseDto[];
   refresh: () => void;
   assign: (target: AssignmentTarget) => void;
   edit: (site: SiteResponseDto) => void;
@@ -256,7 +256,7 @@ function SitesPanel({
             <div><h3>{__t('settings.managers')}</h3><p>{__t('settings.managersHelp')}</p></div>
             <button className="button button-primary" type="button" onClick={() => { const site = items[0]; if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName }); }}><UserPlus />{__t('settings.addManager')}</button>
           </div>
-          {managers.length ? <ul className="manager-list">{managers.map((manager) => <li key={manager.userId}><div><strong>{manager.username}</strong><span>{manager.email}</span></div><span className={`status-badge ${manager.isActive ? 'status-success' : ''}`}>{manager.isActive ? __t('common.active') : __t('common.inactive')}</span><button className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveManager(site.siteId, manager.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
+          {directUsers.length ? <ul className="manager-list">{directUsers.map((user) => <li key={user.userId}><div><strong>{user.username}</strong><span>{user.email}</span></div><span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>{user.isActive ? __t('common.active') : __t('common.inactive')}</span><button className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
         </Card>
       ) : null}
       {items.length > ADMIN_PAGE_SIZE ? (

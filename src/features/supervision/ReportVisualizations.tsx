@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import type { QueueResponseDto, ReportBucketDto, ReportGroupDto, ReportMetricsDto } from '@/api/generated/models';
+import type { QueueResponseDto } from '@/api/generated/models';
+import type { ReportBucketDto, ReportGroupDto, ReportMetricsDto } from './report-utils';
 import { BarChart3, ChartPie, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/design-system/components/Card';
@@ -7,6 +8,7 @@ import { formatReportNumber } from './report-number';
 
 type View = 'trend' | 'comparison' | 'distribution';
 type Metric = 'registered' | 'served' | 'walkin' | 'appointments' | 'noShow' | 'cancelled' | 'expired' | 'averageWaitMinutes' | 'medianWaitMinutes' | 'p90WaitMinutes' | 'averageServiceMinutes' | 'medianServiceMinutes' | 'p90ServiceMinutes' | 'noShowRate';
+type ComparisonMetric = 'registered' | 'served' | 'noShow' | 'cancelled' | 'averageWaitMinutes' | 'averageServiceMinutes' | 'noShowRate';
 type Series = { id: string; label: string; color: string; values: number[] };
 
 const palette = [
@@ -77,28 +79,28 @@ function groupId(group: ReportGroupDto, index: number) {
   return typeof value === 'number' || typeof value === 'string' ? String(value) : String(index);
 }
 function groupLabel(group: ReportGroupDto, index: number, fallback: (number: number) => string) { const label = group.dimension.queueName ?? group.dimension.queue_name ?? group.dimension.label ?? group.dimension.name ?? group.dimension.queueCode ?? group.dimension.queue_code; return typeof label === 'string' ? label : fallback(index + 1); }
-function metricValue(bucket: ReportBucketDto, metric: Metric) {
+function metricValue(bucket: ReportMetricsDto, metric: Metric) {
   if (metric === 'registered' || metric === 'served' || metric === 'walkin' || metric === 'appointments' || metric === 'noShow' || metric === 'cancelled' || metric === 'expired') return bucket.volume[metric];
   if (metric === 'noShowRate') return (bucket.rates.noShowRate ?? 0) * 100;
   return bucket.timing[metric] ?? 0;
 }
 
 function ComparisonChart({ groups, queues }: { groups: readonly ReportGroupDto[]; queues: readonly QueueResponseDto[] }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selected, setSelected] = useState<string[] | null>(null);
-  const [metric, setMetric] = useState<Metric>('registered');
+  const [metric, setMetric] = useState<ComparisonMetric>('registered');
   const available = groups.map((group, index) => {
     const id = groupId(group, index);
     const queue = queues.find((item) => String(item.queueId) === id) ?? queues[index];
     return { group, id, label: queue ? `${queue.queueCode} · ${queue.queueName}` : groupLabel(group, index, (number) => t('reports.visual.queueFallback', { number })) };
   });
-  const effective = selected ?? available.slice(0, 3).map((item) => item.id);
+  const selectedAvailable = selected?.filter((id) => available.some((item) => item.id === id));
+  const effective = selectedAvailable ?? available.slice(0, 3).map((item) => item.id);
   const visible = available.filter((item) => effective.includes(item.id));
-  const periods = [...new Set(visible.flatMap((item) => item.group.buckets.map((bucket) => bucket.periodStart)))].sort();
-  const bucketByPeriod = new Map(visible.flatMap((item) => item.group.buckets.map((bucket) => [bucket.periodStart, bucket] as const)));
-  const buckets = periods.flatMap((period) => { const bucket = bucketByPeriod.get(period); return bucket ? [bucket] : []; });
-  const series = visible.map((item) => { const index = available.findIndex((candidate) => candidate.id === item.id); const valuesByPeriod = new Map(item.group.buckets.map((bucket) => [bucket.periodStart, metricValue(bucket, metric)])); return { id: item.id, label: item.label, color: palette[index % palette.length] ?? '#5b8def', values: periods.map((period) => valuesByPeriod.get(period) ?? 0) }; });
-  return <div className="report-comparison"><div className="report-comparison-controls"><label>{t('reports.visual.metric')}<select value={metric} onChange={(event) => { setMetric(event.target.value as Metric); }}><option value="registered">{t('reports.visual.registrations')}</option><option value="served">{t('reports.visual.served')}</option><option value="walkin">{t('reports.analytics.walkins')}</option><option value="appointments">{t('reports.visual.appointments')}</option><option value="noShow">{t('common.noShow')}</option><option value="averageWaitMinutes">{t('reports.averageWaitAbbreviation')}</option><option value="medianWaitMinutes">{t('reports.medianWait')}</option><option value="p90WaitMinutes">{t('reports.p90Wait')}</option><option value="averageServiceMinutes">{t('reports.averageServiceAbbreviation')}</option><option value="medianServiceMinutes">{t('reports.medianService')}</option><option value="p90ServiceMinutes">{t('reports.p90Service')}</option><option value="noShowRate">{t('reports.visual.noShowRate')}</option></select></label><fieldset><legend>{t('reports.visual.queuesToCompare')}</legend>{available.map((item) => <label key={item.id}><input type="checkbox" checked={effective.includes(item.id)} onChange={() => { setSelected((current) => { const base = current ?? effective; return base.includes(item.id) ? base.filter((id) => id !== item.id) : [...base, item.id]; }); }} />{item.label}</label>)}</fieldset></div>{visible.length ? <Chart buckets={buckets} series={series} /> : <p className="report-comparison-empty">{t('reports.visual.selectAtLeastOneQueue')}</p>}</div>;
+  const values = visible.map((item) => metricValue(item.group, metric));
+  const max = Math.max(...values, 1);
+  const suffix = metric === 'noShowRate' ? '%' : metric.endsWith('Minutes') ? ` ${t('common.min')}` : '';
+  return <div className="report-comparison"><div className="report-comparison-controls"><label>{t('reports.visual.metric')}<select value={metric} onChange={(event) => { setMetric(event.target.value as ComparisonMetric); }}><option value="registered">{t('reports.visual.registrations')}</option><option value="served">{t('reports.visual.served')}</option><option value="noShow">{t('common.noShow')}</option><option value="cancelled">{t('common.cancelled')}</option><option value="averageWaitMinutes">{t('reports.averageWaitAbbreviation')}</option><option value="averageServiceMinutes">{t('reports.averageServiceAbbreviation')}</option><option value="noShowRate">{t('reports.visual.noShowRate')}</option></select></label><fieldset><legend>{t('reports.visual.queuesToCompare')}</legend>{available.map((item) => <label key={item.id}><input type="checkbox" checked={effective.includes(item.id)} onChange={() => { setSelected((current) => { const base = current?.filter((id) => available.some((candidate) => candidate.id === id)) ?? effective; return base.includes(item.id) ? base.filter((id) => id !== item.id) : [...base, item.id]; }); }} />{item.label}</label>)}</fieldset></div>{visible.length ? <div className="report-comparison-bars">{visible.map((item, index) => { const value = values[index] ?? 0; const colorIndex = available.findIndex((candidate) => candidate.id === item.id); return <div className="report-comparison-row" key={item.id}><span>{item.label}</span><div><i style={{ width: `${String(value / max * 100)}%`, background: palette[colorIndex % palette.length] }} /></div><strong>{formatReportNumber(value, i18n.language)}{suffix}</strong></div>; })}</div> : <p className="report-comparison-empty">{t('reports.visual.selectAtLeastOneQueue')}</p>}</div>;
 }
 
 function DonutPanel({ title, description, values, labels, center, centerLabel, suffix = '', highlights = [] }: { title: string; description: string; values: readonly number[]; labels: readonly string[]; center: string; centerLabel: string; suffix?: string; highlights?: readonly { label: string; value: string }[] }) {

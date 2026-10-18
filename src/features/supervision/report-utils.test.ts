@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import type { QueueResponseDto, ReportGroupDto } from '@/api/generated/models';
+import type { QueueResponseDto } from '@/api/generated/models';
+import type { ReportGroupDto } from './report-utils';
 import { addDays, groupsToQueueRows, reportPeriodDates, reportsToCsv } from './report-utils';
 
 const group: ReportGroupDto = {
-  dimension: { queueId: 10 }, timezone: 'Europe/Paris', buckets: [],
+  dimension: { queueId: 10 }, buckets: [],
   volume: { registered: 12, walkin: 8, appointments: 4, served: 10, noShow: 1, expired: 0, cancelled: 1 },
   timing: { averageWaitMinutes: 7, medianWaitMinutes: 6, p90WaitMinutes: 12, averageServiceMinutes: 5, medianServiceMinutes: 4, p90ServiceMinutes: 9 },
   rates: { noShowRate: 0.1, cancellationRate: 0.08, expirationRate: 0 },

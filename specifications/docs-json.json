@@ -1435,17 +1435,17 @@
                 ]
             }
         },
-        "/api/v1/sites/{siteId}/managers": {
+        "/api/v1/sites/{siteId}/direct-users": {
             "get": {
-                "operationId": "SitesController_getManagers",
+                "operationId": "SitesController_getDirectUsers",
                 "x-required-permissions": {
                     "mode": "all",
                     "permissions": [
                         "site_view"
                     ]
                 },
-                "summary": "Lister les managers d'un site",
-                "description": "Retourne la liste paginée des utilisateurs affectés comme managers à ce site.",
+                "summary": "Lister les utilisateurs directement affectés à un site",
+                "description": "Retourne uniquement les admins et managers directement affectés à ce site.",
                 "parameters": [
                     {
                         "name": "siteId",
@@ -1498,11 +1498,24 @@
                                 "assignedAt:desc"
                             ]
                         }
+                    },
+                    {
+                        "name": "role",
+                        "required": false,
+                        "in": "query",
+                        "description": "Filtrer les utilisateurs directs par rôle",
+                        "schema": {
+                            "enum": [
+                                "admin",
+                                "manager"
+                            ],
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Liste paginée des managers du site",
+                        "description": "Liste paginée des utilisateurs directs du site",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1525,7 +1538,7 @@
                                             "description": "Paramètres de traduction"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/PaginatedSiteManagerResponseDto"
+                                            "$ref": "#/components/schemas/PaginatedSiteDirectUserResponseDto"
                                         }
                                     },
                                     "required": [
@@ -1629,15 +1642,15 @@
                 ]
             },
             "post": {
-                "operationId": "SitesController_assignManager",
+                "operationId": "SitesController_assignDirectUser",
                 "x-required-permissions": {
                     "mode": "all",
                     "permissions": [
                         "user_site_assign"
                     ]
                 },
-                "summary": "Affecter un manager au site",
-                "description": "Associe un utilisateur au périmètre de gestion de ce site.",
+                "summary": "Affecter directement un utilisateur au site",
+                "description": "Associe au site un utilisateur actif ayant le rôle admin ou manager.",
                 "parameters": [
                     {
                         "name": "siteId",
@@ -1655,14 +1668,14 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AssignManagerDto"
+                                "$ref": "#/components/schemas/AssignDirectSiteUserDto"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Manager affecté avec succès",
+                        "description": "Utilisateur directement affecté avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1685,7 +1698,7 @@
                                             "description": "Paramètres de traduction"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/AssignManagerResponseDto"
+                                            "$ref": "#/components/schemas/AssignDirectSiteUserResponseDto"
                                         }
                                     },
                                     "required": [
@@ -1789,16 +1802,16 @@
                 ]
             }
         },
-        "/api/v1/sites/{siteId}/managers/{userId}": {
+        "/api/v1/sites/{siteId}/direct-users/{userId}": {
             "delete": {
-                "operationId": "SitesController_removeManager",
+                "operationId": "SitesController_removeDirectUser",
                 "x-required-permissions": {
                     "mode": "all",
                     "permissions": [
                         "user_site_assign"
                     ]
                 },
-                "summary": "Retirer un manager du site",
+                "summary": "Retirer un utilisateur directement affecté au site",
                 "description": "Supprime l'association d'un utilisateur au site.",
                 "parameters": [
                     {
@@ -1824,7 +1837,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Manager retiré avec succès",
+                        "description": "Utilisateur retiré du site avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1847,7 +1860,7 @@
                                             "description": "Paramètres de traduction"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/RemoveManagerResponseDto"
+                                            "$ref": "#/components/schemas/RemoveDirectSiteUserResponseDto"
                                         }
                                     },
                                     "required": [
@@ -9240,7 +9253,8 @@
                 "x-required-permissions": {
                     "mode": "all",
                     "permissions": [
-                        "queue_view"
+                        "queue_view",
+                        "registration_call"
                     ]
                 },
                 "summary": "Prévisualiser les prochains tickets éligibles",
@@ -14242,11 +14256,12 @@
                         "system_manage"
                     ]
                 },
-                "summary": "Instantané de l’activité opérationnelle",
+                "summary": "Vue globale d'exploitation de la plateforme",
+                "description": "Réservée à l’exploitation système : notifications en attente ou en traitement, échecs des dernières 24 heures, sessions opérateur ouvertes et inscriptions non terminées. Ne remplace ni la supervision par site ni les rapports.",
                 "parameters": [],
                 "responses": {
                     "200": {
-                        "description": "Activité opérationnelle",
+                        "description": "État global d'exploitation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -14293,6 +14308,79 @@
                 ]
             }
         },
+        "/api/v1/monitoring/live": {
+            "get": {
+                "operationId": "MonitoringController_live",
+                "x-required-permissions": {
+                    "mode": "all",
+                    "permissions": [
+                        "queue_view"
+                    ]
+                },
+                "summary": "État opérationnel actuel d'un site",
+                "description": "Retourne les files, volumes courants, guichets et opérateurs actifs sans historique ni données personnelles.",
+                "parameters": [
+                    {
+                        "name": "siteId",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "minimum": 1,
+                            "example": 1,
+                            "type": "integer"
+                        },
+                        "description": "Identifiant du site."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Supervision opérationnelle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MonitoringLiveResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Monitoring"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/v1/monitoring/series": {
             "get": {
                 "operationId": "MonitoringController_series",
@@ -14303,92 +14391,114 @@
                     ]
                 },
                 "summary": "Série d’activité sur une période",
-                "description": "Agrège une file, plusieurs files ou un site par jour, semaine ou mois. Exactement un périmètre doit être fourni : queueIds ou siteId. La période est inclusive, ordonnée et limitée à 366 jours.",
+                "description": "Agrège en un appel les volumes, durées et ventilations par file, utilisateur, forfait, statut et type d’entrée. registered est attribué à createdAt ; served à servedAt ; noShow et cancelled à closedAt. Les durées incomplètes sont exclues des moyennes. Exactement un périmètre doit être fourni : queueIds ou siteId. La période est inclusive, ordonnée et limitée à 366 jours.",
                 "parameters": [
                     {
-                        "name": "dateFrom",
-                        "required": true,
+                        "name": "siteId",
+                        "required": false,
                         "in": "query",
-                        "description": "Première date calendaire incluse (YYYY-MM-DD)",
+                        "description": "Site à superviser",
                         "schema": {
-                            "format": "date",
-                            "example": "2026-09-01",
-                            "type": "string",
-                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-                        }
-                    },
-                    {
-                        "name": "dateTo",
-                        "required": true,
-                        "in": "query",
-                        "description": "Dernière date calendaire incluse (YYYY-MM-DD). La plage doit être ordonnée et respecter la limite propre à l’opération.",
-                        "schema": {
-                            "format": "date",
-                            "example": "2026-09-30",
-                            "type": "string",
-                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                            "minimum": 1,
+                            "type": "integer"
                         }
                     },
                     {
                         "name": "queueIds",
                         "required": false,
                         "in": "query",
-                        "description": "Identifiants de files séparés par des virgules. Une seule file utilise par exemple queueIds=10.",
                         "schema": {
+                            "example": "1,2,3",
                             "type": "string",
-                            "pattern": "^\\d+(?:\\s*,\\s*\\d+)*$",
-                            "example": "1,2,3"
+                            "pattern": "^\\d+(?:\\s*,\\s*\\d+)*$"
+                        },
+                        "description": "Valeur du paramètre « queue ids »."
+                    },
+                    {
+                        "name": "userIds",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "example": "4,7",
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « user ids »."
+                    },
+                    {
+                        "name": "tierIds",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "example": "1,3",
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « tier ids »."
+                    },
+                    {
+                        "name": "statuses",
+                        "required": false,
+                        "in": "query",
+                        "description": "Valeurs autorisées : booked, waiting, in_progress, served, no_show, expired, cancelled",
+                        "schema": {
+                            "example": "served,no_show",
+                            "type": "string"
                         }
                     },
                     {
-                        "name": "siteId",
+                        "name": "entryTypes",
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "minimum": 1,
-                            "type": "integer"
+                            "example": "walkin,appointment",
+                            "type": "string"
                         },
-                        "description": "Identifiant du site."
+                        "description": "Valeur du paramètre « entry types »."
                     },
                     {
-                        "name": "granularity",
+                        "name": "from",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "format": "date-time",
+                            "example": "2026-10-01T00:00:00+02:00",
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « from »."
+                    },
+                    {
+                        "name": "to",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "format": "date-time",
+                            "example": "2026-11-01T00:00:00+01:00",
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « to »."
+                    },
+                    {
+                        "name": "bucket",
                         "required": false,
                         "in": "query",
-                        "description": "Granularité temporelle des buckets retournés",
                         "schema": {
                             "default": "day",
                             "enum": [
+                                "hour",
                                 "day",
                                 "week",
                                 "month"
                             ],
                             "type": "string"
-                        }
+                        },
+                        "description": "Valeur du paramètre « bucket »."
                     },
                     {
-                        "name": "includeEmpty",
+                        "name": "timezone",
                         "required": false,
                         "in": "query",
-                        "description": "Inclure les périodes sans inscription avec des volumes à zéro et des KPI non calculables à null",
+                        "description": "Fuseau IANA ; par défaut, celui du site",
                         "schema": {
-                            "default": false,
-                            "type": "boolean"
-                        }
-                    },
-                    {
-                        "name": "groupBy",
-                        "required": false,
-                        "in": "query",
-                        "description": "Dimension optionnelle de regroupement des résultats",
-                        "schema": {
-                            "enum": [
-                                "site",
-                                "queue",
-                                "tier",
-                                "entryType",
-                                "hour",
-                                "weekday"
-                            ],
+                            "example": "Europe/Berlin",
                             "type": "string"
                         }
                     }
@@ -15411,24 +15521,24 @@
                     "deleted"
                 ]
             },
-            "SiteManagerResponseDto": {
+            "SiteDirectUserResponseDto": {
                 "type": "object",
                 "properties": {
                     "userId": {
                         "type": "number",
                         "example": 2,
-                        "description": "ID utilisateur du manager",
+                        "description": "ID de l'utilisateur directement affecté",
                         "minimum": 1
                     },
                     "username": {
                         "type": "string",
                         "example": "manager1",
-                        "description": "Identifiant du manager"
+                        "description": "Identifiant de l'utilisateur"
                     },
                     "email": {
                         "type": "string",
                         "example": "manager1@dori.local",
-                        "description": "Email du manager"
+                        "description": "Email de l'utilisateur"
                     },
                     "isActive": {
                         "type": "boolean",
@@ -15458,7 +15568,7 @@
                     "isActive"
                 ]
             },
-            "PaginatedSiteManagerResponseDto": {
+            "PaginatedSiteDirectUserResponseDto": {
                 "type": "object",
                 "properties": {
                     "page": {
@@ -15482,10 +15592,10 @@
                         "description": "Total de pages"
                     },
                     "items": {
-                        "description": "Liste des managers du site",
+                        "description": "Liste des admins et managers directement affectés au site",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/SiteManagerResponseDto"
+                            "$ref": "#/components/schemas/SiteDirectUserResponseDto"
                         }
                     }
                 },
@@ -15497,7 +15607,7 @@
                     "items"
                 ]
             },
-            "AssignManagerResponseDto": {
+            "AssignDirectSiteUserResponseDto": {
                 "type": "object",
                 "properties": {
                     "assigned": {
@@ -15524,7 +15634,7 @@
                     "userId"
                 ]
             },
-            "AssignManagerDto": {
+            "AssignDirectSiteUserDto": {
                 "type": "object",
                 "properties": {
                     "userId": {
@@ -15538,7 +15648,7 @@
                     "userId"
                 ]
             },
-            "RemoveManagerResponseDto": {
+            "RemoveDirectSiteUserResponseDto": {
                 "type": "object",
                 "properties": {
                     "siteId": {
@@ -20004,18 +20114,28 @@
                         "additionalProperties": {
                             "type": "number"
                         },
-                        "description": "Valeur du champ « notifications »."
+                        "description": "Notifications pending/processing et failed sur les dernières 24 heures",
+                        "example": {
+                            "pending": 4,
+                            "processing": 1,
+                            "failed": 2
+                        }
                     },
                     "openOperatorSessions": {
                         "type": "number",
-                        "description": "Valeur du champ « open operator sessions »."
+                        "description": "Sessions opérateur actuellement ouvertes"
                     },
                     "registrations": {
                         "type": "object",
                         "additionalProperties": {
                             "type": "number"
                         },
-                        "description": "Valeur du champ « registrations »."
+                        "description": "Inscriptions non terminées, tous sites confondus",
+                        "example": {
+                            "booked": 8,
+                            "waiting": 12,
+                            "in_progress": 3
+                        }
                     },
                     "generatedAt": {
                         "type": "string",
@@ -20030,51 +20150,479 @@
                     "generatedAt"
                 ]
             },
-            "ReportPeriodDto": {
+            "MonitoringLiveTotalsDto": {
                 "type": "object",
                 "properties": {
-                    "dateFrom": {
-                        "type": "string",
-                        "format": "date",
-                        "description": "Première date incluse dans la période.",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    "waiting": {
+                        "type": "number",
+                        "description": "Valeur du champ « waiting »."
                     },
-                    "dateTo": {
-                        "type": "string",
-                        "format": "date",
-                        "description": "Dernière date incluse dans la période.",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    "inProgress": {
+                        "type": "number",
+                        "description": "Valeur du champ « in progress »."
                     },
-                    "granularity": {
+                    "activeQueues": {
+                        "type": "number",
+                        "description": "Valeur du champ « active queues »."
+                    },
+                    "openDesks": {
+                        "type": "number",
+                        "description": "Valeur du champ « open desks »."
+                    },
+                    "activeOperators": {
+                        "type": "number",
+                        "description": "Valeur du champ « active operators »."
+                    },
+                    "longestWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Valeur du champ « longest wait minutes »."
+                    }
+                },
+                "required": [
+                    "waiting",
+                    "inProgress",
+                    "activeQueues",
+                    "openDesks",
+                    "activeOperators",
+                    "longestWaitMinutes"
+                ]
+            },
+            "MonitoringLiveQueueDto": {
+                "type": "object",
+                "properties": {
+                    "queueId": {
+                        "type": "number",
+                        "description": "Valeur du champ « queue id ».",
+                        "minimum": 1
+                    },
+                    "queueName": {
+                        "type": "string",
+                        "description": "Valeur du champ « queue name »."
+                    },
+                    "waiting": {
+                        "type": "number",
+                        "description": "Valeur du champ « waiting »."
+                    },
+                    "inProgress": {
+                        "type": "number",
+                        "description": "Valeur du champ « in progress »."
+                    },
+                    "openDesks": {
+                        "type": "number",
+                        "description": "Valeur du champ « open desks »."
+                    },
+                    "activeOperators": {
+                        "type": "number",
+                        "description": "Valeur du champ « active operators »."
+                    },
+                    "estimatedWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Valeur du champ « estimated wait minutes »."
+                    },
+                    "longestWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Valeur du champ « longest wait minutes »."
+                    }
+                },
+                "required": [
+                    "queueId",
+                    "queueName",
+                    "waiting",
+                    "inProgress",
+                    "openDesks",
+                    "activeOperators",
+                    "estimatedWaitMinutes",
+                    "longestWaitMinutes"
+                ]
+            },
+            "MonitoringLiveOperatorDto": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "number",
+                        "description": "Valeur du champ « user id ».",
+                        "minimum": 1
+                    },
+                    "displayName": {
+                        "type": "string",
+                        "description": "Valeur du champ « display name »."
+                    },
+                    "queueIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "description": "Valeur du champ « queue ids »."
+                    },
+                    "sessionId": {
+                        "type": "number",
+                        "description": "Valeur du champ « session id ».",
+                        "minimum": 1
+                    },
+                    "counterName": {
+                        "type": "string",
+                        "description": "Valeur du champ « counter name »."
+                    },
+                    "threadNumber": {
+                        "type": "number",
+                        "description": "Valeur du champ « thread number »."
+                    },
+                    "startedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « started at »."
+                    },
+                    "currentRegistrationId": {
+                        "type": "number",
+                        "description": "Valeur du champ « current registration id ».",
+                        "minimum": 1
+                    },
+                    "currentTicketNumber": {
+                        "type": "string",
+                        "description": "Valeur du champ « current ticket number »."
+                    }
+                },
+                "required": [
+                    "userId",
+                    "displayName",
+                    "queueIds",
+                    "sessionId",
+                    "startedAt"
+                ]
+            },
+            "MonitoringLiveAlertDto": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "description": "Valeur du champ « code »."
+                    },
+                    "severity": {
                         "type": "string",
                         "enum": [
+                            "info",
+                            "warning",
+                            "critical"
+                        ],
+                        "description": "Valeur du champ « severity »."
+                    },
+                    "queueId": {
+                        "type": "number",
+                        "description": "Valeur du champ « queue id ».",
+                        "minimum": 1
+                    },
+                    "messageKey": {
+                        "type": "string",
+                        "description": "Valeur du champ « message key »."
+                    },
+                    "translationParams": {
+                        "type": "object",
+                        "description": "Valeur du champ « translation params »."
+                    }
+                },
+                "required": [
+                    "code",
+                    "severity",
+                    "messageKey"
+                ]
+            },
+            "MonitoringLiveResponseDto": {
+                "type": "object",
+                "properties": {
+                    "generatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « generated at »."
+                    },
+                    "siteId": {
+                        "type": "number",
+                        "description": "Valeur du champ « site id ».",
+                        "minimum": 1
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "description": "Fuseau horaire IANA utilisé pour les calculs temporels."
+                    },
+                    "totals": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/MonitoringLiveTotalsDto"
+                            }
+                        ],
+                        "description": "Valeur du champ « totals »."
+                    },
+                    "queues": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringLiveQueueDto"
+                        },
+                        "description": "Valeur du champ « queues »."
+                    },
+                    "operators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringLiveOperatorDto"
+                        },
+                        "description": "Valeur du champ « operators »."
+                    },
+                    "alerts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringLiveAlertDto"
+                        },
+                        "description": "Valeur du champ « alerts »."
+                    }
+                },
+                "required": [
+                    "generatedAt",
+                    "siteId",
+                    "timezone",
+                    "totals",
+                    "queues",
+                    "operators",
+                    "alerts"
+                ]
+            },
+            "MonitoringAppliedFiltersDto": {
+                "type": "object",
+                "properties": {
+                    "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « from »."
+                    },
+                    "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « to »."
+                    },
+                    "bucket": {
+                        "type": "string",
+                        "enum": [
+                            "hour",
                             "day",
                             "week",
                             "month"
                         ],
-                        "description": "Valeur du champ « granularity »."
+                        "description": "Valeur du champ « bucket »."
+                    },
+                    "siteId": {
+                        "type": "number",
+                        "description": "Valeur du champ « site id ».",
+                        "minimum": 1
+                    },
+                    "queueIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "description": "Valeur du champ « queue ids »."
+                    },
+                    "userIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "description": "Valeur du champ « user ids »."
+                    },
+                    "tierIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "description": "Valeur du champ « tier ids »."
+                    },
+                    "statuses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Valeur du champ « statuses »."
+                    },
+                    "entryTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Valeur du champ « entry types »."
                     }
                 },
                 "required": [
-                    "dateFrom",
-                    "dateTo",
-                    "granularity"
+                    "from",
+                    "to",
+                    "bucket"
                 ]
             },
-            "ReportVolumeDto": {
+            "MonitoringSeriesMetricsDto": {
                 "type": "object",
                 "properties": {
                     "registered": {
                         "type": "number",
+                        "example": 120,
                         "description": "Valeur du champ « registered »."
                     },
-                    "walkin": {
+                    "served": {
                         "type": "number",
-                        "description": "Valeur du champ « walkin »."
+                        "example": 92,
+                        "description": "Valeur du champ « served »."
                     },
-                    "appointments": {
+                    "noShow": {
                         "type": "number",
-                        "description": "Valeur du champ « appointments »."
+                        "example": 5,
+                        "description": "Valeur du champ « no show »."
+                    },
+                    "cancelled": {
+                        "type": "number",
+                        "example": 8,
+                        "description": "Valeur du champ « cancelled »."
+                    },
+                    "averageWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 12.4,
+                        "description": "Valeur du champ « average wait minutes »."
+                    },
+                    "averageServiceMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 7.8,
+                        "description": "Valeur du champ « average service minutes »."
+                    }
+                },
+                "required": [
+                    "registered",
+                    "served",
+                    "noShow",
+                    "cancelled",
+                    "averageWaitMinutes",
+                    "averageServiceMinutes"
+                ]
+            },
+            "MonitoringSeriesBucketDto": {
+                "type": "object",
+                "properties": {
+                    "registered": {
+                        "type": "number",
+                        "example": 120,
+                        "description": "Valeur du champ « registered »."
+                    },
+                    "served": {
+                        "type": "number",
+                        "example": 92,
+                        "description": "Valeur du champ « served »."
+                    },
+                    "noShow": {
+                        "type": "number",
+                        "example": 5,
+                        "description": "Valeur du champ « no show »."
+                    },
+                    "cancelled": {
+                        "type": "number",
+                        "example": 8,
+                        "description": "Valeur du champ « cancelled »."
+                    },
+                    "averageWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 12.4,
+                        "description": "Valeur du champ « average wait minutes »."
+                    },
+                    "averageServiceMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 7.8,
+                        "description": "Valeur du champ « average service minutes »."
+                    },
+                    "periodStart": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « period start »."
+                    }
+                },
+                "required": [
+                    "registered",
+                    "served",
+                    "noShow",
+                    "cancelled",
+                    "averageWaitMinutes",
+                    "averageServiceMinutes",
+                    "periodStart"
+                ]
+            },
+            "MonitoringQueueBreakdownDto": {
+                "type": "object",
+                "properties": {
+                    "registered": {
+                        "type": "number",
+                        "example": 120,
+                        "description": "Valeur du champ « registered »."
+                    },
+                    "served": {
+                        "type": "number",
+                        "example": 92,
+                        "description": "Valeur du champ « served »."
+                    },
+                    "noShow": {
+                        "type": "number",
+                        "example": 5,
+                        "description": "Valeur du champ « no show »."
+                    },
+                    "cancelled": {
+                        "type": "number",
+                        "example": 8,
+                        "description": "Valeur du champ « cancelled »."
+                    },
+                    "averageWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 12.4,
+                        "description": "Valeur du champ « average wait minutes »."
+                    },
+                    "averageServiceMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 7.8,
+                        "description": "Valeur du champ « average service minutes »."
+                    },
+                    "queueId": {
+                        "type": "number",
+                        "description": "Valeur du champ « queue id ».",
+                        "minimum": 1
+                    },
+                    "queueName": {
+                        "type": "string",
+                        "description": "Valeur du champ « queue name »."
+                    }
+                },
+                "required": [
+                    "registered",
+                    "served",
+                    "noShow",
+                    "cancelled",
+                    "averageWaitMinutes",
+                    "averageServiceMinutes",
+                    "queueId",
+                    "queueName"
+                ]
+            },
+            "MonitoringUserBreakdownDto": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "number",
+                        "description": "Valeur du champ « user id ».",
+                        "minimum": 1
+                    },
+                    "displayName": {
+                        "type": "string",
+                        "description": "Valeur du champ « display name »."
+                    },
+                    "registered": {
+                        "type": "number",
+                        "description": "Valeur du champ « registered »."
                     },
                     "served": {
                         "type": "number",
@@ -20084,275 +20632,198 @@
                         "type": "number",
                         "description": "Valeur du champ « no show »."
                     },
-                    "expired": {
-                        "type": "number",
-                        "description": "Valeur du champ « expired »."
-                    },
-                    "cancelled": {
-                        "type": "number",
-                        "description": "Valeur du champ « cancelled »."
-                    }
-                },
-                "required": [
-                    "registered",
-                    "walkin",
-                    "appointments",
-                    "served",
-                    "noShow",
-                    "expired",
-                    "cancelled"
-                ]
-            },
-            "ReportTimingDto": {
-                "type": "object",
-                "properties": {
-                    "averageWaitMinutes": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « average wait minutes »."
-                    },
-                    "medianWaitMinutes": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « median wait minutes »."
-                    },
-                    "p90WaitMinutes": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « p90 wait minutes »."
-                    },
                     "averageServiceMinutes": {
                         "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « average service minutes »."
-                    },
-                    "medianServiceMinutes": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « median service minutes »."
-                    },
-                    "p90ServiceMinutes": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « p90 service minutes »."
                     }
                 },
                 "required": [
-                    "averageWaitMinutes",
-                    "medianWaitMinutes",
-                    "p90WaitMinutes",
-                    "averageServiceMinutes",
-                    "medianServiceMinutes",
-                    "p90ServiceMinutes"
+                    "userId",
+                    "displayName",
+                    "registered",
+                    "served",
+                    "noShow",
+                    "averageServiceMinutes"
                 ]
             },
-            "ReportRatesDto": {
+            "MonitoringTierBreakdownDto": {
                 "type": "object",
                 "properties": {
-                    "noShowRate": {
+                    "tierId": {
                         "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « no show rate »."
+                        "description": "Valeur du champ « tier id ».",
+                        "minimum": 1
                     },
-                    "cancellationRate": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « cancellation rate »."
-                    },
-                    "expirationRate": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Valeur du champ « expiration rate »."
-                    }
-                },
-                "required": [
-                    "noShowRate",
-                    "cancellationRate",
-                    "expirationRate"
-                ]
-            },
-            "ReportMetricsDto": {
-                "type": "object",
-                "properties": {
-                    "volume": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportVolumeDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « volume »."
-                    },
-                    "timing": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportTimingDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « timing »."
-                    },
-                    "rates": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportRatesDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « rates »."
-                    }
-                },
-                "required": [
-                    "volume",
-                    "timing",
-                    "rates"
-                ]
-            },
-            "ReportBucketDto": {
-                "type": "object",
-                "properties": {
-                    "volume": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportVolumeDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « volume »."
-                    },
-                    "timing": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportTimingDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « timing »."
-                    },
-                    "rates": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportRatesDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « rates »."
-                    },
-                    "periodStart": {
+                    "tierCode": {
                         "type": "string",
-                        "format": "date",
-                        "description": "Valeur du champ « period start »."
+                        "description": "Valeur du champ « tier code »."
                     },
-                    "periodEnd": {
+                    "tierName": {
                         "type": "string",
-                        "format": "date",
-                        "description": "Valeur du champ « period end »."
+                        "description": "Valeur du champ « tier name »."
+                    },
+                    "registered": {
+                        "type": "number",
+                        "description": "Valeur du champ « registered »."
+                    },
+                    "served": {
+                        "type": "number",
+                        "description": "Valeur du champ « served »."
+                    },
+                    "noShow": {
+                        "type": "number",
+                        "description": "Valeur du champ « no show »."
+                    },
+                    "averageWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Valeur du champ « average wait minutes »."
                     }
                 },
                 "required": [
-                    "volume",
-                    "timing",
-                    "rates",
-                    "periodStart",
-                    "periodEnd"
+                    "tierId",
+                    "tierCode",
+                    "tierName",
+                    "registered",
+                    "served",
+                    "noShow",
+                    "averageWaitMinutes"
                 ]
             },
-            "ReportGroupDto": {
+            "MonitoringCountBreakdownDto": {
                 "type": "object",
                 "properties": {
-                    "volume": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportVolumeDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « volume »."
+                    "entryType": {
+                        "type": "string",
+                        "description": "Valeur du champ « entry type »."
                     },
-                    "timing": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportTimingDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « timing »."
+                    "count": {
+                        "type": "number",
+                        "description": "Valeur du champ « count »."
+                    }
+                },
+                "required": [
+                    "entryType",
+                    "count"
+                ]
+            },
+            "MonitoringStatusBreakdownDto": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "description": "Valeur du champ « status »."
                     },
-                    "rates": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ReportRatesDto"
-                            }
-                        ],
-                        "description": "Valeur du champ « rates »."
-                    },
-                    "dimension": {
-                        "type": "object",
-                        "description": "Valeur du champ « dimension »."
-                    },
-                    "buckets": {
+                    "count": {
+                        "type": "number",
+                        "description": "Valeur du champ « count »."
+                    }
+                },
+                "required": [
+                    "status",
+                    "count"
+                ]
+            },
+            "MonitoringSeriesBreakdownsDto": {
+                "type": "object",
+                "properties": {
+                    "byQueue": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ReportBucketDto"
+                            "$ref": "#/components/schemas/MonitoringQueueBreakdownDto"
                         },
-                        "description": "Valeur du champ « buckets »."
+                        "description": "Valeur du champ « by queue »."
                     },
-                    "timezone": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "Fuseau horaire IANA utilisé pour les calculs temporels."
+                    "byUser": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringUserBreakdownDto"
+                        },
+                        "description": "Valeur du champ « by user »."
+                    },
+                    "byTier": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringTierBreakdownDto"
+                        },
+                        "description": "Valeur du champ « by tier »."
+                    },
+                    "byEntryType": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringCountBreakdownDto"
+                        },
+                        "description": "Valeur du champ « by entry type »."
+                    },
+                    "byStatus": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonitoringStatusBreakdownDto"
+                        },
+                        "description": "Valeur du champ « by status »."
                     }
                 },
                 "required": [
-                    "volume",
-                    "timing",
-                    "rates",
-                    "dimension",
-                    "buckets",
-                    "timezone"
+                    "byQueue",
+                    "byUser",
+                    "byTier",
+                    "byEntryType",
+                    "byStatus"
                 ]
             },
             "ReportSeriesResponseDto": {
                 "type": "object",
                 "properties": {
-                    "scope": {
-                        "type": "object",
-                        "description": "Valeur du champ « scope »."
+                    "generatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « generated at »."
                     },
                     "timezone": {
                         "type": "string",
-                        "nullable": true,
+                        "example": "Europe/Berlin",
                         "description": "Fuseau horaire IANA utilisé pour les calculs temporels."
                     },
-                    "period": {
+                    "appliedFilters": {
                         "allOf": [
                             {
-                                "$ref": "#/components/schemas/ReportPeriodDto"
+                                "$ref": "#/components/schemas/MonitoringAppliedFiltersDto"
                             }
                         ],
-                        "description": "Valeur du champ « period »."
+                        "description": "Valeur du champ « applied filters »."
                     },
-                    "summary": {
+                    "totals": {
                         "allOf": [
                             {
-                                "$ref": "#/components/schemas/ReportMetricsDto"
+                                "$ref": "#/components/schemas/MonitoringSeriesMetricsDto"
                             }
                         ],
-                        "description": "Valeur du champ « summary »."
+                        "description": "Valeur du champ « totals »."
                     },
-                    "buckets": {
+                    "series": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ReportBucketDto"
+                            "$ref": "#/components/schemas/MonitoringSeriesBucketDto"
                         },
-                        "description": "Valeur du champ « buckets »."
+                        "description": "Valeur du champ « series »."
                     },
-                    "groups": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ReportGroupDto"
-                        },
-                        "description": "Valeur du champ « groups »."
+                    "breakdowns": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/MonitoringSeriesBreakdownsDto"
+                            }
+                        ],
+                        "description": "Valeur du champ « breakdowns »."
                     }
                 },
                 "required": [
-                    "scope",
+                    "generatedAt",
                     "timezone",
-                    "period",
-                    "summary",
-                    "buckets"
+                    "appliedFilters",
+                    "totals",
+                    "series",
+                    "breakdowns"
                 ]
             }
         }

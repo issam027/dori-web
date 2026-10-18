@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Award, CalendarRange, CircleAlert, Gauge, Target, TrendingDown, TrendingUp } from 'lucide-react';
-import type { ReportBucketDto, ReportMetricsDto } from '@/api/generated/models';
+import type { ReportBucketDto, ReportMetricsDto } from './report-utils';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import type { QueueReportRow } from './report-utils';

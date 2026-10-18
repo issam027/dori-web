@@ -1,4 +1,11 @@
-import type { QueueResponseDto, ReportBucketDto, ReportGroupDto, ReportMetricsDto } from '@/api/generated/models';
+import type { QueueResponseDto } from '@/api/generated/models';
+
+export interface ReportVolume { registered: number; served: number; walkin: number; appointments: number; noShow: number; cancelled: number; expired: number }
+export interface ReportTiming { averageWaitMinutes: number | null; medianWaitMinutes: number | null; p90WaitMinutes: number | null; averageServiceMinutes: number | null; medianServiceMinutes: number | null; p90ServiceMinutes: number | null }
+export interface ReportRates { noShowRate: number | null; cancellationRate: number | null; expirationRate: number | null }
+export interface ReportMetricsDto { volume: ReportVolume; timing: ReportTiming; rates: ReportRates }
+export interface ReportBucketDto extends ReportMetricsDto { periodStart: string; periodEnd: string }
+export interface ReportGroupDto extends ReportMetricsDto { dimension: Record<string, string | number | undefined>; buckets: ReportBucketDto[] }
 
 const DAY_IN_MS = 86_400_000;
 

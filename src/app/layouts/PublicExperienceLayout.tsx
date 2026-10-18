@@ -3,7 +3,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { clearSession } from '@/core/auth/session-actions';
+import { useSessionStore } from '@/core/auth/session-store';
 import { LocaleSwitcher } from '@/design-system/components/LocaleSwitcher';
+import { useSite } from '@/features/portfolio/hooks/useSites';
 
 export function PublicExperienceLayout({
   mode,
@@ -17,6 +19,12 @@ export function PublicExperienceLayout({
   const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useSessionStore((state) => state.user);
+  const kioskSiteId =
+    mode === 'kiosk' && user?.userType === 'kiosk' && !user.scope.isGlobal
+      ? (user.scope.siteIds[0] ?? null)
+      : null;
+  const kioskSite = useSite(kioskSiteId);
   const logoutStarted = useRef(false);
   const disconnectRequested =
     (mode === 'kiosk' || mode === 'display' || mode === 'tracking') &&
@@ -45,11 +53,11 @@ export function PublicExperienceLayout({
   return (
     <div className={`public-layout public-${mode}`}>
       <header className={`public-header${mode === 'display' ? ' public-header-display' : ''}`}>
-          <strong>{t('app.name')}</strong>
+          <strong>{mode === 'kiosk' ? (kioskSite.data?.data.siteName ?? '') : t('app.name')}</strong>
           <LocaleSwitcher />
       </header>
       <main>{children}</main>
-      {mode !== 'display' ? (
+      {mode !== 'display' && mode !== 'kiosk' ? (
         <footer>
           <Link to="/legal" state={{ from: origin }}>
             {t('nav.legal')}

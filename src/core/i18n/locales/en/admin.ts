@@ -128,9 +128,9 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   "settings.confirmAssignment": "Confirm assignment",
   "settings.assignmentDone": "Assignment saved",
   "settings.assignmentDoneMessage": "{{username}} is now assigned to {{resource}}.",
-  "settings.managers": "Assigned managers",
-  "settings.managersHelp": "Managers authorized to administer this site.",
-  "settings.addManager": "Add manager",
+  "settings.managers": "Assigned admins and managers",
+  "settings.managersHelp": "Users directly authorized to administer this site.",
+  "settings.addManager": "Assign user",
   "settings.removeManager": "Remove",
-  "settings.noManagers": "No manager is assigned to this site.",
+  "settings.noManagers": "No admin or manager is directly assigned.",
 };

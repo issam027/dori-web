@@ -49,6 +49,7 @@ export function ReportsPage() {
     endDate: effectiveEndDate,
     queueId,
     granularity,
+    timezone: site.data?.data.timezone ?? fallbackTimeZone,
     enabled: Boolean(queues.data && periodDates.length),
   });
   const queueItems = groupsToQueueRows(

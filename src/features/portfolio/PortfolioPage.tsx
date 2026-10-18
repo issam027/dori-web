@@ -213,10 +213,6 @@ export function PortfolioPage() {
                   {summariesBySite.get(site.siteId)?.data.activeQueues}{' '}
                   {__t('portfolio.portfolio.filesActives')}
                 </span>
-                <span>
-                  {summariesBySite.get(site.siteId)?.data.appointmentsToday}{' '}
-                  {__t('portfolio.portfolio.rdvAujourdHui')}
-                </span>
               </div>
             ) : null}
             <div className="site-card-actions">

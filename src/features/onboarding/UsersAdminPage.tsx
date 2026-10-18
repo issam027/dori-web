@@ -55,7 +55,7 @@ export function UsersAdminPage() {
     queues: createOpen,
     roles: createOpen,
     tiers: false,
-    managers: false,
+    directUsers: false,
   });
   const [editing, setEditing] = useState<UserSummaryItemDto>();
   const [viewingId, setViewingId] = useState<number>();

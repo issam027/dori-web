@@ -97,7 +97,7 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   "onboarding.settings.scope": "Scope:",
   "onboarding.settings.segmentS": "segment(s)",
   "onboarding.settings.seuil": "Threshold",
-  "onboarding.settings.sitesManagers": "Sites & managers",
+  "onboarding.settings.sitesManagers": "Site & direct users",
   "onboarding.settings.sms": "SMS",
   "onboarding.settings.suspendre": "Suspend",
   "onboarding.settings.systeme": "System",
