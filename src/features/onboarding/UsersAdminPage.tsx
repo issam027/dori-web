@@ -29,6 +29,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { useSettingsData } from './hooks/useSettingsData';
+import { queryKeys } from '@/api/client/query-keys';
 import {
   deleteUser,
   findUserById,
@@ -75,7 +76,7 @@ export function UsersAdminPage() {
     return () => { document.removeEventListener('pointerdown', close); };
   }, [openActionsUserId]);
   const users = useQuery({
-    queryKey: ['admin', 'users-page', page, effectiveFilters],
+    queryKey: queryKeys.admin.usersPage(page, effectiveFilters),
     queryFn: ({ signal }) =>
       findUsers(
         {
@@ -93,7 +94,7 @@ export function UsersAdminPage() {
       ),
   });
   const userDetail = useQuery({
-    queryKey: ['admin', 'user-detail', viewingId],
+    queryKey: queryKeys.admin.userDetail(viewingId),
     queryFn: ({ signal }) => findUserById(viewingId ?? 0, undefined, signal),
     enabled: Boolean(viewingId),
   });
@@ -103,7 +104,7 @@ export function UsersAdminPage() {
     ...roles.filter((role) => current?.roles.includes(role.roleName)).map((role) => role.rank),
     0,
   );
-  const refresh = async () => queryClient.invalidateQueries({ queryKey: ['admin', 'users-page'] });
+  const refresh = async () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.usersPages });
   const edit = (user: UserSummaryItemDto) => {
     setEditing(user);
     setEditForm({ fullName: user.fullName ?? '', email: user.email ?? '', language: user.languagePreference });

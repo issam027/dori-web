@@ -60,15 +60,13 @@ export function useReports(options: {
   enabled: boolean;
 }) {
   return useQuery({
-    queryKey: [
-      ...queryKeys.reports.daily(
-        options.siteId,
-        options.startDate,
-        options.endDate,
-        options.queueId ? [options.queueId] : [],
-      ),
+    queryKey: queryKeys.reports.dailyByGranularity(
+      options.siteId,
+      options.startDate,
+      options.endDate,
+      options.queueId ? [options.queueId] : [],
       options.granularity,
-    ],
+    ),
     enabled: options.enabled && options.siteId !== null,
     queryFn: async ({ signal }) => {
       const requestParams = {

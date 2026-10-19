@@ -15,6 +15,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { queryKeys } from '@/api/client/query-keys';
 
 type View = 'assigned' | 'add';
 
@@ -44,14 +45,14 @@ export function QueueOperatorsModal({
     resetAddView();
     onOpenChange(false);
   };
-  const operatorsKey = ['queue-operators', queue?.queueId];
+  const operatorsKey = queryKeys.queueOperators.byQueue(queue?.queueId);
   const operators = useQuery({
     queryKey: operatorsKey,
     queryFn: ({ signal }) => queuesControllerGetOperators(queue?.queueId ?? 0, undefined, undefined, signal),
     enabled: Boolean(queue),
   });
   const users = useQuery({
-    queryKey: ['queue-operator-candidates', queue?.queueId, queue?.siteId, debounced, page],
+    queryKey: queryKeys.queueOperators.candidates(queue?.queueId, queue?.siteId, debounced, page),
     queryFn: ({ signal }) => usersControllerFindUsers({ search: debounced, siteIds: String(queue?.siteId ?? 0), isActive: true, page, pageSize: 5, sort: 'username:asc' }, undefined, signal),
     enabled: Boolean(queue && view === 'add' && debounced.length >= 4),
   });

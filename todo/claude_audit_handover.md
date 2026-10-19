@@ -33,7 +33,7 @@ Dorify possède une fondation saine : typage strict, découpage par fonctionnali
 | REU-05 | Design | 🟠 Majeur | 262 lignes contenant une couleur hexadécimale hors `tokens.css`, plus 1 091 lignes CSS contenant une valeur en px et 72 media queries. | `src/design-system/styles/tokens.css:3-43`; `src/design-system/styles/layouts/shell.css:4-26,68-86,309-321`; `src/design-system/styles/print/documents.css:22-36` | Introduire tokens couleur/rayon/espace/breakpoint ; exclure explicitement les contraintes physiques d'impression (`mm`, `pt`). | L | [ ] À faire |
 | REU-06 | Granularité | 🟠 Majeur | Plusieurs composants mêlent requêtes, mutations, état et rendu sur 400 à 1 100 lignes. | `src/features/onboarding/components/OnboardingWizard.tsx:1-1100`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:1-767`; `src/features/appointments/AppointmentActionDialog.tsx:1-551`; `src/features/onboarding/TranslationsAdminPage.tsx:1-513`; `src/features/appointments/AppointmentsPage.tsx:1-483`; `src/features/queue-operations/QuickRegistration.tsx:1-459` | Extraire hooks de contrôleur, sections visuelles et schémas/formateurs ; conserver un orchestrateur mince. | L | [ ] À faire |
 | ARC-01 | Architecture | 🟠 Majeur | Des DTO de rapport étaient recopiés hors du client généré ; ils sont désormais des view models alimentés par un mappeur typé depuis le modèle Orval. | `src/features/supervision/report-utils.ts:1-21`; `src/features/supervision/hooks/useReports.ts:5-6,82-105`; `tools/phase11-audit.mjs:42-46` | Correctif livré ; conserver la frontière API → view model et ses tests. | M | [x] Terminé |
-| ARC-02 | Architecture | 🟡 Mineur | Des query keys ad hoc coexistent avec le catalogue centralisé. | `src/api/client/query-keys.ts:1-114`; `src/features/onboarding/UsersAdminPage.tsx:83-100,112`; `src/features/users/QueueOperatorsModal.tsx:52-67` | Ajouter les clés manquantes au catalogue et utiliser les invalidations centralisées. | S | [ ] À faire |
+| ARC-02 | Architecture | 🟡 Mineur | Toutes les query keys applicatives sont désormais produites par le catalogue centralisé, avec formes historiques caractérisées. | `src/api/client/query-keys.ts`; `src/api/client/query-keys.test.ts`; `src/features/users/QueueOperatorsModal.test.tsx` | Correctif livré ; conserver l'audit des clés littérales et les tests d'invalidation. | S | [x] Terminé — preuve 9.11 |
 | QUA-01 | Qualité | 🟠 Majeur | Le `console.warn` de production a été remplacé par un reporter injectable, avec événement navigateur contrôlé par défaut. | `src/core/i18n/remote.ts:17-53,114-122`; `src/core/i18n/i18n.test.ts:128-168`; `tools/phase11-audit.mjs:52-55` | Correctif livré ; brancher le reporter sur la future télémétrie de production. | S | [x] Terminé |
 | QUA-02 | Typage | 🟡 Mineur | Trois assertions `as never` masquent la relation clé/valeur d'éditeurs. | `src/features/queues/QueueEditor.tsx:38-39`; `src/features/onboarding/components/SiteEditor.tsx:71` | Typer les setters par clé (`K extends keyof T`, `T[K]`) ou séparer setters numériques. | S | [ ] À faire |
 | SEC-01 | Session | 🟡 Mineur | L'expiration efface tout le stockage de l'origine, pas uniquement les clés Dorify. | `src/core/auth/session-actions.ts:64-73`; `src/core/scope/scope-store.ts:12-13,38-40` | Supprimer seulement les clés possédées ; préserver préférences non sensibles et intégrations partageant l'origine. | S | [ ] À faire |
@@ -146,6 +146,7 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 | 2026-10-19 | Codex | A11Y-01 terminé : lint global restauré pendant REU-02, tous les critères communs et spécifiques sont désormais verts ; preuve finale en 9.9. |
 | 2026-10-19 | Codex | REU-02 partiel : hook temporisé mutualisé dans les cinq écrans, lint et régressions verts ; quatre tests d'intégration par écran restent requis avant clôture, preuve en 9.10. |
 | 2026-10-19 | Codex | REU-02 terminé : quatre tests d'intégration ajoutés, cinq écrans protégés contre les requêtes multiples pendant une rafale, trois passes ciblées vertes et contrôles globaux réussis ; preuve finale en 9.10. |
+| 2026-10-19 | Codex | ARC-02 terminé : toutes les query keys littérales restantes ont rejoint le catalogue sans changement de tuple ; tests de formes et d'invalidation ajoutés, preuve en 9.11. |
 ## 9. Protocole de non-régression et conditions de sortie
 
 Cette section complète les sections 6 et 7. Une action n'est cochée `[x] Terminé` que si TOUS ses critères de sortie (9.3) ET la définition de terminé commune (9.2) sont satisfaits, avec preuve notée (9.5). Un critère non satisfait = statut inchangé, jamais de coche "presque".
@@ -436,6 +437,19 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 - **Écart** : aucun commit n'a été créé dans le worktree partagé ; les changements restent regroupés et réversibles par fichier.
 - **Statut** : [x] Terminé.
 
+### 9.11 Preuve ARC-02
+
+- **ID** : ARC-02
+- **Date** : 2026-10-19
+- **Inventaire** : les clés ad hoc couvraient les pages utilisateurs/traductions, le détail utilisateur, les opérateurs et candidats de file, les inscriptions par opérateur, les personnes administrées, les utilisateurs directs d'un site, les files par statut et les séries/live de supervision.
+- **Implémentation** : toutes ces familles ont été ajoutées à `queryKeys` puis consommées dans les composants et hooks concernés. Chaque helper restitue exactement le tuple historique ; les racines de listes (`usersPages`, `translationPages`) servent aux invalidations partielles.
+- **Vérification reproductible** : `rg -n "queryKey:\\s*\\[|invalidateQueries\\(\\{\\s*queryKey:\\s*\\[|const .*Key\\s*=\\s*\\[" src --glob '!src/api/generated/**' -g '*.ts' -g '*.tsx'` ne retourne aucune occurrence.
+- **Tests** : `query-keys.test.ts` caractérise les formes des nouveaux tuples. `QueueOperatorsModal.test.tsx` démontre qu'une affectation réussie invalide `['queue-operators', 10]`, soit exactement la clé lue par la liste.
+- **Commandes** : lint vert ; typecheck vert ; 56 fichiers / 187 tests verts ; build et génération Orval verts ; audits i18n et phase11 verts ; E2E 62/62 verts. Bundle initial : 118,99 kB JS gzip et 34,05 kB CSS gzip.
+- **UI/captures** : non applicables ; seules les constructions de clés de cache et leurs tests ont changé, sans JSX, CSS, texte ou DOM modifié.
+- **Écart** : aucun commit créé dans le worktree partagé.
+- **Statut** : [x] Terminé.
+
 <!-- CHECKPOINT id="ckpt_mvezekch_ghscwq" time="2026-10-19T08:17:35.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvezrfb6_twt6oi" time="2026-10-19T08:27:35.106Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -479,3 +493,5 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvfec85f_t7h8zi" time="2026-10-19T15:15:40.227Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvfep345_ueqm9o" time="2026-10-19T15:25:40.229Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvff1y2x_v4l5qs" time="2026-10-19T15:35:40.233Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

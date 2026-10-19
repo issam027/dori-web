@@ -55,7 +55,7 @@ export function PersonsPage() {
   const [pending, setPending] = useState(false);
 
   const persons = useQuery({
-    queryKey: [...queryKeys.persons.search(siteId, search, page, PAGE_SIZE, 'admin-page'), { status, sort }],
+    queryKey: queryKeys.persons.adminSearch(siteId, search, page, PAGE_SIZE, { status, sort }),
     queryFn: ({ signal }) => {
       if (!siteId) throw new Error('An active site is required');
       return findPersons(

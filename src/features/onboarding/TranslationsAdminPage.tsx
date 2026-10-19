@@ -16,6 +16,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { loadTranslationBundle } from '@/core/i18n/i18n';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { queryKeys } from '@/api/client/query-keys';
 import {
   createTranslation,
   deleteTranslation,
@@ -61,7 +62,7 @@ export function TranslationsAdminPage() {
   const categoryLabel = (category: CreateTranslationDto['category']) =>
     t(`admin.translations.categories.${category}`);
   const translations = useQuery({
-    queryKey: ['admin', 'translations-page', page, effectiveFilters],
+    queryKey: queryKeys.admin.translationsPage(page, effectiveFilters),
     queryFn: ({ signal }) =>
       findTranslations(
         {
@@ -123,7 +124,7 @@ export function TranslationsAdminPage() {
             }),
           ),
         );
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'translations-page'] });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.translationPages });
       if (form.category === 'ihm') {
         const activeLocale = (i18n.resolvedLanguage ?? i18n.language).split('-')[0] ?? 'fr';
         const locale = editing ? form.locale : activeLocale;
@@ -153,7 +154,7 @@ export function TranslationsAdminPage() {
     setPending(true);
     try {
       await deleteTranslation(deleting.translationId);
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'translations-page'] });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.translationPages });
       const activeLocale = (i18n.resolvedLanguage ?? i18n.language).split('-')[0] ?? 'fr';
       if (deleting.category === 'ihm' && deleting.locale === activeLocale) {
         await loadTranslationBundle(activeLocale, 'ihm', true);

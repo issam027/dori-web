@@ -4,34 +4,41 @@ import userEvent from '@testing-library/user-event';
 import { QueueOperatorsModal } from './QueueOperatorsModal';
 
 const findUsers = vi.fn();
+const assignOperator = vi.fn();
+const getOperators = vi.fn().mockResolvedValue({
+  data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] },
+});
 
 vi.mock('@/api/generated/users/users', () => ({
   usersControllerFindUsers: (...args: unknown[]) => findUsers(...args) as never,
 }));
 
 vi.mock('@/api/generated/queues/queues', () => ({
-  queuesControllerGetOperators: vi.fn().mockResolvedValue({
-    data: { data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] } },
-  }),
-  queuesControllerAssignOperator: vi.fn(),
+  queuesControllerGetOperators: (...args: unknown[]) => getOperators(...args) as never,
+  queuesControllerAssignOperator: (...args: unknown[]) => assignOperator(...args) as never,
   queuesControllerRemoveOperator: vi.fn(),
 }));
 
-it('issues one candidate request after a typing burst reaches four characters', async () => {
-  findUsers.mockResolvedValue({
-    data: { data: { page: 1, pageSize: 5, total: 0, totalPages: 0, items: [] } },
-  });
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+function renderModal(client = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
   render(
     <QueryClientProvider client={client}>
       <QueueOperatorsModal
         queue={{ queueId: 10, queueName: 'Accueil', siteId: 1 }}
         onOpenChange={() => {
-          // The close callback is irrelevant to this search characterization.
+          // The close callback is irrelevant to these characterizations.
         }}
       />
     </QueryClientProvider>,
   );
+  return client;
+}
+
+it('issues one candidate request after a typing burst reaches four characters', async () => {
+  findUsers.mockResolvedValue({
+    data: { page: 1, pageSize: 5, total: 0, totalPages: 0, items: [] },
+  });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  renderModal(client);
 
   await userEvent.click(screen.getByRole('button', { name: /ajouter une affectation/i }));
   await userEvent.type(screen.getByRole('searchbox'), 'abcd');
@@ -43,5 +50,30 @@ it('issues one candidate request after a typing burst reaches four characters', 
     search: 'abcd',
     siteIds: '1',
     pageSize: 5,
+  });
+});
+
+it('refreshes the centralized operator list after a successful assignment', async () => {
+  findUsers.mockResolvedValue({
+    data: {
+      page: 1,
+      pageSize: 5,
+      total: 1,
+      totalPages: 1,
+      items: [{ userId: 8, username: 'alice', fullName: 'Alice Martin', isActive: true }],
+    },
+  });
+  assignOperator.mockResolvedValue({ data: { data: {} } });
+  const client = renderModal();
+  const invalidate = vi.spyOn(client, 'invalidateQueries');
+
+  await userEvent.click(screen.getByRole('button', { name: /ajouter une affectation/i }));
+  await userEvent.type(screen.getByRole('searchbox'), 'abcd');
+  await userEvent.click(await screen.findByRole('button', { name: /alice martin/i }));
+  await userEvent.click(screen.getByRole('button', { name: /confirmer/i }));
+
+  await waitFor(() => {
+    expect(assignOperator).toHaveBeenCalledWith(10, { userId: 8 });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['queue-operators', 10] });
   });
 });

@@ -3,10 +3,11 @@ import { useBusinessMutation } from '@/api/client/use-business-mutation';
 import { invalidateControlRoom } from '@/api/client/query-invalidations';
 import { monitoringControllerLive, monitoringControllerSeries } from '@/api/generated/monitoring/monitoring';
 import { resetQueue } from '../api/control-room-api';
+import { queryKeys } from '@/api/client/query-keys';
 
 export function useMonitoringLive(siteId: number | null, refreshInterval: number | false = 30_000) {
   return useQuery({
-    queryKey: ['monitoring', 'live', siteId],
+    queryKey: queryKeys.monitoring.live(siteId),
     queryFn: ({ signal }) => monitoringControllerLive({ siteId: siteId ?? 0 }, undefined, signal),
     enabled: siteId !== null,
     refetchInterval: refreshInterval,
@@ -23,7 +24,7 @@ export function useMonitoringSeries(options: {
   timezone?: string;
 }) {
   return useQuery({
-    queryKey: ['monitoring', 'series', options],
+    queryKey: queryKeys.monitoring.series(options),
     queryFn: ({ signal }) => monitoringControllerSeries({
       siteId: options.siteId ?? undefined,
       queueIds: options.queueIds.length ? options.queueIds.join(',') : undefined,

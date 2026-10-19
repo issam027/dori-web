@@ -37,7 +37,7 @@ export function useOperatorRegistrations(
   pageSize = 10,
 ) {
   return useQuery({
-    queryKey: ['registrations', 'operator', userId, status, siteId, pageSize],
+    queryKey: queryKeys.registrations.operator(userId, status, siteId, pageSize),
     queryFn: ({ signal }) => registrationsControllerFindRegistrations({
       servedByUserId: userId,
       siteId: siteId ?? undefined,

@@ -49,6 +49,12 @@ export const queryKeys = {
     }) => ['registrations', 'list', filters] as const,
     detail: (registrationId: number | null | undefined) =>
       ['registrations', 'detail', registrationId] as const,
+    operator: (
+      userId: number | undefined,
+      status: string,
+      siteId: number | null,
+      pageSize: number,
+    ) => ['registrations', 'operator', userId, status, siteId, pageSize] as const,
   },
   persons: {
     all: ['persons'] as const,
@@ -62,6 +68,13 @@ export const queryKeys = {
     detail: (personId: number | null | undefined) => ['persons', 'detail', personId] as const,
     notes: (personId: number, usage = 'list') =>
       ['persons', 'detail', personId, 'notes', usage] as const,
+    adminSearch: <T extends object>(
+      siteId: number | null,
+      search: string,
+      page: number,
+      pageSize: number,
+      filters: T,
+    ) => [...queryKeys.persons.search(siteId, search, page, pageSize, 'admin-page'), filters] as const,
   },
   tiers: {
     all: ['tiers'] as const,
@@ -95,17 +108,47 @@ export const queryKeys = {
     portfolioSummary: (siteId: number) => ['reports', 'portfolio-summary', siteId] as const,
     daily: (siteId: number | null, start: string, end: string, queueIds: readonly number[]) =>
       ['reports', 'daily', { siteId, start, end, queueIds }] as const,
+    dailyByGranularity: (
+      siteId: number | null,
+      start: string,
+      end: string,
+      queueIds: readonly number[],
+      granularity: string,
+    ) => [...queryKeys.reports.daily(siteId, start, end, queueIds), granularity] as const,
+  },
+  monitoring: {
+    live: (siteId: number | null) => ['monitoring', 'live', siteId] as const,
+    series: <T extends object>(options: T) => ['monitoring', 'series', options] as const,
   },
   admin: {
     all: ['admin'] as const,
     sites: ['admin', 'sites'] as const,
     queues: (siteId: number | null) => ['admin', 'queues', siteId] as const,
+    queuesByStatus: (siteId: number | null, status: string) =>
+      ['admin', 'queues', siteId, status] as const,
     users: ['admin', 'users'] as const,
     roles: ['admin', 'roles'] as const,
     tiers: ['admin', 'tiers'] as const,
     translations: (locale: string) => ['admin', 'translations', { locale }] as const,
     assignmentUsers: (search: string, page: number) =>
       ['admin', 'assignment-users', { search, page }] as const,
+    usersPage: <T extends object>(page: number, filters: T) =>
+      ['admin', 'users-page', page, filters] as const,
+    usersPages: ['admin', 'users-page'] as const,
+    userDetail: (userId: number | undefined) => ['admin', 'user-detail', userId] as const,
+    translationsPage: <T extends object>(page: number, filters: T) =>
+      ['admin', 'translations-page', page, filters] as const,
+    translationPages: ['admin', 'translations-page'] as const,
+    siteDirectUsers: (siteId: number | null) => ['admin', 'site-direct-users', siteId] as const,
+  },
+  queueOperators: {
+    byQueue: (queueId: number | undefined) => ['queue-operators', queueId] as const,
+    candidates: (
+      queueId: number | undefined,
+      siteId: number | undefined,
+      search: string,
+      page: number,
+    ) => ['queue-operator-candidates', queueId, siteId, search, page] as const,
   },
   publicExperience: {
     kioskQueues: (siteId: number | null) => ['kiosk', 'queues', siteId] as const,

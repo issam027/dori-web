@@ -22,6 +22,29 @@ describe('queryKeys', () => {
     );
   });
 
+  it('preserves the legacy tuple shapes of the centralized feature keys', () => {
+    const filters = { search: 'abcd', sort: 'username:asc' };
+    const series = { siteId: 1, queueIds: [10] };
+
+    expect(queryKeys.admin.usersPage(2, filters)).toEqual(['admin', 'users-page', 2, filters]);
+    expect(queryKeys.admin.userDetail(7)).toEqual(['admin', 'user-detail', 7]);
+    expect(queryKeys.admin.translationsPage(3, filters)).toEqual([
+      'admin',
+      'translations-page',
+      3,
+      filters,
+    ]);
+    expect(queryKeys.queueOperators.byQueue(10)).toEqual(['queue-operators', 10]);
+    expect(queryKeys.queueOperators.candidates(10, 1, 'abcd', 2)).toEqual([
+      'queue-operator-candidates',
+      10,
+      1,
+      'abcd',
+      2,
+    ]);
+    expect(queryKeys.monitoring.series(series)).toEqual(['monitoring', 'series', series]);
+  });
+
   it('invalidates every queue-operation resource through one policy', async () => {
     const queryClient = new QueryClient();
     const roots = [

@@ -19,7 +19,7 @@ export function useSettingsData(
   });
   const queueSiteId = enabled.allAccessibleQueues ? null : siteId;
   const queues = useQuery({
-    queryKey: [...queryKeys.admin.queues(queueSiteId), queueStatus],
+    queryKey: queryKeys.admin.queuesByStatus(queueSiteId, queueStatus),
     queryFn: async ({ signal }) => {
       const load = (isActive: boolean) => findQueues({ page: 1, pageSize: 100, siteId: queueSiteId ?? undefined, isActive }, undefined, signal);
       if (queueStatus !== 'all') return load(queueStatus === 'active');
@@ -38,7 +38,7 @@ export function useSettingsData(
     enabled: enabled.tiers ?? true,
   });
   const directUsers = useQuery({
-    queryKey: ['admin', 'site-direct-users', siteId],
+    queryKey: queryKeys.admin.siteDirectUsers(siteId),
     queryFn: ({ signal }) =>
       sitesControllerGetDirectUsers(
         siteId ?? 0,
