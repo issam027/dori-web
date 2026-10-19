@@ -25,7 +25,7 @@ describe('catalog structure', () => {
     const duplicates: string[] = [];
     for (const [domain, entries] of Object.entries(domains as Record<string, Catalog>)) {
       for (const key of Object.keys(entries)) {
-        if (seen.has(key)) duplicates.push(`${key} (${seen.get(key)} + ${domain})`);
+        if (seen.has(key)) duplicates.push(`${key} (${String(seen.get(key))} + ${domain})`);
         seen.set(key, domain);
       }
     }
@@ -159,7 +159,7 @@ describe('Tunisian humour (ar-TN)', () => {
     const tooLong = serious
       .filter(([key]) => /^common\./.test(key) && !LOADING_KEYS.has(key))
       .filter(([, value]) => value.length > 30)
-      .map(([key, value]) => `${key} (${value.length}): ${value}`);
+      .map(([key, value]) => `${key} (${String(value.length)}): ${value}`);
     expect(tooLong).toEqual([]);
   });
 

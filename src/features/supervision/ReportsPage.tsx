@@ -157,7 +157,7 @@ export function ReportsPage() {
         ))}
       </div>
       {reports.data ? (
-        <ReportVisualizations buckets={reports.data.data.buckets} groups={reports.data.data.groups ?? []} summary={reports.data.data.summary} queues={queues.data?.data.items ?? []} />
+        <ReportVisualizations buckets={reports.data.data.buckets} groups={reports.data.data.groups} summary={reports.data.data.summary} queues={queues.data?.data.items ?? []} />
       ) : null}
       {totals ? (
         <div className="metric-grid report-percentiles">

@@ -2,6 +2,10 @@
 // This is a ratchet: adding a key here must be a conscious review decision.
 export const ALLOW_IDENTICAL = {
   en: [
+    "controlRoom.alert.info",
+    "common.public",
+    "common.sortAscending",
+    "common.sortDescending",
     "onboarding.queueActions",
     "app.name",
     "appointments.appointmentActionDialog.checkIn",
@@ -56,7 +60,6 @@ export const ALLOW_IDENTICAL = {
     "onboarding.settings.global",
     "onboarding.settings.ihm",
     "onboarding.settings.segmentS",
-    "onboarding.settings.sitesManagers",
     "onboarding.settings.sms",
     "onboarding.settings.ticketPosition",
     "onboarding.settings.variables",

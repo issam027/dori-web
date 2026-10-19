@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { i18n, loadTranslationBundle } from '@/core/i18n/i18n';
+import { loadTranslationBundle, setLanguage } from '@/core/i18n/i18n';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
 
@@ -11,13 +11,9 @@ export function PreferenceSynchronizer() {
   const accentColor = usePreferencesStore((state) => state.accentColor);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
-    document.documentElement.dir = ['ar', 'fa', 'he', 'ur'].includes(locale.split('-')[0] ?? '')
-      ? 'rtl'
-      : 'ltr';
     const publicExperiencePaths = new Set(['/kiosk', '/display', '/track']);
     const category = publicExperiencePaths.has(location.pathname) ? 'public_ihm' : 'ihm';
-    void loadTranslationBundle(locale, category).catch(() => i18n.changeLanguage(locale));
+    void setLanguage(locale).then(() => loadTranslationBundle(locale, category)).catch(() => undefined);
   }, [locale, location.pathname]);
 
   useEffect(() => {

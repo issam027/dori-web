@@ -23,5 +23,13 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
     },
   },
+  {
+    files: ['src/core/i18n/locales/{en,ar}/**/*.ts'],
+    rules: {
+      // Domain catalogs intentionally derive their exact shape from the matching FR module.
+      // Type queries avoid adding 28 runtime-shaped imports solely for compile-time parity.
+      '@typescript-eslint/consistent-type-imports': 'off',
+    },
+  },
   prettier,
 );

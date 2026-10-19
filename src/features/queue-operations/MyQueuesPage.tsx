@@ -147,9 +147,9 @@ export function MyQueuesPage() {
                   <option value="priorityReferenceTime:asc">{__t('common.position')}</option>
                   <option value="createdAt:desc">{__t('notifications.filters.newest')}</option>
                   <option value="createdAt:asc">{__t('notifications.filters.oldest')}</option>
-                  <option value="ticketNumber:asc">{__t('common.ticket')} A-Z</option>
-                  <option value="ticketNumber:desc">{__t('common.ticket')} Z-A</option>
-                  <option value="status:asc">{__t('common.status')} A-Z</option>
+                  <option value="ticketNumber:asc">{__t('common.ticket')} · {__t('common.sortAscending')}</option>
+                  <option value="ticketNumber:desc">{__t('common.ticket')} · {__t('common.sortDescending')}</option>
+                  <option value="status:asc">{__t('common.status')} · {__t('common.sortAscending')}</option>
                 </select>
               </label>
               <div className="admin-filter-actions">

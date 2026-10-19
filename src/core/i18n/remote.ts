@@ -1,8 +1,7 @@
 import { translationsControllerGetBundle } from '@/api/generated/translations/translations';
 import type { TranslationsControllerGetBundleCategory } from '@/api/generated/models';
 import { normalizeLocale, toBackendLocale } from './config';
-import { ensureLocaleLoaded, i18n } from './instance';
-import { legacyUiKeyAliases } from './legacy-aliases';
+import { ensureLocaleLoaded, i18n, setLanguage } from './instance';
 import { fr } from './locales/fr';
 import { extractPlaceholders, placeholdersMatch, referenceFor } from './placeholders';
 
@@ -40,7 +39,7 @@ export function sanitizeRemoteEntries(entries: Record<string, unknown>): {
   const accepted: Record<string, string> = {};
   const rejected: RejectedEntry[] = [];
   for (const [rawKey, value] of Object.entries(entries)) {
-    const key = legacyUiKeyAliases[rawKey] ?? rawKey;
+    const key = rawKey;
     if (typeof value !== 'string') {
       rejected.push({ key, reason: 'not-a-string' });
       continue;
@@ -90,10 +89,10 @@ export async function loadTranslationBundle(
       loadedBundleVersions.set(cacheKey, bundle.version);
       if (rejected.length > 0) {
         if (opts.onRejected) opts.onRejected(rejected);
-        else console.warn(`[i18n] ${rejected.length} remote entr(ies) rejected for ${cacheKey}`, rejected);
+        else console.warn(`[i18n] ${String(rejected.length)} remote entr(ies) rejected for ${cacheKey}`, rejected);
       }
     }
-    if (opts.activate) await i18n.changeLanguage(target);
+    if (opts.activate) await setLanguage(target);
     return bundle.version;
   })().finally(() => {
     bundleRequests.delete(requestKey);

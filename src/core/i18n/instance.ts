@@ -66,7 +66,7 @@ export async function setLanguage(input: string): Promise<SupportedLocale> {
 /** Opt-in (dev / staging): reports keys that resolve to nothing. */
 export function enableMissingKeyReporting(handler: (locales: readonly string[], ns: string, key: string) => void): void {
   i18n.options.saveMissing = true;
-  i18n.options.missingKeyHandler = (lngs, ns, key) => handler(lngs, ns, key);
+  i18n.options.missingKeyHandler = (lngs, ns, key) => { handler(lngs, ns, key); };
 }
 
 export { i18n };

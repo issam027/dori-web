@@ -57,7 +57,7 @@ export function PassagePrintDocument({ passage, site }: { passage: PassageSummar
         </section>
         <section className="attestation-panel attestation-ticket">
           <h2>{t('passageCertificate.ticketDetails', { defaultValue: 'INFORMATIONS DU TICKET' })}</h2>
-          <dl><div><dt>{t('passageReceipt.ticket')}</dt><dd>{passage.ticketNumber}</dd></div>{passage.threadNumber > 0 ? <div><dt>{t('passageReceipt.desk')}</dt><dd>N° {passage.threadNumber}</dd></div> : null}</dl>
+          <dl><div><dt>{t('passageReceipt.ticket')}</dt><dd>{passage.ticketNumber}</dd></div>{passage.threadNumber > 0 ? <div><dt>{t('passageReceipt.desk')}</dt><dd>{t('common.numberAbbreviation', { value: passage.threadNumber })}</dd></div> : null}</dl>
         </section>
       </div>
 

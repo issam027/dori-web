@@ -31,7 +31,8 @@ export const FALLBACK_CHAIN: Record<string, string[]> = {
 export function normalizeLocale(input: string | null | undefined): SupportedLocale {
   if (!input) return DEFAULT_LOCALE;
   const lower = input.trim().toLowerCase().replace(/_/g, '-');
-  if (lower in LEGACY_LOCALE_ALIASES) return LEGACY_LOCALE_ALIASES[lower];
+  const legacy = LEGACY_LOCALE_ALIASES[lower];
+  if (legacy) return legacy;
   const exact = SUPPORTED_LOCALES.find((l) => l.toLowerCase() === lower);
   if (exact) return exact;
   const base = lower.split(/[-_]/)[0];

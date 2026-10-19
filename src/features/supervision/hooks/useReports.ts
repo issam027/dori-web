@@ -83,14 +83,15 @@ export function useReports(options: {
     ],
     enabled: options.enabled && options.siteId !== null,
     queryFn: async ({ signal }) => {
-      const response = await monitoringControllerSeries({
+      const requestParams = {
       siteId: options.siteId ?? undefined,
       queueIds: options.queueId ? String(options.queueId) : undefined,
       from: new Date(`${options.startDate}T00:00:00.000Z`).toISOString(),
       to: new Date(`${addDays(options.endDate, 1)}T00:00:00.000Z`).toISOString(),
       bucket: options.granularity,
       timezone: options.timezone,
-    }, undefined, signal);
+      } as const;
+      const response = await monitoringControllerSeries(requestParams, undefined, signal);
       const data = response.data;
       const entryCounts = new Map(data.breakdowns.byEntryType.map((item) => [item.entryType, item.count]));
       const summary = metrics(data.totals, entryCounts.get('walkin') ?? 0, entryCounts.get('appointment') ?? 0);
@@ -98,8 +99,20 @@ export function useReports(options: {
         ...metrics(bucket), periodStart: bucket.periodStart,
         periodEnd: data.series[index + 1]?.periodStart ?? data.appliedFilters.to,
       }));
-      const groups: ReportGroupDto[] = data.breakdowns.byQueue.map((queue) => ({
-        ...metrics(queue), dimension: { queueId: queue.queueId, queueName: queue.queueName }, buckets: [],
+      const queueSeries = await Promise.all(data.breakdowns.byQueue.map(async (queue) => {
+        const queueResponse = await monitoringControllerSeries(
+          { ...requestParams, queueIds: String(queue.queueId) }, undefined, signal,
+        );
+        return { queue, data: queueResponse.data };
+      }));
+      const groups: ReportGroupDto[] = queueSeries.map(({ queue, data: queueData }) => ({
+        ...metrics(queue),
+        dimension: { queueId: queue.queueId, queueName: queue.queueName },
+        buckets: queueData.series.map((bucket, index) => ({
+          ...metrics(bucket),
+          periodStart: bucket.periodStart,
+          periodEnd: queueData.series[index + 1]?.periodStart ?? queueData.appliedFilters.to,
+        })),
       }));
       return { ...response, data: { ...data, summary, buckets, groups } };
     },

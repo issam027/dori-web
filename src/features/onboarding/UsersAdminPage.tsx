@@ -184,8 +184,8 @@ export function UsersAdminPage() {
             <label>
               {t('notifications.filters.sort')}
               <select value={draft.sort} onChange={(event) => { setDraft({ ...draft, sort: event.target.value }); }}>
-                <option value="username:asc">{t('common.name')} A-Z</option>
-                <option value="username:desc">{t('common.name')} Z-A</option>
+                <option value="username:asc">{t('common.name')} · {t('common.sortAscending')}</option>
+                <option value="username:desc">{t('common.name')} · {t('common.sortDescending')}</option>
                 <option value="lastLogin:desc">{t('admin.users.lastLogin')} ↓</option>
                 <option value="lastLogin:asc">{t('admin.users.lastLogin')} ↑</option>
                 <option value="createdAt:desc">{t('common.createdAt')} ↓</option>
