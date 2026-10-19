@@ -65,7 +65,7 @@
   border: 1px solid rgb(255 255 255 / 18%);
   border-radius: 999px;
   padding: 0.45rem 0.75rem;
-  color: #ffffff;
+  color: var(--a);
   background: rgb(255 255 255 / 10%);
   font-size: 0.82rem;
 }
@@ -128,9 +128,9 @@
   box-shadow: none;
 }
 .site-deactivate-button:not(:disabled):hover {
-  border-color: color-mix(in srgb, #9f1d20 35%, var(--color-border));
-  color: #9f1d20;
-  background: color-mix(in srgb, #9f1d20 7%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--m) 35%, var(--color-border));
+  color: var(--m);
+  background: color-mix(in srgb, var(--m) 7%, var(--color-surface));
   box-shadow: none;
 }
 .site-card-heading h2 {
@@ -320,36 +320,36 @@
   line-height: 1.2;
 }
 .appointment-status-scheduled {
-  border-color: #4f7dd9;
-  background: color-mix(in srgb, #4f7dd9 13%, var(--color-surface));
+  border-color: var(--v);
+  background: color-mix(in srgb, var(--v) 13%, var(--color-surface));
 }
 .appointment-status-booked {
-  border-color: #4f7dd9;
-  background: color-mix(in srgb, #4f7dd9 16%, var(--color-surface));
+  border-color: var(--v);
+  background: color-mix(in srgb, var(--v) 16%, var(--color-surface));
 }
 .appointment-status-confirmed {
-  border-color: #7357c7;
-  background: color-mix(in srgb, #7357c7 13%, var(--color-surface));
+  border-color: var(--au);
+  background: color-mix(in srgb, var(--au) 13%, var(--color-surface));
 }
 .appointment-status-present {
-  border-color: #168267;
-  background: color-mix(in srgb, #168267 14%, var(--color-surface));
+  border-color: var(--ap);
+  background: color-mix(in srgb, var(--ap) 14%, var(--color-surface));
 }
 .appointment-status-in-progress {
-  border-color: #cf7b18;
-  background: color-mix(in srgb, #cf7b18 14%, var(--color-surface));
+  border-color: var(--bb);
+  background: color-mix(in srgb, var(--bb) 14%, var(--color-surface));
 }
 .appointment-status-served {
-  border-color: #477565;
-  background: color-mix(in srgb, #477565 10%, var(--color-surface));
+  border-color: var(--as);
+  background: color-mix(in srgb, var(--as) 10%, var(--color-surface));
 }
 .appointment-status-no-show {
-  border-color: #b76532;
-  background: color-mix(in srgb, #b76532 13%, var(--color-surface));
+  border-color: var(--az);
+  background: color-mix(in srgb, var(--az) 13%, var(--color-surface));
 }
 .appointment-status-expired {
-  border-color: #8b6f47;
-  background: color-mix(in srgb, #8b6f47 9%, var(--color-surface));
+  border-color: var(--aw);
+  background: color-mix(in srgb, var(--aw) 9%, var(--color-surface));
   opacity: 0.62;
 }
 .appointment-status-cancelled {
@@ -723,6 +723,6 @@
 }
 .tracking-status {
   margin: 0;
-  color: #627d98;
+  color: var(--r);
   font-size: 0.72rem;
 }

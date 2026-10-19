@@ -8,7 +8,7 @@ body[data-print-kiosk-ticket] > #root {
 @media print {
   @page { size: A4 portrait; margin: 12mm; }
   body[data-print-passage],
-  body[data-print-passage] #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  body[data-print-passage] #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: var(--a) !important; }
   body[data-print-passage] > .passage-print-document {
     position: absolute;
     inset: 0;
@@ -19,53 +19,53 @@ body[data-print-kiosk-ticket] > #root {
     flex-direction: column;
     padding: 10mm 11mm 8mm;
     overflow: hidden;
-    color: #24332f !important;
-    background: #fff !important;
+    color: var(--cl) !important;
+    background: var(--a) !important;
     font: 9.5pt/1.42 Arial, sans-serif;
   }
   body[data-print-passage] > .passage-print-document * { box-sizing: border-box; }
-  .passage-print-document .attestation-header { display: flex !important; align-items: center; justify-content: space-between; gap: 8mm; padding: 0 0 5mm; border-bottom: 1.2mm solid #174c3b; }
+  .passage-print-document .attestation-header { display: flex !important; align-items: center; justify-content: space-between; gap: 8mm; padding: 0 0 5mm; border-bottom: 1.2mm solid var(--d); }
   .passage-print-document .attestation-brand { display: flex !important; align-items: center; gap: 3mm; }
   .passage-print-document .attestation-brand img { display: block !important; width: 13mm; height: 13mm; object-fit: contain; }
-  .passage-print-document .attestation-brand strong { color: #174c3b !important; font-size: 18pt; letter-spacing: .09em; }
-  .passage-print-document .attestation-brand span { color: #64716d !important; font-size: 7.5pt; }
-  .passage-print-document .attestation-official { max-width: 62mm; color: #45534f !important; font-size: 7.5pt; font-weight: 700; letter-spacing: .08em; text-align: right; }
+  .passage-print-document .attestation-brand strong { color: var(--d) !important; font-size: 18pt; letter-spacing: .09em; }
+  .passage-print-document .attestation-brand span { color: var(--dc) !important; font-size: 7.5pt; }
+  .passage-print-document .attestation-official { max-width: 62mm; color: var(--cz) !important; font-size: 7.5pt; font-weight: 700; letter-spacing: .08em; text-align: right; }
   .passage-print-document .attestation-title { padding: 7mm 0 5mm; text-align: center; }
-  .passage-print-document .attestation-title h1 { margin: 0; color: #174c3b !important; font-size: 23pt; letter-spacing: .04em; }
-  .passage-print-document .attestation-title p { margin: 1.5mm 0 0; color: #66736f !important; font-size: 10pt; }
-  .passage-print-document .attestation-establishment { display: grid !important; gap: .8mm; padding: 4mm 5mm; border: .3mm solid #bdcec8; border-radius: 3mm; background: #f1f6f4 !important; }
+  .passage-print-document .attestation-title h1 { margin: 0; color: var(--d) !important; font-size: 23pt; letter-spacing: .04em; }
+  .passage-print-document .attestation-title p { margin: 1.5mm 0 0; color: var(--af) !important; font-size: 10pt; }
+  .passage-print-document .attestation-establishment { display: grid !important; gap: .8mm; padding: 4mm 5mm; border: .3mm solid var(--dw); border-radius: 3mm; background: var(--bf) !important; }
   .passage-print-document .attestation-establishment > span,
   .passage-print-document .attestation-panel h2,
   .passage-print-document .attestation-timeline h2,
-  .passage-print-document .attestation-purpose h2 { color: #174c3b !important; font-size: 7.5pt; font-weight: 800; letter-spacing: .09em; }
+  .passage-print-document .attestation-purpose h2 { color: var(--d) !important; font-size: 7.5pt; font-weight: 800; letter-spacing: .09em; }
   .passage-print-document .attestation-establishment strong { font-size: 14pt; }
-  .passage-print-document .attestation-establishment small { color: #66736f !important; }
+  .passage-print-document .attestation-establishment small { color: var(--af) !important; }
   .passage-print-document .attestation-establishment time { font-weight: 700; }
-  .passage-print-document .attestation-introduction { margin: 5mm 0; color: #34443f !important; font-size: 10pt; }
+  .passage-print-document .attestation-introduction { margin: 5mm 0; color: var(--cr) !important; font-size: 10pt; }
   .passage-print-document .attestation-two-columns { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4mm; }
-  .passage-print-document .attestation-panel { padding: 4mm; border: .3mm solid #d3dfdb; border-radius: 2.5mm; break-inside: avoid; }
+  .passage-print-document .attestation-panel { padding: 4mm; border: .3mm solid var(--bc); border-radius: 2.5mm; break-inside: avoid; }
   .passage-print-document .attestation-panel h2,
   .passage-print-document .attestation-timeline h2,
   .passage-print-document .attestation-purpose h2 { margin: 0 0 3mm; }
   .passage-print-document .attestation-panel dl { margin: 0; }
   .passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
-  .passage-print-document .attestation-panel dt { min-width: 0; color: #687570 !important; font-size: 8.5pt; }
+  .passage-print-document .attestation-panel dt { min-width: 0; color: var(--dg) !important; font-size: 8.5pt; }
   .passage-print-document .attestation-panel dd { margin: 0; font-size: 10pt; font-weight: 700; overflow-wrap: anywhere; }
-  .passage-print-document .attestation-ticket dd { color: #174c3b !important; font-size: 12pt; }
+  .passage-print-document .attestation-ticket dd { color: var(--d) !important; font-size: 12pt; }
   .passage-print-document .attestation-timeline { margin-top: 5mm; }
   .passage-print-document .attestation-events { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
-  .passage-print-document .attestation-events > div { position: relative; min-height: 27mm; padding: 3.5mm 3mm 3mm 9mm; border: .3mm solid #d3dfdb; border-radius: 2.5mm; background: #fafcfb !important; }
-  .passage-print-document .attestation-events > div > span { position: absolute; top: 3.5mm; left: 3mm; display: grid !important; width: 4.5mm; height: 4.5mm; place-items: center; border-radius: 50%; color: #fff !important; background: #174c3b !important; font-size: 7pt; font-weight: 800; }
-  .passage-print-document .attestation-events small { display: block !important; color: #65736e !important; font-size: 6.8pt; font-weight: 800; letter-spacing: .04em; }
-  .passage-print-document .attestation-events strong { display: block !important; margin: 1mm 0; color: #174c3b !important; font-size: 15pt; }
-  .passage-print-document .attestation-events p { margin: 0; color: #697570 !important; font-size: 7pt; }
-  .passage-print-document .attestation-purpose { margin-top: 5mm; padding: 4mm 5mm; border-left: 1.2mm solid #174c3b; background: #f1f6f4 !important; break-inside: avoid; }
+  .passage-print-document .attestation-events > div { position: relative; min-height: 27mm; padding: 3.5mm 3mm 3mm 9mm; border: .3mm solid var(--bc); border-radius: 2.5mm; background: var(--eu) !important; }
+  .passage-print-document .attestation-events > div > span { position: absolute; top: 3.5mm; left: 3mm; display: grid !important; width: 4.5mm; height: 4.5mm; place-items: center; border-radius: 50%; color: var(--a) !important; background: var(--d) !important; font-size: 7pt; font-weight: 800; }
+  .passage-print-document .attestation-events small { display: block !important; color: var(--de) !important; font-size: 6.8pt; font-weight: 800; letter-spacing: .04em; }
+  .passage-print-document .attestation-events strong { display: block !important; margin: 1mm 0; color: var(--d) !important; font-size: 15pt; }
+  .passage-print-document .attestation-events p { margin: 0; color: var(--dh) !important; font-size: 7pt; }
+  .passage-print-document .attestation-purpose { margin-top: 5mm; padding: 4mm 5mm; border-left: 1.2mm solid var(--d); background: var(--bf) !important; break-inside: avoid; }
   .passage-print-document .attestation-purpose p { margin: 0 0 2mm; font-size: 8pt; }
   .passage-print-document .attestation-purpose p:last-child { margin-bottom: 0; }
   .passage-print-document .attestation-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 18mm; margin-top: 7mm; break-inside: avoid; }
-  .passage-print-document .attestation-signatures > div { display: flex !important; min-height: 18mm; align-items: flex-end; justify-content: center; border-bottom: .3mm solid #6d7975; }
-  .passage-print-document .attestation-signatures span { transform: translateY(5mm); color: #66736f !important; font-size: 7.5pt; }
-  .passage-print-document .attestation-trace { display: block !important; margin-top: auto; padding-top: 6mm; border-top: .3mm solid #cbd7d3; color: #65716d !important; }
+  .passage-print-document .attestation-signatures > div { display: flex !important; min-height: 18mm; align-items: flex-end; justify-content: center; border-bottom: .3mm solid var(--di); }
+  .passage-print-document .attestation-signatures span { transform: translateY(5mm); color: var(--af) !important; font-size: 7.5pt; }
+  .passage-print-document .attestation-trace { display: block !important; margin-top: auto; padding-top: 6mm; border-top: .3mm solid var(--dy); color: var(--dd) !important; }
   .passage-print-document .attestation-trace > div { display: flex !important; justify-content: space-between; gap: 5mm; font-size: 7pt; }
   .passage-print-document .attestation-trace p { margin: 2mm 0 0; font-size: 6.8pt; line-height: 1.35; }
 }
@@ -76,11 +76,11 @@ body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   margin: 0 auto;
   align-content: start;
   gap: 7mm;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--u);
   border-radius: 4mm;
   padding: 7mm;
-  color: #111827 !important;
-  background: #fff !important;
+  color: var(--f) !important;
+  background: var(--a) !important;
   box-shadow: none;
   font-family: Arial, sans-serif;
   text-align: center;
@@ -94,7 +94,7 @@ html body[data-print-kiosk-ticket] {
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: #fff !important;
+  background: var(--a) !important;
 }
 html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   position: absolute !important;
@@ -136,7 +136,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
 }
 @media print {
   body[data-print-kiosk-ticket] {
-    background: #fff !important;
+    background: var(--a) !important;
   }
   body[data-print-kiosk-ticket] > #root {
     display: none !important;
@@ -148,11 +148,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     margin: 0 auto;
     align-content: start;
     gap: 7mm;
-    border: 1px solid #1f2937;
+    border: 1px solid var(--u);
     border-radius: 4mm;
     padding: 7mm;
-    color: #111827 !important;
-    background: #fff !important;
+    color: var(--f) !important;
+    background: var(--a) !important;
     box-shadow: none;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -161,7 +161,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: grid;
     gap: 1mm;
     padding-bottom: 4mm;
-    border-bottom: 1px dashed #6b7280;
+    border-bottom: 1px dashed var(--c);
   }
   .kiosk-ticket-print-document header strong {
     font-size: 20pt;
@@ -169,7 +169,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   }
   .kiosk-ticket-print-document header span,
   .kiosk-ticket-print-document main > small {
-    color: #4b5563 !important;
+    color: var(--p) !important;
     font-size: 9pt;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -181,18 +181,18 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   }
   .kiosk-ticket-print-document h1 {
     margin: 0;
-    color: #111827 !important;
+    color: var(--f) !important;
     font-size: 38pt;
     line-height: 1;
     letter-spacing: 0.1em;
   }
   .kiosk-ticket-print-document p {
     margin: 0;
-    color: #374151 !important;
+    color: var(--ar) !important;
     font-size: 9pt;
   }
   .kiosk-ticket-print-document .kiosk-print-queue {
-    color: #111827 !important;
+    color: var(--f) !important;
     font-size: 13pt;
     font-weight: 700;
   }
@@ -209,15 +209,15 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   }
   .kiosk-ticket-print-document .tracking-qr figcaption {
     max-width: 55mm;
-    color: #374151 !important;
+    color: var(--ar) !important;
     font-size: 8pt;
   }
   .kiosk-ticket-print-document footer {
     display: grid;
     gap: 2mm;
     padding-top: 4mm;
-    border-top: 1px dashed #6b7280;
-    color: #4b5563 !important;
+    border-top: 1px dashed var(--c);
+    color: var(--p) !important;
     font-size: 7.5pt;
   }
 }
@@ -239,7 +239,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     min-height: 0 !important;
     margin: 0;
     padding: 0;
-    background: #fff !important;
+    background: var(--a) !important;
   }
   body[data-print-passage] * {
     display: none !important;
@@ -262,10 +262,10 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     box-sizing: border-box;
     margin: 0;
     padding: 4mm;
-    border-color: #999;
+    border-color: var(--dq);
     border-radius: 2mm;
-    color: #111;
-    background: #fff;
+    color: var(--ao);
+    background: var(--a);
     font-size: 9pt;
     box-shadow: none;
   }
@@ -282,7 +282,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   body[data-print-passage] .passage-print-header {
     margin: 3mm 0;
     padding: 3mm 0;
-    border-block: 1px solid #bbb;
+    border-block: 1px solid var(--dv);
     text-align: center;
   }
   body[data-print-passage] .passage-print-header strong,
@@ -302,7 +302,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   body[data-print-passage] .passage-print-legal div {
     height: 18mm;
     margin-top: 5mm;
-    border-bottom: 1px solid #777;
+    border-bottom: 1px solid var(--dk);
     text-align: center;
   }
   body[data-print-passage] .print-hidden,
@@ -320,8 +320,8 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     width: 100%;
     box-sizing: border-box;
     padding: 8mm;
-    color: #17212b;
-    background: #fff;
+    color: var(--t);
+    background: var(--a);
     font:
       11pt/1.5 system-ui,
       sans-serif;
@@ -335,7 +335,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     justify-content: space-between;
     gap: 12mm;
     padding-bottom: 6mm;
-    border-bottom: 2px solid #17212b;
+    border-bottom: 2px solid var(--t);
   }
   .passage-print-document header strong,
   .passage-print-document header span,
@@ -353,8 +353,8 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   .passage-print-document .passage-print-statement {
     margin: 0 0 9mm;
     padding: 5mm;
-    border-left: 4px solid #3867d6;
-    background: #f2f5fa;
+    border-left: 4px solid var(--cu);
+    background: var(--ep);
     font-size: 12pt;
   }
   .passage-print-document dl {
@@ -365,11 +365,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: flex !important;
     gap: 2mm;
     padding: 2.5mm 0;
-    border-bottom: 1px dotted #c8d0da;
+    border-bottom: 1px dotted var(--dx);
   }
   .passage-print-document dt {
     min-width: 42mm;
-    color: #53606d;
+    color: var(--w);
     font-size: 9pt;
   }
   .passage-print-document dt::after {
@@ -381,7 +381,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   }
   .passage-print-document .passage-print-disclaimer {
     margin-top: 10mm;
-    color: #53606d;
+    color: var(--w);
     font-size: 9pt;
   }
   .passage-print-document footer {
@@ -395,11 +395,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     min-height: 28mm;
     align-items: flex-end;
     justify-content: center;
-    border-bottom: 1px solid #53606d;
+    border-bottom: 1px solid var(--w);
   }
   .passage-print-document footer span {
     transform: translateY(6mm);
-    color: #53606d;
+    color: var(--w);
     font-size: 9pt;
   }
 }
@@ -421,11 +421,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: block;
     width: min(80mm, 100%);
     margin: 0;
-    border: 1px solid #1f2937;
+    border: 1px solid var(--u);
     border-radius: 4mm;
     padding: 7mm;
-    color: #111827 !important;
-    background: #fff !important;
+    color: var(--f) !important;
+    background: var(--a) !important;
     box-shadow: none;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -435,14 +435,14 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: grid;
     gap: 1mm;
     padding-bottom: 4mm;
-    border-bottom: 1px dashed #6b7280;
+    border-bottom: 1px dashed var(--c);
   }
   body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
     font-size: 20pt;
     letter-spacing: 0.08em;
   }
   body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
-    color: #4b5563 !important;
+    color: var(--p) !important;
     font-size: 9pt;
     text-transform: uppercase;
   }
@@ -458,11 +458,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     margin: 5mm 0;
     border: 0;
     padding: 0;
-    background: #fff;
+    background: var(--a);
   }
   body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
     margin: 3mm 0 1mm;
-    color: #111827 !important;
+    color: var(--f) !important;
     font-size: 38pt;
   }
   body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
@@ -472,8 +472,8 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
     display: block;
     padding-top: 4mm;
-    border-top: 1px dashed #6b7280;
-    color: #4b5563 !important;
+    border-top: 1px dashed var(--c);
+    color: var(--p) !important;
     font-size: 8pt;
   }
 
@@ -490,7 +490,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: inline !important;
     min-width: 0;
     margin: 0;
-    color: #17212b;
+    color: var(--t);
     font-size: 11pt;
   }
   body[data-print-passage] > .passage-print-document dd {
@@ -500,7 +500,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
 
 @media print {
   html body[data-print-passage] > .passage-print-document.passage-print-document { display: flex !important; width: 100% !important; min-height: 273mm; flex-direction: column; padding: 10mm 11mm 8mm; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-header { display: flex !important; padding: 0 0 5mm; border-bottom: 1.2mm solid #174c3b; }
+  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-header { display: flex !important; padding: 0 0 5mm; border-bottom: 1.2mm solid var(--d); }
   html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
   html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dt,
   html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dd { display: block !important; margin: 0; }
@@ -526,11 +526,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: block;
     width: min(80mm, 100%);
     margin: 0;
-    border: 1px solid #1f2937;
+    border: 1px solid var(--u);
     border-radius: 4mm;
     padding: 7mm;
-    color: #111827 !important;
-    background: #fff !important;
+    color: var(--f) !important;
+    background: var(--a) !important;
     box-shadow: none;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -540,14 +540,14 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: grid;
     gap: 1mm;
     padding-bottom: 4mm;
-    border-bottom: 1px dashed #6b7280;
+    border-bottom: 1px dashed var(--c);
   }
   body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
     font-size: 20pt;
     letter-spacing: 0.08em;
   }
   body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
-    color: #4b5563 !important;
+    color: var(--p) !important;
     font-size: 9pt;
     text-transform: uppercase;
   }
@@ -563,11 +563,11 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     margin: 5mm 0;
     border: 0;
     padding: 0;
-    background: #fff;
+    background: var(--a);
   }
   body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
     margin: 3mm 0 1mm;
-    color: #111827 !important;
+    color: var(--f) !important;
     font-size: 38pt;
   }
   body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
@@ -577,8 +577,8 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
     display: block;
     padding-top: 4mm;
-    border-top: 1px dashed #6b7280;
-    color: #4b5563 !important;
+    border-top: 1px dashed var(--c);
+    color: var(--p) !important;
     font-size: 8pt;
   }
 
@@ -595,7 +595,7 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     display: inline !important;
     min-width: 0;
     margin: 0;
-    color: #17212b;
+    color: var(--t);
     font-size: 11pt;
   }
   body[data-print-passage] > .passage-print-document dd {

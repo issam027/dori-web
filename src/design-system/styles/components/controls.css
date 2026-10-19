@@ -113,7 +113,7 @@ textarea:disabled {
 .login-showcase-dots button[aria-pressed='true']::before {
   width: 1.8rem;
   border-radius: 999px;
-  background: #9cf2e7;
+  background: var(--g);
 }
 .login-showcase-dots button:focus-visible {
   outline: 3px solid rgb(156 242 231 / 42%);
@@ -313,90 +313,90 @@ textarea:disabled {
   flex-shrink: 0;
 }
 .calendar-event-button.appointment-status-scheduled {
-  border-color: color-mix(in srgb, #2563eb 28%, var(--color-line));
-  border-inline-start-color: #2563eb;
-  background: linear-gradient(110deg, color-mix(in srgb, #2563eb 18%, var(--color-surface)), color-mix(in srgb, #2563eb 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--k) 28%, var(--color-line));
+  border-inline-start-color: var(--k);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--k) 18%, var(--color-surface)), color-mix(in srgb, var(--k) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-scheduled:hover {
-  border-color: #2563eb;
-  background: color-mix(in srgb, #2563eb 18%, var(--color-surface));
+  border-color: var(--k);
+  background: color-mix(in srgb, var(--k) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-scheduled .appointment-status-dot {
-  background-color: #2563eb;
+  background-color: var(--k);
 }
 .calendar-event-button.appointment-status-confirmed {
-  border-color: color-mix(in srgb, #7c3aed 28%, var(--color-line));
-  border-inline-start-color: #7c3aed;
-  background: linear-gradient(110deg, color-mix(in srgb, #7c3aed 18%, var(--color-surface)), color-mix(in srgb, #7c3aed 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--l) 28%, var(--color-line));
+  border-inline-start-color: var(--l);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--l) 18%, var(--color-surface)), color-mix(in srgb, var(--l) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-confirmed:hover {
-  border-color: #7c3aed;
-  background: color-mix(in srgb, #7c3aed 18%, var(--color-surface));
+  border-color: var(--l);
+  background: color-mix(in srgb, var(--l) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-confirmed .appointment-status-dot {
-  background-color: #7c3aed;
+  background-color: var(--l);
 }
 .calendar-event-button.appointment-status-present {
-  border-color: color-mix(in srgb, #059669 28%, var(--color-line));
-  border-inline-start-color: #059669;
-  background: linear-gradient(110deg, color-mix(in srgb, #059669 19%, var(--color-surface)), color-mix(in srgb, #059669 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--i) 28%, var(--color-line));
+  border-inline-start-color: var(--i);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--i) 19%, var(--color-surface)), color-mix(in srgb, var(--i) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-present:hover {
-  border-color: #059669;
-  background: color-mix(in srgb, #059669 18%, var(--color-surface));
+  border-color: var(--i);
+  background: color-mix(in srgb, var(--i) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-present .appointment-status-dot {
-  background-color: #059669;
+  background-color: var(--i);
 }
 .calendar-event-button.appointment-status-in-progress {
-  border-color: color-mix(in srgb, #d97706 28%, var(--color-line));
-  border-inline-start-color: #d97706;
-  background: linear-gradient(110deg, color-mix(in srgb, #d97706 19%, var(--color-surface)), color-mix(in srgb, #d97706 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--n) 28%, var(--color-line));
+  border-inline-start-color: var(--n);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--n) 19%, var(--color-surface)), color-mix(in srgb, var(--n) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-in-progress:hover {
-  border-color: #d97706;
-  background: color-mix(in srgb, #d97706 18%, var(--color-surface));
+  border-color: var(--n);
+  background: color-mix(in srgb, var(--n) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-in-progress .appointment-status-dot {
-  background-color: #d97706;
+  background-color: var(--n);
 }
 .calendar-event-button.appointment-status-served {
-  border-color: color-mix(in srgb, #0284c7 28%, var(--color-line));
-  border-inline-start-color: #0284c7;
-  background: linear-gradient(110deg, color-mix(in srgb, #0284c7 18%, var(--color-surface)), color-mix(in srgb, #0284c7 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--h) 28%, var(--color-line));
+  border-inline-start-color: var(--h);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--h) 18%, var(--color-surface)), color-mix(in srgb, var(--h) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-served:hover {
-  border-color: #0284c7;
-  background: color-mix(in srgb, #0284c7 18%, var(--color-surface));
+  border-color: var(--h);
+  background: color-mix(in srgb, var(--h) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-served .appointment-status-dot {
-  background-color: #0284c7;
+  background-color: var(--h);
 }
 .calendar-event-button.appointment-status-no-show {
-  border-color: color-mix(in srgb, #dc2626 28%, var(--color-line));
-  border-inline-start-color: #dc2626;
-  background: linear-gradient(110deg, color-mix(in srgb, #dc2626 18%, var(--color-surface)), color-mix(in srgb, #dc2626 7%, var(--color-surface)));
+  border-color: color-mix(in srgb, var(--o) 28%, var(--color-line));
+  border-inline-start-color: var(--o);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--o) 18%, var(--color-surface)), color-mix(in srgb, var(--o) 7%, var(--color-surface)));
 }
 .calendar-event-button.appointment-status-no-show:hover {
-  border-color: #dc2626;
-  background: color-mix(in srgb, #dc2626 18%, var(--color-surface));
+  border-color: var(--o);
+  background: color-mix(in srgb, var(--o) 18%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-no-show .appointment-status-dot {
-  background-color: #dc2626;
+  background-color: var(--o);
 }
 .calendar-event-button.appointment-status-cancelled {
-  border-color: color-mix(in srgb, #6b7280 20%, var(--color-line));
-  border-inline-start-color: #6b7280;
-  background: color-mix(in srgb, #6b7280 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--c) 20%, var(--color-line));
+  border-inline-start-color: var(--c);
+  background: color-mix(in srgb, var(--c) 8%, var(--color-surface));
   color: var(--color-muted);
   opacity: 0.72;
 }
 .calendar-event-button.appointment-status-cancelled:hover {
-  border-color: #6b7280;
-  background: color-mix(in srgb, #6b7280 14%, var(--color-surface));
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 14%, var(--color-surface));
 }
 .calendar-event-button.appointment-status-cancelled .appointment-status-dot {
-  background-color: #6b7280;
+  background-color: var(--c);
 }
 .calendar-event-button.appointment-status-cancelled .appointment-event-name {
   text-decoration: line-through;
@@ -525,24 +525,24 @@ select:focus-visible {
   background: var(--color-accent);
 }
 .button-danger {
-  border-color: #9f1d20;
-  color: #ffffff;
-  background: #9f1d20;
+  border-color: var(--m);
+  color: var(--a);
+  background: var(--m);
 }
 .button-danger:not(:disabled):hover {
-  border-color: #7f171a;
-  color: #ffffff;
-  background: #7f171a;
+  border-color: var(--av);
+  color: var(--a);
+  background: var(--av);
   box-shadow: 0 7px 16px rgb(127 23 26 / 24%);
 }
 .button-danger:focus-visible {
-  outline-color: color-mix(in srgb, #d92d20 58%, var(--color-surface));
+  outline-color: color-mix(in srgb, var(--ed) 58%, var(--color-surface));
 }
 
 .button-danger:disabled {
-  border-color: color-mix(in srgb, #9f1d20 72%, var(--color-surface));
-  color: color-mix(in srgb, #ffffff 86%, var(--color-surface));
-  background: color-mix(in srgb, #9f1d20 72%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--m) 72%, var(--color-surface));
+  color: color-mix(in srgb, var(--a) 86%, var(--color-surface));
+  background: color-mix(in srgb, var(--m) 72%, var(--color-surface));
 }
 .button-small {
   min-height: 34px;

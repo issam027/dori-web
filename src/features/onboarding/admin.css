@@ -52,13 +52,13 @@
 }
 .setup-nav-row.active {
   border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-line));
-  background: var(--teal-soft, #e8f8f6);
+  background: var(--teal-soft, var(--y));
 }
 .setup-nav-row small,
 table td small {
   display: block;
   margin-top: 3px;
-  color: var(--muted, #66788a);
+  color: var(--muted, var(--ag));
 }
 .setup-progress {
   display: grid;
@@ -72,7 +72,7 @@ table td small {
   background: var(--color-line);
 }
 .setup-progress span.done {
-  background: var(--teal, #0f8b8d);
+  background: var(--teal, var(--j));
 }
 .card-heading {
   display: flex;
@@ -83,11 +83,11 @@ table td small {
 }
 .card-heading p {
   margin: 5px 0 0;
-  color: var(--muted, #66788a);
+  color: var(--muted, var(--ag));
 }
 .inheritance-note,
 .resume-card {
-  background: var(--teal-soft, #e8f8f6);
+  background: var(--teal-soft, var(--y));
   border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-line));
 }
 .inheritance-note {
@@ -116,7 +116,7 @@ table td small {
   gap: 12px;
   margin-top: 24px;
   padding-top: 18px;
-  border-top: 1px solid var(--line, #dce6ec);
+  border-top: 1px solid var(--line, var(--q));
 }
 .setup-actions > div {
   display: flex;
@@ -137,14 +137,14 @@ table td small {
 }
 .station {
   padding: 16px;
-  border: 1px solid var(--line, #dce6ec);
+  border: 1px solid var(--line, var(--q));
   border-radius: 13px;
-  background: var(--surface, #fff);
+  background: var(--surface, var(--a));
 }
 .tier-queue-section {
   margin-top: 18px;
   padding-top: 18px;
-  border-top: 1px solid var(--line, #dce6ec);
+  border-top: 1px solid var(--line, var(--q));
 }
 .tier-choice {
   color: inherit;
@@ -160,14 +160,14 @@ table td small {
   border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-line));
 }
 .tier-choice.selected {
-  border-color: var(--teal, #0f8b8d);
-  background: var(--teal-soft, #e8f8f6);
+  border-color: var(--teal, var(--j));
+  background: var(--teal-soft, var(--y));
   box-shadow: 0 8px 20px color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 .empty-admin-state {
   text-align: center;
   padding: 30px 16px;
-  border: 1px dashed var(--line, #dce6ec);
+  border: 1px dashed var(--line, var(--q));
   border-radius: 13px;
 }
 .config-chain {
@@ -181,35 +181,35 @@ table td small {
   gap: 8px;
   min-height: 105px;
   padding: 15px;
-  border: 1px solid var(--line, #dce6ec);
+  border: 1px solid var(--line, var(--q));
   border-radius: 12px;
-  background: var(--surface, #fff);
+  background: var(--surface, var(--a));
   color: inherit;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
 }
 .role-card.selected {
-  border-color: var(--teal, #0f8b8d);
-  background: var(--teal-soft, #e8f8f6);
+  border-color: var(--teal, var(--j));
+  background: var(--teal-soft, var(--y));
 }
 .admin-tabs {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--line, #dce6ec);
+  border-bottom: 1px solid var(--line, var(--q));
 }
 .admin-tabs a {
   padding: 11px 13px;
   border-bottom: 3px solid transparent;
-  color: var(--muted, #66788a);
+  color: var(--muted, var(--ag));
   text-decoration: none;
   white-space: nowrap;
 }
 .admin-tabs a.active {
-  border-color: var(--teal, #0f8b8d);
-  color: var(--teal, #0f8b8d);
+  border-color: var(--teal, var(--j));
+  color: var(--teal, var(--j));
   font-weight: 800;
 }
 .table-actions {
@@ -430,7 +430,7 @@ table td small {
 .phone-preview {
   min-height: 240px;
   padding: 25px 16px;
-  border: 9px solid #183142;
+  border: 9px solid var(--cd);
   border-radius: 30px;
   background: var(--color-surface-muted);
 }
@@ -440,7 +440,7 @@ table td small {
   border-radius: 14px 14px 14px 3px;
   color: var(--color-ink);
   background: var(--color-surface);
-  box-shadow: 0 5px 18px #1e3c501a;
+  box-shadow: 0 5px 18px var(--ch);
 }
 .form-span {
   grid-column: 1/-1;

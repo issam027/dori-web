@@ -16,6 +16,7 @@ jobs:
       - run: npm ci
       - run: npm run api:check
       - run: npm run audit:phase11
+      - run: npm run audit:tokens
       - run: npm run audit:security
       - run: npm run lint
       - run: npm run typecheck

@@ -1,7 +1,7 @@
 /* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
  * Keep rules in their owning family; the import order is defined in index.css. */
 .public-layout.public-public {
-  background: radial-gradient(circle at 15% 15%, #1a6670, #102a43 50%, #091d2f);
+  background: radial-gradient(circle at 15% 15%, var(--cf), var(--b) 50%, var(--aa));
 }
 .public-public .public-header {
   color: white;
@@ -16,14 +16,14 @@
 .public-public:has(.legal-page) .public-header {
   justify-content: space-between;
   border-bottom: 1px solid color-mix(in srgb, white 18%, transparent);
-  background: color-mix(in srgb, #091d2f 88%, transparent);
+  background: color-mix(in srgb, var(--aa) 88%, transparent);
 }
 .public-public:has(.legal-page) .public-header > strong {
   visibility: visible;
 }
 .public-public:has(.legal-page) > footer {
   border-top: 1px solid color-mix(in srgb, white 16%, transparent);
-  background: #091d2f;
+  background: var(--aa);
 }
 .public-layout.public-device {
   color: var(--color-ink);
@@ -65,8 +65,8 @@
   flex-direction: column;
   overflow: hidden;
   padding: 24px 18px;
-  color: #eef6f8;
-  background: linear-gradient(165deg, #0b2034 0%, #123752 58%, #0c5b63 130%);
+  color: var(--em);
+  background: linear-gradient(165deg, var(--bo) 0%, var(--bt) 58%, var(--am) 130%);
   transition:
     width 180ms ease,
     transform 180ms ease,
@@ -82,8 +82,8 @@
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  color: #0d5960;
-  background: #c5f4ef;
+  color: var(--an);
+  background: var(--ba);
   font-size: 19px;
 }
 .sidebar-brand strong {
@@ -123,7 +123,7 @@
   margin-top: 9px;
   padding: 9px 10px;
   border-radius: 9px;
-  color: #8fb1c4;
+  color: var(--do);
   background: transparent;
   cursor: pointer;
   font-size: 10px;
@@ -156,7 +156,7 @@
   min-height: 42px;
   border-radius: 9px;
   padding: 11px 12px;
-  color: #c7d9e5;
+  color: var(--x);
   text-decoration: none;
 }
 .nav-links a svg,
@@ -174,7 +174,7 @@
 }
 .nav-links a.active {
   color: white;
-  border-inline-start: 3px solid #58c8c4;
+  border-inline-start: 3px solid var(--at);
   background: rgb(61 152 171 / 24%);
 }
 .sidebar-collapse {
@@ -186,7 +186,7 @@
   margin-top: 8px;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 10px;
-  color: #c7d9e5;
+  color: var(--x);
   background: rgb(255 255 255 / 5%);
   cursor: pointer;
 }
@@ -209,7 +209,7 @@
 }
 .sidebar.is-collapsed .nav-links a.active {
   border-inline-start: 0;
-  box-shadow: inset 3px 0 #58c8c4;
+  box-shadow: inset 3px 0 var(--at);
 }
 .sidebar-mobile-close,
 .topbar .mobile-menu-trigger,

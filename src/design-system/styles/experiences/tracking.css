@@ -20,7 +20,7 @@
 .experience-preview-tracking .tracking-screen {
   width: min(100%, 26rem);
   min-height: 42rem;
-  border: 10px solid #102a43;
+  border: 10px solid var(--b);
   border-radius: 2.5rem;
   background: var(--color-surface);
   box-shadow: var(--shadow-lg);
@@ -37,7 +37,7 @@
   background: linear-gradient(var(--color-surface), var(--color-primary-soft));
 }
 .tracking-preview-layout .tracking-screen {
-  border: 11px solid #0f2536;
+  border: 11px solid var(--s);
   border-radius: 38px;
   box-shadow: 0 25px 48px rgb(16 42 67 / 25%);
 }

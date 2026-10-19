@@ -64,8 +64,8 @@
 .public-display {
   height: 100dvh;
   overflow: hidden;
-  background: #071827;
-  color: #fff;
+  background: var(--z);
+  color: var(--a);
 }
 .public-layout.public-display > .public-header-display {
   display: none;
@@ -89,7 +89,7 @@
   grid-template: auto 1fr auto / minmax(0, 3fr) minmax(18rem, 1fr);
   gap: 2vw;
   padding: 2vw;
-  background: radial-gradient(circle at 35% 45%, #123f52, #071827 60%);
+  background: radial-gradient(circle at 35% 45%, var(--bv), var(--z) 60%);
 }
 .display-screen > header {
   grid-column: 1 / -1;
@@ -108,11 +108,11 @@
 }
 .display-audio {
   min-height: 48px;
-  border: 1px solid #ffffff66;
+  border: 1px solid var(--ey);
   border-radius: 999px;
   padding: 0.6rem 1rem;
   background: transparent;
-  color: #fff;
+  color: var(--a);
 }
 .display-call {
   position: relative;
@@ -120,9 +120,9 @@
   place-items: center;
   align-content: center;
   overflow: hidden;
-  border: 2px solid #ffffff33;
+  border: 2px solid var(--ex);
   border-radius: 3vw;
-  background: #ffffff0d;
+  background: var(--ew);
   text-align: center;
 }
 .display-call strong {
@@ -140,15 +140,15 @@
   position: absolute;
   width: 20vw;
   aspect-ratio: 1;
-  border: 3px solid #33d3b0;
+  border: 3px solid var(--cq);
   border-radius: 50%;
   animation: display-ripple 2s ease-out infinite;
 }
 .display-screen aside {
   border-radius: 2vw;
   padding: 2vw;
-  background: #fff;
-  color: #102a43;
+  background: var(--a);
+  color: var(--b);
 }
 .display-screen aside h2 {
   font-size: clamp(1.5rem, 2.3vw, 3rem);
@@ -258,8 +258,8 @@
   max-width: none;
 }
 .display-screen {
-  background: radial-gradient(circle at 80% 0%, #17656b, #102a43 58%);
-  color: #fff;
+  background: radial-gradient(circle at 80% 0%, var(--cb), var(--b) 58%);
+  color: var(--a);
   box-shadow: 0 22px 45px rgb(16 42 67 / 22%);
 }
 .display-brand {
@@ -299,8 +299,8 @@
   margin: 0;
   padding: clamp(1.25rem, 2.5vw, 2.5rem);
   border-radius: 17px;
-  background: #9cf2e7;
-  color: #103b45;
+  background: var(--g);
+  color: var(--ab);
   font-size: clamp(1.6rem, 3vw, 3.5rem);
   font-weight: 900;
   text-align: center;
@@ -309,7 +309,7 @@
 .display-screen aside {
   border: 1px solid rgb(255 255 255 / 14%);
   background: rgb(255 255 255 / 8%);
-  color: #fff;
+  color: var(--a);
 }
 .display-screen aside ol {
   padding: 0;
@@ -318,7 +318,7 @@
 .display-audio {
   border-color: rgb(255 255 255 / 40%);
   background: rgb(255 255 255 / 8%);
-  color: #fff;
+  color: var(--a);
   font-weight: 800;
 }
 
@@ -357,7 +357,7 @@
   margin-bottom: 0;
 }
 .display-section-heading span {
-  color: #9cf2e7;
+  color: var(--g);
   font-size: clamp(0.72rem, 1vw, 1rem);
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -373,8 +373,8 @@
   aspect-ratio: 1;
   place-items: center;
   border-radius: 50%;
-  background: #9cf2e7;
-  color: #103b45;
+  background: var(--g);
+  color: var(--ab);
   font-size: clamp(1.1rem, 2vw, 2rem);
 }
 .display-active-grid {
@@ -401,12 +401,12 @@
 .display-active-ticket small,
 .display-active-ticket span {
   display: block;
-  color: #cbdbe6;
+  color: var(--x);
 }
 .display-active-ticket > div > strong {
   display: block;
   margin-top: 0.2rem;
-  color: #fff;
+  color: var(--a);
   overflow-wrap: anywhere;
   font-size: clamp(1.8rem, 2.7vw, 3.25rem);
   line-height: 0.95;
@@ -416,12 +416,12 @@
   min-width: 0;
   padding: clamp(0.55rem, 0.75vw, 0.8rem);
   border-radius: 15px;
-  background: #9cf2e7;
-  color: #103b45;
+  background: var(--g);
+  color: var(--ab);
 }
 .display-destination small,
 .display-destination span {
-  color: #31666d;
+  color: var(--co);
 }
 .display-destination b {
   display: block;
@@ -429,7 +429,7 @@
   font-size: clamp(1rem, 1.35vw, 1.55rem);
 }
 .display-active-ticket.is-calling {
-  border-color: #9cf2e7;
+  border-color: var(--g);
   box-shadow: 0 0 0 4px rgb(156 242 231 / 12%);
   animation: display-ticket-call 1.2s ease-in-out 2;
 }
@@ -445,10 +445,10 @@
 }
 .display-no-call p,
 .display-next-empty {
-  color: #cbdbe6;
+  color: var(--x);
 }
 .display-screen .display-next-zone {
-  color: #fff;
+  color: var(--a);
   background: rgb(255 255 255 / 8%);
 }
 .display-next-zone ol {
@@ -469,7 +469,7 @@
   background: rgb(255 255 255 / 8%);
 }
 .display-next-zone li span {
-  color: #9cf2e7;
+  color: var(--g);
   font-size: 0.78rem;
   font-weight: 900;
 }
@@ -482,7 +482,7 @@
 .display-next-zone li small {
   display: block;
   overflow: hidden;
-  color: #cbdbe6;
+  color: var(--dz);
   font-size: clamp(0.7rem, 0.9vw, 0.9rem);
   text-overflow: ellipsis;
   white-space: nowrap;
