@@ -11,8 +11,9 @@ import { EmptyState } from '@/design-system/components/FeedbackState';
 import { AppErrorBoundary } from '@/app/AppErrorBoundary';
 import { useActiveSite, useSite } from '@/features/portfolio/hooks/useSites';
 import { routeRequiresActiveSite } from './site-context-rules';
+import { storageKeys } from '@/core/storage/storage-keys';
 
-const sidebarPreferenceKey = 'dori.sidebar.collapsed';
+const sidebarPreferenceKey = storageKeys.session.sidebarCollapsed;
 
 function mediaMatches(query: string): boolean {
   return typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
@@ -36,21 +37,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mobileViewport, setMobileViewport] = useState(() => mediaMatches('(max-width: 620px)'));
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const activeSiteQuery = useSite(activeSiteId);
-  const sites = useMemo(
-    () => {
-      const scoped = user?.scope.siteIds.map((id) => ({
+  const sites = useMemo(() => {
+    const scoped =
+      user?.scope.siteIds.map((id) => ({
         id,
-        name: activeSiteQuery.data?.data.siteId === id
-          ? activeSiteQuery.data.data.siteName
-          : t('site.fallback', { id }),
+        name:
+          activeSiteQuery.data?.data.siteId === id
+            ? activeSiteQuery.data.data.siteName
+            : t('site.fallback', { id }),
       })) ?? [];
-      const active = activeSiteQuery.data?.data;
-      return active && !scoped.some((site) => site.id === active.siteId)
-        ? [{ id: active.siteId, name: active.siteName }, ...scoped]
-        : scoped;
-    },
-    [activeSiteQuery.data, t, user],
-  );
+    const active = activeSiteQuery.data?.data;
+    return active && !scoped.some((site) => site.id === active.siteId)
+      ? [{ id: active.siteId, name: active.siteName }, ...scoped]
+      : scoped;
+  }, [activeSiteQuery.data, t, user]);
   useEffect(() => {
     const onlySite = sites.length === 1 ? sites[0] : undefined;
     if (!user || activeSiteId !== null || !onlySite) return;

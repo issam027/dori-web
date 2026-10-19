@@ -13,6 +13,7 @@
     "api:check": "npm run api:generate && git diff --exit-code -- src/api/generated",
     "audit:phase11": "node tools/phase11-audit.mjs",
     "audit:i18n": "node tools/i18n-ui-audit.mjs",
+    "audit:bundle": "node tools/bundle-budget.mjs",
     "audit:security": "npm audit --audit-level=high",
     "build": "npm run api:generate && tsc -b && vite build",
     "lint": "eslint . --max-warnings=0",
@@ -21,7 +22,7 @@
     "test:watch": "vitest",
     "pretest:e2e": "node tools/check-generated-client.mjs && vite build",
     "test:e2e": "playwright test",
-    "verify": "npm run api:check && npm run audit:phase11 && npm run audit:i18n && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "verify": "npm run api:check && npm run audit:phase11 && npm run audit:i18n && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run audit:bundle && npm run test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

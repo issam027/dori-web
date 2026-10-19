@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { UserScopeDto } from '@/api/generated/models';
+import { storageKeys } from '@/core/storage/storage-keys';
 
 interface ScopeState {
   activeSiteId: number | null;
@@ -9,7 +10,7 @@ interface ScopeState {
   clear: () => void;
 }
 
-const activeSiteStorageKey = 'dori.activeSiteId';
+const activeSiteStorageKey = storageKeys.session.activeSiteId;
 const storedSiteId = Number(sessionStorage.getItem(activeSiteStorageKey));
 
 function assertScoped(

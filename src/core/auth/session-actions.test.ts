@@ -2,7 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { QueryClient } from '@tanstack/react-query';
 import { mockServer } from '@/shared/testing/mock-server';
 import { useScopeStore } from '@/core/scope/scope-store';
-import { getAccessToken } from './access-token';
+import { getAccessToken, setAccessToken } from './access-token';
+import { storageKeys } from '@/core/storage/storage-keys';
 import {
   clearSession,
   clearActiveSiteContext,
@@ -122,10 +123,20 @@ describe('hydrateSession', () => {
       mustChangePassword: false,
       scope: { isGlobal: true, siteIds: [], queueIds: [] },
     });
+    setAccessToken('logout-token');
+    localStorage.setItem(storageKeys.local.rememberedUsername, 'u');
+    localStorage.setItem('foreign.preference', 'keep-local');
+    sessionStorage.setItem(storageKeys.session.sidebarCollapsed, 'true');
+    sessionStorage.setItem('foreign.session', 'keep-session');
     await clearSession(queryClient);
     expect(logoutCalled).toBe(true);
     expect(useSessionStore.getState().status).toBe('anonymous');
+    expect(getAccessToken()).toBeNull();
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+    expect(localStorage.getItem(storageKeys.local.rememberedUsername)).toBeNull();
+    expect(sessionStorage.getItem(storageKeys.session.sidebarCollapsed)).toBeNull();
+    expect(localStorage.getItem('foreign.preference')).toBe('keep-local');
+    expect(sessionStorage.getItem('foreign.session')).toBe('keep-session');
   });
 
   it('purges session, scope, brand and cached data when authentication expires', async () => {
@@ -146,13 +157,28 @@ describe('hydrateSession', () => {
       queueIds: [25],
     });
     useBrandStore.setState({ name: 'Private site', logoUrl: 'https://invalid.test/logo.svg' });
+    setAccessToken('expired-token');
+    localStorage.setItem(storageKeys.local.onboardingDraft, '{}');
+    localStorage.setItem(storageKeys.local.legacyOnboardingDrafts[0], '{}');
+    localStorage.setItem(storageKeys.local.legacyOnboardingDrafts[1], '{}');
+    localStorage.setItem('foreign.preference', 'keep-local');
+    sessionStorage.setItem(storageKeys.session.sidebarCollapsed, 'true');
+    sessionStorage.setItem('foreign.session', 'keep-session');
 
     await expireSession(queryClient);
 
     expect(useSessionStore.getState().status).toBe('anonymous');
+    expect(getAccessToken()).toBeNull();
     expect(useScopeStore.getState().activeSiteId).toBeNull();
     expect(useBrandStore.getState()).toMatchObject({ name: 'DORIFY', logoUrl: null });
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+    expect(localStorage.getItem(storageKeys.local.onboardingDraft)).toBeNull();
+    expect(localStorage.getItem(storageKeys.local.legacyOnboardingDrafts[0])).toBeNull();
+    expect(localStorage.getItem(storageKeys.local.legacyOnboardingDrafts[1])).toBeNull();
+    expect(sessionStorage.getItem(storageKeys.session.activeSiteId)).toBeNull();
+    expect(sessionStorage.getItem(storageKeys.session.sidebarCollapsed)).toBeNull();
+    expect(localStorage.getItem('foreign.preference')).toBe('keep-local');
+    expect(sessionStorage.getItem('foreign.session')).toBe('keep-session');
   });
 });
 

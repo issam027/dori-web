@@ -36,10 +36,10 @@ Dorify possède une fondation saine : typage strict, découpage par fonctionnali
 | ARC-02 | Architecture | 🟡 Mineur | Toutes les query keys applicatives sont désormais produites par le catalogue centralisé, avec formes historiques caractérisées. | `src/api/client/query-keys.ts`; `src/api/client/query-keys.test.ts`; `src/features/users/QueueOperatorsModal.test.tsx` | Correctif livré ; conserver l'audit des clés littérales et les tests d'invalidation. | S | [x] Terminé — preuve 9.11 |
 | QUA-01 | Qualité | 🟠 Majeur | Le `console.warn` de production a été remplacé par un reporter injectable, avec événement navigateur contrôlé par défaut. | `src/core/i18n/remote.ts:17-53,114-122`; `src/core/i18n/i18n.test.ts:128-168`; `tools/phase11-audit.mjs:52-55` | Correctif livré ; brancher le reporter sur la future télémétrie de production. | S | [x] Terminé |
 | QUA-02 | Typage | 🟡 Mineur | Les setters numériques des deux éditeurs sont désormais typés par groupes de clés ; aucun `as never` ne subsiste dans `src/`. | `src/features/queues/QueueEditor.tsx`; `src/features/onboarding/components/SiteEditor.tsx`; tests de caractérisation associés | Correctif livré ; conserver les unions de clés alignées sur les champs numériques. | S | [x] Terminé — preuve 9.13 |
-| SEC-01 | Session | 🟡 Mineur | L'expiration efface tout le stockage de l'origine, pas uniquement les clés Dorify. | `src/core/auth/session-actions.ts:64-73`; `src/core/scope/scope-store.ts:12-13,38-40` | Supprimer seulement les clés possédées ; préserver préférences non sensibles et intégrations partageant l'origine. | S | [ ] À faire |
+| SEC-01 | Session | 🟡 Mineur | L'expiration et la déconnexion suppriment désormais uniquement les clés possédées par Dorify, centralisées dans un registre, et préservent les clés étrangères. | `src/core/storage/storage-keys.ts`; `src/core/auth/session-actions.ts`; `src/core/auth/session-actions.test.ts` | Correctif livré ; toute nouvelle clé de stockage doit être ajoutée au registre central. | S | [x] Terminé — preuve 9.14 |
 | SEC-02 | CSP | 🔵 Amélioration | La CSP autorise encore `style-src 'unsafe-inline'`. | `vite.config.ts:35-46` | Évaluer nonce/hash ou extraction complète des styles inline avant retrait. | M | [ ] À faire |
 | A11Y-01 | Accessibilité | 🟡 Mineur | Le serveur E2E est fiable, les 62 tests passent trois fois consécutivement et axe est vert sur quatre thèmes. | `playwright.config.ts`; `e2e/global-setup.ts`; `e2e/support/scenario-fixtures.ts`; `e2e/visual-layout.spec.ts`; `e2e/walkin.spec.ts` | Correctif livré ; conserver le cycle de vie Playwright, les assertions et l'audit axe. | M | [x] Terminé — preuve 9.9 |
-| PERF-01 | Performance | 🟡 Mineur | Le bundle initial reste à 376,11 kB JS / 118,94 kB gzip malgré le lazy-loading ; aucune limite de budget n'est configurée. | `src/app/App.tsx:19-71`; `vite.config.ts:60-65`; `package.json:6-22` | Ajouter analyse et budget CI ; isoler les dépendances lourdes si le budget mesuré est dépassé. | M | [ ] À faire |
+| PERF-01 | Performance | 🟡 Mineur | Un budget reproductible contrôle désormais le JS/CSS initial, le plus gros chunk secondaire et la séparation des pages ; le rapport JSON est archivé en CI. | `tools/bundle-budget.mjs`; `package.json`; `.github/workflows/ci.yml` | Correctif livré ; ajuster un budget uniquement avec une mesure et une justification consignées. | M | [x] Terminé — preuve 9.15 |
 | TST-01 | Tests | 🟠 Majeur | Couverture globale modérée et sans seuil : 53,15 % statements, 40,45 % branches, 38,30 % fonctions ; hooks critiques à 0–18 %. | `vitest.config.ts:4-19`; `src/features/queue-operations/hooks/useQueueOperations.ts:26-151`; `src/features/persons/hooks/usePersons.ts:29-100` | Fixer des seuils progressifs et tester mutations, invalidations, erreurs et courses réseau. | L | [ ] À faire |
 | TST-02 | Tests | 🟡 Mineur | Le test d'alignement i18n utilisait le chargement dynamique et pouvait dépasser le timeout sous couverture ; il importe maintenant directement les catalogues. | `src/core/i18n/i18n.test.ts:3-72`; `src/core/i18n/locales/index.ts:4-10`; `vitest.config.ts:8-18` | Correctif livré ; conserver les tests structurels synchrones et les tests runtime séparés. | S | [x] Terminé |
 
@@ -149,6 +149,8 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 | 2026-10-19 | Codex | ARC-02 terminé : toutes les query keys littérales restantes ont rejoint le catalogue sans changement de tuple ; tests de formes et d'invalidation ajoutés, preuve en 9.11. |
 | 2026-10-19 | Codex | REU-04 terminé : `FilterDrawer` et quatre inputs inutilisés supprimés, `RequiredMark` rendu interne, `EntityPicker` conservé avec test ; preuve en 9.12. |
 | 2026-10-19 | Codex | QUA-02 terminé : setters numériques typés dans les éditeurs, fixtures historiques assainies et tests de caractérisation ajoutés ; preuve en 9.13. |
+| 2026-10-19 | Codex | SEC-01 terminé : registre central des clés Dorify, nettoyage ciblé à l'expiration/déconnexion et préservation des clés étrangères ; preuve en 9.14. |
+| 2026-10-19 | Codex | PERF-01 terminé : budgets de bundle exécutés par `verify` et la CI, rapport JSON archivé, dépassement volontaire et séparation de 21 pages vérifiés ; preuve en 9.15. |
 ## 9. Protocole de non-régression et conditions de sortie
 
 Cette section complète les sections 6 et 7. Une action n'est cochée `[x] Terminé` que si TOUS ses critères de sortie (9.3) ET la définition de terminé commune (9.2) sont satisfaits, avec preuve notée (9.5). Un critère non satisfait = statut inchangé, jamais de coche "presque".
@@ -279,10 +281,10 @@ En cas d'échec d'un critère : ne pas cocher, corriger ou `git revert` le commi
 - **Avant** : inventorier toutes les clés possédées par Dorify (localStorage et sessionStorage), dont celles de `src/core/scope/scope-store.ts:12-13,38-40` et `src/core/auth/session-actions.ts:64-73`.
 - **Faire** : centraliser la liste des clés possédées et ne supprimer que celles-ci.
 - **Sortie** :
-  - [ ] Test unitaire : avec une clé étrangère et des clés Dorify présentes, l'expiration supprime toutes les clés Dorify et conserve la clé étrangère.
-  - [ ] Après expiration et après déconnexion : le jeton en mémoire est vidé et aucune donnée de session ou de scope ne subsiste (vérifié par test).
-  - [ ] `e2e/session.spec.ts` et `e2e/scope.spec.ts` verts.
-  - [ ] Toute nouvelle clé de stockage doit passer par la liste centralisée (test ou règle de revue notée).
+  - [x] Test unitaire : avec une clé étrangère et des clés Dorify présentes, l'expiration supprime toutes les clés Dorify et conserve la clé étrangère.
+  - [x] Après expiration et après déconnexion : le jeton en mémoire est vidé et aucune donnée de session ou de scope ne subsiste (vérifié par test).
+  - [x] `e2e/session.spec.ts` et `e2e/scope.spec.ts` verts.
+  - [x] Toute nouvelle clé de stockage doit passer par la liste centralisée (test ou règle de revue notée).
 
 #### SEC-02 : CSP et `style-src 'unsafe-inline'`
 - **Avant** : inventorier les styles inline (attributs `style=`, balises `<style>` injectées par des bibliothèques comme Radix) et relever la CSP exacte (`vite.config.ts:35-46`). Les en-têtes servis en production ne sont pas dans ce dépôt : les vérifier sur l'environnement réel, sinon NON VÉRIFIÉ.
@@ -295,10 +297,10 @@ En cas d'échec d'un critère : ne pas cocher, corriger ou `git revert` le commi
 #### PERF-01 : budget de bundle
 - **Faire** : ajouter une analyse du bundle (rapport archivé en CI) et un contrôle qui échoue au-delà d'un budget.
 - **Sortie** :
-  - [ ] Budget chiffré défini et validé (point de départ : JS initial 118,94 kB gzip, CSS 33,97 kB gzip, avec marge décidée et notée).
-  - [ ] Le contrôle échoue en CI quand le budget est dépassé (prouvé par un essai volontaire sur une branche jetable).
-  - [ ] Les chunks par page restent séparés (les routes paresseuses de `src/app/App.tsx:19-71` ne sont pas regroupées).
-  - [ ] Les métriques de performance réelle (temps de chargement, Web Vitals) restent NON VÉRIFIÉES tant qu'un audit Lighthouse ou équivalent n'est pas fait.
+  - [x] Budget chiffré défini et validé (point de départ : JS initial 118,94 kB gzip, CSS 33,97 kB gzip, avec marge décidée et notée).
+  - [x] Le contrôle échoue en CI quand le budget est dépassé (prouvé par un essai volontaire local équivalent au contrôle CI).
+  - [x] Les chunks par page restent séparés (les routes paresseuses de `src/app/App.tsx:19-71` ne sont pas regroupées).
+  - [x] Les métriques de performance réelle (temps de chargement, Web Vitals) restent NON VÉRIFIÉES tant qu'un audit Lighthouse ou équivalent n'est pas fait.
 
 #### REU-01 : migrer les 8 tableaux vers `DataTable`
 - **Avant** : pour chacun des 8 écrans (`UsersAdminPage.tsx:216-217`, `TranslationsAdminPage.tsx:256-257`, `PersonsPage.tsx:211-212`, `SettingsWorkspace.tsx:190,333`, `OnboardingWizard.tsx:656`, `KioskWizard.tsx:463`, `HealthPage.tsx:137`) : capturer l'écran (4 thèmes, mobile, RTL) et écrire un test de caractérisation (colonnes, ordre, actions de ligne, état vide, chargement, erreur, permissions).
@@ -479,6 +481,37 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 - **Écart** : aucun commit créé dans le worktree partagé.
 - **Statut** : [x] Terminé.
 
+### 9.14 Preuve SEC-01
+
+- **ID** : SEC-01
+- **Date** : 2026-10-19
+- **Inventaire** : le stockage local contient le nom utilisateur mémorisé et les brouillons onboarding v1 à v3 ; le stockage de session contient le site actif et la préférence de barre latérale. Ces cinq familles sont déclarées dans `src/core/storage/storage-keys.ts`.
+- **Implémentation** : `expireSession` n'appelle plus `localStorage.clear()` ni `sessionStorage.clear()`. `clearOwnedStorage` retire explicitement les seules clés du registre. Le scope, l'onboarding, la barre latérale et l'authentification consomment désormais les constantes centralisées.
+- **Tests de sécurité** : `session-actions.test.ts` place simultanément des clés Dorify et des clés étrangères dans les deux stockages. Après expiration comme après déconnexion, le jeton mémoire, la session, le scope et les clés Dorify sont absents, tandis que les clés étrangères restent intactes.
+- **Recherche reproductible** : `rg -n "localStorage|sessionStorage" src --glob '!src/api/generated/**' --glob '!**/*.test.ts' --glob '!**/*.test.tsx'` montre que tous les accès applicatifs utilisent une clé issue du registre central ; aucun appel global `.clear()` ne subsiste.
+- **Commandes** : lint et typecheck verts ; 59 fichiers / 190 tests verts ; tests ciblés 17/17 ; build vert sur 2 863 modules ; audits i18n et phase11 verts sur 274 fichiers source.
+- **E2E** : `npx playwright test e2e/session.spec.ts e2e/scope.spec.ts` vert (**15/15**).
+- **Bundle** : JS initial 119,03 kB gzip et CSS 34,00 kB gzip. Le nouveau registre est isolé dans un chunk de 0,26 kB gzip.
+- **UI/captures** : non applicables ; aucun rendu, style, libellé ou structure DOM n'a changé.
+- **Règle de revue** : toute nouvelle utilisation de `localStorage` ou `sessionStorage` doit déclarer sa clé dans `storageKeys` afin d'expliciter sa propriété et sa politique de nettoyage.
+- **Écart** : aucun commit créé dans le worktree partagé.
+- **Statut** : [x] Terminé.
+
+### 9.15 Preuve PERF-01
+
+- **ID** : PERF-01
+- **Date** : 2026-10-19
+- **Budgets** : JS d'entrée gzip ≤ **125 000 octets**, CSS initial gzip ≤ **36 000 octets**, plus gros chunk JS secondaire gzip ≤ **45 000 octets**, et au moins **15 chunks de pages**. Les deux premiers seuils laissent environ 5 % au-dessus des valeurs Vite de départ (118,94 kB et 33,97 kB) ; les deux autres empêchent un regroupement silencieux des dépendances/pages.
+- **Implémentation** : `tools/bundle-budget.mjs` analyse les fichiers réellement produits dans `dist/assets`, compresse de manière déterministe avec Node, identifie les assets initiaux depuis `dist/index.html`, écrit `dist/bundle-report.json` puis retourne un code non nul au premier budget dépassé. Les seuils sont surchargeables par variables d'environnement pour les tests contrôlés.
+- **CI** : `npm run audit:bundle` est exécuté après le build dans `.github/workflows/ci.yml` et dans `npm run verify`. Le rapport JSON est publié comme artefact `bundle-report` pendant 14 jours, y compris quand le contrôle échoue.
+- **Résultat courant** : JS d'entrée **117 766 octets gzip / 125 000**, CSS **33 950 / 36 000**, plus gros chunk secondaire **40 142 / 45 000**, **21 chunks de pages / minimum 15**. La sortie Vite reste à 119,03 kB JS gzip et 34,00 kB CSS gzip.
+- **Preuve d'échec** : avec `BUNDLE_INITIAL_JS_GZIP_BUDGET=1`, `npm run audit:bundle` retourne volontairement un échec (`FAIL initialJsGzip: 117767 <= 1`). Le rapport normal a ensuite été régénéré avec tous les contrôles verts.
+- **Commandes** : lint et typecheck verts ; 59 fichiers / 190 tests verts ; build vert sur 2 863 modules ; audits bundle, phase11 et i18n verts ; E2E **62/62** verts.
+- **Performance réelle** : **NON VÉRIFIÉE**. Ce contrôle mesure le poids des artefacts, pas les temps réseau, LCP, INP, CLS ou autres Web Vitals ; un audit Lighthouse sur un environnement représentatif reste nécessaire.
+- **UI/captures** : non applicables ; aucune source d'interface ou feuille de style n'a été modifiée.
+- **Écart** : aucun commit créé dans le worktree partagé.
+- **Statut** : [x] Terminé.
+
 <!-- CHECKPOINT id="ckpt_mvezekch_ghscwq" time="2026-10-19T08:17:35.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvezrfb6_twt6oi" time="2026-10-19T08:27:35.106Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -530,3 +563,7 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvffro0q_g7xm52" time="2026-10-19T15:55:40.250Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvfg4izh_xkywhk" time="2026-10-19T16:05:40.254Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfghdyl_797qee" time="2026-10-19T16:15:40.269Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfgu8xb_czy882" time="2026-10-19T16:25:40.271Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

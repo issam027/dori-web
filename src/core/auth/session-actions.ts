@@ -12,18 +12,18 @@ import { useSessionStore } from './session-store';
 import { setAccessToken } from './access-token';
 import { useOperationStore } from '@/features/queue-operations/operation-store';
 import { queryKeys } from '@/api/client/query-keys';
-
-const rememberedUsernameKey = 'dori.rememberedUsername';
+import { clearOwnedStorage, storageKeys } from '@/core/storage/storage-keys';
 
 export function getRememberedUsername(): string {
-  return localStorage.getItem(rememberedUsernameKey) ?? '';
+  return localStorage.getItem(storageKeys.local.rememberedUsername) ?? '';
 }
 
 export async function login(credentials: LoginDto, rememberUsername: boolean): Promise<void> {
   const response = await authControllerLogin(credentials);
   setAccessToken(response.data.accessToken);
-  if (rememberUsername) localStorage.setItem(rememberedUsernameKey, credentials.username);
-  else localStorage.removeItem(rememberedUsernameKey);
+  if (rememberUsername)
+    localStorage.setItem(storageKeys.local.rememberedUsername, credentials.username);
+  else localStorage.removeItem(storageKeys.local.rememberedUsername);
   await hydrateSession();
 }
 
@@ -68,8 +68,7 @@ export async function expireSession(queryClient: QueryClient): Promise<void> {
   useOperationStore.getState().reset();
   await queryClient.cancelQueries();
   queryClient.clear();
-  localStorage.clear();
-  sessionStorage.clear();
+  clearOwnedStorage();
 }
 
 export async function changeActiveSite(
