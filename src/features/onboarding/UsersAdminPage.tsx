@@ -27,6 +27,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { useSettingsData } from './hooks/useSettingsData';
 import {
   deleteUser,
@@ -63,15 +64,8 @@ export function UsersAdminPage() {
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [openActionsUserId, setOpenActionsUserId] = useState<number>();
   const [pending, setPending] = useState(false);
-  useEffect(() => {
-    const search = draft.search.trim();
-    if (search.length <= 3) return;
-    const timeout = window.setTimeout(() => {
-      setFilters((currentFilters) => ({ ...currentFilters, search }));
-      setPage(1);
-    }, 350);
-    return () => { window.clearTimeout(timeout); };
-  }, [draft.search]);
+  const debouncedSearch = useDebouncedFilter(draft.search, { delay: 350, minimumLength: 4 });
+  const effectiveFilters = { ...filters, search: debouncedSearch };
   useEffect(() => {
     if (openActionsUserId === undefined) return;
     const close = (event: PointerEvent) => {
@@ -81,18 +75,18 @@ export function UsersAdminPage() {
     return () => { document.removeEventListener('pointerdown', close); };
   }, [openActionsUserId]);
   const users = useQuery({
-    queryKey: ['admin', 'users-page', page, filters],
+    queryKey: ['admin', 'users-page', page, effectiveFilters],
     queryFn: ({ signal }) =>
       findUsers(
         {
           page,
           pageSize: PAGE_SIZE,
-          sort: filters.sort as UsersControllerFindUsersParams['sort'],
+          sort: effectiveFilters.sort as UsersControllerFindUsersParams['sort'],
           siteIds: current && !current.scope.isGlobal && current.scope.siteIds.length
             ? current.scope.siteIds.join(',')
             : undefined,
-          search: filters.search || undefined,
-          userType: (filters.userType || undefined) as UsersControllerFindUsersParams['userType'],
+          search: effectiveFilters.search || undefined,
+          userType: (effectiveFilters.userType || undefined) as UsersControllerFindUsersParams['userType'],
         },
         undefined,
         signal,
@@ -167,9 +161,9 @@ export function UsersAdminPage() {
                 onChange={(event) => {
                   const search = event.target.value;
                   setDraft({ ...draft, search });
+                  setPage(1);
                   if (search.trim().length <= 3) {
                     setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
-                    setPage(1);
                   }
                 }}
               />

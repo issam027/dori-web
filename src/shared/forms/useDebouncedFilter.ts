@@ -21,17 +21,14 @@ export function useDebouncedFilter(
   const [debouncedValue, setDebouncedValue] = useState('');
 
   useEffect(() => {
-    if (!eligible) {
-      setDebouncedValue('');
-      return;
-    }
+    if (!eligible) return;
     const timeout = window.setTimeout(() => {
       setDebouncedValue(normalizedValue);
     }, delay);
     return () => {
       window.clearTimeout(timeout);
     };
-  }, [delay, eligible, minimumLength, normalizedValue]);
+  }, [delay, eligible, normalizedValue]);
 
   return eligible ? debouncedValue : '';
 }

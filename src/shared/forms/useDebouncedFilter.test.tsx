@@ -56,4 +56,17 @@ describe('useDebouncedFilter', () => {
     rerender({ value: 'abc' });
     expect(result.current).toBe('');
   });
+
+  it('cancels a pending publication when unmounted', () => {
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+    const { unmount } = renderHook(() =>
+      useDebouncedFilter('abcd', { delay: 300, minimumLength: 4 }),
+    );
+    expect(setTimeoutSpy).toHaveBeenCalledOnce();
+
+    unmount();
+
+    expect(clearTimeoutSpy).toHaveBeenCalledOnce();
+  });
 });

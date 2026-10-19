@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { RoleResponseDto, UserSummaryItemDto } from '@/api/generated/models';
@@ -15,6 +15,7 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { queryKeys } from '@/api/client/query-keys';
 import { UserPlus } from 'lucide-react';
 import { getUserDisplayName, getUserInitials } from './user-display';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -35,7 +36,7 @@ export function UserAssignmentModal({
 }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto | null>(null);
   const [roleId, setRoleId] = useState(0);
@@ -46,19 +47,8 @@ export function UserAssignmentModal({
       : role.roleName === 'hotesse' || role.roleName === 'operator',
   );
 
-  useEffect(() => {
-    const normalized = search.trim();
-    const timer = window.setTimeout(() => {
-      setDebouncedSearch(normalized);
-    }, 300);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [search]);
-
   const close = () => {
     setSearch('');
-    setDebouncedSearch('');
     setPage(1);
     setSelectedUser(null);
     setRoleId(0);

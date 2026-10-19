@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Search, UserMinus, UserPlus, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { getUserDisplayName, getUserInitials } from './user-display';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 
 type View = 'assigned' | 'add';
 
@@ -28,20 +29,14 @@ export function QueueOperatorsModal({
   const queryClient = useQueryClient();
   const [view, setView] = useState<View>('assigned');
   const [search, setSearch] = useState('');
-  const [debounced, setDebounced] = useState('');
+  const debounced = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto>();
   const [pendingId, setPendingId] = useState<number>();
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => { setDebounced(search.trim()); }, 300);
-    return () => { window.clearTimeout(timer); };
-  }, [search]);
-
   const resetAddView = () => {
     setView('assigned');
     setSearch('');
-    setDebounced('');
     setPage(1);
     setSelectedUser(undefined);
   };

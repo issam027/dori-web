@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Languages, Pencil, Plus, Save, Search, Trash2 } from 'lucide-react';
@@ -15,6 +15,7 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { loadTranslationBundle } from '@/core/i18n/i18n';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import {
   createTranslation,
   deleteTranslation,
@@ -55,29 +56,22 @@ export function TranslationsAdminPage() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [createLocale, setCreateLocale] = useState<'fr' | 'en' | 'ar'>('fr');
-  useEffect(() => {
-    const key = filterDraft.key.trim();
-    if (key.length <= 3) return;
-    const timeout = window.setTimeout(() => {
-      setFilters((current) => ({ ...current, key }));
-      setPage(1);
-    }, 350);
-    return () => { window.clearTimeout(timeout); };
-  }, [filterDraft.key]);
+  const debouncedKey = useDebouncedFilter(filterDraft.key, { delay: 350, minimumLength: 4 });
+  const effectiveFilters = { ...filters, key: debouncedKey };
   const categoryLabel = (category: CreateTranslationDto['category']) =>
     t(`admin.translations.categories.${category}`);
   const translations = useQuery({
-    queryKey: ['admin', 'translations-page', page, filters],
+    queryKey: ['admin', 'translations-page', page, effectiveFilters],
     queryFn: ({ signal }) =>
       findTranslations(
         {
           page,
           pageSize: PAGE_SIZE,
           sort: 'translationKey:asc',
-          key: filters.key || undefined,
-          category: (filters.category ||
+          key: effectiveFilters.key || undefined,
+          category: (effectiveFilters.category ||
             undefined) as TranslationsControllerFindTranslationsParams['category'],
-          locale: filters.locale || undefined,
+          locale: effectiveFilters.locale || undefined,
         },
         undefined,
         signal,
@@ -204,9 +198,9 @@ export function TranslationsAdminPage() {
                 onChange={(event) => {
                   const key = event.target.value;
                   setFilterDraft({ ...filterDraft, key });
+                  setPage(1);
                   if (key.trim().length <= 3) {
                     setFilters((current) => ({ ...current, key: '' }));
-                    setPage(1);
                   }
                 }}
               />
