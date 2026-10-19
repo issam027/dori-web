@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Award, CalendarRange, CircleAlert, Gauge, Target, TrendingDown, TrendingUp } from 'lucide-react';
-import type { ReportBucketDto, ReportMetricsDto } from './report-utils';
+import type { ReportBucketViewModel, ReportMetricsViewModel } from './report-utils';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import type { QueueReportRow } from './report-utils';
@@ -17,9 +17,9 @@ function PerformanceScale({ average, median, p90 }: { average: number | null; me
   ].map(([name, raw, className]) => { const value = raw as number | null; return <div key={String(name)}><span>{String(name)}</span><div><i className={String(className)} style={{ width: `${String(((value ?? 0) / max) * 100)}%` }} /></div><strong>{format(value, i18n.language, ` ${t('common.min')}`)}</strong></div>; })}</div>;
 }
 
-export function ReportAnalyticsSections({ summary, buckets, queues }: { summary: ReportMetricsDto; buckets: readonly ReportBucketDto[]; queues: readonly QueueReportRow[] }) {
+export function ReportAnalyticsSections({ summary, buckets, queues }: { summary: ReportMetricsViewModel; buckets: readonly ReportBucketViewModel[]; queues: readonly QueueReportRow[] }) {
   const { t, i18n } = useTranslation();
-  const busiest = buckets.reduce<ReportBucketDto | undefined>((best, item) => !best || item.volume.registered > best.volume.registered ? item : best, undefined);
+  const busiest = buckets.reduce<ReportBucketViewModel | undefined>((best, item) => !best || item.volume.registered > best.volume.registered ? item : best, undefined);
   const first = buckets[0]?.volume.registered ?? 0;
   const last = buckets.at(-1)?.volume.registered ?? 0;
   const evolution = first === 0 ? null : ((last - first) / first) * 100;

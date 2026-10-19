@@ -19,8 +19,37 @@ export interface LoadBundleOptions {
   force?: boolean;
   /** Also make this locale the active language. Default false: loading ≠ switching. */
   activate?: boolean;
-  /** Called with entries refused by validation. Defaults to console.warn. */
+  /** Optional caller-specific observer for entries refused by validation. */
   onRejected?: (entries: RejectedEntry[]) => void;
+}
+
+export interface TranslationRejectionReport {
+  locale: string;
+  category: TranslationCategory;
+  version: number;
+  entries: RejectedEntry[];
+}
+
+export type TranslationRejectionReporter = (report: TranslationRejectionReport) => void;
+
+export const translationRejectionEventName = 'dorify:i18n-rejected';
+
+const browserRejectionReporter: TranslationRejectionReporter = (report) => {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(translationRejectionEventName, { detail: report }));
+};
+
+let rejectionReporter: TranslationRejectionReporter = browserRejectionReporter;
+
+/** Installs the application reporter and returns a function restoring the previous one. */
+export function setTranslationRejectionReporter(
+  reporter: TranslationRejectionReporter,
+): () => void {
+  const previous = rejectionReporter;
+  rejectionReporter = reporter;
+  return () => {
+    rejectionReporter = previous;
+  };
 }
 
 const loadedBundleVersions = new Map<string, number>();
@@ -88,8 +117,8 @@ export async function loadTranslationBundle(
       i18n.addResourceBundle(target, 'translation', accepted, true, true);
       loadedBundleVersions.set(cacheKey, bundle.version);
       if (rejected.length > 0) {
-        if (opts.onRejected) opts.onRejected(rejected);
-        else console.warn(`[i18n] ${String(rejected.length)} remote entr(ies) rejected for ${cacheKey}`, rejected);
+        rejectionReporter({ locale: target, category, version: bundle.version, entries: rejected });
+        opts.onRejected?.(rejected);
       }
     }
     if (opts.activate) await setLanguage(target);

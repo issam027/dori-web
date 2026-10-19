@@ -9,10 +9,8 @@ import {
   Pencil,
   Phone,
   Plus,
-  RotateCcw,
   Save,
   Search,
-  StickyNote,
   Trash2,
   UserRound,
   UsersRound,
@@ -30,9 +28,11 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { createPerson, deletePerson, findPersons, updatePerson } from './api/persons-api';
 import { PersonFormModal } from './PersonFormModal';
 import { PersonNotesViewer } from './PersonNotesViewer';
+import { PersonNotesButton } from './PersonNotesButton';
 import { displayPersonLanguage, formatPersonDate } from './person-display';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 
 const PAGE_SIZE = 10;
 
@@ -43,10 +43,8 @@ export function PersonsPage() {
   const canDelete = hasPermission(useSessionStore((state) => state.user), 'registration_delete');
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
-  const [search, setSearch] = useState('');
-  const [statusDraft, setStatusDraft] = useState<'all' | 'active' | 'inactive'>('active');
+  const search = useDebouncedFilter(searchDraft);
   const [status, setStatus] = useState<'all' | 'active' | 'inactive'>('active');
-  const [sortDraft, setSortDraft] = useState<PersonsControllerFindPersonsSort>('lastName:asc');
   const [sort, setSort] = useState<PersonsControllerFindPersonsSort>('lastName:asc');
   const [viewing, setViewing] = useState<PersonResponseDto>();
   const [editing, setEditing] = useState<PersonResponseDto>();
@@ -129,15 +127,8 @@ export function PersonsPage() {
             </span>
             <small>{t('persons.admin.searchHint')}</small>
           </summary>
-          <form
+          <div
             className="admin-filter-grid persons-filter-grid"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setPage(1);
-              setSearch(searchDraft.trim());
-              setStatus(statusDraft);
-              setSort(sortDraft);
-            }}
           >
             <label>
               {t('common.search')}
@@ -146,12 +137,13 @@ export function PersonsPage() {
                 placeholder={t('persons.admin.searchPlaceholder')}
                 onChange={(event) => {
                   setSearchDraft(event.target.value);
+                  setPage(1);
                 }}
               />
             </label>
             <label>
               {t('persons.admin.statusFilter')}
-              <select value={statusDraft} onChange={(event) => { setStatusDraft(event.target.value as 'all' | 'active' | 'inactive'); }}>
+              <select value={status} onChange={(event) => { setStatus(event.target.value as 'all' | 'active' | 'inactive'); setPage(1); }}>
                 <option value="all">{t('persons.admin.allStatuses')}</option>
                 <option value="active">{t('common.active')}</option>
                 <option value="inactive">{t('common.inactive')}</option>
@@ -159,7 +151,7 @@ export function PersonsPage() {
             </label>
             <label>
               {t('persons.admin.sort')}
-              <select value={sortDraft} onChange={(event) => { setSortDraft(event.target.value as PersonsControllerFindPersonsSort); }}>
+              <select value={sort} onChange={(event) => { setSort(event.target.value as PersonsControllerFindPersonsSort); setPage(1); }}>
                 <option value="lastName:asc">{t('persons.admin.sort.lastNameAsc')}</option>
                 <option value="lastName:desc">{t('persons.admin.sort.lastNameDesc')}</option>
                 <option value="firstName:asc">{t('persons.admin.sort.firstNameAsc')}</option>
@@ -170,27 +162,7 @@ export function PersonsPage() {
                 <option value="phoneNumber:asc">{t('persons.admin.sort.phone')}</option>
               </select>
             </label>
-            <div className="admin-filter-actions">
-              <button
-                className="button"
-                type="button"
-                onClick={() => {
-                  setSearchDraft('');
-                  setSearch('');
-                  setStatusDraft('active');
-                  setStatus('active');
-                  setSortDraft('lastName:asc');
-                  setSort('lastName:asc');
-                  setPage(1);
-                }}
-              >
-                <RotateCcw aria-hidden="true" /> {t('common.reset')}
-              </button>
-              <button className="button button-primary" type="submit">
-                <Search aria-hidden="true" /> {t('common.apply')}
-              </button>
-            </div>
-          </form>
+          </div>
         </details>
       </Card>
       <Card className="settings-card">
@@ -262,20 +234,13 @@ export function PersonsPage() {
                         >
                           <Pencil aria-hidden="true" /> {t('common.edit')}
                         </button>
-                        <button
-                          className="button button-small"
-                          type="button"
-                          title={person.activeNoteCount ? t('queues.myQueues.viewNotes', { count: person.activeNoteCount }) : t('queues.myQueues.addNote')}
+                        <PersonNotesButton
+                          noteCount={person.activeNoteCount}
                           onClick={() => {
                             setNotesMode(person.activeNoteCount ? 'view' : 'add');
                             setNotesPerson(person);
                           }}
-                        >
-                          {person.activeNoteCount ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
-                          {person.activeNoteCount
-                            ? t('queues.myQueues.viewNotes', { count: person.activeNoteCount })
-                            : t('queues.myQueues.addNote')}
-                        </button>
+                        />
                         {canDelete ? <button className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
                           <Trash2 aria-hidden="true" /> {t('common.delete')}
                         </button> : null}

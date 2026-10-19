@@ -966,7 +966,7 @@ table td small {
 .admin-filter-grid-single {
   grid-template-columns: minmax(240px, 1fr) auto;
 }
-.persons-filter-grid { grid-template-columns: minmax(14rem, 2fr) minmax(10rem, 1fr) minmax(12rem, 1.3fr) auto; }
+.persons-filter-grid { grid-template-columns: minmax(14rem, 2fr) minmax(10rem, 1fr) minmax(12rem, 1.3fr); }
 .notification-filter-grid { grid-template-columns: repeat(4, minmax(10rem, 1fr)); }
 .notification-filter-grid .admin-filter-actions { grid-column: 4; }
 .settings-queue-filter { margin-bottom: 1rem; }

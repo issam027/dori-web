@@ -33,6 +33,8 @@ identiques entre les langues. Les variantes plurielles utilisent les suffixes CL
 
 - `setLanguage(locale)` charge le catalogue local et active la langue.
 - `loadTranslationBundle(locale, category)` charge les traductions distantes sans changer la langue.
+- `setTranslationRejectionReporter(reporter)` branche l'observabilité des entrées distantes rejetées ;
+  sans reporter applicatif, un événement navigateur `dorify:i18n-rejected` est émis.
 - `ensureLocaleLoaded(locale)` précharge une langue et sa chaîne de fallback.
 - `i18n` reste disponible pour les usages non React.
 

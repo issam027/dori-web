@@ -18,13 +18,13 @@ async function openNewPersonStep(page: Page) {
 
 async function fillRequiredIdentity(page: Page) {
   await page.getByRole('textbox', { name: /^nom/i }).fill('Martin');
-  await page.getByRole('textbox', { name: /téléphone/i }).fill('+33612345678');
+  await page.getByRole('textbox', { name: /téléphone/i }).fill('06 12 34 56 78');
 }
 
 async function reachTicketConfirmation(page: Page) {
   await page.getByRole('button', { name: /continuer vers le ticket/i }).click();
   await page.getByLabel(/^file/i).selectOption({ label: 'Accueil E2E' });
-  await page.getByLabel(/forfait/i).selectOption({ label: 'Standard E2E' });
+  await page.getByLabel(/forfait/i).selectOption({ index: 1 });
 }
 
 test('known-person search starts at three characters and exposes five-result pagination', async ({
@@ -93,7 +93,7 @@ test('known-person search starts at three characters and exposes five-result pag
   await page.getByRole('option').click();
   await reachTicketConfirmation(page);
   await page.getByRole('button', { name: /créer le ticket/i }).click();
-  await expect(page.getByText('E001', { exact: true })).toBeVisible();
+  await expect(page.getByRole('status').getByText('E001', { exact: true })).toBeVisible();
   expect(registrationBody).toMatchObject({ personId: 20, queueId: 10, tierId: 1 });
 });
 
@@ -141,7 +141,7 @@ test('new-person walk-in sends every identity field once and refreshes operation
     button.click();
     button.click();
   });
-  await expect(page.getByText('E001', { exact: true })).toBeVisible();
+  await expect(page.getByRole('status').getByText('E001', { exact: true })).toBeVisible();
   expect(registrationCalls).toBe(1);
   expect(registrationBody).toMatchObject({
     queueId: 10,
@@ -178,7 +178,8 @@ test('a registration conflict stays in context and gives an actionable notificat
   await reachTicketConfirmation(page);
   await page.getByRole('button', { name: /créer le ticket/i }).click();
 
-  await expect(page.getByText(/données à actualiser/i)).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText(/inscription active/i);
+  await expect(page.getByRole('alert')).toContainText(/choisissez un autre créneau/i);
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page).toHaveURL(/\/desk$/);
 });

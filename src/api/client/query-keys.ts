@@ -36,7 +36,10 @@ export const queryKeys = {
       siteId?: number | null;
       queueId?: number;
       personId?: number;
+      dateFrom?: string;
+      dateTo?: string;
       status?: string;
+      search?: string;
       businessDate?: string;
       entryType?: string;
       page?: number;

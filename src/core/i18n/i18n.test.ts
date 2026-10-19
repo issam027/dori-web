@@ -1,19 +1,17 @@
 import { http, HttpResponse } from 'msw';
 import { mockServer } from '@/shared/testing/mock-server';
-import { ensureLocaleLoaded, getLoadedBundleVersion, i18n, loadTranslationBundle, setLanguage } from './i18n';
+import { ar } from './locales/ar';
+import { en } from './locales/en';
+import { fr } from './locales/fr';
+import { getLoadedBundleVersion, i18n, loadTranslationBundle, setLanguage, setTranslationRejectionReporter } from './i18n';
+
+const fallbackCatalogs: Record<'fr' | 'en' | 'ar', Record<string, string>> = { fr, en, ar };
 
 describe('translation bundles', () => {
-  it('keeps the local fallback catalogs aligned', async () => {
-    await Promise.all(['en', 'ar'].map(ensureLocaleLoaded));
-    const catalogs = Object.fromEntries(
-      ['fr', 'en', 'ar'].map((locale) => [
-        locale,
-        i18n.getResourceBundle(locale, 'fallback') as Record<string, string>,
-      ]),
-    ) as Record<'fr' | 'en' | 'ar', Record<string, string>>;
-    const allKeys = new Set(Object.keys(catalogs.fr));
+  it('keeps the local fallback catalogs aligned', () => {
+    const allKeys = new Set(Object.keys(fallbackCatalogs.fr));
     const missing = Object.fromEntries(
-      Object.entries(catalogs).map(([locale, catalog]) => [
+      Object.entries(fallbackCatalogs).map(([locale, catalog]) => [
         locale,
         [...allKeys].filter((key) => !(key in catalog)),
       ]),
@@ -21,19 +19,11 @@ describe('translation bundles', () => {
     expect(missing).toEqual({ fr: [], en: [], ar: [] });
     const loginKeys = [...allKeys].filter((key) => key.startsWith('auth.login.'));
     expect(loginKeys.length).toBeGreaterThan(0);
-    expect(loginKeys.filter((key) => catalogs.en[key] === catalogs.fr[key])).toEqual([]);
-    expect(loginKeys.filter((key) => catalogs.ar[key] === catalogs.fr[key])).toEqual([]);
-
+    expect(loginKeys.filter((key) => fallbackCatalogs.en[key] === fallbackCatalogs.fr[key])).toEqual([]);
+    expect(loginKeys.filter((key) => fallbackCatalogs.ar[key] === fallbackCatalogs.fr[key])).toEqual([]);
   });
 
-  it('provides complete localized copy for the kiosk journey', async () => {
-    await Promise.all(['en', 'ar'].map(ensureLocaleLoaded));
-    const catalogs = Object.fromEntries(
-      ['fr', 'en', 'ar'].map((locale) => [
-        locale,
-        i18n.getResourceBundle(locale, 'fallback') as Record<string, string>,
-      ]),
-    ) as Record<'fr' | 'en' | 'ar', Record<string, string>>;
+  it('provides complete localized copy for the kiosk journey', () => {
     const kioskKeys = [
       'kiosk.queue.waitEstimate',
       'kiosk.tier.name',
@@ -60,23 +50,23 @@ describe('translation bundles', () => {
     ];
 
     for (const key of kioskKeys) {
-      expect(catalogs.en[key], `${key} (en)`).toBeTruthy();
-      expect(catalogs.ar[key], `${key} (ar)`).toBeTruthy();
-      expect(catalogs.en[key], `${key} must not fall back to French in English`).not.toBe(
-        catalogs.fr[key],
+      expect(fallbackCatalogs.en[key], `${key} (en)`).toBeTruthy();
+      expect(fallbackCatalogs.ar[key], `${key} (ar)`).toBeTruthy();
+      expect(fallbackCatalogs.en[key], `${key} must not fall back to French in English`).not.toBe(
+        fallbackCatalogs.fr[key],
       );
-      expect(catalogs.ar[key], `${key} must not fall back to French in Arabic`).not.toBe(
-        catalogs.fr[key],
+      expect(fallbackCatalogs.ar[key], `${key} must not fall back to French in Arabic`).not.toBe(
+        fallbackCatalogs.fr[key],
       );
     }
 
-    const publicKioskKeys = Object.keys(catalogs.fr).filter((key) =>
+    const publicKioskKeys = Object.keys(fallbackCatalogs.fr).filter((key) =>
       key.startsWith('public-experiences.kiosk.'),
     );
     for (const key of publicKioskKeys) {
-      expect(catalogs.ar[key], `${key} must be localized in Arabic`).not.toBe(catalogs.fr[key]);
+      expect(fallbackCatalogs.ar[key], `${key} must be localized in Arabic`).not.toBe(fallbackCatalogs.fr[key]);
       if (key !== 'public-experiences.kiosk.service') {
-        expect(catalogs.en[key], `${key} must be localized in English`).not.toBe(catalogs.fr[key]);
+        expect(fallbackCatalogs.en[key], `${key} must be localized in English`).not.toBe(fallbackCatalogs.fr[key]);
       }
     }
   });
@@ -123,5 +113,41 @@ describe('translation bundles', () => {
     expect(i18n.t('auth.login')).toBe('Connexion');
     await loadTranslationBundle('fr', 'ihm');
     expect(i18n.t('auth.login')).toBe('Connexion fournie par le service');
+  });
+
+  it('rejects an invalid remote placeholder without replacing the local fallback', async () => {
+    const onRejected = vi.fn();
+    const reporter = vi.fn();
+    const restoreReporter = setTranslationRejectionReporter(reporter);
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/translations/bundle', () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: {
+            locale: 'fr',
+            category: 'ihm',
+            version: 988,
+            entries: { 'common.guichetLabel': 'Guichet distant sans paramètre' },
+          },
+        }),
+      ),
+    );
+
+    try {
+      await expect(
+        loadTranslationBundle('fr', 'ihm', { force: true, onRejected }),
+      ).resolves.toBe(988);
+    } finally {
+      restoreReporter();
+    }
+    expect(reporter).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: 'fr', category: 'ihm', version: 988 }),
+    );
+    expect(onRejected).toHaveBeenCalledWith([
+      expect.objectContaining({ key: 'common.guichetLabel', reason: 'placeholder-mismatch' }),
+    ]);
+    expect(i18n.t('common.guichetLabel', { value0: 'A' })).toBe('Guichet A');
   });
 });

@@ -80,12 +80,12 @@ test('a draft queue can be reopened and edited from the onboarding table', async
   await expect(row).toContainText('Accueil initial');
   await expect(row).toContainText('2');
   await row.getByRole('button', { name: /modifier la file accueil initial/i }).click();
-  await expect(page.getByRole('dialog', { name: /modifier la file/i })).toBeVisible();
-  await page.getByRole('dialog').getByLabel(/^nom$/i).fill('Accueil modifié');
-  await page
-    .getByRole('dialog')
-    .getByRole('button', { name: /enregistrer/i })
-    .click();
+  const dialog = page.getByRole('dialog', { name: /^modifier$/i });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel(/^nom$/i).fill('Accueil modifié');
+  await dialog.getByRole('button', { name: /suivant/i }).click();
+  await dialog.getByRole('button', { name: /suivant/i }).click();
+  await dialog.getByRole('button', { name: /terminer/i }).click();
   await expect(row).toContainText('Accueil modifié');
 });
 
@@ -97,6 +97,9 @@ test('a root account can assign every role from kiosk through root', async ({ pa
     { roleId: 4, roleName: 'admin', rank: 4, isActive: true, permissions: [] },
     { roleId: 5, roleName: 'root', rank: 5, isActive: true, permissions: [] },
   ];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('dori.activeSiteId', '1');
+  });
   await installApiScenario(page, {
     profile: 'root',
     sites: [buildSite()],
@@ -114,7 +117,7 @@ test('a root account can assign every role from kiosk through root', async ({ pa
       },
     ],
   });
-  await page.goto('/settings/users');
+  await page.goto('/admin/users');
   await page.getByRole('button', { name: /nouvel utilisateur/i }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel(/nom d.utilisateur/i).fill('role-check');

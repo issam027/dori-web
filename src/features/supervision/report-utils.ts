@@ -1,11 +1,24 @@
-import type { QueueResponseDto } from '@/api/generated/models';
+import type { MonitoringSeriesMetricsDto, QueueResponseDto } from '@/api/generated/models';
 
-export interface ReportVolume { registered: number; served: number; walkin: number; appointments: number; noShow: number; cancelled: number; expired: number }
-export interface ReportTiming { averageWaitMinutes: number | null; medianWaitMinutes: number | null; p90WaitMinutes: number | null; averageServiceMinutes: number | null; medianServiceMinutes: number | null; p90ServiceMinutes: number | null }
-export interface ReportRates { noShowRate: number | null; cancellationRate: number | null; expirationRate: number | null }
-export interface ReportMetricsDto { volume: ReportVolume; timing: ReportTiming; rates: ReportRates }
-export interface ReportBucketDto extends ReportMetricsDto { periodStart: string; periodEnd: string }
-export interface ReportGroupDto extends ReportMetricsDto { dimension: Record<string, string | number | undefined>; buckets: ReportBucketDto[] }
+export interface ReportVolumeViewModel { registered: number; served: number; walkin: number; appointments: number; noShow: number; cancelled: number; expired: number }
+export interface ReportTimingViewModel { averageWaitMinutes: number | null; medianWaitMinutes: number | null; p90WaitMinutes: number | null; averageServiceMinutes: number | null; medianServiceMinutes: number | null; p90ServiceMinutes: number | null }
+export interface ReportRatesViewModel { noShowRate: number | null; cancellationRate: number | null; expirationRate: number | null }
+export interface ReportMetricsViewModel { volume: ReportVolumeViewModel; timing: ReportTimingViewModel; rates: ReportRatesViewModel }
+export interface ReportBucketViewModel extends ReportMetricsViewModel { periodStart: string; periodEnd: string }
+export interface ReportGroupViewModel extends ReportMetricsViewModel { dimension: Record<string, string | number | undefined>; buckets: ReportBucketViewModel[] }
+
+/** Maps the generated API contract to the richer shape consumed by report views. */
+export function toReportMetricsViewModel(value: MonitoringSeriesMetricsDto, walkin = 0, appointments = 0): ReportMetricsViewModel {
+  return {
+    volume: { registered: value.registered, served: value.served, noShow: value.noShow, cancelled: value.cancelled, walkin, appointments, expired: 0 },
+    timing: { averageWaitMinutes: value.averageWaitMinutes, averageServiceMinutes: value.averageServiceMinutes, medianWaitMinutes: null, p90WaitMinutes: null, medianServiceMinutes: null, p90ServiceMinutes: null },
+    rates: {
+      noShowRate: value.registered ? value.noShow / value.registered : null,
+      cancellationRate: value.registered ? value.cancelled / value.registered : null,
+      expirationRate: null,
+    },
+  };
+}
 
 const DAY_IN_MS = 86_400_000;
 
@@ -32,14 +45,14 @@ export function reportPeriodDates(startDate: string, endDate: string): string[] 
   );
 }
 
-export type QueueReportRow = ReportGroupDto & {
+export type QueueReportRow = ReportGroupViewModel & {
   queueId: number;
   queueCode: string;
   queueName: string;
 };
 
 export function groupsToQueueRows(
-  groups: readonly ReportGroupDto[],
+  groups: readonly ReportGroupViewModel[],
   queues: readonly QueueResponseDto[],
 ): QueueReportRow[] {
   return groups.map((group, index) => {
@@ -61,7 +74,7 @@ export function groupsToQueueRows(
   });
 }
 
-export function reportsToCsv(rows: readonly QueueReportRow[], buckets: readonly ReportBucketDto[] = [], summary?: ReportMetricsDto) {
+export function reportsToCsv(rows: readonly QueueReportRow[], buckets: readonly ReportBucketViewModel[] = [], summary?: ReportMetricsViewModel) {
   const data = rows.map((row) => [
     row.queueCode,
     row.queueName,

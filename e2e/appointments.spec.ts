@@ -21,10 +21,21 @@ const appointmentQueue = buildQueue({
 
 const availability = (date: string) => ({
   queueId: 10,
-  date,
-  slots: [
-    { time: '09:00', capacity: 2, booked: 0, available: 2, isAvailable: true },
-    { time: '10:00', capacity: 2, booked: 1, available: 1, isAvailable: true },
+  timezone: 'Europe/Paris',
+  dateFrom: date,
+  dateTo: date,
+  days: [
+    {
+      businessDate: date,
+      isOpen: true,
+      capacity: 4,
+      booked: 1,
+      available: 3,
+      slots: [
+        { time: '09:00', capacity: 2, booked: 0, available: 2, isAvailable: true },
+        { time: '10:00', capacity: 2, booked: 1, available: 1, isAvailable: true },
+      ],
+    },
   ],
 });
 
@@ -49,7 +60,7 @@ test('the appointment wizard loads availability and creates the selected civil t
   let registrationBody: Record<string, unknown> = {};
   const appointments: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/queues/10/availability') {
-      const date = url.searchParams.get('date') ?? '';
+      const date = url.searchParams.get('dateFrom') ?? '';
       availabilityDates.push(date);
       await route.fulfill({ json: apiEnvelope(availability(date)) });
       return true;
@@ -96,7 +107,9 @@ test('a slot conflict keeps the wizard open and reloads availability', async ({ 
   const conflict: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/queues/10/availability') {
       availabilityCalls += 1;
-      await route.fulfill({ json: apiEnvelope(availability(url.searchParams.get('date') ?? '')) });
+      await route.fulfill({
+        json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
+      });
       return true;
     }
     if (method === 'POST' && path === '/api/v1/registrations') {
@@ -139,14 +152,14 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
   const noteBodies: string[] = [];
   const existing: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/registrations') {
-      if (url.searchParams.get('businessDate') === '2026-10-09') {
+      if (url.searchParams.get('dateFrom') === '2026-10-05') {
         expectedListQuery =
           url.searchParams.get('page') === '1' &&
-          url.searchParams.get('pageSize') === '25' &&
+          url.searchParams.get('pageSize') === '100' &&
           url.searchParams.get('queueId') === '10' &&
           url.searchParams.get('entryType') === 'appointment';
       }
-      const items = url.searchParams.get('businessDate') === '2026-10-09' ? [appointment] : [];
+      const items = url.searchParams.get('dateFrom') === '2026-10-05' ? [appointment] : [];
       await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
@@ -159,7 +172,9 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
       return true;
     }
     if (method === 'GET' && path === '/api/v1/queues/10/availability') {
-      await route.fulfill({ json: apiEnvelope(availability(url.searchParams.get('date') ?? '')) });
+      await route.fulfill({
+        json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
+      });
       return true;
     }
     if (method === 'POST' && path === '/api/v1/registrations/501/reschedule') {
@@ -194,13 +209,14 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
   });
   await page.goto('/appointments');
   await expect.poll(() => expectedListQuery).toBe(true);
-  await page.getByRole('button', { name: /personne test.*R001/i }).click();
+  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
   await expect(page.getByRole('dialog', { name: /rendez-vous R001/i })).toBeVisible();
   await expect(page.getByRole('dialog')).toContainText(/personne test/i);
   await page.getByRole('button', { name: /marquer comme présent/i }).click();
   await expect.poll(() => checkInCalls).toBe(1);
+  await page.getByRole('button', { name: /terminer/i }).click();
 
-  await page.getByRole('button', { name: /personne test.*R001/i }).click();
+  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
   await page.getByRole('button', { name: /^reprogrammer$/i }).click();
   await page.getByLabel(/nouvelle date/i).fill('2026-10-10');
   await page.getByRole('button', { name: /10:00.*1 place/i }).click();
@@ -210,7 +226,7 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
   await expect.poll(() => noteBodies.length).toBe(1);
   expect(noteBodies[0]).toMatch(/reprogrammation.*R001.*2026-10-09.*2026-10-10/i);
 
-  await page.getByRole('button', { name: /personne test.*R001/i }).click();
+  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
   await page.getByRole('button', { name: /annuler le rendez-vous/i }).click();
   await page.getByLabel(/motif de l’annulation/i).fill('Demande téléphonique du client');
   await page.getByRole('button', { name: /confirmer l’annulation/i }).click();

@@ -178,6 +178,18 @@ export function buildRegistration(overrides: Record<string, unknown> = {}) {
     status: 'waiting',
     arrivalTime: '2026-10-09T08:00:00Z',
     personId: 100,
+    businessDate: '2026-10-09',
+    registrationTrackingToken: 'registration-e2e',
+    createdAt: '2026-10-09T08:00:00Z',
+    updatedAt: '2026-10-09T08:00:00Z',
+    isActive: true,
+    firstName: 'Personne',
+    lastName: 'Test',
+    queueName: 'Accueil E2E',
+    tierName: 'Standard E2E',
+    servedBySessionId: null,
+    servedByUserId: null,
+    activeNoteCount: 0,
     ...overrides,
   };
 }
@@ -190,6 +202,62 @@ export function buildAppointment(overrides: Record<string, unknown> = {}) {
     scheduledTime: '2026-10-10T09:00:00Z',
     ...overrides,
   });
+}
+
+export function buildMonitoringLive(overrides: Record<string, unknown> = {}) {
+  return {
+    generatedAt: '2026-10-09T10:00:00Z',
+    siteId: 1,
+    timezone: 'Europe/Paris',
+    totals: {
+      waiting: 0,
+      inProgress: 0,
+      activeQueues: 0,
+      openDesks: 0,
+      activeOperators: 0,
+      longestWaitMinutes: null,
+    },
+    queues: [],
+    operators: [],
+    alerts: [],
+    ...overrides,
+  };
+}
+
+export function buildMonitoringSeries(overrides: Record<string, unknown> = {}) {
+  return {
+    generatedAt: '2026-10-09T10:00:00Z',
+    timezone: 'Europe/Paris',
+    appliedFilters: {
+      siteId: 1,
+      queueIds: [],
+      userIds: [],
+      tierIds: [],
+      statuses: [],
+      entryTypes: [],
+      from: '2026-10-09T00:00:00.000Z',
+      to: '2026-10-10T00:00:00.000Z',
+      bucket: 'day',
+      timezone: 'Europe/Paris',
+    },
+    totals: {
+      registered: 0,
+      served: 0,
+      noShow: 0,
+      cancelled: 0,
+      averageWaitMinutes: null,
+      averageServiceMinutes: null,
+    },
+    series: [],
+    breakdowns: {
+      byQueue: [],
+      byUser: [],
+      byTier: [],
+      byEntryType: [],
+      byStatus: [],
+    },
+    ...overrides,
+  };
 }
 
 export function apiFailure(
@@ -277,6 +345,28 @@ export async function installApiScenario(
       await route.fulfill({ json: apiEnvelope(paginated(tiers)) });
       return;
     }
+    if (/^\/api\/v1\/queues\/\d+\/tiers$/.test(request.path)) {
+      const queueId = Number(request.path.split('/')[4]);
+      await route.fulfill({
+        json: apiEnvelope(
+          paginated(
+            tiers.map((tier, index) => ({
+              queueId,
+              tierId: tier.tierId,
+              price: 0,
+              currency: 'EUR',
+              currencyOverride: null,
+              currencyOrigin: 'site',
+              isActive: tier.isActive !== false,
+              isDefault: index === 0,
+              displayOrder: index,
+              tier,
+            })),
+          ),
+        ),
+      });
+      return;
+    }
     if (/^\/api\/v1\/queues\/\d+\/status$/.test(request.path)) {
       const queueId = Number(request.path.split('/')[4]);
       await route.fulfill({
@@ -305,6 +395,14 @@ export async function installApiScenario(
     }
     if (/^\/api\/v1\/queues\/\d+\/(sessions|threads)$/.test(request.path)) {
       await route.fulfill({ json: apiEnvelope(paginated([])) });
+      return;
+    }
+    if (request.path === '/api/v1/monitoring/live') {
+      await route.fulfill({ json: apiEnvelope(buildMonitoringLive()) });
+      return;
+    }
+    if (request.path === '/api/v1/monitoring/series') {
+      await route.fulfill({ json: apiEnvelope(buildMonitoringSeries()) });
       return;
     }
     if (request.path === '/api/v1/reports/dashboard/summary') {
@@ -349,7 +447,7 @@ export async function installApiScenario(
       });
       return;
     }
-    if (request.path === '/api/v1/health') {
+    if (request.path === '/api/v1/monitoring/health') {
       await route.fulfill({
         json: {
           status: 'ok',
@@ -388,7 +486,7 @@ export async function setNetworkOffline(page: Page, offline = true) {
 export async function activateSite(page: Page, siteName = 'Site E2E Alpha') {
   await page.goto('/portfolio');
   const card = page.locator('.site-card').filter({ hasText: siteName });
-  await card.getByRole('button', { name: /activer ce site/i }).click();
+  await card.getByRole('button', { name: /travailler sur ce site/i }).click();
 }
 
 export async function openNavigationSection(page: Page, name: RegExp) {

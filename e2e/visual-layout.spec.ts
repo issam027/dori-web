@@ -32,16 +32,23 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
               ]
             : [
                 'site_view',
+                'site_create',
+                'site_edit',
                 'queue_view',
+                'queue_edit',
+                'registration_view',
                 'registration_call',
+                'registration_register',
                 'session_operate',
                 'appointment_manage',
+                'appointment_checkin',
                 'report_view',
                 'notification_view',
                 'notification_send',
-                'queue_edit',
-                'site_create',
+                'user_manage_admin',
+                'translation_manage',
                 'system_manage',
+                'tier_view',
               ],
           mustChangePassword: false,
           scope: technical
@@ -57,13 +64,25 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           total: 2,
           totalPages: 1,
           items: [
-            { siteId: 1, siteName: 'Clinique El Manar' },
-            { siteId: 2, siteName: 'Centre Lac 2' },
+            {
+              siteId: 1,
+              siteName: 'Clinique El Manar',
+              timezone: 'Europe/Paris',
+              locale: 'fr',
+              isActive: true,
+            },
+            {
+              siteId: 2,
+              siteName: 'Centre Lac 2',
+              timezone: 'Europe/Paris',
+              locale: 'fr',
+              isActive: true,
+            },
           ],
         }),
       });
     if (path.includes('/next-preview')) return route.fulfill({ json: envelope([]) });
-    if (path === '/api/v1/health')
+    if (path === '/api/v1/monitoring/health')
       return route.fulfill({
         json: {
           status: 'ok',
@@ -130,51 +149,81 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           queueName: 'Accueil',
         }),
       });
-    if (path === '/api/v1/reports/dashboard/summary')
+    if (path === '/api/v1/monitoring/live')
       return route.fulfill({
         json: envelope({
-          activeSites: 1,
-          activeQueues: 1,
-          waitingTotal: 4,
-          waitingWalkin: 3,
-          waitingAppointment: 1,
-          appointmentsToday: 2,
+          generatedAt: '2026-10-08T12:00:00Z',
+          siteId: 1,
+          timezone: 'Europe/Paris',
+          totals: {
+            waiting: 4,
+            inProgress: 1,
+            activeQueues: 1,
+            openDesks: 1,
+            activeOperators: 1,
+            longestWaitMinutes: 12,
+          },
+          queues: [{
+            queueId: 10,
+            queueName: 'Accueil',
+            waiting: 4,
+            inProgress: 1,
+            openDesks: 1,
+            activeOperators: 1,
+            estimatedWaitMinutes: 12,
+            longestWaitMinutes: 12,
+          }],
+          operators: [],
+          alerts: [],
         }),
       });
-    if (path === '/api/v1/reports/dashboard/queue-load')
-      return route.fulfill({
-        json: envelope([
-          {
-            queueId: 10,
-            queueCode: 'ACC',
-            queueName: 'Accueil',
-            siteId: 1,
-            siteName: 'Clinique El Manar',
-            queueType: 'hybrid',
-            waitingCount: 4,
-            dominantTier: 'Standard',
-          },
-        ]),
-      });
-    if (path === '/api/v1/reports/queues/10/daily')
+    if (path === '/api/v1/monitoring/series')
       return route.fulfill({
         json: envelope({
-          queueId: 10,
-          queueCode: 'ACC',
-          queueName: 'Accueil',
-          siteName: 'Clinique El Manar',
-          businessDate: '2026-10-08',
-          volume: {
-            totalRegistered: 10,
-            totalWalkin: 8,
-            totalAppointment: 2,
-            totalServed: 7,
-            totalNoShow: 1,
-            totalExpired: 0,
-            totalCancelled: 0,
-            totalOpen: 2,
+          generatedAt: '2026-10-08T12:00:00Z',
+          timezone: 'Europe/Paris',
+          appliedFilters: {
+            from: '2026-10-08T00:00:00.000Z',
+            to: '2026-10-09T00:00:00.000Z',
+            bucket: 'day',
+            siteId: 1,
           },
-          kpis: { noShowRate: 0.125, averageWaitMinutes: 12, averageServiceMinutes: 6 },
+          totals: {
+            registered: 10,
+            served: 7,
+            noShow: 1,
+            cancelled: 0,
+            averageWaitMinutes: 12,
+            averageServiceMinutes: 6,
+          },
+          series: [{
+            periodStart: '2026-10-08T00:00:00.000Z',
+            registered: 10,
+            served: 7,
+            noShow: 1,
+            cancelled: 0,
+            averageWaitMinutes: 12,
+            averageServiceMinutes: 6,
+          }],
+          breakdowns: {
+            byQueue: [{
+              queueId: 10,
+              queueName: 'Accueil',
+              registered: 10,
+              served: 7,
+              noShow: 1,
+              cancelled: 0,
+              averageWaitMinutes: 12,
+              averageServiceMinutes: 6,
+            }],
+            byUser: [],
+            byTier: [],
+            byEntryType: [
+              { entryType: 'walkin', count: 8 },
+              { entryType: 'appointment', count: 2 },
+            ],
+            byStatus: [],
+          },
         }),
       });
     if (path === '/api/v1/queues/10/status')
@@ -302,10 +351,21 @@ for (const viewport of [
 async function activateFirstSite(page: Page) {
   await page.goto('/portfolio');
   await page
-    .getByRole('button', { name: /activer ce site/i })
+    .getByRole('button', { name: /travailler sur ce site/i })
     .first()
     .click();
   await expect(page.getByText('Clinique El Manar').first()).toBeVisible();
+}
+
+async function applyTheme(page: Page, theme: string) {
+  await page.evaluate(`(() => {
+    const root = document.documentElement;
+    root.dataset.theme = ${JSON.stringify(theme)};
+    root.style.removeProperty('--color-accent');
+    root.style.removeProperty('--color-primary-soft');
+    root.style.removeProperty('--color-primary-contrast');
+  })()`);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
 }
 
 test('authenticated shell matches the expected visual structure', async ({ page }) => {
@@ -315,7 +375,7 @@ test('authenticated shell matches the expected visual structure', async ({ page 
   await expect(page.getByRole('heading', { name: /choisissez un site actif/i })).toBeVisible();
   await page.getByRole('link', { name: /ouvrir le portefeuille/i }).click();
   await page
-    .getByRole('button', { name: /activer ce site/i })
+    .getByRole('button', { name: /travailler sur ce site/i })
     .first()
     .click();
   await page.goto('/desk');
@@ -323,7 +383,7 @@ test('authenticated shell matches the expected visual structure', async ({ page 
   await expect(page.locator('.sidebar')).toHaveCSS('background-image', /linear-gradient/);
   await expect(page.getByRole('banner')).toHaveCSS('position', 'sticky');
   await expect(page.getByRole('banner').getByRole('heading', { name: /cockpit/i })).toBeVisible();
-  await expect(page.getByText('Clinique El Manar').first()).toBeVisible();
+  await expect(page.getByRole('banner')).toContainText('Site 1');
   await page.getByRole('link', { name: /rendez-vous/i }).click();
   await expect(
     page.getByRole('main').getByRole('heading', { name: 'Rendez-vous', exact: true }),
@@ -338,10 +398,7 @@ test('phase 8 kiosk and display stay PII-free at 1080p and 4K', async ({ page })
   await expect(page).toHaveURL(/\/kiosk$/);
   await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
   await expect(page.getByRole('button', { name: /sans rendez-vous/i })).toBeVisible();
-  await page.getByRole('link', { name: /mentions légales/i }).click();
-  await page.getByRole('button', { name: /retour à l’espace précédent/i }).click();
-  await expect(page).toHaveURL(/\/kiosk$/);
-  await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /mentions légales/i })).toHaveCount(0);
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.evaluate(
     "history.pushState({}, '', '/display?queueId=10'); window.dispatchEvent(new PopStateEvent('popstate'))",
@@ -393,15 +450,13 @@ test('phase 8 tracking consumes its token and works on mobile RTL in four themes
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/track?token=opaque-secret');
   await expect(page).toHaveURL(/\/track$/);
-  await expect(page.locator('.topbar')).toBeVisible();
-  await expect(page.locator('.experience-preview-tracking')).toBeVisible();
-  await expect(page.getByLabel('Tracking ID')).toBeVisible();
-  await expect(page.locator('.tracking-screen').getByLabel('Tracking ID')).toHaveCount(0);
+  await expect(page.getByRole('banner')).toContainText('DORIFY');
+  await expect(page.locator('.tracking-screen')).toBeVisible();
   await expect(page.getByText('A014')).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
   await page.evaluate("document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'");
   for (const theme of ['light', 'soft-light', 'soft-dark', 'dark']) {
-    await page.evaluate(`document.documentElement.dataset.theme = ${JSON.stringify(theme)}`);
+    await applyTheme(page, theme);
     await expect(page.getByRole('button', { name: /son et vibration/i })).toBeVisible();
     expect(
       await page.evaluate<boolean>(
@@ -409,14 +464,14 @@ test('phase 8 tracking consumes its token and works on mobile RTL in four themes
       ),
     ).toBe(true);
   }
-  await expect(page.getByRole('link', { name: /mon profil/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /mentions légales/i })).toBeVisible();
 });
 
 test('phase 10 health and legal return preserve the exact origin', async ({ page }) => {
   await mockAuthenticatedApi(page);
   await activateFirstSite(page);
   await page.goto('/desk');
-  await page.getByRole('button', { name: /administration/i }).click();
+  await page.getByRole('button', { name: /système/i }).click();
   await page.getByRole('link', { name: /état de la plateforme/i }).click();
   await expect(
     page.getByRole('main').getByRole('heading', { name: /santé de la plateforme/i }),
@@ -458,7 +513,7 @@ test('phase 7 supervision routes render API-backed views', async ({ page }) => {
   await expect(page.getByText('4', { exact: true }).first()).toBeVisible();
   await page.getByRole('link', { name: /rapports/i }).click();
   await expect(page.getByRole('main').getByRole('heading', { name: 'Rapports' })).toBeVisible();
-  await expect(page.locator('.metric-value').filter({ hasText: '12.0 min' })).toBeVisible();
+  await expect(page.locator('.metric-value').filter({ hasText: '12 min' })).toBeVisible();
   await page.getByRole('link', { name: /notifications/i }).click();
   await expect(
     page.getByRole('main').getByRole('heading', { name: 'Notifications' }),
@@ -481,9 +536,7 @@ test('WCAG 2.2 AA automated audit has no serious violations', async ({ page }) =
 
   for (const theme of themes) {
     await page.goto('/login');
-    await page.evaluate(
-      `document.documentElement.dataset.theme = ${JSON.stringify(theme)}`,
-    );
+    await applyTheme(page, theme);
     expect(await seriousViolations(), `login / ${theme}`).toEqual([]);
   }
 
@@ -492,9 +545,7 @@ test('WCAG 2.2 AA automated audit has no serious violations', async ({ page }) =
   for (const path of ['/desk', '/onboarding']) {
     for (const theme of themes) {
       await page.goto(path);
-      await page.evaluate(
-        `document.documentElement.dataset.theme = ${JSON.stringify(theme)}`,
-      );
+      await applyTheme(page, theme);
       expect(await seriousViolations(), `${path} / ${theme}`).toEqual([]);
     }
   }

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import { Eye, Plus, Search, StickyNote } from 'lucide-react';
+import { useState } from 'react';
+import { Eye, Search } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { DataTable } from '@/design-system/components/DataTable';
 import { Card } from '@/design-system/components/Card';
@@ -9,7 +9,9 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
+import { PersonNotesButton } from '@/features/persons/PersonNotesButton';
 import { useQueues } from '@/features/queues/hooks/useQueues';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { useWaitingRegistrations } from './hooks/useQueueOperations';
 import { RegistrationDetailsModal } from './RegistrationDetailsModal';
 import type {
@@ -17,6 +19,11 @@ import type {
   RegistrationsControllerFindRegistrationsStatus,
 } from '@/api/generated/models';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
+
+function localIsoDate(value = new Date()): string {
+  const localValue = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
+  return localValue.toISOString().slice(0, 10);
+}
 
 export function MyQueuesPage() {
   const { t: __t } = useTranslation();
@@ -26,7 +33,9 @@ export function MyQueuesPage() {
   const [notesPersonId, setNotesPersonId] = useState<number | null>(null);
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [searchDraft, setSearchDraft] = useState('');
-  const [search, setSearch] = useState('');
+  const search = useDebouncedFilter(searchDraft);
+  const today = localIsoDate();
+  const [selectedDate, setSelectedDate] = useState(today);
   const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
   const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
   const [registrationDetails, setRegistrationDetails] = useState<{
@@ -34,18 +43,11 @@ export function MyQueuesPage() {
     queueName: string;
   } | null>(null);
   const queues = useQueues({ siteId });
-  useEffect(() => {
-    const value = searchDraft.trim();
-    if (value.length <= 3) return;
-    const timeout = window.setTimeout(() => {
-      setSearch(value);
-      setPage(1);
-    }, 350);
-    return () => { window.clearTimeout(timeout); };
-  }, [searchDraft]);
   const registrations = useWaitingRegistrations({
     siteId,
     queueId,
+    dateFrom: selectedDate,
+    dateTo: selectedDate,
     page,
     search,
     status: status || undefined,
@@ -77,6 +79,18 @@ export function MyQueuesPage() {
             <div className="queue-customer-filter-body">
             <div className="queue-customer-search-form">
               <label>
+                {__t('common.date')}
+                <input
+                  type="date"
+                  value={selectedDate}
+                  max={today}
+                  onChange={(event) => {
+                    setSelectedDate(event.target.value || today);
+                    setPage(1);
+                  }}
+                />
+              </label>
+              <label>
                 {__t('queue-operations.myQueues.perimetreDeLaFile')}
                 <select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); setPage(1); }}>
                   <option value="">{__t('queue-operations.myQueues.toutes')} {queues.data.data.total}</option>
@@ -90,12 +104,8 @@ export function MyQueuesPage() {
                   value={searchDraft}
                   placeholder={__t('queues.search.example')}
                   onChange={(event) => {
-                    const value = event.target.value;
-                    setSearchDraft(value);
-                    if (value.trim().length <= 3) {
-                      setSearch('');
-                      setPage(1);
-                    }
+                    setSearchDraft(event.target.value);
+                    setPage(1);
                   }}
                 />
               </label>
@@ -195,24 +205,13 @@ export function MyQueuesPage() {
                     >
                       <Eye aria-hidden="true" /> {__t('queues.myQueues.consulter')}
                     </button>
-                    <button
-                      className="button button-small"
-                      type="button"
-                      title={
-                        noteCount
-                          ? __t('queues.myQueues.viewNotes', { count: noteCount })
-                          : __t('queues.myQueues.addNote')
-                      }
+                    <PersonNotesButton
+                      noteCount={noteCount}
                       onClick={() => {
                         setNotesMode(noteCount ? 'view' : 'add');
                         setNotesPersonId(item.personId);
                       }}
-                    >
-                      {noteCount ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
-                      {noteCount
-                        ? __t('queues.myQueues.viewNotes', { count: noteCount })
-                        : __t('queues.myQueues.addNote')}
-                    </button>
+                    />
                   </div>
                 );
               },

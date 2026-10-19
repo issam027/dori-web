@@ -66,7 +66,7 @@ async function installExperienceScenario(page: Page) {
             json: apiEnvelope({
               registrationId: 700,
               ticketNumber: 'A700',
-              trackingUrl: 'https://api.example/track?token=opaque-kiosk-token',
+              registrationTrackingToken: 'opaque-kiosk-token',
             }),
           });
           return true;
@@ -106,8 +106,9 @@ test('kiosk completes the walk-in journey and purges personal data', async ({ pa
   await page.getByLabel(/nom de famille/i).fill('Martin');
   await page.getByLabel(/prénom/i).fill('Lina');
   await page.getByLabel(/email/i).fill('lina.martin@example.test');
-  await page.getByLabel(/indicatif pays/i).selectOption('+216');
-  await page.getByPlaceholder(/6 12 34 56 78/i).fill('20 123 456');
+  await page.getByRole('button', { name: /indicatif pays/i }).click();
+  await page.getByRole('option', { name: '+216' }).click();
+  await page.getByRole('textbox', { name: /téléphone/i }).fill('20 123 456');
   await expect(page.getByText(/\+21620123456/)).toBeVisible();
   await page.getByRole('button', { name: /continuer/i }).click();
   const tier = page.getByRole('button', { name: /standard/i });
@@ -124,8 +125,11 @@ test('kiosk completes the walk-in journey and purges personal data', async ({ pa
     ),
   ).toMatch(/\S+\s+\S+/);
   await page.getByRole('button', { name: /créer mon ticket/i }).click();
-  await expect(page.getByText('A700')).toBeVisible();
-  await expect(page.getByAltText(/QR code/i)).toHaveAttribute('src', /^data:image\/png/);
+  await expect(page.locator('.kiosk-ticket-result').getByText('A700', { exact: true })).toBeVisible();
+  await expect(page.locator('.kiosk-ticket-result').getByAltText(/QR code/i)).toHaveAttribute(
+    'src',
+    /^data:image\/png/,
+  );
   expect(
     await page.evaluate<boolean>(
       "document.querySelector('.kiosk-screen').scrollHeight <= document.querySelector('.kiosk-screen').clientHeight",

@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 import {
   apiEnvelope,
   apiFailure,
+  buildMonitoringLive,
+  buildMonitoringSeries,
   buildPerson,
   buildQueue,
   buildRegistration,
@@ -10,24 +12,54 @@ import {
   paginated,
 } from './support/scenario-fixtures';
 
-const dailyReport = (queueId: number, queueName: string, date: string) => ({
-  queueId,
-  queueCode: queueId === 10 ? 'ACC' : 'DOC',
-  queueName,
-  siteName: 'Site E2E Alpha',
-  businessDate: date,
-  volume: {
-    totalRegistered: queueId === 10 ? 10 : 5,
-    totalWalkin: 12,
-    totalAppointment: 3,
-    totalServed: queueId === 10 ? 8 : 4,
-    totalNoShow: 1,
-    totalExpired: 0,
-    totalCancelled: 0,
-    totalOpen: 2,
-  },
-  kpis: { noShowRate: 0.1, averageWaitMinutes: 12, averageServiceMinutes: 6 },
+const reportMetrics = (registered: number, served: number) => ({
+  registered,
+  served,
+  noShow: 1,
+  cancelled: 0,
+  averageWaitMinutes: 12,
+  averageServiceMinutes: 6,
 });
+
+const reportSeries = (from: string, to: string, queueId?: number) => {
+  const queues = [
+    { queueId: 10, queueName: 'Accueil général', ...reportMetrics(10, 8) },
+    { queueId: 11, queueName: 'Documents', ...reportMetrics(5, 4) },
+  ];
+  const selected = queueId ? queues.filter((queue) => queue.queueId === queueId) : queues;
+  const totals = selected.reduce(
+    (sum, queue) => ({
+      registered: sum.registered + queue.registered,
+      served: sum.served + queue.served,
+      noShow: sum.noShow + queue.noShow,
+      cancelled: sum.cancelled + queue.cancelled,
+      averageWaitMinutes: 12,
+      averageServiceMinutes: 6,
+    }),
+    reportMetrics(0, 0),
+  );
+  return buildMonitoringSeries({
+    appliedFilters: {
+      from,
+      to,
+      bucket: 'day',
+      siteId: 1,
+      queueIds: queueId ? [queueId] : [],
+    },
+    totals,
+    series: [{ periodStart: from, ...totals }],
+    breakdowns: {
+      byQueue: selected,
+      byUser: [],
+      byTier: [],
+      byEntryType: [
+        { entryType: 'walkin', count: 12 },
+        { entryType: 'appointment', count: 3 },
+      ],
+      byStatus: [],
+    },
+  });
+};
 
 test('supervision renders operational cards, refreshes them and handles an empty scope', async ({
   page,
@@ -37,34 +69,33 @@ test('supervision renders operational cards, refreshes them and handles an empty
     profile: 'manager',
     handlers: [
       async ({ path, route }) => {
-        if (path === '/api/v1/reports/dashboard/summary') {
-          await route.fulfill({
-            json: apiEnvelope({
-              activeSites: 1,
-              activeQueues: 2,
-              waitingTotal: loadCalls ? 9 : 7,
-              waitingWalkin: 5,
-              waitingAppointment: 2,
-              appointmentsToday: 3,
-            }),
-          });
-          return true;
-        }
-        if (path === '/api/v1/reports/dashboard/queue-load') {
+        if (path === '/api/v1/monitoring/live') {
           loadCalls += 1;
           await route.fulfill({
-            json: apiEnvelope([
-              {
-                queueId: 10,
-                queueCode: 'ACC',
-                queueName: 'Accueil général',
-                siteId: 1,
-                siteName: 'Site E2E Alpha',
-                queueType: 'hybrid',
-                waitingCount: 7,
-                dominantTier: 'Standard',
-              },
-            ]),
+            json: apiEnvelope(
+              buildMonitoringLive({
+                totals: {
+                  waiting: loadCalls > 1 ? 9 : 7,
+                  inProgress: 1,
+                  activeQueues: 1,
+                  openDesks: 1,
+                  activeOperators: 1,
+                  longestWaitMinutes: 12,
+                },
+                queues: [
+                  {
+                    queueId: 10,
+                    queueName: 'Accueil général',
+                    waiting: loadCalls > 1 ? 9 : 7,
+                    inProgress: 1,
+                    openDesks: 1,
+                    activeOperators: 1,
+                    estimatedWaitMinutes: 12,
+                    longestWaitMinutes: 12,
+                  },
+                ],
+              }),
+            ),
           });
           return true;
         }
@@ -74,14 +105,14 @@ test('supervision renders operational cards, refreshes them and handles an empty
   });
   await page.goto('/control-room');
   await expect(page.getByRole('heading', { name: /supervision temps réel/i })).toBeVisible();
-  await expect(page.getByText('Accueil général')).toBeVisible();
-  await expect(page.getByText(/7.*en attente/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Accueil général' })).toBeVisible();
+  await expect(page.locator('.supervision-queue-card')).toContainText(/7.*en attente/i);
   const callsBeforeRefresh = loadCalls;
   await page.getByRole('button', { name: /actualiser/i }).click();
   await expect.poll(() => loadCalls).toBeGreaterThan(callsBeforeRefresh);
 
-  await page.route('**/api/v1/reports/dashboard/queue-load**', async (route) => {
-    await route.fulfill({ json: apiEnvelope([]) });
+  await page.route('**/api/v1/monitoring/live**', async (route) => {
+    await route.fulfill({ json: apiEnvelope(buildMonitoringLive()) });
   });
   await page.getByRole('button', { name: /actualiser/i }).click();
   await expect(page.getByText(/aucune file à superviser/i)).toBeVisible();
@@ -93,11 +124,11 @@ test('supervision exposes a recoverable error state', async ({ page }) => {
     profile: 'manager',
     handlers: [
       async ({ path, route }) => {
-        if (path !== '/api/v1/reports/dashboard/queue-load') return false;
+        if (path !== '/api/v1/monitoring/live') return false;
         if (failing) {
           await route.fulfill(apiFailure(503, 'REPORTS_UNAVAILABLE'));
         } else {
-          await route.fulfill({ json: apiEnvelope([]) });
+          await route.fulfill({ json: apiEnvelope(buildMonitoringLive()) });
         }
         return true;
       },
@@ -110,10 +141,10 @@ test('supervision exposes a recoverable error state', async ({ page }) => {
   await expect(page.getByText(/aucune file à superviser/i)).toBeVisible();
 });
 
-test('reports apply a period of at most seven days to every queue and render an empty state', async ({
+test('reports apply the selected period to every queue and render an empty state', async ({
   page,
 }) => {
-  const requests: string[] = [];
+  const requests: Array<{ from: string; to: string; queueIds: string | null }> = [];
   const queues = [
     buildQueue({ queueId: 10, queueName: 'Accueil général' }),
     buildQueue({ queueId: 11, queueName: 'Documents' }),
@@ -124,43 +155,40 @@ test('reports apply a period of at most seven days to every queue and render an 
     queues,
     handlers: [
       async ({ path, url, route }) => {
-        const match = /^\/api\/v1\/reports\/queues\/(10|11)\/daily$/.exec(path);
-        if (!match) return false;
-        const date = url.searchParams.get('date') ?? '';
-        const queueId = Number(match[1]);
-        requests.push(`${String(queueId)}:${date}`);
-        const queue = queues.find((item) => item.queueId === queueId);
+        if (path !== '/api/v1/monitoring/series') return false;
+        const from = url.searchParams.get('from') ?? '';
+        const to = url.searchParams.get('to') ?? '';
+        const queueIds = url.searchParams.get('queueIds');
+        requests.push({ from, to, queueIds });
         await route.fulfill({
-          json: apiEnvelope(dailyReport(queueId, String(queue?.queueName), date)),
+          json: apiEnvelope(reportSeries(from, to, queueIds ? Number(queueIds) : undefined)),
         });
         return true;
       },
     ],
   });
   await page.goto('/reports');
-  await expect(page.getByText('Accueil général')).toBeVisible();
-  await expect(page.getByText('Documents')).toBeVisible();
+  await expect(page.getByRole('main')).toContainText('Accueil général');
+  await expect(page.getByRole('main')).toContainText('Documents');
   const startDate = page.getByLabel(/date de début/i);
   const endDate = page.getByLabel(/date de fin/i);
   await startDate.fill('2026-09-18');
   await endDate.fill('2026-09-20');
-  await expect
-    .poll(() => [
-      ...new Set(requests.filter((value) => /2026-09-(18|19|20)$/.test(value))),
-    ].sort())
-    .toEqual([
-      '10:2026-09-18',
-      '10:2026-09-19',
-      '10:2026-09-20',
-      '11:2026-09-18',
-      '11:2026-09-19',
-      '11:2026-09-20',
-    ]);
-  await expect(endDate).toHaveAttribute('max', '2026-09-24');
+  await expect.poll(() => [
+    ...new Set(
+      requests
+        .filter(
+          (request) =>
+            request.from.startsWith('2026-09-18') && request.to.startsWith('2026-09-21'),
+        )
+        .map((request) => request.queueIds)
+        .filter((queueIds): queueIds is string => Boolean(queueIds)),
+    ),
+  ].sort()).toEqual(['10', '11']);
   await expect(page.getByRole('main').getByRole('heading', { name: /rapports/i })).toBeVisible();
 
-  await page.route('**/api/v1/queues**', async (route) => {
-    await route.fulfill({ json: apiEnvelope(paginated([])) });
+  await page.route('**/api/v1/monitoring/series**', async (route) => {
+    await route.fulfill({ json: apiEnvelope(buildMonitoringSeries()) });
   });
   await page.reload();
   await expect(page.getByText(/aucune donnée pour cette période/i)).toBeVisible();
@@ -175,11 +203,13 @@ test('reports expose a recoverable API error', async ({ page }) => {
     queues: [buildQueue()],
     handlers: [
       async ({ path, route }) => {
-        if (path !== '/api/v1/reports/queues/10/daily') return false;
+        if (path !== '/api/v1/monitoring/series') return false;
         if (failing) await route.fulfill(apiFailure(503, 'DAILY_REPORT_UNAVAILABLE'));
         else {
+          const from = '2026-10-05T00:00:00.000Z';
+          const to = '2026-10-12T00:00:00.000Z';
           await route.fulfill({
-            json: apiEnvelope(dailyReport(10, 'Accueil E2E', '2026-10-10')),
+            json: apiEnvelope(reportSeries(from, to, 10)),
           });
         }
         return true;
@@ -190,7 +220,7 @@ test('reports expose a recoverable API error', async ({ page }) => {
   await expect(page.getByText(/impossible de charger/i)).toBeVisible();
   failing = false;
   await page.getByRole('button', { name: /réessayer/i }).click();
-  await expect(page.getByText('Accueil E2E')).toBeVisible();
+  await expect(page.getByRole('main')).toContainText('Accueil E2E');
 });
 
 async function installNotificationScenario(page: Page, failSend: () => boolean) {
@@ -243,10 +273,11 @@ async function installNotificationScenario(page: Page, failSend: () => boolean) 
 
 async function reachNotificationMessageStep(page: Page) {
   await page.getByRole('button', { name: /nouvel envoi/i }).click();
+  await page.getByRole('textbox', { name: /rechercher une personne/i }).fill('Lina');
   await page.getByRole('button', { name: /Lina Martin/i }).click();
-  await page.getByRole('button', { name: /continuer/i }).click();
+  await page.getByRole('button', { name: /suivant/i }).click();
   await page.getByRole('button', { name: /ticket.*A700/i }).click();
-  await page.getByRole('button', { name: /rédiger le message/i }).click();
+  await page.getByRole('button', { name: /suivant/i }).click();
 }
 
 test('guided notification validates the recipient and confirms a successful send', async ({
@@ -255,7 +286,7 @@ test('guided notification validates the recipient and confirms a successful send
   const getSentBody = await installNotificationScenario(page, () => false);
   await page.goto('/notifications');
   await reachNotificationMessageStep(page);
-  await expect(page.getByLabel(/canal/i).locator('option[value="email"]')).toHaveAttribute(
+  await expect(page.getByRole('dialog').getByLabel(/canal/i).locator('option[value="email"]')).toHaveAttribute(
     'disabled',
     '',
   );
@@ -288,7 +319,7 @@ test('health is restricted to system_manage and renders no secret', async ({ pag
     sites: [buildSite()],
     handlers: [
       async ({ path, route }) => {
-        if (path !== '/api/v1/health') return false;
+        if (path !== '/api/v1/monitoring/health') return false;
         healthCalls += 1;
         await route.fulfill({
           json: {
@@ -329,7 +360,7 @@ test('health is restricted to system_manage and renders no secret', async ({ pag
     sites: [buildSite()],
     handlers: [
       ({ path }) => {
-        if (path === '/api/v1/health') unauthorizedHealthCalls += 1;
+        if (path === '/api/v1/monitoring/health') unauthorizedHealthCalls += 1;
         return false;
       },
     ],
@@ -346,7 +377,7 @@ test('health exposes a recoverable error state', async ({ page }) => {
     sites: [buildSite()],
     handlers: [
       async ({ path, route }) => {
-        if (path !== '/api/v1/health') return false;
+        if (path !== '/api/v1/monitoring/health') return false;
         if (failing) await route.fulfill(apiFailure(503, 'HEALTH_UNAVAILABLE'));
         else {
           await route.fulfill({

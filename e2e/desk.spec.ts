@@ -89,6 +89,8 @@ test('opening and closing a desk refreshes the card and prioritizes the active q
   const primary = page.locator('.queue-desk-card').filter({ hasText: 'Accueil prioritaire' });
   await expect(primary).toHaveClass(/no-open-desk/);
   await primary.getByRole('button', { name: /occuper le guichet/i }).click();
+  await page.getByRole('textbox', { name: /nom du guichet/i }).fill('Bureau E2E');
+  await page.getByRole('button', { name: /ouvrir le guichet/i }).click();
   await expect(primary).toHaveClass(/has-open-desk/);
   await expect(page.locator('.queue-desk-card').first()).toContainText('Accueil prioritaire');
   await primary.getByRole('button', { name: /libérer/i }).click();
@@ -139,6 +141,10 @@ test('the cockpit restores the server-side current call when local state is miss
             businessDate: '2026-10-09',
             registrationTrackingToken: 'desk-restore-e2e',
             tierId: 1,
+            servedBySessionId: 100,
+            servedByUserId: 1,
+            firstName: 'Lina',
+            lastName: 'Martin',
           }),
         ),
       });
@@ -150,11 +156,27 @@ test('the cockpit restores the server-side current call when local state is miss
       });
       return true;
     }
+    if (method === 'GET' && path === '/api/v1/registrations') {
+      await route.fulfill({
+        json: apiEnvelope(
+          paginated([
+            buildRegistration({
+              status: 'in_progress',
+              servedBySessionId: 100,
+              servedByUserId: 1,
+              firstName: 'Lina',
+              lastName: 'Martin',
+            }),
+          ]),
+        ),
+      });
+      return true;
+    }
     return false;
   };
   await installDesk(page, [operational], [primaryQueue]);
   await page.goto('/desk');
-  const active = page.locator('.active-call');
+  const active = page.locator('.queue-card-active-call');
   await expect(active).toContainText('E001');
   await expect(active).toContainText('Lina Martin');
   await expect(active.getByRole('button', { name: /^servi$/i })).toBeVisible();
@@ -164,7 +186,23 @@ test('calling and serving a person shows details, disables mutation and builds a
   page,
 }) => {
   let servedCalls = 0;
-  const operational: ApiScenarioHandler = async ({ method, path, route }) => {
+  let called = false;
+  let hasBeenServed = false;
+  const activeRegistration = () =>
+    buildRegistration({
+      status: hasBeenServed ? 'served' : 'in_progress',
+      createdAt: '2026-10-09T09:00:00Z',
+      updatedAt: '2026-10-09T09:15:00Z',
+      businessDate: '2026-10-09',
+      registrationTrackingToken: 'desk-e2e',
+      tierId: 1,
+      servedBySessionId: 100,
+      servedByUserId: 1,
+      firstName: undefined,
+      lastName: 'Martin',
+      activeNoteCount: 3,
+    });
+  const operational: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
@@ -182,22 +220,22 @@ test('calling and serving a person shows details, disables mutation and builds a
       return true;
     }
     if (method === 'POST' && path === '/api/v1/queues/10/next') {
+      called = true;
       await route.fulfill({ json: apiEnvelope(call()) });
       return true;
     }
     if (method === 'GET' && path === '/api/v1/registrations/500') {
-      await route.fulfill({
-        json: apiEnvelope(
-          buildRegistration({
-            status: 'in_service',
-            createdAt: '2026-10-09T09:00:00Z',
-            updatedAt: '2026-10-09T09:15:00Z',
-            businessDate: '2026-10-09',
-            registrationTrackingToken: 'desk-e2e',
-            tierId: 1,
-          }),
-        ),
-      });
+      await route.fulfill({ json: apiEnvelope(activeRegistration()) });
+      return true;
+    }
+    if (method === 'GET' && path === '/api/v1/registrations') {
+      const requestedStatus = url.searchParams.get('status');
+      const items =
+        (requestedStatus === 'in_progress' && called && !hasBeenServed) ||
+        (requestedStatus === 'served' && hasBeenServed)
+          ? [activeRegistration()]
+          : [];
+      await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
     if (method === 'GET' && path === '/api/v1/persons/100') {
@@ -213,6 +251,7 @@ test('calling and serving a person shows details, disables mutation and builds a
     if (method === 'POST' && path === '/api/v1/registrations/500/served') {
       servedCalls += 1;
       await new Promise((resolve) => setTimeout(resolve, 150));
+      hasBeenServed = true;
       await route.fulfill({ json: apiEnvelope({ registrationId: 500, status: 'served' }) });
       return true;
     }
@@ -224,14 +263,14 @@ test('calling and serving a person shows details, disables mutation and builds a
   await installDesk(page, [operational], [primaryQueue]);
   await page.goto('/desk');
   await page.getByRole('button', { name: /appeler le suivant/i }).click();
-  let active = page.locator('.active-call');
+  let active = page.locator('.queue-card-active-call');
   await expect(active).toContainText('Martin');
   await expect(active).toContainText(/15 min/i);
   await expect(active.getByLabel(/3 note/i)).toBeVisible();
   await page.getByRole('button', { name: /actualiser/i }).click();
   await expect(active).toContainText('E001');
   await page.reload();
-  active = page.locator('.active-call');
+  active = page.locator('.queue-card-active-call');
   await expect(active).toContainText('Martin');
   await expect(active).toContainText('E001');
   const served = active.getByRole('button', { name: /^servi$/i });
@@ -243,10 +282,17 @@ test('calling and serving a person shows details, disables mutation and builds a
   await expect(summary).toContainText('E001');
   await expect(summary).toContainText(/document non fiscal/i);
   await expect(summary.locator('.passage-print-legal')).toContainText(/demande du client/i);
-  const cardWidths = await page.evaluate<number[]>(
-    "[document.querySelector('.queue-desk-card'), document.querySelector('.passage-summary-card')].map(card => Math.round(card.getBoundingClientRect().width))",
-  );
-  expect(Math.abs((cardWidths[0] ?? 0) - (cardWidths[1] ?? 0))).toBeLessThanOrEqual(1);
+  const summaryBounds = await summary.boundingBox();
+  const summaryContainerBounds = await summary.locator('..').boundingBox();
+  expect(summaryBounds?.width).toBeGreaterThanOrEqual(288);
+  expect(summaryBounds).not.toBeNull();
+  expect(summaryContainerBounds).not.toBeNull();
+  if (summaryBounds && summaryContainerBounds) {
+    expect(summaryBounds.x).toBeGreaterThanOrEqual(summaryContainerBounds.x);
+    expect(summaryBounds.x + summaryBounds.width).toBeLessThanOrEqual(
+      summaryContainerBounds.x + summaryContainerBounds.width,
+    );
+  }
   expect(servedCalls).toBe(1);
   await page.reload();
   await expect(page.locator('.passage-summary-card')).toContainText('E001');
@@ -256,26 +302,41 @@ test('calling and serving a person shows details, disables mutation and builds a
 
 test('marking a called person absent also creates a discreet passage summary', async ({ page }) => {
   let noShowCalls = 0;
-  const absent: ApiScenarioHandler = async ({ method, path, route }) => {
+  let called = false;
+  let markedAbsent = false;
+  const absentRegistration = () =>
+    buildRegistration({
+      status: markedAbsent ? 'no_show' : 'in_progress',
+      createdAt: '2026-10-09T09:00:00Z',
+      updatedAt: '2026-10-09T09:15:00Z',
+      businessDate: '2026-10-09',
+      registrationTrackingToken: 'desk-absent-e2e',
+      tierId: 1,
+      servedBySessionId: 100,
+      servedByUserId: 1,
+    });
+  const absent: ApiScenarioHandler = async ({ method, path, url, route }) => {
     if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
     if (method === 'POST' && path === '/api/v1/queues/10/next') {
+      called = true;
       await route.fulfill({ json: apiEnvelope(call()) });
       return true;
     }
     if (method === 'GET' && path === '/api/v1/registrations/500') {
-      await route.fulfill({
-        json: apiEnvelope(
-          buildRegistration({
-            createdAt: '2026-10-09T09:00:00Z',
-            businessDate: '2026-10-09',
-            registrationTrackingToken: 'desk-absent-e2e',
-            tierId: 1,
-          }),
-        ),
-      });
+      await route.fulfill({ json: apiEnvelope(absentRegistration()) });
+      return true;
+    }
+    if (method === 'GET' && path === '/api/v1/registrations') {
+      const requestedStatus = url.searchParams.get('status');
+      const items =
+        (requestedStatus === 'in_progress' && called && !markedAbsent) ||
+        (requestedStatus === 'no_show' && markedAbsent)
+          ? [absentRegistration()]
+          : [];
+      await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
     if (method === 'GET' && path === '/api/v1/persons/100') {
@@ -284,6 +345,7 @@ test('marking a called person absent also creates a discreet passage summary', a
     }
     if (method === 'POST' && path === '/api/v1/registrations/500/no-show') {
       noShowCalls += 1;
+      markedAbsent = true;
       await route.fulfill({ json: apiEnvelope({ registrationId: 500, status: 'no_show' }) });
       return true;
     }
@@ -293,6 +355,7 @@ test('marking a called person absent also creates a discreet passage summary', a
   await page.goto('/desk');
   await page.getByRole('button', { name: /appeler le suivant/i }).click();
   await page.getByRole('button', { name: /^absent$/i }).click();
+  await page.getByRole('button', { name: /no-show/i }).click();
   await expect(page.locator('.passage-summary-card')).toContainText(/absent/i);
   expect(noShowCalls).toBe(1);
 });
@@ -321,7 +384,7 @@ test('zero waiting is handled as a normal business outcome', async ({ page }) =>
   await page.getByRole('button', { name: /appeler le suivant/i }).click();
   await expect(page.getByRole('status')).toContainText(/aucun ticket en attente/i);
   await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0);
-  await expect(page.locator('.active-call')).toHaveCount(0);
+  await expect(page.locator('.queue-card-active-call')).toHaveCount(0);
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page).toHaveURL(/\/desk$/);
   await expect(page.locator('body')).not.toContainText(/page blanche/i);
@@ -376,8 +439,8 @@ test('two operators competing for the same next ticket produce one call and one 
   await expect
     .poll(
       async () =>
-        (await first.locator('.active-call').count()) +
-        (await second.locator('.active-call').count()),
+        (await first.locator('.queue-card-active-call').count()) +
+        (await second.locator('.queue-card-active-call').count()),
     )
     .toBe(1);
   await expect

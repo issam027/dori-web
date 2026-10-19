@@ -14,7 +14,11 @@ export {
   getLoadedBundleVersion,
   loadTranslationBundle,
   sanitizeRemoteEntries,
+  setTranslationRejectionReporter,
+  translationRejectionEventName,
   type LoadBundleOptions,
   type RejectedEntry,
   type TranslationCategory,
+  type TranslationRejectionReport,
+  type TranslationRejectionReporter,
 } from './remote';

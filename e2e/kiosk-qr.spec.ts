@@ -130,7 +130,7 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
           status: 'waiting',
           tier: {},
           priorityReferenceTime: '2026-10-11T08:00:00Z',
-          trackingUrl: 'https://api.example/track?token=visual-qr-token',
+          registrationTrackingToken: 'visual-qr-token',
         }),
       });
       return;

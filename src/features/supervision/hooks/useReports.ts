@@ -2,20 +2,8 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { monitoringControllerLive, monitoringControllerSeries } from '@/api/generated/monitoring/monitoring';
 import { queuesControllerFindAll } from '@/api/generated/queues/queues';
-import type { MonitoringSeriesMetricsDto } from '@/api/generated/models';
-import type { ReportBucketDto, ReportGroupDto, ReportMetricsDto } from '../report-utils';
-import { addDays } from '../report-utils';
-
-const rates = (metrics: MonitoringSeriesMetricsDto) => ({
-  noShowRate: metrics.registered ? metrics.noShow / metrics.registered : null,
-  cancellationRate: metrics.registered ? metrics.cancelled / metrics.registered : null,
-  expirationRate: null,
-});
-const metrics = (value: MonitoringSeriesMetricsDto, walkin = 0, appointments = 0): ReportMetricsDto => ({
-  volume: { registered: value.registered, served: value.served, noShow: value.noShow, cancelled: value.cancelled, walkin, appointments, expired: 0 },
-  timing: { averageWaitMinutes: value.averageWaitMinutes, averageServiceMinutes: value.averageServiceMinutes, medianWaitMinutes: null, p90WaitMinutes: null, medianServiceMinutes: null, p90ServiceMinutes: null },
-  rates: rates(value),
-});
+import type { ReportBucketViewModel, ReportGroupViewModel } from '../report-utils';
+import { addDays, toReportMetricsViewModel } from '../report-utils';
 
 async function loadSiteSummary(siteId: number, signal?: AbortSignal) {
   const response = await monitoringControllerLive({ siteId }, undefined, signal);
@@ -94,9 +82,9 @@ export function useReports(options: {
       const response = await monitoringControllerSeries(requestParams, undefined, signal);
       const data = response.data;
       const entryCounts = new Map(data.breakdowns.byEntryType.map((item) => [item.entryType, item.count]));
-      const summary = metrics(data.totals, entryCounts.get('walkin') ?? 0, entryCounts.get('appointment') ?? 0);
-      const buckets: ReportBucketDto[] = data.series.map((bucket, index) => ({
-        ...metrics(bucket), periodStart: bucket.periodStart,
+      const summary = toReportMetricsViewModel(data.totals, entryCounts.get('walkin') ?? 0, entryCounts.get('appointment') ?? 0);
+      const buckets: ReportBucketViewModel[] = data.series.map((bucket, index) => ({
+        ...toReportMetricsViewModel(bucket), periodStart: bucket.periodStart,
         periodEnd: data.series[index + 1]?.periodStart ?? data.appliedFilters.to,
       }));
       const queueSeries = await Promise.all(data.breakdowns.byQueue.map(async (queue) => {
@@ -105,11 +93,11 @@ export function useReports(options: {
         );
         return { queue, data: queueResponse.data };
       }));
-      const groups: ReportGroupDto[] = queueSeries.map(({ queue, data: queueData }) => ({
-        ...metrics(queue),
+      const groups: ReportGroupViewModel[] = queueSeries.map(({ queue, data: queueData }) => ({
+        ...toReportMetricsViewModel(queue),
         dimension: { queueId: queue.queueId, queueName: queue.queueName },
         buckets: queueData.series.map((bucket, index) => ({
-          ...metrics(bucket),
+          ...toReportMetricsViewModel(bucket),
           periodStart: bucket.periodStart,
           periodEnd: queueData.series[index + 1]?.periodStart ?? queueData.appliedFilters.to,
         })),

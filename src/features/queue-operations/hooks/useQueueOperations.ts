@@ -53,6 +53,8 @@ export function useOperatorRegistrations(
 export function useWaitingRegistrations(options: {
   siteId: number | null;
   queueId?: number;
+  dateFrom?: string;
+  dateTo?: string;
   page: number;
   search?: string;
   status?: RegistrationsControllerFindRegistrationsStatus;
@@ -71,6 +73,8 @@ export function useWaitingRegistrations(options: {
         {
           siteId: options.siteId ?? undefined,
           queueId: options.queueId,
+          dateFrom: options.dateFrom,
+          dateTo: options.dateTo,
           status: options.status,
           search: options.search || undefined,
           page: options.page,
