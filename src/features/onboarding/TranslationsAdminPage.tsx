@@ -23,6 +23,7 @@ import {
   findTranslations,
   updateTranslation,
 } from './api/onboarding-api';
+import { Button } from '@/design-system/components/Button';
 
 const PAGE_SIZE = 10;
 const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
@@ -178,9 +179,9 @@ export function TranslationsAdminPage() {
         title={t('onboarding.settings.traductions')}
         description={t('admin.translations.pageDescription')}
         actions={
-          <button className="button button-primary" type="button" onClick={showCreate}>
+          <Button variant="unstyled" className="button button-primary" type="button" onClick={showCreate}>
             <Plus /> {t('onboarding.settings.nouvelleTraduction')}
-          </button>
+          </Button>
         }
       />
       <Card className="admin-filter-card">
@@ -280,7 +281,7 @@ export function TranslationsAdminPage() {
                   </td>
                   <td>
                     <div className="table-actions responsive-table-actions">
-                      <button
+                      <Button variant="unstyled"
                         className="button button-small"
                         type="button"
                         title={t('common.edit')}
@@ -289,8 +290,8 @@ export function TranslationsAdminPage() {
                         }}
                       >
                         <Pencil aria-hidden="true" /> {t('common.edit')}
-                      </button>
-                      <button
+                      </Button>
+                      <Button variant="unstyled"
                         className="button button-small button-danger"
                         type="button"
                         title={t('common.delete')}
@@ -299,7 +300,7 @@ export function TranslationsAdminPage() {
                         }}
                       >
                         <Trash2 aria-hidden="true" /> {t('common.delete')}
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -338,7 +339,7 @@ export function TranslationsAdminPage() {
         }
         actions={
           <>
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={
@@ -351,7 +352,7 @@ export function TranslationsAdminPage() {
               onClick={() => void save()}
             >
               <Save /> {t('common.save')}
-            </button>
+            </Button>
           </>
         }
       >
@@ -442,7 +443,7 @@ export function TranslationsAdminPage() {
                 ).map(([locale, flag, label]) => {
                   const completed = Boolean(form.contents[locale].trim());
                   return (
-                    <button
+                    <Button variant="unstyled"
                       key={locale}
                       type="button"
                       role="tab"
@@ -462,7 +463,7 @@ export function TranslationsAdminPage() {
                       ) : (
                         <i aria-hidden="true" />
                       )}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

@@ -16,6 +16,7 @@ import { canResendNotification, maskRecipient } from './notification-utils';
 import { useNotification, useNotifications, useResendNotification } from './hooks/useNotifications';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useQueues } from '@/features/queues/hooks/useQueues';
+import { Button } from '@/design-system/components/Button';
 
 const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger' =>
   status === 'delivered'
@@ -72,7 +73,7 @@ export function NotificationsPage() {
         description={t('supervision.notifications.journalDEnvoiDetailEtEmissionManuelle')}
         actions={
           canSend ? (
-              <button
+              <Button variant="unstyled"
                 type="button"
                 className="button button-primary"
                 onClick={() => {
@@ -81,7 +82,7 @@ export function NotificationsPage() {
               >
                 <Plus aria-hidden="true" />
                 {t('supervision.notifications.nouvelEnvoi')}
-              </button>
+              </Button>
             ) : null
         }
       />
@@ -96,7 +97,7 @@ export function NotificationsPage() {
             <label>{t('queues.singular')}<select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); setPage(1); }}><option value="">{t('common.all')}</option>{queues.data?.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueName}</option>)}</select></label>
             <label>{t('notifications.filters.registrationId')}<input type="number" min="1" value={registrationId} onChange={(event) => { setRegistrationId(event.target.value); setPage(1); }} /></label>
             <label>{t('notifications.filters.sort')}<select value={sort} onChange={(event) => { setSort(event.target.value as NotificationsControllerFindNotificationsSort); setPage(1); }}><option value="createdAt:desc">{t('notifications.filters.newest')}</option><option value="createdAt:asc">{t('notifications.filters.oldest')}</option><option value="notificationStatus:asc">{t('common.status')}</option><option value="channel:asc">{t('common.canal')}</option><option value="sentAt:desc">{t('notifications.filters.recentlySent')}</option></select></label>
-            <div className="admin-filter-actions"><button className="button" type="button" onClick={() => { setChannel(''); setStatus(''); setDateFrom(''); setDateTo(''); setQueueId(undefined); setRegistrationId(''); setSort('createdAt:desc'); setPage(1); }}><RotateCcw aria-hidden="true" />{t('common.reset')}</button></div>
+            <div className="admin-filter-actions"><Button variant="unstyled" className="button" type="button" onClick={() => { setChannel(''); setStatus(''); setDateFrom(''); setDateTo(''); setQueueId(undefined); setRegistrationId(''); setSort('createdAt:desc'); setPage(1); }}><RotateCcw aria-hidden="true" />{t('common.reset')}</Button></div>
           </div>
         </details>
       </Card>
@@ -146,7 +147,7 @@ export function NotificationsPage() {
               header: t('common.actions'),
               render: (row) => (
                 <div className="action-row">
-                  <button
+                  <Button variant="unstyled"
                     type="button"
                     className="button button-small"
                     onClick={() => {
@@ -155,9 +156,9 @@ export function NotificationsPage() {
                   >
                     <Search aria-hidden="true" />
                     {t('supervision.notifications.detail')}
-                  </button>
+                  </Button>
                   {canResendNotification(row.notificationStatus, canSend) ? (
-                    <button
+                    <Button variant="unstyled"
                       type="button"
                       className="button button-small"
                       disabled={resend.isPending}
@@ -167,7 +168,7 @@ export function NotificationsPage() {
                     >
                       <RefreshCcw aria-hidden="true" />
                       {t('supervision.notifications.reemettre')}
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
               ),

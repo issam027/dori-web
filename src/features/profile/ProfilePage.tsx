@@ -19,6 +19,7 @@ import { notify } from '@/core/notifications/notification-store';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
 import { getUserDisplayName, getUserInitials } from '@/features/users/user-display';
+import { Button } from '@/design-system/components/Button';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -153,10 +154,10 @@ export function ProfilePage() {
           </dl>
           <footer className="profile-identity-footer">
             <p>{__t('profile.globalLogout.help')}</p>
-            <button className="button button-danger" type="button" onClick={() => { setGlobalLogoutOpen(true); }}>
+            <Button variant="unstyled" className="button button-danger" type="button" onClick={() => { setGlobalLogoutOpen(true); }}>
               <LogOut aria-hidden="true" />
               {__t('profile.globalLogout.action')}
-            </button>
+            </Button>
           </footer>
         </Card>
         <Card className="profile-settings-card">
@@ -192,10 +193,10 @@ export function ProfilePage() {
               </select>
             </FormField>
             {saved ? <p role="status">{__t('profile.profile.profilEnregistre')}</p> : null}
-            <button className="button button-primary" disabled={isSubmitting} type="submit">
+            <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
               <Save aria-hidden="true" />
               {__t('common.save')}
-            </button>
+            </Button>
           </form>
           <section className="profile-appearance-panel" aria-labelledby="profile-appearance-title">
             <div className="profile-appearance-heading">
@@ -216,7 +217,7 @@ export function ProfilePage() {
                 const selected = color.id === accentColor;
                 const label = __t(color.labelKey);
                 return (
-                  <button
+                  <Button variant="unstyled"
                     key={color.id}
                     className={'profile-color-swatch' + (selected ? ' is-selected' : '')}
                     type="button"
@@ -230,7 +231,7 @@ export function ProfilePage() {
                     }}
                   >
                     {selected ? <Check aria-hidden="true" /> : null}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -251,7 +252,7 @@ export function ProfilePage() {
                   <strong>{__t('profile.profile.securiteDuCompte')}</strong>
                   <p>{__t('profile.profile.modifiezVotreMotDePasseDepuisUnParcoursD')}</p>
                 </div>
-                <button
+                <Button variant="unstyled"
                   className="button button-primary"
                   type="button"
                   onClick={() => {
@@ -260,7 +261,7 @@ export function ProfilePage() {
                 >
                   <KeyRound aria-hidden="true" />
                   {__t('profile.profile.changerMonMotDePasse')}
-                </button>
+                </Button>
               </>
             ) : (
               <div className="profile-password-editor">
@@ -304,7 +305,7 @@ export function ProfilePage() {
                     />
                   </FormField>
                   <div className="profile-password-actions">
-                    <button
+                    <Button variant="unstyled"
                       className="button"
                       type="button"
                       disabled={passwordSubmitting}
@@ -314,15 +315,15 @@ export function ProfilePage() {
                       }}
                     >
                       {__t('common.cancel')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="unstyled"
                       className="button button-primary"
                       type="submit"
                       disabled={passwordSubmitting}
                     >
                       <Save aria-hidden="true" />
                       {__t('profile.updatePassword')}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               </div>
@@ -358,7 +359,7 @@ export function ProfilePage() {
         onOpenChange={(open) => { if (!globalLogoutPending) setGlobalLogoutOpen(open); }}
         title={__t('profile.globalLogout.confirmTitle')}
         description={__t('profile.globalLogout.confirmDescription')}
-        actions={<button className="button button-danger" type="button" disabled={globalLogoutPending} onClick={() => { void globalLogout(); }}><LogOut aria-hidden="true" />{globalLogoutPending ? __t('profile.globalLogout.pending') : __t('profile.globalLogout.confirmAction')}</button>}
+        actions={<Button variant="unstyled" className="button button-danger" type="button" disabled={globalLogoutPending} onClick={() => { void globalLogout(); }}><LogOut aria-hidden="true" />{globalLogoutPending ? __t('profile.globalLogout.pending') : __t('profile.globalLogout.confirmAction')}</Button>}
       >
         <span />
       </Modal>

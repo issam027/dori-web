@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
 import { legalConfig } from './legal-config';
+import { Button } from '@/design-system/components/Button';
 
 interface LegalLocationState {
   from?: string;
@@ -28,7 +29,7 @@ export function LegalPage() {
           <h1>{t('legal.title')}</h1>
           <p>{t('legal.updated')}</p>
         </div>
-        <button
+        <Button variant="unstyled"
           type="button"
           className="button"
           onClick={() => {
@@ -36,7 +37,7 @@ export function LegalPage() {
           }}
         >
           {t('legal.back')}
-        </button>
+        </Button>
       </header>
       <div className="legal-summary" role="note">
         <span className="status-badge status-success">{t('legal.summarySecure')}</span>

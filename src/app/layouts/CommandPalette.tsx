@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
+import { Button } from '@/design-system/components/Button';
 
 const commands = [
   {
@@ -109,7 +110,7 @@ export function CommandPalette({
           />
           <div className="command-list">
             {available.map((command) => (
-              <button
+              <Button variant="unstyled"
                 key={command.id}
                 type="button"
                 onClick={() => {
@@ -118,7 +119,7 @@ export function CommandPalette({
                 }}
               >
                 {t('commands.goTo', { page: t(command.labelKey) })}
-              </button>
+              </Button>
             ))}
             {available.length === 0 ? <p className="muted">{t('commands.noResults')}</p> : null}
           </div>

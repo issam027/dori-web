@@ -5,6 +5,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { playChime, speakTicket } from './audio';
 import { useDisplaySnapshot } from './hooks/usePublicExperiences';
+import { Button } from '@/design-system/components/Button';
 
 const activeTicketsPerPage = 6;
 const upcomingTicketsPerPage = 8;
@@ -152,7 +153,7 @@ export function DisplayPage() {
           <h1>{scopeTitle}</h1>
         </div>
         <time>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
-        <button
+        <Button variant="unstyled"
           type="button"
           className="display-audio"
           aria-pressed={audio}
@@ -163,7 +164,7 @@ export function DisplayPage() {
           {audio
             ? __t('public-experiences.display.sonActive')
             : __t('public-experiences.display.activerLeSon')}
-        </button>
+        </Button>
       </header>
       <main className="display-board">
         <section className="display-active-zone" aria-live="assertive">

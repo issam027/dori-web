@@ -29,6 +29,7 @@ import {
   loginShowcaseSlides,
   type LoginShowcaseSlide,
 } from '@/core/content/login-showcase';
+import { Button } from '@/design-system/components/Button';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -98,7 +99,7 @@ function LoginShowcase() {
         setPaused(false);
       }}
     >
-      <button
+      <Button variant="unstyled"
         className="login-showcase-pause"
         type="button"
         aria-label={t(paused ? 'login.showcase.play' : 'login.showcase.pause')}
@@ -108,7 +109,7 @@ function LoginShowcase() {
         }}
       >
         {paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-      </button>
+      </Button>
       <div className="login-showcase-visual" aria-hidden="true">
         <span className="login-showcase-orbit login-showcase-orbit-one" />
         <span className="login-showcase-orbit login-showcase-orbit-two" />
@@ -137,7 +138,7 @@ function LoginShowcase() {
       </div>
       <div className="login-showcase-dots" role="group" aria-label={t('login.showcase.navigation')}>
         {loginShowcaseSlides.map((item, itemIndex) => (
-          <button
+          <Button variant="unstyled"
             key={item}
             type="button"
             aria-label={t('login.showcase.goto', { number: itemIndex + 1 })}
@@ -245,18 +246,18 @@ export function LoginPage() {
               <input type="checkbox" {...register('rememberUsername')} />{' '}
               {__t('auth.login.memoriserMonIdentifiant')}
             </label>
-            <button type="button" className="text-button" disabled>
+            <Button variant="unstyled" type="button" className="text-button" disabled>
               {__t('auth.login.motDePasseOublie')}
-            </button>
+            </Button>
             {apiError ? (
               <p className="field-error" role="alert">
                 {apiError}
               </p>
             ) : null}
-            <button className="button button-primary" disabled={isSubmitting} type="submit">
+            <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
               <LogIn aria-hidden="true" />
               {isSubmitting ? __t('auth.login.signingIn') : __t('auth.login.seConnecter')}
-            </button>
+            </Button>
           </form>
         </div>
         {import.meta.env.DEV ? (
@@ -268,7 +269,7 @@ export function LoginPage() {
             </div>
             <div className="quick-login-grid">
               {demoProfiles.map(({ username, labelKey, detailKey, icon: ProfileIcon }) => (
-                <button
+                <Button variant="unstyled"
                   key={username}
                   className="button quick-login-button"
                   type="button"
@@ -289,7 +290,7 @@ export function LoginPage() {
                   <span>{__t(detailKey)}</span>
                   <small>@{username}</small>
                   {quickProfile === username ? <small>{__t('auth.login.connexion')}</small> : null}
-                </button>
+                </Button>
               ))}
             </div>
           </aside>

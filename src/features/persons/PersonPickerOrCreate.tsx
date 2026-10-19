@@ -8,6 +8,7 @@ import { InternationalPhoneInput } from '@/design-system/components/Internationa
 import { Pagination } from '@/design-system/components/Pagination';
 import { isValidPersonIdentity } from './person-validation';
 import { usePersonsSearch } from './hooks/usePersons';
+import { Button } from '@/design-system/components/Button';
 
 export type PersonChoice =
   { kind: 'existing'; person: PersonResponseDto } | { kind: 'new'; person: PersonIdentityDto };
@@ -47,7 +48,7 @@ export function PersonPickerOrCreate({
   return (
     <div className="person-picker form-stack">
       <div className="segmented">
-        <button
+        <Button variant="unstyled"
           type="button"
           aria-pressed={mode === 'existing'}
           onClick={() => {
@@ -56,8 +57,8 @@ export function PersonPickerOrCreate({
           }}
         >
           {__t('persons.personPickerOrCreate.personneConnue')}
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled"
           type="button"
           aria-pressed={mode === 'new'}
           onClick={() => {
@@ -66,7 +67,7 @@ export function PersonPickerOrCreate({
           }}
         >
           {__t('common.nouvellePersonne')}
-        </button>
+        </Button>
       </div>
       {mode === 'existing' ? (
         <>

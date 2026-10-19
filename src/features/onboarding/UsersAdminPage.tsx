@@ -39,6 +39,7 @@ import {
   updateUser,
   updateUserStatus,
 } from './api/onboarding-api';
+import { Button } from '@/design-system/components/Button';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
@@ -134,7 +135,7 @@ export function UsersAdminPage() {
         title={t('admin.users.utilisateurs')}
         description={t('admin.users.pageDescription')}
         actions={
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             onClick={() => {
@@ -142,7 +143,7 @@ export function UsersAdminPage() {
             }}
           >
             <Plus /> {t('onboarding.settings.nouvelUtilisateur')}
-          </button>
+          </Button>
         }
       />
       <Card className="admin-filter-card">
@@ -233,8 +234,8 @@ export function UsersAdminPage() {
                   <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}</td>
                   <td>
                     <div className="row-user-actions">
-                      <button className="button button-small" type="button" title={t('common.view')} onClick={() => { setViewingId(user.userId); }}><Eye />{t('common.view')}</button>
-                      <button
+                      <Button variant="unstyled" className="button button-small" type="button" title={t('common.view')} onClick={() => { setViewingId(user.userId); }}><Eye />{t('common.view')}</Button>
+                      <Button variant="unstyled"
                         className="button button-small"
                         type="button"
                         title={t('common.edit')}
@@ -243,12 +244,12 @@ export function UsersAdminPage() {
                         }}
                       >
                         <Pencil /> {t('common.edit')}
-                      </button>
-                      {canDeleteUsers ? <button className="button button-small button-danger" type="button" title={t('common.delete')} disabled={current?.userId === user.userId} onClick={() => { setDeleting(user); }}><Trash2 />{t('common.delete')}</button> : null}
+                      </Button>
+                      {canDeleteUsers ? <Button variant="unstyled" className="button button-small button-danger" type="button" title={t('common.delete')} disabled={current?.userId === user.userId} onClick={() => { setDeleting(user); }}><Trash2 />{t('common.delete')}</Button> : null}
                       <div className="row-actions-menu">
-                      <button className="button button-small" type="button" title={t('common.actions')} aria-label={t('common.actions')} aria-expanded={openActionsUserId === user.userId} onClick={() => { setOpenActionsUserId((currentId) => currentId === user.userId ? undefined : user.userId); }}><MoreHorizontal aria-hidden="true" /></button>
+                      <Button variant="unstyled" className="button button-small" type="button" title={t('common.actions')} aria-label={t('common.actions')} aria-expanded={openActionsUserId === user.userId} onClick={() => { setOpenActionsUserId((currentId) => currentId === user.userId ? undefined : user.userId); }}><MoreHorizontal aria-hidden="true" /></Button>
                       {openActionsUserId === user.userId ? <div className="row-actions-popover">
-                      <button
+                      <Button variant="unstyled"
                         className="button button-small"
                         type="button"
                         title={user.isActive ? t('admin.users.suspend') : t('common.activate')}
@@ -266,8 +267,8 @@ export function UsersAdminPage() {
                           <UserCheck aria-hidden="true" />
                         )}
                         {user.isActive ? t('admin.users.suspend') : t('common.activate')}
-                      </button>
-                      <button
+                      </Button>
+                      <Button variant="unstyled"
                         className="button button-small"
                         type="button"
                         title={t('onboarding.settings.reinitialiserMdp')}
@@ -286,8 +287,8 @@ export function UsersAdminPage() {
                         }
                       >
                         <KeyRound /> {t('onboarding.settings.reinitialiserMdp')}
-                      </button>
-                      <button
+                      </Button>
+                      <Button variant="unstyled"
                         className="button button-small button-danger"
                         type="button"
                         title={t('admin.users.deconnecter')}
@@ -296,7 +297,7 @@ export function UsersAdminPage() {
                         }}
                       >
                         <LogOut /> {t('admin.users.deconnecter')}
-                      </button>
+                      </Button>
                       </div> : null}
                       </div>
                     </div>
@@ -322,11 +323,11 @@ export function UsersAdminPage() {
       <Modal open={Boolean(viewingId)} onOpenChange={(open) => { if (!open) setViewingId(undefined); }} title={t('admin.users.detailsTitle')} description={userDetail.data ? getUserDisplayName(userDetail.data.data) : undefined}>
         {userDetail.data ? <UserDetail user={userDetail.data.data} t={t} /> : <p className="muted">{t('common.loading')}</p>}
       </Modal>
-      <Modal open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }} title={t('admin.users.deleteTitle')} description={deleting ? getUserDisplayName(deleting) : undefined} actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
+      <Modal open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }} title={t('admin.users.deleteTitle')} description={deleting ? getUserDisplayName(deleting) : undefined} actions={<Button variant="unstyled" className="button button-danger" type="button" disabled={pending} onClick={() => {
         if (!deleting) return;
         setPending(true);
         void deleteUser(deleting.userId).then(async () => { await refresh(); notify({ tone: 'success', title: t('admin.users.deleteSuccess'), message: getUserDisplayName(deleting) }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
-      }}><Trash2 />{t('common.delete')}</button>}><p className="admin-message">{t('admin.users.deleteDescription')}</p></Modal>
+      }}><Trash2 />{t('common.delete')}</Button>}><p className="admin-message">{t('admin.users.deleteDescription')}</p></Modal>
       <Modal
         open={Boolean(editing)}
         onOpenChange={(next) => {
@@ -336,14 +337,14 @@ export function UsersAdminPage() {
         description={editing ? getUserDisplayName(editing) : undefined}
         actions={
           <>
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={pending || !editForm.language}
               onClick={() => void saveEdit()}
             >
               <Save /> {t('common.save')}
-            </button>
+            </Button>
           </>
         }
       >
@@ -395,7 +396,7 @@ export function UsersAdminPage() {
         description={disconnecting ? getUserDisplayName(disconnecting) : undefined}
         actions={
           <>
-            <button
+            <Button variant="unstyled"
               className="button button-danger"
               type="button"
               disabled={pending}
@@ -418,7 +419,7 @@ export function UsersAdminPage() {
               }}
             >
               <LogOut /> {t('admin.users.deconnecter')}
-            </button>
+            </Button>
           </>
         }
       >

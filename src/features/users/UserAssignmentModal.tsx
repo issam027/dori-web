@@ -16,6 +16,7 @@ import { queryKeys } from '@/api/client/query-keys';
 import { UserPlus } from 'lucide-react';
 import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { Button } from '@/design-system/components/Button';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -107,7 +108,7 @@ export function UserAssignmentModal({
       title={t('settings.assignUser')}
       description={t('settings.assignUserDescription', { resource: target?.label ?? '' })}
       actions={
-        <button
+        <Button variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={!selectedUser || !roleId || saving}
@@ -115,7 +116,7 @@ export function UserAssignmentModal({
         >
           <UserPlus aria-hidden="true" />
           {t('settings.confirmAssignment')}
-        </button>
+        </Button>
       }
     >
       <div className="assignment-flow">
@@ -145,7 +146,7 @@ export function UserAssignmentModal({
           ) : results.length ? (
             <div className="assignment-user-results">
               {results.map((user) => (
-                <button
+                <Button variant="unstyled"
                   type="button"
                   className={selectedUser?.userId === user.userId ? 'selected' : ''}
                   aria-pressed={selectedUser?.userId === user.userId}
@@ -164,7 +165,7 @@ export function UserAssignmentModal({
                   <span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>
                     {user.isActive ? t('settings.active') : t('settings.inactive')}
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
           ) : debouncedSearch.length >= 4 ? (

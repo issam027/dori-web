@@ -13,6 +13,7 @@ import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { Button } from '@/design-system/components/Button';
 
 const createSchema = (t: TFunction) =>
   z
@@ -86,10 +87,10 @@ export function ChangePasswordPage() {
               {apiError}
             </p>
           ) : null}
-          <button className="button button-primary" disabled={isSubmitting} type="submit">
+          <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
             <Save aria-hidden="true" />
             {__t('common.save')}
-          </button>
+          </Button>
         </form>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
+import { Button } from '@/design-system/components/Button';
 
 export function WizardModal({
   open,
@@ -36,20 +37,20 @@ export function WizardModal({
       actions={
         <>
           {onPrevious ? (
-            <button className="button" type="button" onClick={onPrevious}>
+            <Button variant="unstyled" className="button" type="button" onClick={onPrevious}>
               {t('common.previous')}
-            </button>
+            </Button>
           ) : (
             <span />
           )}
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={!canContinue}
             onClick={onNext}
           >
             {step === stepCount ? t('common.finish') : t('common.next')}
-          </button>
+          </Button>
         </>
       }
     >

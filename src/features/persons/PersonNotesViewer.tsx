@@ -8,6 +8,7 @@ import { useAddPersonNote, useDeletePersonNote, usePerson, usePersonNotes, useUp
 import { normalizePersonText } from './person-display';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
+import { Button } from '@/design-system/components/Button';
 
 export function PersonNotesViewer({
   personId,
@@ -90,7 +91,7 @@ export function PersonNotesViewer({
       actions={
         <>
           {adding && items.length > 0 ? (
-            <button
+            <Button variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -99,12 +100,12 @@ export function PersonNotesViewer({
             >
               <ArrowLeft aria-hidden="true" />
               {__t('persons.personNotesViewer.retourAuxNotes')}
-            </button>
+            </Button>
           ) : null}
           {editingNoteId ? (
-            <button className="button button-primary" type="button" disabled={!content.trim()} onClick={() => void saveEdit()}><Save aria-hidden="true" />{__t('common.save')}</button>
+            <Button variant="unstyled" className="button button-primary" type="button" disabled={!content.trim()} onClick={() => void saveEdit()}><Save aria-hidden="true" />{__t('common.save')}</Button>
           ) : adding ? (
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!content.trim()}
@@ -112,9 +113,9 @@ export function PersonNotesViewer({
             >
               <Save aria-hidden="true" />
               {__t('persons.personNotesViewer.enregistrerLaNote')}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               onClick={() => {
@@ -123,7 +124,7 @@ export function PersonNotesViewer({
             >
               <Plus aria-hidden="true" />
               {__t('common.add')}
-            </button>
+            </Button>
           )}
         </>
       }
@@ -166,13 +167,13 @@ export function PersonNotesViewer({
             · {new Date(current.createdAt).toLocaleString()}
           </small>
           {canManage ? <div className="note-inline-actions">
-            <button className="icon-button" type="button" title={__t('common.edit')} aria-label={__t('common.edit')} onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" /></button>
-            <button className="icon-button icon-button-danger" type="button" title={__t('common.delete')} aria-label={__t('common.delete')} onClick={() => void remove()}><Trash2 aria-hidden="true" /></button>
+            <Button variant="unstyled" className="icon-button" type="button" title={__t('common.edit')} aria-label={__t('common.edit')} onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" /></Button>
+            <Button variant="unstyled" className="icon-button icon-button-danger" type="button" title={__t('common.delete')} aria-label={__t('common.delete')} onClick={() => void remove()}><Trash2 aria-hidden="true" /></Button>
           </div> : null}
           </div>
           {items.length > 1 ? (
             <div className="note-pagination">
-              <button
+              <Button variant="unstyled"
                 className="button"
                 type="button"
                 disabled={index >= items.length - 1}
@@ -182,11 +183,11 @@ export function PersonNotesViewer({
               >
                 <ChevronLeft aria-hidden="true" />
                 {__t('persons.personNotesViewer.precedente')}
-              </button>
+              </Button>
               <span>
                 {index + 1} / {items.length}
               </span>
-              <button
+              <Button variant="unstyled"
                 className="button"
                 type="button"
                 disabled={index === 0}
@@ -196,7 +197,7 @@ export function PersonNotesViewer({
               >
                 {__t('persons.personNotesViewer.suivante')}
                 <ChevronRight aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           ) : null}
         </article>

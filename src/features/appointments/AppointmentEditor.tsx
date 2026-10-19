@@ -11,6 +11,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
+import { Button } from '@/design-system/components/Button';
 
 export function AppointmentEditor({
   open,
@@ -105,7 +106,7 @@ export function AppointmentEditor({
       actions={
         <>
           {step === 2 ? (
-            <button
+            <Button variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -113,10 +114,10 @@ export function AppointmentEditor({
               }}
             >
               {__t('appointments.appointmentEditor.personne')}
-            </button>
+            </Button>
           ) : null}
           {step === 1 ? (
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!person}
@@ -126,9 +127,9 @@ export function AppointmentEditor({
             >
               {__t('common.continuer')}
               <ArrowRight aria-hidden="true" />
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!person || !queueId || !tierId}
@@ -136,7 +137,7 @@ export function AppointmentEditor({
             >
               <CalendarPlus aria-hidden="true" />
               {__t('appointments.appointmentEditor.creerLeRendezVous')}
-            </button>
+            </Button>
           )}
         </>
       }
@@ -175,7 +176,7 @@ export function AppointmentEditor({
                     : __t('common.nouvellePersonne')}
                 </span>
               </div>
-              <button
+              <Button variant="unstyled"
                 className="button button-small"
                 type="button"
                 onClick={() => {
@@ -183,7 +184,7 @@ export function AppointmentEditor({
                 }}
               >
                 {__t('common.edit')}
-              </button>
+              </Button>
             </div>
             <div className="appointment-step-heading">
               <span className="ticket-chip">2</span>

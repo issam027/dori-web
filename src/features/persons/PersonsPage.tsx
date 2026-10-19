@@ -33,6 +33,7 @@ import { displayPersonLanguage, formatPersonDate } from './person-display';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { Button } from '@/design-system/components/Button';
 
 const PAGE_SIZE = 10;
 
@@ -108,7 +109,7 @@ export function PersonsPage() {
         title={t('persons.admin.title')}
         description={t('persons.admin.description')}
         actions={
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             onClick={() => {
@@ -116,7 +117,7 @@ export function PersonsPage() {
             }}
           >
             <Plus aria-hidden="true" /> {t('persons.admin.newPerson')}
-          </button>
+          </Button>
         }
       />
       <Card className="admin-filter-card">
@@ -214,7 +215,7 @@ export function PersonsPage() {
                     </td>
                     <td>
                       <div className="table-actions responsive-table-actions">
-                        <button
+                        <Button variant="unstyled"
                           className="button button-small"
                           type="button"
                           title={t('common.view')}
@@ -223,8 +224,8 @@ export function PersonsPage() {
                           }}
                         >
                           <Eye aria-hidden="true" /> {t('common.view')}
-                        </button>
-                        <button
+                        </Button>
+                        <Button variant="unstyled"
                           className="button button-small"
                           type="button"
                           title={t('common.edit')}
@@ -233,7 +234,7 @@ export function PersonsPage() {
                           }}
                         >
                           <Pencil aria-hidden="true" /> {t('common.edit')}
-                        </button>
+                        </Button>
                         <PersonNotesButton
                           noteCount={person.activeNoteCount}
                           onClick={() => {
@@ -241,9 +242,9 @@ export function PersonsPage() {
                             setNotesPerson(person);
                           }}
                         />
-                        {canDelete ? <button className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
+                        {canDelete ? <Button variant="unstyled" className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
                           <Trash2 aria-hidden="true" /> {t('common.delete')}
-                        </button> : null}
+                        </Button> : null}
                       </div>
                     </td>
                   </tr>
@@ -285,11 +286,11 @@ export function PersonsPage() {
         onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }}
         title={t('persons.admin.deleteTitle')}
         description={deleting ? [deleting.firstName, deleting.lastName].filter(Boolean).join(' ') : undefined}
-        actions={<button className="button button-danger" type="button" disabled={pending} onClick={() => {
+        actions={<Button variant="unstyled" className="button button-danger" type="button" disabled={pending} onClick={() => {
           if (!deleting) return;
           setPending(true);
           void deletePerson(deleting.personId).then(async () => { await refresh(); notify({ tone: 'success', title: t('persons.admin.deleted') }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
-        }}><Trash2 aria-hidden="true" />{t('common.delete')}</button>}
+        }}><Trash2 aria-hidden="true" />{t('common.delete')}</Button>}
       >
         <p className="admin-message">{t('persons.admin.deleteDescription')}</p>
       </Modal>
@@ -304,7 +305,7 @@ export function PersonsPage() {
         }
         actions={
           viewing ? (
-            <button
+            <Button variant="unstyled"
               className="button button-primary"
               type="button"
               onClick={() => {
@@ -313,7 +314,7 @@ export function PersonsPage() {
               }}
             >
               <Pencil aria-hidden="true" /> {t('common.edit')}
-            </button>
+            </Button>
           ) : undefined
         }
       >

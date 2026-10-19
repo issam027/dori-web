@@ -1,5 +1,6 @@
 import { Plus, StickyNote } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/design-system/components/Button';
 
 export function PersonNotesButton({
   noteCount,
@@ -15,7 +16,7 @@ export function PersonNotesButton({
     : t('queues.myQueues.addNote');
 
   return (
-    <button
+    <Button variant="unstyled"
       aria-label={accessibleLabel}
       className="button button-small person-notes-button"
       type="button"
@@ -30,6 +31,6 @@ export function PersonNotesButton({
       >
         {count}
       </span>
-    </button>
+    </Button>
   );
 }

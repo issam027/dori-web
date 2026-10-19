@@ -38,6 +38,7 @@ import {
 import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 import { trackingUrlFromToken } from '../../tracking-url';
 import { useSite } from '@/features/portfolio/hooks/useSites';
+import { Button } from '@/design-system/components/Button';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
   trackingUrl: string | null;
   queueName?: string;
@@ -209,9 +210,9 @@ export function KioskWizard() {
             {__t('public-experiences.kiosk.effacementDans')}
             {watchdog.remainingSeconds} {__t('public-experiences.kiosk.secondes')}
           </span>
-          <button type="button" className="button button-primary" onClick={watchdog.prolong}>
+          <Button variant="unstyled" type="button" className="button button-primary" onClick={watchdog.prolong}>
             {__t('common.continue')}
-          </button>
+          </Button>
         </div>
       ) : null}
       {flow === 'home' ? (
@@ -221,7 +222,7 @@ export function KioskWizard() {
             <p>{__t('public-experiences.kiosk.touchezVotreSituationPourCommencer')}</p>
           </div>
           <div className="kiosk-choices">
-            <button
+            <Button variant="unstyled"
               type="button"
               onClick={() => {
                 clearRegistrationError();
@@ -229,8 +230,8 @@ export function KioskWizard() {
               }}
             >
               {__t('public-experiences.kiosk.jeViensSansRendezVous')}
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               type="button"
               onClick={() => {
                 clearAppointmentState();
@@ -238,7 +239,7 @@ export function KioskWizard() {
               }}
             >
               {__t('public-experiences.kiosk.jAiUnRendezVous')}
-            </button>
+            </Button>
           </div>
         </KioskWelcomeStep>
       ) : null}
@@ -284,7 +285,7 @@ export function KioskWizard() {
             <KioskQueueStep>
               <div className="kiosk-tiles">
                 {queues.data?.data.items.map((queue, index) => (
-                  <button
+                  <Button variant="unstyled"
                     type="button"
                     className={queueId === queue.queueId ? 'selected' : ''}
                     key={queue.queueId}
@@ -308,7 +309,7 @@ export function KioskWizard() {
                         ? __t('common.selectionne')
                         : __t('public-experiences.kiosk.choisirCeService')}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </KioskQueueStep>
@@ -400,7 +401,7 @@ export function KioskWizard() {
                     const hasSms = rules.some((rule) => rule.channel === 'sms');
                     const hasTracking = rules.some((rule) => rule.includeTrackingLink);
                     return (
-                      <button
+                      <Button variant="unstyled"
                         type="button"
                         className={tier?.tierId === item.tierId ? 'selected' : ''}
                         key={item.tierId}
@@ -451,7 +452,7 @@ export function KioskWizard() {
                               : __t('public-experiences.kiosk.nonConfigure')}
                           </li>
                         </ul>
-                      </button>
+                      </Button>
                     );
                   })}
               </div>
@@ -545,7 +546,7 @@ export function KioskWizard() {
             </Card>
           ) : null}
           <div className="kiosk-actions">
-            <button
+            <Button variant="unstyled"
               type="button"
               onClick={() => {
                 clearRegistrationError();
@@ -554,8 +555,8 @@ export function KioskWizard() {
               }}
             >
               {__t('common.retour')}
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               type="button"
               className="primary"
               disabled={
@@ -574,7 +575,7 @@ export function KioskWizard() {
                   ? __t('common.creation')
                   : __t('public-experiences.kiosk.creerMonTicket')
                 : __t('common.continuer')}
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
@@ -639,7 +640,7 @@ export function KioskWizard() {
             </section>
           </div>
           <div className="kiosk-appointment-actions">
-            <button
+            <Button variant="unstyled"
               type="button"
               onClick={() => {
                 clearAppointmentState();
@@ -647,8 +648,8 @@ export function KioskWizard() {
               }}
             >
               {__t('public-experiences.kiosk.retourALAccueil')}
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               type="button"
               className="primary"
               disabled={(!phoneValid && (!lastName.trim() || !scheduledTime)) || lookup.isPending}
@@ -659,7 +660,7 @@ export function KioskWizard() {
             >
               <Search aria-hidden="true" />
               {__t('common.search')}
-            </button>
+            </Button>
           </div>
           {found && !appointmentFeedback ? (
             <Card className="kiosk-appointment-found">
@@ -681,7 +682,7 @@ export function KioskWizard() {
                     : __t('public-experiences.kiosk.heureNonFournie')}
                 </p>
               </div>
-              <button
+              <Button variant="unstyled"
                 type="button"
                 className="button button-primary"
                 disabled={checkIn.isPending}
@@ -691,7 +692,7 @@ export function KioskWizard() {
                 }}
               >
                 {__t('public-experiences.kiosk.confirmerMaPresence')}
-              </button>
+              </Button>
             </Card>
           ) : null}
           {appointmentFeedback && AppointmentFeedbackIcon ? (
@@ -734,7 +735,7 @@ export function KioskWizard() {
             {__t('public-experiences.kiosk.conservezCeTicketEtSuivezLEcranDeSalleS')}
           </p>
           <div className="kiosk-result-actions">
-            <button
+            <Button variant="unstyled"
               type="button"
               disabled={!printReady}
               onClick={() => {
@@ -748,10 +749,10 @@ export function KioskWizard() {
               }}
             >
               {__t('public-experiences.kiosk.imprimerMonTicket')}
-            </button>
-            <button type="button" className="primary" onClick={purge}>
+            </Button>
+            <Button variant="unstyled" type="button" className="primary" onClick={purge}>
               {__t('common.terminer')}
-            </button>
+            </Button>
           </div>
           <KioskTicketPrintDocument
             ticketNumber={result.ticketNumber}

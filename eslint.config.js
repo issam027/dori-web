@@ -31,5 +31,18 @@ export default tseslint.config(
       '@typescript-eslint/consistent-type-imports': 'off',
     },
   },
+  {
+    files: ['src/**/*.tsx'],
+    ignores: ['src/**/*.test.tsx', 'src/design-system/components/Button.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXOpeningElement[name.name='button']",
+          message: 'Utiliser le composant Button du design system.',
+        },
+      ],
+    },
+  },
   prettier,
 );

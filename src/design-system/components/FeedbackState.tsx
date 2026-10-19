@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleAlert, Inbox, RotateCcw } from 'lucide-react';
+import { Button } from '@/design-system/components/Button';
 
 export function EmptyState({
   title,
@@ -32,10 +33,10 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
       </div>
       <h2>{t('states.error')}</h2>
       {onRetry ? (
-        <button className="button button-primary" type="button" onClick={onRetry}>
+        <Button variant="unstyled" className="button button-primary" type="button" onClick={onRetry}>
           <RotateCcw aria-hidden="true" />
           {t('common.retry')}
-        </button>
+        </Button>
       ) : null}
     </section>
   );

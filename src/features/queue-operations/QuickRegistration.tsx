@@ -24,6 +24,7 @@ import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url
 import { findPersons } from '@/features/persons/api/persons-api';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
+import { Button } from '@/design-system/components/Button';
 
 export function QuickRegistration({
   siteId,
@@ -166,7 +167,7 @@ export function QuickRegistration({
           <h2>{__t('queue-operations.quickRegistration.accueilRapide')}</h2>
           <p>{__t('quickRegistration.description')}</p>
         </div>
-        <button
+        <Button variant="unstyled"
           className="button button-primary"
           type="button"
           onClick={() => {
@@ -176,7 +177,7 @@ export function QuickRegistration({
         >
           <Plus aria-hidden="true" />
           {__t('queue-operations.quickRegistration.creerUnTicket')}
-        </button>
+        </Button>
       </Card>
       <Modal
         open={open}
@@ -193,7 +194,7 @@ export function QuickRegistration({
         actions={
           <>
             {step === 1 ? (
-              <button
+              <Button variant="unstyled"
                 className="button button-primary"
                 type="button"
                 disabled={!choice}
@@ -203,11 +204,11 @@ export function QuickRegistration({
               >
                 {__t('queue-operations.quickRegistration.continuerVersLeTicket')}
                 <ArrowRight aria-hidden="true" />
-              </button>
+              </Button>
             ) : null}
             {step === 2 ? (
               <>
-                <button
+                <Button variant="unstyled"
                   className="button"
                   type="button"
                   onClick={() => {
@@ -215,8 +216,8 @@ export function QuickRegistration({
                   }}
                 >
                   {__t('queue-operations.quickRegistration.modifierLaPersonne')}
-                </button>
-                <button
+                </Button>
+                <Button variant="unstyled"
                   className="button button-primary"
                   type="button"
                   disabled={!canSubmit}
@@ -226,12 +227,12 @@ export function QuickRegistration({
                   {pending
                     ? __t('common.creation')
                     : __t('queue-operations.quickRegistration.creerLeTicket')}
-                </button>
+                </Button>
               </>
             ) : null}
             {step === 3 ? (
               <>
-                <button
+                <Button variant="unstyled"
                   className="button"
                   type="button"
                   disabled={!printReady}
@@ -247,8 +248,8 @@ export function QuickRegistration({
                 >
                   <Printer aria-hidden="true" />
                   {__t('public-experiences.kiosk.imprimerMonTicket')}
-                </button>
-                <button
+                </Button>
+                <Button variant="unstyled"
                   className="button button-primary"
                   type="button"
                   onClick={() => {
@@ -257,7 +258,7 @@ export function QuickRegistration({
                 >
                   <Check aria-hidden="true" />
                   {__t('common.terminer')}
-                </button>
+                </Button>
               </>
             ) : null}
           </>

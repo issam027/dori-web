@@ -26,6 +26,7 @@ import {
 } from './hooks/useQueueOperations';
 import { EligiblePreviewCard, QueueDeskCard } from './components/DeskCards';
 import { DeskPassages } from './components/DeskPassages';
+import { Button } from '@/design-system/components/Button';
 
 export function DeskPage() {
   const { t } = useTranslation();
@@ -329,7 +330,7 @@ export function DeskPage() {
         title={t('desk.openCounterTitle')}
         description={deskToOpen?.queueName}
         actions={
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={Boolean(pendingQueueIds.size) || !counterName.trim()}
@@ -344,7 +345,7 @@ export function DeskPage() {
             }}
           >
             {t('desk.openCounterAction')}
-          </button>
+          </Button>
         }
       >
         <FormField label={t('desk.counterName')} hint={t('desk.counterNameHint')} required>

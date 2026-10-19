@@ -2,6 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, Clipboard, RefreshCcw, RotateCcw } from 'lucide-react';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { i18n } from '@/core/i18n/i18n';
+import { Button } from '@/design-system/components/Button';
 
 interface AppErrorBoundaryState {
   error: Error | null;
@@ -170,7 +171,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           <pre>{this.diagnostic()}</pre>
         </details>
         <div className="runtime-error-actions">
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             onClick={() => {
@@ -178,8 +179,8 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
             }}
           >
             <RotateCcw size={17} /> {i18n.t('common.retry')}
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled"
             className="button"
             type="button"
             onClick={() => {
@@ -187,8 +188,8 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
             }}
           >
             <RefreshCcw size={17} /> {i18n.t('errorBoundary.reload')}
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled"
             className="button"
             type="button"
             onClick={() => {
@@ -199,7 +200,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           >
             <Clipboard size={17} />{' '}
             {this.state.copied ? i18n.t('errorBoundary.copied') : i18n.t('errorBoundary.copy')}
-          </button>
+          </Button>
         </div>
         <p className="runtime-error-privacy">{i18n.t('errorBoundary.privacy')}</p>
       </section>

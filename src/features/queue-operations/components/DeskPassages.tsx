@@ -5,6 +5,7 @@ import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { Card } from '@/design-system/components/Card';
 import type { PassageSummary } from '../operation-store';
 import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
+import { Button } from '@/design-system/components/Button';
 
 export function DeskPassages({
   passages,
@@ -53,8 +54,8 @@ export function DeskPassages({
         </div>
         <div className="passage-summary-controls">
           <div className="segmented-control passage-filter">
-            <button type="button" className={status === 'served' ? 'is-active' : ''} onClick={() => { onStatusChange('served'); }}>{t('common.servedPlural')}</button>
-            <button type="button" className={status === 'no_show' ? 'is-active' : ''} onClick={() => { onStatusChange('no_show'); }}>{t('common.noShow')}</button>
+            <Button variant="unstyled" type="button" className={status === 'served' ? 'is-active' : ''} onClick={() => { onStatusChange('served'); }}>{t('common.servedPlural')}</Button>
+            <Button variant="unstyled" type="button" className={status === 'no_show' ? 'is-active' : ''} onClick={() => { onStatusChange('no_show'); }}>{t('common.noShow')}</Button>
           </div>
           <StatusBadge tone="neutral">{passages.length}</StatusBadge>
         </div>
@@ -111,7 +112,7 @@ export function DeskPassages({
             </dl>
             <footer>
               <small>{t('queue-operations.desk.justificatifDePassageDoriDocumentNonFiscal')}</small>
-              <button
+              <Button variant="unstyled"
                 className="button print-hidden"
                 type="button"
                 disabled={!site?.siteName}
@@ -121,7 +122,7 @@ export function DeskPassages({
               >
                 <Printer aria-hidden="true" />
                 {t('queue-operations.desk.imprimerLeJustificatif')}
-              </button>
+              </Button>
             </footer>
             <div className="passage-print-legal" aria-hidden="true">
               <p>{t('queue-operations.desk.ceJustificatifEstImprimeALaDemandeDuClie')}</p>

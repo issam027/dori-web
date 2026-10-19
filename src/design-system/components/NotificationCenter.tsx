@@ -5,6 +5,7 @@ import {
   type AppNotification,
   useNotificationStore,
 } from '@/core/notifications/notification-store';
+import { Button } from '@/design-system/components/Button';
 
 const icons = {
   success: CheckCircle2,
@@ -57,7 +58,7 @@ function NotificationItem({ item }: { item: AppNotification }) {
           </small>
         ) : null}
       </div>
-      <button
+      <Button variant="unstyled"
         type="button"
         className="app-notification-dismiss"
         aria-label={__t('design.components.notificationCenter.fermerLaNotification')}
@@ -66,7 +67,7 @@ function NotificationItem({ item }: { item: AppNotification }) {
         }}
       >
         <X aria-hidden="true" />
-      </button>
+      </Button>
       {item.duration > 0 ? (
         <span
           className="app-notification-timer"

@@ -6,6 +6,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
 import { usePublicTracking } from './hooks/usePublicExperiences';
+import { Button } from '@/design-system/components/Button';
 
 type TrackingPhase = 'far' | 'near' | 'next' | 'called' | 'completed';
 
@@ -146,9 +147,9 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 setTrackingId(event.target.value);
               }}
             />
-            <button type="submit" className="button button-primary" disabled={!trackingId.trim()}>
+            <Button variant="unstyled" type="submit" className="button button-primary" disabled={!trackingId.trim()}>
               {__t('public-experiences.track.appliquer')}
-            </button>
+            </Button>
           </div>
         </form>
       ) : null}
@@ -254,7 +255,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
 
             {!completed ? (
               <div className="tracking-actions">
-                <button
+                <Button variant="unstyled"
                   type="button"
                   className="button tracking-refresh"
                   disabled={refreshing}
@@ -263,8 +264,8 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 >
                   <RefreshCw className={refreshing ? 'is-spinning' : undefined} aria-hidden="true" />
                   {__t('tracking.refresh')}
-                </button>
-                <button
+                </Button>
+                <Button variant="unstyled"
                   type="button"
                   className="button button-primary tracking-consent"
                   aria-pressed={consent}
@@ -275,7 +276,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                   {consent
                     ? __t('public-experiences.track.sonEtVibrationActives')
                     : __t('public-experiences.track.activerSonEtVibration')}
-                </button>
+                </Button>
               </div>
             ) : null}
           </>

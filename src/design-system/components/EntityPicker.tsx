@@ -1,4 +1,5 @@
 import type { Key, ReactNode } from 'react';
+import { Button } from '@/design-system/components/Button';
 
 export function EntityPicker<TEntity>({
   entities,
@@ -27,7 +28,7 @@ export function EntityPicker<TEntity>({
         const key = getKey(entity);
         const selected = key === selectedKey;
         return (
-          <button
+          <Button variant="unstyled"
             key={key}
             type="button"
             role="option"
@@ -38,7 +39,7 @@ export function EntityPicker<TEntity>({
             }}
           >
             {render(entity)}
-          </button>
+          </Button>
         );
       })}
     </div>

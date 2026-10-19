@@ -5,6 +5,7 @@ import { BarChart3, ChartPie, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/design-system/components/Card';
 import { formatReportNumber } from './report-number';
+import { Button } from '@/design-system/components/Button';
 
 type View = 'trend' | 'comparison' | 'distribution';
 type Metric = 'registered' | 'served' | 'walkin' | 'appointments' | 'noShow' | 'cancelled' | 'expired' | 'averageWaitMinutes' | 'medianWaitMinutes' | 'p90WaitMinutes' | 'averageServiceMinutes' | 'medianServiceMinutes' | 'p90ServiceMinutes' | 'noShowRate';
@@ -71,7 +72,7 @@ function TrendChart({ buckets }: { buckets: readonly ReportBucketViewModel[] }) 
     { id: 'noShowRate', label: t('reports.visual.noShowRate'), color: palette[13] ?? '#c28b2c', values: buckets.map((bucket) => (bucket.rates.noShowRate ?? 0) * 100) },
   ];
   const toggle = (id: string) => { setSelected((current) => current.includes(id) ? (current.length > 1 ? current.filter((item) => item !== id) : current) : [...current, id]); };
-  return <div className="report-trend"><Chart buckets={buckets} series={available.filter((item) => selected.includes(item.id))} showLegend={false} /><div className="report-series-picker" role="group" aria-label={t('reports.visual.indicatorsToDisplay')}>{available.map((item) => { const active = selected.includes(item.id); return <button key={item.id} type="button" className={active ? 'active' : ''} aria-pressed={active} onClick={() => { toggle(item.id); }}><i style={{ background: item.color }} />{item.label}</button>; })}</div></div>;
+  return <div className="report-trend"><Chart buckets={buckets} series={available.filter((item) => selected.includes(item.id))} showLegend={false} /><div className="report-series-picker" role="group" aria-label={t('reports.visual.indicatorsToDisplay')}>{available.map((item) => { const active = selected.includes(item.id); return <Button variant="unstyled" key={item.id} type="button" className={active ? 'active' : ''} aria-pressed={active} onClick={() => { toggle(item.id); }}><i style={{ background: item.color }} />{item.label}</Button>; })}</div></div>;
 }
 
 function groupId(group: ReportGroupViewModel, index: number) {
@@ -125,5 +126,5 @@ function DonutCharts({ metrics }: { metrics: ReportMetricsViewModel }) {
 
 export function ReportVisualizations({ buckets, groups, summary, queues }: { buckets: readonly ReportBucketViewModel[]; groups: readonly ReportGroupViewModel[]; summary: ReportMetricsViewModel; queues: readonly QueueResponseDto[] }) {
   const { t } = useTranslation(); const [view, setView] = useState<View>('trend');
-  return <Card className="report-visual-panel"><div className="card-head report-visual-toolbar"><div><span className="eyebrow">{t('reports.visual.exploration')}</span><h2>{t('reports.visual.title')}</h2></div><div className="segmented-control" role="group" aria-label={t('reports.visual.type')}><button className={view === 'trend' ? 'active' : ''} onClick={() => { setView('trend'); }}><TrendingUp />{t('reports.visual.trend')}</button><button className={view === 'comparison' ? 'active' : ''} onClick={() => { setView('comparison'); }}><BarChart3 />{t('reports.visual.comparison')}</button><button className={view === 'distribution' ? 'active' : ''} onClick={() => { setView('distribution'); }}><ChartPie />{t('reports.visual.distribution')}</button></div></div>{view === 'trend' ? <TrendChart buckets={buckets} /> : view === 'comparison' ? <ComparisonChart groups={groups} queues={queues} /> : <DonutCharts metrics={summary} />}</Card>;
+  return <Card className="report-visual-panel"><div className="card-head report-visual-toolbar"><div><span className="eyebrow">{t('reports.visual.exploration')}</span><h2>{t('reports.visual.title')}</h2></div><div className="segmented-control" role="group" aria-label={t('reports.visual.type')}><Button variant="unstyled" type="submit" className={view === 'trend' ? 'active' : ''} onClick={() => { setView('trend'); }}><TrendingUp />{t('reports.visual.trend')}</Button><Button variant="unstyled" type="submit" className={view === 'comparison' ? 'active' : ''} onClick={() => { setView('comparison'); }}><BarChart3 />{t('reports.visual.comparison')}</Button><Button variant="unstyled" type="submit" className={view === 'distribution' ? 'active' : ''} onClick={() => { setView('distribution'); }}><ChartPie />{t('reports.visual.distribution')}</Button></div></div>{view === 'trend' ? <TrendChart buckets={buckets} /> : view === 'comparison' ? <ComparisonChart groups={groups} queues={queues} /> : <DonutCharts metrics={summary} />}</Card>;
 }

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/design-system/components/Button';
 
 export function Pagination({
   page,
@@ -13,7 +14,7 @@ export function Pagination({
   const { t } = useTranslation();
   return (
     <nav className="pagination" aria-label={t('pagination.label')}>
-      <button
+      <Button variant="unstyled"
         type="button"
         className="button"
         disabled={page <= 1}
@@ -23,9 +24,9 @@ export function Pagination({
       >
         <ChevronLeft aria-hidden="true" />
         {t('pagination.previous')}
-      </button>
+      </Button>
       <span>{t('pagination.position', { page, totalPages })}</span>
-      <button
+      <Button variant="unstyled"
         type="button"
         className="button"
         disabled={page >= totalPages}
@@ -35,7 +36,7 @@ export function Pagination({
       >
         {t('pagination.next')}
         <ChevronRight aria-hidden="true" />
-      </button>
+      </Button>
     </nav>
   );
 }

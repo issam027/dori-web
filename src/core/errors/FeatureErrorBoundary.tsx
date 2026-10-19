@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { i18n } from '@/core/i18n/i18n';
+import { Button } from '@/design-system/components/Button';
 
 interface FeatureErrorBoundaryState {
   error: Error | null;
@@ -25,9 +26,9 @@ export class FeatureErrorBoundary extends Component<
     return (
       <section role="alert">
         <p>{i18n.t('states.error')}</p>
-        <button type="button" onClick={this.retry}>
+        <Button variant="unstyled" type="button" onClick={this.retry}>
           {i18n.t('common.retry')}
-        </button>
+        </Button>
       </section>
     );
   }

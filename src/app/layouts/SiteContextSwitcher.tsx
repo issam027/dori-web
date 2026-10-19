@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/design-system/components/Button';
 
 export interface SiteOption {
   id: number;
@@ -30,7 +31,7 @@ export function SiteContextSwitcher({
       </summary>
       <div className="site-menu">
         {sites.map((site) => (
-          <button
+          <Button variant="unstyled"
             key={site.id}
             type="button"
             aria-current={site.id === activeSiteId ? 'true' : undefined}
@@ -40,7 +41,7 @@ export function SiteContextSwitcher({
             }}
           >
             {site.name}
-          </button>
+          </Button>
         ))}
       </div>
     </details>

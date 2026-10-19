@@ -6,6 +6,7 @@ import { sitesControllerAssignDirectUser } from '@/api/generated/sites/sites';
 import { queuesControllerAssignOperator } from '@/api/generated/queues/queues';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { assignableRoles } from './user-rank';
+import { Button } from '@/design-system/components/Button';
 
 export function UserAccountWizard({
   open,
@@ -171,7 +172,7 @@ export function UserAccountWizard({
           <div className="wizard-step-heading"><span>2</span><div><h3>{__t('users.userAccountWizard.roleInitial')}</h3><p>{__t('users.userAccountWizard.lesRolesDeRangSuperieurAuVotreSontMasque')}</p></div></div>
           <div className="choice-grid">
             {allowed.map((r) => (
-              <button
+              <Button variant="unstyled"
                 type="button"
                 key={r.roleId}
                 className={`role-card ${f.roleId === r.roleId ? 'selected' : ''}`}
@@ -184,7 +185,7 @@ export function UserAccountWizard({
                   {__t('users.userAccountWizard.rang')}
                   {r.rank} · {r.description}
                 </small>
-              </button>
+              </Button>
             ))}
           </div>
         </section>

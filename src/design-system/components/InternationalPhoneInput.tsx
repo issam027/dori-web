@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/design-system/components/Button';
 
 const countries = [
   { code: 'FR', dialCode: '+33', groups: [1, 2, 2, 2, 2], placeholder: '6 12 34 56 78' },
@@ -124,7 +125,7 @@ export function InternationalPhoneInput({
   return (
     <div className="international-phone-input" ref={rootRef}>
       <div className="phone-country-control">
-        <button
+        <Button variant="unstyled"
           type="button"
           className="phone-country-trigger"
           aria-label={`${countryLabel}: ${country.dialCode}`}
@@ -138,11 +139,11 @@ export function InternationalPhoneInput({
           <CountryFlag code={country.code} />
           <span>{country.dialCode}</span>
           <ChevronDown aria-hidden="true" />
-        </button>
+        </Button>
         {menuOpen ? (
           <div className="phone-country-menu" role="listbox" aria-label={countryLabel}>
             {countries.map((item) => (
-              <button
+              <Button variant="unstyled"
                 type="button"
                 role="option"
                 aria-label={item.dialCode}
@@ -160,7 +161,7 @@ export function InternationalPhoneInput({
               >
                 <CountryFlag code={item.code} />
                 <span>{item.dialCode}</span>
-              </button>
+              </Button>
             ))}
           </div>
         ) : null}

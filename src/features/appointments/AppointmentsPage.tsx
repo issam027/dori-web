@@ -17,6 +17,7 @@ import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useAppointment, useAppointments } from './hooks/useAppointments';
+import { Button } from '@/design-system/components/Button';
 
 export function AppointmentsPage() {
   const { t: __t, i18n } = useTranslation();
@@ -128,7 +129,7 @@ export function AppointmentsPage() {
         description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
         actions={
           <div className="segmented">
-            <button
+            <Button variant="unstyled"
               className={`button${view === 'week' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'week'}
@@ -137,8 +138,8 @@ export function AppointmentsPage() {
               }}
             >
               {__t('appointments.appointments.semaine')}
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               className={`button${view === 'month' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'month'}
@@ -147,7 +148,7 @@ export function AppointmentsPage() {
               }}
             >
               {__t('appointments.appointments.mois')}
-            </button>
+            </Button>
           </div>
         }
       />
@@ -187,7 +188,7 @@ export function AppointmentsPage() {
                 </option>
               ))}
             </select>
-            <button
+            <Button variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -195,13 +196,13 @@ export function AppointmentsPage() {
               }}
             >
               {__t('appointments.appointments.precedent')}
-            </button>
+            </Button>
             <strong>
               {view === 'month'
                 ? displayedMonthLabel
                 : [dates[0], dates.at(-1)].filter(Boolean).join(' — ')}
             </strong>
-            <button
+            <Button variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -209,7 +210,7 @@ export function AppointmentsPage() {
               }}
             >
               {__t('common.next')}
-            </button>
+            </Button>
           </div>
           {view === 'week' ? (
             <div className="week-calendar">
@@ -281,7 +282,7 @@ export function AppointmentsPage() {
                                   : time;
                                 const statusText = __t(appointmentStatusKey(item));
                                 return (
-                                  <button
+                                  <Button variant="unstyled"
                                     className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
                                     key={item.registrationId}
                                     type="button"
@@ -293,12 +294,12 @@ export function AppointmentsPage() {
                                   >
                                     <span className="appointment-status-dot" aria-hidden="true" />
                                     <span className="appointment-event-name">{name}</span>
-                                  </button>
+                                  </Button>
                                 );
                               })}
                             </div>
                             {hasMore && (
-                              <button
+                              <Button variant="unstyled"
                                 type="button"
                                 className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
                                 onClick={(event) => {
@@ -321,7 +322,7 @@ export function AppointmentsPage() {
                                     <span aria-hidden="true">▾</span>
                                   </>
                                 )}
-                              </button>
+                              </Button>
                             )}
                           </>
                         ) : null}
@@ -361,7 +362,7 @@ export function AppointmentsPage() {
                     }}
                   >
                     <div className="month-day-header">
-                      <button
+                      <Button variant="unstyled"
                         className="calendar-date-button"
                         type="button"
                         onClick={(event) => {
@@ -370,7 +371,7 @@ export function AppointmentsPage() {
                         }}
                       >
                         <strong>{date.slice(-2)}</strong>
-                      </button>
+                      </Button>
                       {dayAppointments.length > 0 && (
                         <span className="calendar-slot-count">
                           {dayAppointments.length}
@@ -385,7 +386,7 @@ export function AppointmentsPage() {
                           : '—';
                         const statusText = __t(appointmentStatusKey(item));
                         return (
-                          <button
+                          <Button variant="unstyled"
                             className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
                             key={item.registrationId}
                             type="button"
@@ -400,12 +401,12 @@ export function AppointmentsPage() {
                             <time className="appointment-event-time" dateTime={item.scheduledTime}>
                               {itemTime}
                             </time>
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
                     {hasMore && (
-                      <button
+                      <Button variant="unstyled"
                         type="button"
                         className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
                         onClick={(event) => {
@@ -428,7 +429,7 @@ export function AppointmentsPage() {
                             <span aria-hidden="true">▾</span>
                           </>
                         )}
-                      </button>
+                      </Button>
                     )}
                   </section>
                 );

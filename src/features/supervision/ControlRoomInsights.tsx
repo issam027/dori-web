@@ -5,6 +5,7 @@ import { Card } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
 import { formatReportNumber } from './report-number';
 import { slaTone } from './sla';
+import { Button } from '@/design-system/components/Button';
 
 type FlowMetric = 'registered' | 'served' | 'noShow' | 'cancelled';
 const colors: Record<FlowMetric, string> = { registered: 'var(--color-primary)', served: 'var(--color-success)', noShow: 'var(--color-warning)', cancelled: 'var(--color-danger)' };
@@ -30,7 +31,7 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
       {buckets.filter((_, index) => index === 0 || index === buckets.length - 1 || index === Math.floor(buckets.length / 2)).map((bucket) => { const index = buckets.indexOf(bucket); return <text key={bucket.periodStart} x={x(index)} y="238" textAnchor="middle" className="report-axis-label">{formatTime(bucket.periodStart)}</text>; })}
       {hovered !== undefined && buckets[hovered] ? <g className="report-chart-tooltip" transform={`translate(${String(Math.min(x(hovered) + 8, 515))},24)`}><rect width="170" height={36 + visible.length * 20} rx="9" /><text x="12" y="20">{formatTooltipTime(buckets[hovered].periodStart)}</text>{visible.map((metric, index) => <text key={metric} x="12" y={42 + index * 20}>{t(`controlRoom.flow.${metric}`)}: {formatReportNumber(buckets[hovered]?.[metric] ?? 0, i18n.language)}</text>)}</g> : null}
     </svg></div>
-    <div className="report-series-picker">{metrics.map((metric) => <button key={metric} type="button" className={visible.includes(metric) ? 'active' : ''} aria-pressed={visible.includes(metric)} onClick={() => { setVisible((current) => current.includes(metric) ? (current.length > 1 ? current.filter((item) => item !== metric) : current) : [...current, metric]); }}><i style={{ background: colors[metric] }} />{t(`controlRoom.flow.${metric}`)}</button>)}</div>
+    <div className="report-series-picker">{metrics.map((metric) => <Button variant="unstyled" key={metric} type="button" className={visible.includes(metric) ? 'active' : ''} aria-pressed={visible.includes(metric)} onClick={() => { setVisible((current) => current.includes(metric) ? (current.length > 1 ? current.filter((item) => item !== metric) : current) : [...current, metric]); }}><i style={{ background: colors[metric] }} />{t(`controlRoom.flow.${metric}`)}</Button>)}</div>
   </>;
 }
 

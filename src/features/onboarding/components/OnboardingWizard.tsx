@@ -37,6 +37,7 @@ import {
   moveToPreviousOnboardingStep,
   recordCreatedQueue,
 } from '../model/onboarding-workflow';
+import { Button } from '@/design-system/components/Button';
 
 const stepKeys = [
   'onboarding.steps.identity',
@@ -230,7 +231,7 @@ export function OnboardingWizard() {
             <span className="status-badge status-success">
               {__t('onboarding.onboarding.brouillonLocal')}
             </span>
-            <button
+            <Button variant="unstyled"
               className="button button-danger button-small"
               type="button"
               disabled={discarding}
@@ -239,7 +240,7 @@ export function OnboardingWizard() {
               }}
             >
               {__t('onboarding.discardDraft')}
-            </button>
+            </Button>
           </div>
         </Card>
       ) : null}
@@ -247,7 +248,7 @@ export function OnboardingWizard() {
         <Card className="setup-navigation">
           <h2>{__t('onboarding.onboarding.parcoursDeConfiguration')}</h2>
           {stepKeys.map((key, index) => (
-            <button
+            <Button variant="unstyled" type="submit"
               key={key}
               className={`setup-nav-row ${draft.step === index + 1 ? 'active' : ''}`}
               disabled={index + 1 > draft.step}
@@ -264,7 +265,7 @@ export function OnboardingWizard() {
                   {__t('onboarding.onboarding.termine')}
                 </span>
               ) : null}
-            </button>
+            </Button>
           ))}
         </Card>
         <Card className="setup-content">
@@ -299,7 +300,7 @@ export function OnboardingWizard() {
             </p>
           ) : null}
           <div className="setup-actions">
-            <button
+            <Button variant="unstyled" type="submit"
               className="button"
               disabled={draft.step === 1 || busy}
               onClick={() => {
@@ -307,17 +308,17 @@ export function OnboardingWizard() {
               }}
             >
               {__t('onboarding.onboarding.precedent')}
-            </button>
+            </Button>
             <div>
-              <button
+              <Button variant="unstyled" type="submit"
                 className="button"
                 onClick={() => {
                   saveOnboardingDraft(draft);
                 }}
               >
                 {__t('common.enregistrerLeBrouillon')}
-              </button>
-              <button
+              </Button>
+              <Button variant="unstyled" type="submit"
                 className="button button-primary"
                 disabled={busy || !canAdvanceOnboarding(draft, fixed.length)}
                 onClick={() => void next()}
@@ -325,7 +326,7 @@ export function OnboardingWizard() {
                 {draft.step === 6
                   ? __t('onboarding.onboarding.activerLeSite')
                   : __t('common.enregistrerEtContinuer')}
-              </button>
+              </Button>
             </div>
           </div>
         </Card>
@@ -375,7 +376,7 @@ export function OnboardingWizard() {
         title={__t('onboarding.discardDraftTitle')}
         description={__t('onboarding.discardDraftDescription')}
         actions={
-          <button
+          <Button variant="unstyled"
             className="button button-danger"
             type="button"
             disabled={discarding}
@@ -383,7 +384,7 @@ export function OnboardingWizard() {
           >
             <Trash2 aria-hidden="true" />
             {discarding ? __t('onboarding.discardingDraft') : __t('onboarding.confirmDiscardDraft')}
-          </button>
+          </Button>
         }
       >
         <p className="admin-message">{__t('onboarding.discardDraftServerNotice')}</p>
@@ -643,9 +644,9 @@ function QueuesStep({
         title={__t('onboarding.onboarding.filesGuichets')}
         text={__t('onboarding.queueOverrideHelp')}
         action={
-          <button className="button button-primary" onClick={open}>
+          <Button variant="unstyled" type="submit" className="button button-primary" onClick={open}>
             {__t('onboarding.onboarding.ajouterUneFile')}
-          </button>
+          </Button>
         }
       />
       <div className="inheritance-note">
@@ -691,7 +692,7 @@ function QueuesStep({
                   </span>
                 </td>
                 <td className="table-action-column">
-                  <button
+                  <Button variant="unstyled"
                     type="button"
                     className="button button-small"
                     aria-label={__t('onboarding.editQueueLabel', {
@@ -702,7 +703,7 @@ function QueuesStep({
                     }}
                   >
                     {__t('onboarding.editQueue')}
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -856,7 +857,7 @@ function TiersStep({
                     className={`station tier-config-card ${isSelected ? 'selected' : ''}`}
                     key={tier.tierId}
                   >
-                    <button
+                    <Button variant="unstyled"
                       type="button"
                       className="tier-choice tier-choice-toggle"
                       aria-pressed={isSelected}
@@ -873,7 +874,7 @@ function TiersStep({
                         <strong>{tier.tierName}</strong>
                         <small>{tier.description || tier.tierCode}</small>
                       </span>
-                    </button>
+                    </Button>
                     {isSelected ? (
                       <div className="tier-inline-config">
                         <div className="tier-config-grid">
@@ -1085,14 +1086,14 @@ function ReviewStep({
         {draft.testValidated ? (
           <span className="status-badge status-success">{__t('common.valide')}</span>
         ) : (
-          <button
+          <Button variant="unstyled" type="submit"
             className="button"
             onClick={() => {
               save({ ...draft, testValidated: true });
             }}
           >
             {__t('onboarding.onboarding.lancerLeTest')}
-          </button>
+          </Button>
         )}
       </div>
     </section>

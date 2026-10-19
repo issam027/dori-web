@@ -30,6 +30,7 @@ import {
   rescheduleAppointment,
 } from './appointment-actions';
 import { useAvailability } from './hooks/useAppointments';
+import { Button } from '@/design-system/components/Button';
 
 type ActionMode = 'summary' | 'reschedule' | 'cancel';
 
@@ -168,7 +169,7 @@ export function AppointmentActionDialog({
   const actions =
     checkedIn ? (
       <>
-        <button
+        <Button variant="unstyled"
           className="button button-small"
           type="button"
           disabled={!printReady}
@@ -184,8 +185,8 @@ export function AppointmentActionDialog({
         >
           <Printer aria-hidden="true" />
           <span className="button-label">{t('public-experiences.kiosk.imprimerMonTicket')}</span>
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled"
           className="button button-small button-primary"
           type="button"
           onClick={() => {
@@ -194,13 +195,13 @@ export function AppointmentActionDialog({
         >
           <Check aria-hidden="true" />
           <span className="button-label">{t('common.terminer')}</span>
-        </button>
+        </Button>
       </>
     ) : mode === 'summary' ? (
       <>
         {manageable ? (
           <>
-            <button
+            <Button variant="unstyled"
               className="button button-small button-primary"
               type="button"
               title={t('appointments.actions.markPresent')}
@@ -211,8 +212,8 @@ export function AppointmentActionDialog({
             >
               <UserCheck aria-hidden="true" />
               <span className="button-label">{t('appointments.actions.markPresent')}</span>
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               className="button button-small"
               type="button"
               title={t('appointments.actions.reschedule')}
@@ -223,8 +224,8 @@ export function AppointmentActionDialog({
             >
               <CalendarClock aria-hidden="true" />
               <span className="button-label">{t('appointments.actions.reschedule')}</span>
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled"
               className="button button-small button-danger"
               type="button"
               title={t('appointments.actions.cancelAppointment')}
@@ -235,11 +236,11 @@ export function AppointmentActionDialog({
             >
               <Ban aria-hidden="true" />
               <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
-            </button>
+            </Button>
           </>
         ) : null}
         {isTerminalAppointment(appointment) && details && onCreateFollowUp ? (
-          <button
+          <Button variant="unstyled"
             className="button button-small button-primary"
             type="button"
             onClick={() => {
@@ -252,12 +253,12 @@ export function AppointmentActionDialog({
           >
             <CalendarPlus aria-hidden="true" />
             <span className="button-label">{t('appointments.actions.createFollowUp')}</span>
-          </button>
+          </Button>
         ) : null}
       </>
     ) : mode === 'cancel' ? (
       <>
-        <button
+        <Button variant="unstyled"
           className="button button-small"
           type="button"
           title={t('common.previous')}
@@ -266,8 +267,8 @@ export function AppointmentActionDialog({
         >
           <ArrowLeft aria-hidden="true" />
           <span className="button-label">{t('common.previous')}</span>
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled"
           className="button button-small button-danger"
           type="button"
           title={t('appointments.actions.confirmCancellation')}
@@ -289,11 +290,11 @@ export function AppointmentActionDialog({
           <span className="button-label">
             {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
           </span>
-        </button>
+        </Button>
       </>
     ) : (
       <>
-        <button
+        <Button variant="unstyled"
           className="button button-small"
           type="button"
           title={t('common.previous')}
@@ -302,8 +303,8 @@ export function AppointmentActionDialog({
         >
           <ArrowLeft aria-hidden="true" />
           <span className="button-label">{t('common.previous')}</span>
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled"
           className="button button-small button-primary"
           type="button"
           title={t('appointments.actions.confirmReschedule')}
@@ -330,7 +331,7 @@ export function AppointmentActionDialog({
           <span className="button-label">
             {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
           </span>
-        </button>
+        </Button>
       </>
     );
 
@@ -520,7 +521,7 @@ export function AppointmentActionDialog({
               {slots.map((slot) => {
                 const value = slotTime(slot.time, serviceTimeZone);
                 return (
-                  <button
+                  <Button variant="unstyled"
                     className="button"
                     aria-pressed={time === value}
                     type="button"
@@ -532,7 +533,7 @@ export function AppointmentActionDialog({
                   >
                     {value}
                     <small>{t('appointments.actions.remaining', { count: slot.available })}</small>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

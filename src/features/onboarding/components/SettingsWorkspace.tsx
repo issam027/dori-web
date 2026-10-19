@@ -23,6 +23,7 @@ import { useSettingsData } from '../hooks/useSettingsData';
 import { SettingsNavigation } from './SettingsNavigation';
 import { QueueServiceSettings } from './QueueServiceSettings';
 import { SiteEditor } from './SiteEditor';
+import { Button } from '@/design-system/components/Button';
 
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
@@ -146,9 +147,9 @@ function Header({
           <Plus aria-hidden="true" /> {label}
         </Link>
       ) : action ? (
-        <button className="button button-primary" onClick={action}>
+        <Button variant="unstyled" type="submit" className="button button-primary" onClick={action}>
           <Plus aria-hidden="true" /> {label}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -217,10 +218,10 @@ function SitesPanel({
                 </td>
                 <td>
                   <div className="table-actions responsive-table-actions">
-                    <button className="button button-small" type="button" title={__t('common.edit')} onClick={() => { edit(s); }}>
+                    <Button variant="unstyled" className="button button-small" type="button" title={__t('common.edit')} onClick={() => { edit(s); }}>
                       <Pencil aria-hidden="true" />{__t('common.edit')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="unstyled"
                       className="button button-small"
                       type="button"
                       title={__t('settings.assignUser')}
@@ -230,8 +231,8 @@ function SitesPanel({
                     >
                       <UserPlus aria-hidden="true" />
                       {__t('settings.assignUser')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="unstyled" type="submit"
                       className="button button-small"
                       title={
                         s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
@@ -242,7 +243,7 @@ function SitesPanel({
                     >
                       {s.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
                       {s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -254,9 +255,9 @@ function SitesPanel({
         <Card className="site-managers-card">
           <div className="card-heading">
             <div><h3>{__t('settings.managers')}</h3><p>{__t('settings.managersHelp')}</p></div>
-            <button className="button button-primary" type="button" onClick={() => { const site = items[0]; if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName }); }}><UserPlus />{__t('settings.addManager')}</button>
+            <Button variant="unstyled" className="button button-primary" type="button" onClick={() => { const site = items[0]; if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName }); }}><UserPlus />{__t('settings.addManager')}</Button>
           </div>
-          {directUsers.length ? <ul className="manager-list">{directUsers.map((user) => <li key={user.userId}><div><strong>{user.username}</strong><span>{user.email}</span></div><span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>{user.isActive ? __t('common.active') : __t('common.inactive')}</span><button className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
+          {directUsers.length ? <ul className="manager-list">{directUsers.map((user) => <li key={user.userId}><div><strong>{user.username}</strong><span>{user.email}</span></div><span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>{user.isActive ? __t('common.active') : __t('common.inactive')}</span><Button variant="unstyled" className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</Button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
         </Card>
       ) : null}
       {items.length > ADMIN_PAGE_SIZE ? (
@@ -314,7 +315,7 @@ function QueuesPanel({
               ['all', __t('common.all')],
             ] as const
           ).map(([value, label]) => (
-            <button
+            <Button variant="unstyled"
               key={value}
               type="button"
               className={status === value ? 'is-active' : ''}
@@ -325,7 +326,7 @@ function QueuesPanel({
               }}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
       </Card>
@@ -365,7 +366,7 @@ function QueuesPanel({
                 </td>
                 <td>
                   <div className="table-actions responsive-table-actions">
-                    <button
+                    <Button variant="unstyled" type="submit"
                       className="button button-small"
                       title={__t('common.edit')}
                       onClick={() => {
@@ -374,9 +375,9 @@ function QueuesPanel({
                     >
                       <Pencil aria-hidden="true" />
                       {__t('common.edit')}
-                    </button>
+                    </Button>
 
-                    {canAssignOperators ? <button
+                    {canAssignOperators ? <Button variant="unstyled"
                       className="button button-small"
                       type="button"
                       title={__t('settings.queueOperators.title')}
@@ -386,8 +387,8 @@ function QueuesPanel({
                     >
                       <UserPlus aria-hidden="true" />
                       {__t('settings.queueOperators.button')}
-                    </button> : null}
-                    <button
+                    </Button> : null}
+                    <Button variant="unstyled" type="submit"
                       className="button button-small"
                       title={
                         q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
@@ -398,7 +399,7 @@ function QueuesPanel({
                     >
                       {q.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
                       {q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>

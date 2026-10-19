@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Moon, MoonStar, Sun, Sunrise } from 'lucide-react';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
+import { Button } from '@/design-system/components/Button';
 
 export function ThemeSwitcher() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export function ThemeSwitcher() {
       <Sun size={19} />
     );
   return (
-    <button
+    <Button variant="unstyled"
       className="icon-button"
       type="button"
       onClick={cycleTheme}
@@ -27,6 +28,6 @@ export function ThemeSwitcher() {
       <span className="theme-icon" aria-hidden="true">
         {icon}
       </span>
-    </button>
+    </Button>
   );
 }

@@ -25,6 +25,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
+import { Button } from '@/design-system/components/Button';
 
 interface NavItem {
   path: string;
@@ -195,21 +196,21 @@ export function SidebarAccordion({
       <div className="sidebar-brand">
         <span className="brand-mark">{__t('common.d')}</span>
         <strong className="sidebar-label">{__t('app.name')}</strong>
-        <button
+        <Button variant="unstyled"
           className="sidebar-mobile-close"
           type="button"
           onClick={onCloseMobile}
           aria-label={__t('common.fermerLeMenu')}
         >
           <X aria-hidden="true" />
-        </button>
+        </Button>
       </div>
       <nav className="sidebar-nav" aria-label={t('nav.main')}>
         {visibleSections.map((section) => {
           const open = collapsed || openedSection === section.id;
           return (
             <section className="nav-section" key={section.id}>
-              <button
+              <Button variant="unstyled"
                 type="button"
                 className="nav-section-toggle"
                 aria-expanded={open}
@@ -222,7 +223,7 @@ export function SidebarAccordion({
               >
                 {t(section.labelKey)}
                 <span aria-hidden="true">⌄</span>
-              </button>
+              </Button>
               {open ? (
                 <div className="nav-links">
                   {section.items.map((item) => (
@@ -252,7 +253,7 @@ export function SidebarAccordion({
         <ShieldCheck aria-hidden="true" />
         <span className="sidebar-label">{t('nav.legal')}</span>
       </NavLink>
-      <button
+      <Button variant="unstyled"
         className="sidebar-collapse"
         type="button"
         onClick={onToggleCollapsed}
@@ -260,7 +261,7 @@ export function SidebarAccordion({
       >
         {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
         <span className="sidebar-label">{__t('shell.layouts.sidebarAccordion.reduire')}</span>
-      </button>
+      </Button>
     </aside>
   );
 }

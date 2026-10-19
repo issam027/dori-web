@@ -26,6 +26,7 @@ import { useReports } from './hooks/useReports';
 import { ReportVisualizations } from './ReportVisualizations';
 import { ReportAnalyticsSections } from './ReportAnalyticsSections';
 import { formatReportNumber, formatReportPercent } from './report-number';
+import { Button } from '@/design-system/components/Button';
 
 const fallbackTimeZone = 'UTC';
 
@@ -80,10 +81,10 @@ export function ReportsPage() {
         title={__t('supervision.reports.rapports')}
         description={__t('reports.periodDescription')}
         actions={
-          <button type="button" className="button" disabled={!queueItems.length} onClick={exportCsv}>
+          <Button variant="unstyled" type="button" className="button" disabled={!queueItems.length} onClick={exportCsv}>
             <Download aria-hidden="true" />
             {__t('supervision.reports.exporterCsvLocal')}
-          </button>
+          </Button>
         }
       />
       <Card>

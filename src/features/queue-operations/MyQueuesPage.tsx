@@ -19,6 +19,7 @@ import type {
   RegistrationsControllerFindRegistrationsStatus,
 } from '@/api/generated/models';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
+import { Button } from '@/design-system/components/Button';
 
 function localIsoDate(value = new Date()): string {
   const localValue = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
@@ -195,7 +196,7 @@ export function MyQueuesPage() {
                     ?.queueName ?? 'File #' + String(item.queueId);
                 return (
                   <div className="table-actions responsive-table-actions">
-                    <button
+                    <Button variant="unstyled"
                       className="button button-small"
                       type="button"
                       title={__t('queues.myQueues.consulter')}
@@ -204,7 +205,7 @@ export function MyQueuesPage() {
                       }}
                     >
                       <Eye aria-hidden="true" /> {__t('queues.myQueues.consulter')}
-                    </button>
+                    </Button>
                     <PersonNotesButton
                       noteCount={noteCount}
                       onClick={() => {

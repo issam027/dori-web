@@ -20,6 +20,7 @@ import {
   transitionNotificationWizard,
   type NotificationWizardStep,
 } from './notification-wizard-machine';
+import { Button } from '@/design-system/components/Button';
 
 const stepNumber: Record<NotificationWizardStep, number> = {
   audience: 1,
@@ -94,7 +95,7 @@ export function ManualNotificationWizard({
       actions={
         <>
           {step !== 'audience' ? (
-            <button
+            <Button variant="unstyled"
               type="button"
               className="button"
               onClick={() => {
@@ -103,10 +104,10 @@ export function ManualNotificationWizard({
             >
               <ArrowLeft aria-hidden="true" />
               <span className="button-label">{t('common.previous')}</span>
-            </button>
+            </Button>
           ) : null}
           {step !== 'content' ? (
-            <button
+            <Button variant="unstyled"
               type="button"
               className="button button-primary"
               disabled={nextDisabled}
@@ -116,9 +117,9 @@ export function ManualNotificationWizard({
             >
               <span className="button-label">{t('common.next')}</span>
               <ArrowRight aria-hidden="true" />
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button variant="unstyled"
               type="button"
               className="button button-primary"
               disabled={!canSend}
@@ -133,7 +134,7 @@ export function ManualNotificationWizard({
                   ? t('supervision.notifications.envoiEnCours')
                   : t('supervision.notifications.envoyerLaNotification')}
               </span>
-            </button>
+            </Button>
           )}
         </>
       }
@@ -228,7 +229,7 @@ function NotificationAudienceStep({
       </label>
       <div className="picker-list">
         {persons.map((item) => (
-          <button
+          <Button variant="unstyled"
             type="button"
             className={
               person?.personId === item.personId ? 'picker-option selected' : 'picker-option'
@@ -242,7 +243,7 @@ function NotificationAudienceStep({
               {item.firstName} {item.lastName}
             </strong>
             <span>{maskRecipient(item.phoneNumber ?? item.email)}</span>
-          </button>
+          </Button>
         ))}
       </div>
       {totalPages > 1 ? (
@@ -283,7 +284,7 @@ function NotificationRegistrationStep({
       </Card>
       <div className="picker-list">
         {registrations.map((item) => (
-          <button
+          <Button variant="unstyled"
             type="button"
             className={
               registration?.registrationId === item.registrationId
@@ -305,7 +306,7 @@ function NotificationRegistrationStep({
               )}{' '}
               · {t(`common.${item.status}`, { defaultValue: item.status })}
             </span>
-          </button>
+          </Button>
         ))}
       </div>
       {loaded && registrations.length === 0 ? (

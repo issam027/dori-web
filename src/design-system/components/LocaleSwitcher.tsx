@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
+import { Button } from '@/design-system/components/Button';
 
 const locales = ['fr', 'en', 'ar'] as const;
 
@@ -110,7 +111,7 @@ export function LocaleSwitcher() {
 
   return (
     <div className="locale-switcher" ref={rootRef}>
-      <button
+      <Button variant="unstyled"
         className="locale-switcher-trigger"
         type="button"
         aria-label={`${t('locale.label')}: ${t(`locale.${activeLocale}`)}`}
@@ -122,11 +123,11 @@ export function LocaleSwitcher() {
         }}
       >
         <CountryFlag locale={activeLocale} />
-      </button>
+      </Button>
       {open ? (
         <div className="locale-switcher-menu" role="listbox" aria-label={t('locale.label')}>
           {locales.map((code) => (
-            <button
+            <Button variant="unstyled"
               key={code}
               className="locale-switcher-option"
               type="button"
@@ -140,7 +141,7 @@ export function LocaleSwitcher() {
               }}
             >
               <CountryFlag locale={code} />
-            </button>
+            </Button>
           ))}
         </div>
       ) : null}

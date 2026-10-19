@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Printer } from 'lucide-react';
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
+import { Button } from '@/design-system/components/Button';
 
 export function Receipt80mm({
   call,
@@ -30,7 +31,7 @@ export function Receipt80mm({
         </div>
       </dl>
       <small>{__t('queue-operations.receipt80mm.documentNonFiscalDonneesConfirmeesParLeSe')}</small>
-      <button
+      <Button variant="unstyled"
         className="button print-hidden"
         type="button"
         onClick={() => {
@@ -39,7 +40,7 @@ export function Receipt80mm({
       >
         <Printer aria-hidden="true" />
         {__t('queue-operations.receipt80mm.imprimer')}
-      </button>
+      </Button>
     </article>
   );
 }

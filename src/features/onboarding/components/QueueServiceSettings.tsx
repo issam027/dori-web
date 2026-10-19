@@ -22,6 +22,7 @@ import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { queryKeys } from '@/api/client/query-keys';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { Button } from '@/design-system/components/Button';
 
 export function QueueServiceSettings({
   queues,
@@ -218,7 +219,7 @@ function TierConfigurationCard({
     <article
       className={`station tier-config-card ${association?.isActive ? 'selected is-selected' : ''}`}
     >
-      <button
+      <Button variant="unstyled"
         type="button"
         className="tier-choice tier-choice-toggle"
         aria-pressed={Boolean(association?.isActive)}
@@ -254,7 +255,7 @@ function TierConfigurationCard({
           <strong>{tier.tierName}</strong>
           <small>{tier.description || tier.tierCode}</small>
         </span>
-      </button>
+      </Button>
       {association?.isActive ? (
         <div className="tier-inline-config">
           <div className="tier-config-grid">
@@ -378,14 +379,14 @@ function TierConfigurationCard({
               <span>{t('onboarding.trackingLink')}</span>
             </label>
           </fieldset>
-          <button
+          <Button variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={pending}
             onClick={() => void save()}
           >
             <Save /> {t('common.save')}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="tier-disabled-hint">

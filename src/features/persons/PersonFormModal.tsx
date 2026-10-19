@@ -6,6 +6,7 @@ import { InternationalPhoneInput } from '@/design-system/components/Internationa
 import { Modal } from '@/design-system/components/Modal';
 import { isValidPersonIdentity } from './person-validation';
 import { normalizePersonText } from './person-display';
+import { Button } from '@/design-system/components/Button';
 
 interface PersonForm {
   firstName: string;
@@ -73,7 +74,7 @@ export function PersonFormModal({
       title={t(person ? 'persons.admin.editTitle' : 'persons.admin.createTitle')}
       description={t(person ? 'persons.admin.editDescription' : 'persons.admin.createDescription')}
       actions={
-        <button
+        <Button variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={!valid || pending}
@@ -91,7 +92,7 @@ export function PersonFormModal({
         >
           <Save aria-hidden="true" />
           {pending ? t('common.saving') : t('common.save')}
-        </button>
+        </Button>
       }
     >
       <div className="translation-modal-intro">

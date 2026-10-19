@@ -12,6 +12,7 @@ import { AppErrorBoundary } from '@/app/AppErrorBoundary';
 import { useActiveSite, useSite } from '@/features/portfolio/hooks/useSites';
 import { routeRequiresActiveSite } from './site-context-rules';
 import { storageKeys } from '@/core/storage/storage-keys';
+import { Button } from '@/design-system/components/Button';
 
 const sidebarPreferenceKey = storageKeys.session.sidebarCollapsed;
 
@@ -93,7 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         }}
       />
       {mobileNavigationOpen ? (
-        <button
+        <Button variant="unstyled"
           className="sidebar-backdrop"
           type="button"
           aria-label={__t('common.fermerLeMenu')}

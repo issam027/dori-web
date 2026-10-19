@@ -5,6 +5,7 @@ import { ClipboardPenLine, Monitor } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearSession } from '@/core/auth/session-actions';
 import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
+import { Button } from '@/design-system/components/Button';
 
 export function DeviceModePage() {
   const { t: __t } = useTranslation();
@@ -48,7 +49,7 @@ export function DeviceModePage() {
       </div>
       <div className="device-mode-footer">
         <p className="device-mode-hint">{__t('deviceMode.fullscreenTip')}</p>
-        <button
+        <Button variant="unstyled"
           className="button"
           type="button"
           disabled={disconnecting}
@@ -62,7 +63,7 @@ export function DeviceModePage() {
           {disconnecting
             ? __t('public-experiences.deviceMode.deconnexion')
             : __t('public-experiences.deviceMode.deconnecterCetAppareil')}
-        </button>
+        </Button>
       </div>
     </section>
   );

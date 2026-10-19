@@ -10,6 +10,7 @@ import type {
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { useRegistration } from '../hooks/useQueueOperations';
+import { Button } from '@/design-system/components/Button';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {
   const { t } = useTranslation();
@@ -94,25 +95,25 @@ export function ActiveCallCard({
             </dl>
           ) : null}
           <div className="active-call-primary-actions">
-            <button
+            <Button variant="unstyled" type="submit"
               className="button button-primary active-call-action"
               disabled={pending}
               onClick={onServed}
             >
               <Check aria-hidden="true" />
               {t('common.servi')}
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled" type="submit"
               className="button button-danger active-call-action"
               disabled={pending}
               onClick={onNoShow}
             >
               <UserX aria-hidden="true" />
               {t('common.absent')}
-            </button>
+            </Button>
           </div>
           {onNotes ? (
-            <button className="button active-call-notes" type="button" onClick={onNotes}>
+            <Button variant="unstyled" className="button active-call-notes" type="button" onClick={onNotes}>
               <StickyNote aria-hidden="true" />
               {t('queue-operations.desk.consulterLesNotes')}
               <span
@@ -121,7 +122,7 @@ export function ActiveCallCard({
               >
                 {noteCount}
               </span>
-            </button>
+            </Button>
           ) : null}
         </div>
       ) : (
@@ -196,20 +197,20 @@ export function QueueDeskCard({
         />
       ) : session ? (
         <>
-          <button className="button" disabled={pending} onClick={onRelease}>
+          <Button variant="unstyled" type="submit" className="button" disabled={pending} onClick={onRelease}>
             {t('queue-operations.desk.liberer')}
-          </button>
-          <button className="button button-primary" disabled={!active || pending} onClick={onCallNext}>
+          </Button>
+          <Button variant="unstyled" type="submit" className="button button-primary" disabled={!active || pending} onClick={onCallNext}>
             <PhoneCall aria-hidden="true" />
             <span className="button-label">{t('queue-operations.desk.appelerLeSuivant')}</span>
-          </button>
+          </Button>
         </>
       ) : (
-        <button className="button" disabled={pending} onClick={onOccupy}>
+        <Button variant="unstyled" type="submit" className="button" disabled={pending} onClick={onOccupy}>
           {occupied
             ? t('queue-operations.desk.reprendreLeGuichet')
             : t('queue-operations.desk.occuperLeGuichet')}
-        </button>
+        </Button>
       )}
     </Card>
   );
@@ -277,7 +278,7 @@ function QueueActiveCall({
         </dl>
       ) : null}
       <div className="queue-card-call-actions">
-        <button
+        <Button variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={pending}
@@ -287,8 +288,8 @@ function QueueActiveCall({
         >
           <Check aria-hidden="true" />
           <span className="button-label">{t('common.servi')}</span>
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled"
           className="button button-danger"
           type="button"
           disabled={pending}
@@ -298,9 +299,9 @@ function QueueActiveCall({
         >
           <UserX aria-hidden="true" />
           <span className="button-label">{t('common.absent')}</span>
-        </button>
+        </Button>
         {personId ? (
-          <button
+          <Button variant="unstyled"
             className="button"
             type="button"
             aria-label={t('persons.notes.count', { count: noteCount })}
@@ -311,7 +312,7 @@ function QueueActiveCall({
             <StickyNote aria-hidden="true" />
             <span className="button-label">{t('queue-operations.desk.consulterLesNotes')}</span>
             <span className="note-count">{noteCount}</span>
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>
