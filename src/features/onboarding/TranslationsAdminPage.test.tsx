@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TranslationsAdminPage } from './TranslationsAdminPage';
 
-const findTranslations = vi.fn();
+const findTranslations = vi.fn<(...args: unknown[]) => unknown>();
 
 vi.mock('./api/onboarding-api', () => ({
-  findTranslations: (...args: unknown[]) => findTranslations(...args) as never,
+  findTranslations: (...args: unknown[]) => findTranslations(...args),
   createTranslation: vi.fn(),
   deleteTranslation: vi.fn(),
   updateTranslation: vi.fn(),

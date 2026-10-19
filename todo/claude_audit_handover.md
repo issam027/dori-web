@@ -29,13 +29,13 @@ Dorify possède une fondation saine : typage strict, découpage par fonctionnali
 | REU-01 | Réutilisation | 🟠 Majeur | 8 tableaux métier contournent `DataTable`. | `src/design-system/components/DataTable.tsx:10-47`; `src/features/onboarding/UsersAdminPage.tsx:216-217`; `src/features/onboarding/TranslationsAdminPage.tsx:256-257`; `src/features/persons/PersonsPage.tsx:211-212`; `src/features/onboarding/components/SettingsWorkspace.tsx:190,333`; `src/features/onboarding/components/OnboardingWizard.tsx:656`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:463`; `src/features/health/HealthPage.tsx:137` | Étendre `DataTable` (actions, responsive, états) puis migrer les listes administratives en premier. | L | [ ] À faire |
 | REU-02 | Réutilisation | 🟠 Majeur | Les cinq recherches utilisent `useDebouncedFilter` avec leurs délais/seuils historiques et une preuve d'intégration par écran. | `src/shared/forms/useDebouncedFilter.ts`; `src/features/onboarding/UsersAdminPage.tsx`; `src/features/onboarding/TranslationsAdminPage.tsx`; `src/features/queue-operations/MyQueuesPage.tsx`; `src/features/users/UserAssignmentModal.tsx`; `src/features/users/QueueOperatorsModal.tsx` | Correctif livré ; conserver les options explicites et les tests de rafale. | M | [x] Terminé — preuve 9.10 |
 | REU-03 | Réutilisation | 🟡 Mineur | Aucun `Button` partagé malgré 201 `<button>` applicatifs et plusieurs conventions de classes. | `src/design-system/components/Modal.tsx:40-49,79-86`; `src/features/users/QueueOperatorsModal.tsx:89-104`; `src/app/layouts/Topbar.tsx:63-133` | Créer un `Button` polymorphe (variant, size, pending, icon, label) et migrer progressivement. | L | [ ] À faire |
-| REU-04 | Réutilisation | 🟡 Mineur | API partagée morte ou sous-utilisée : `FilterDrawer` 0 usage ; 4 inputs spécialisés 0 usage ; `EntityPicker` 1 usage. | `src/design-system/components/FilterDrawer.tsx:5-34`; `src/design-system/components/FormField.tsx:96-141`; `src/design-system/components/EntityPicker.tsx:3-39` | Supprimer les exports morts ou les adopter avec tests et documentation d'usage. | S | [ ] À faire |
+| REU-04 | Réutilisation | 🟡 Mineur | Les APIs partagées mortes ont été supprimées ; `RequiredMark` est interne et `EntityPicker`, réellement utilisé, possède désormais un test dédié. | `src/design-system/components/FormField.tsx`; `src/design-system/components/EntityPicker.tsx`; `src/design-system/components/EntityPicker.test.tsx` | Correctif livré ; éviter les exports anticipés sans consommateur réel. | S | [x] Terminé — preuve 9.12 |
 | REU-05 | Design | 🟠 Majeur | 262 lignes contenant une couleur hexadécimale hors `tokens.css`, plus 1 091 lignes CSS contenant une valeur en px et 72 media queries. | `src/design-system/styles/tokens.css:3-43`; `src/design-system/styles/layouts/shell.css:4-26,68-86,309-321`; `src/design-system/styles/print/documents.css:22-36` | Introduire tokens couleur/rayon/espace/breakpoint ; exclure explicitement les contraintes physiques d'impression (`mm`, `pt`). | L | [ ] À faire |
 | REU-06 | Granularité | 🟠 Majeur | Plusieurs composants mêlent requêtes, mutations, état et rendu sur 400 à 1 100 lignes. | `src/features/onboarding/components/OnboardingWizard.tsx:1-1100`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:1-767`; `src/features/appointments/AppointmentActionDialog.tsx:1-551`; `src/features/onboarding/TranslationsAdminPage.tsx:1-513`; `src/features/appointments/AppointmentsPage.tsx:1-483`; `src/features/queue-operations/QuickRegistration.tsx:1-459` | Extraire hooks de contrôleur, sections visuelles et schémas/formateurs ; conserver un orchestrateur mince. | L | [ ] À faire |
 | ARC-01 | Architecture | 🟠 Majeur | Des DTO de rapport étaient recopiés hors du client généré ; ils sont désormais des view models alimentés par un mappeur typé depuis le modèle Orval. | `src/features/supervision/report-utils.ts:1-21`; `src/features/supervision/hooks/useReports.ts:5-6,82-105`; `tools/phase11-audit.mjs:42-46` | Correctif livré ; conserver la frontière API → view model et ses tests. | M | [x] Terminé |
 | ARC-02 | Architecture | 🟡 Mineur | Toutes les query keys applicatives sont désormais produites par le catalogue centralisé, avec formes historiques caractérisées. | `src/api/client/query-keys.ts`; `src/api/client/query-keys.test.ts`; `src/features/users/QueueOperatorsModal.test.tsx` | Correctif livré ; conserver l'audit des clés littérales et les tests d'invalidation. | S | [x] Terminé — preuve 9.11 |
 | QUA-01 | Qualité | 🟠 Majeur | Le `console.warn` de production a été remplacé par un reporter injectable, avec événement navigateur contrôlé par défaut. | `src/core/i18n/remote.ts:17-53,114-122`; `src/core/i18n/i18n.test.ts:128-168`; `tools/phase11-audit.mjs:52-55` | Correctif livré ; brancher le reporter sur la future télémétrie de production. | S | [x] Terminé |
-| QUA-02 | Typage | 🟡 Mineur | Trois assertions `as never` masquent la relation clé/valeur d'éditeurs. | `src/features/queues/QueueEditor.tsx:38-39`; `src/features/onboarding/components/SiteEditor.tsx:71` | Typer les setters par clé (`K extends keyof T`, `T[K]`) ou séparer setters numériques. | S | [ ] À faire |
+| QUA-02 | Typage | 🟡 Mineur | Les setters numériques des deux éditeurs sont désormais typés par groupes de clés ; aucun `as never` ne subsiste dans `src/`. | `src/features/queues/QueueEditor.tsx`; `src/features/onboarding/components/SiteEditor.tsx`; tests de caractérisation associés | Correctif livré ; conserver les unions de clés alignées sur les champs numériques. | S | [x] Terminé — preuve 9.13 |
 | SEC-01 | Session | 🟡 Mineur | L'expiration efface tout le stockage de l'origine, pas uniquement les clés Dorify. | `src/core/auth/session-actions.ts:64-73`; `src/core/scope/scope-store.ts:12-13,38-40` | Supprimer seulement les clés possédées ; préserver préférences non sensibles et intégrations partageant l'origine. | S | [ ] À faire |
 | SEC-02 | CSP | 🔵 Amélioration | La CSP autorise encore `style-src 'unsafe-inline'`. | `vite.config.ts:35-46` | Évaluer nonce/hash ou extraction complète des styles inline avant retrait. | M | [ ] À faire |
 | A11Y-01 | Accessibilité | 🟡 Mineur | Le serveur E2E est fiable, les 62 tests passent trois fois consécutivement et axe est vert sur quatre thèmes. | `playwright.config.ts`; `e2e/global-setup.ts`; `e2e/support/scenario-fixtures.ts`; `e2e/visual-layout.spec.ts`; `e2e/walkin.spec.ts` | Correctif livré ; conserver le cycle de vie Playwright, les assertions et l'audit axe. | M | [x] Terminé — preuve 9.9 |
@@ -61,7 +61,7 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 4. **Partagés à usage unique** : `FilterDrawer` est mort ; `EntityPicker` n'a qu'un consommateur. `NotificationCenter` n'est pas un faux partagé : son usage unique à la racine est attendu (`src/design-system/components/NotificationCenter.tsx:84-98`; `src/app/AppProviders.tsx:1-31`).
 5. **Styles/tokens** : 262 lignes hex hors tokens, 1 091 lignes avec `px`, 72 media queries. Les tokens existants couvrent couleurs, une ombre, un rayon et espacements (`src/design-system/styles/tokens.css:3-43`) mais sont insuffisants face à `shell.css:4-26,84-86,309-321`. Les styles d'impression ont des contraintes légitimes distinctes (`print/documents.css:22-68`).
 6. **Logique dupliquée** : temporisation/seuil de recherche dans cinq fichiers (REU-02). Les formateurs de date sont bien centralisés (`src/shared/date/formatters.ts:1-25`), mais les query keys ne le sont pas toutes (ARC-02).
-7. **Types/schémas** : quatre interfaces `Report*Dto` recopiaient le contrat API ; ARC-01 les a remplacées par des view models et un mappeur Orval explicite (`report-utils.ts:1-21`). Aucun `any` applicatif ni `@ts-ignore` trouvé ; trois `as never` restent (QUA-02).
+7. **Types/schémas** : quatre interfaces `Report*Dto` recopiaient le contrat API ; ARC-01 les a remplacées par des view models et un mappeur Orval explicite (`report-utils.ts:1-21`). Aucun `any` applicatif, `@ts-ignore` ou `as never` ne subsiste hors code généré après QUA-02.
 8. **Textes/constantes** : l'audit i18n réussit ; les constantes de pagination restent répétées (`UsersAdminPage.tsx:41`, `TranslationsAdminPage.tsx:25`) mais sont locales et explicites. Les seuils de recherche 3/4 et délais 300/350 ms divergent (`UsersAdminPage.tsx:66-72`; `UserAssignmentModal.tsx:49-53`) et doivent devenir des options nommées.
 9. **Granularité** : six fichiers dépassent 450 lignes, dont deux dépassent 750 (REU-06). Les plus gros orchestrent données, mutations et rendu ; aucun prop drilling >8 props n'a été démontré sur les composants partagés (`Modal.tsx:6-26` en expose 8).
 
@@ -147,6 +147,8 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 | 2026-10-19 | Codex | REU-02 partiel : hook temporisé mutualisé dans les cinq écrans, lint et régressions verts ; quatre tests d'intégration par écran restent requis avant clôture, preuve en 9.10. |
 | 2026-10-19 | Codex | REU-02 terminé : quatre tests d'intégration ajoutés, cinq écrans protégés contre les requêtes multiples pendant une rafale, trois passes ciblées vertes et contrôles globaux réussis ; preuve finale en 9.10. |
 | 2026-10-19 | Codex | ARC-02 terminé : toutes les query keys littérales restantes ont rejoint le catalogue sans changement de tuple ; tests de formes et d'invalidation ajoutés, preuve en 9.11. |
+| 2026-10-19 | Codex | REU-04 terminé : `FilterDrawer` et quatre inputs inutilisés supprimés, `RequiredMark` rendu interne, `EntityPicker` conservé avec test ; preuve en 9.12. |
+| 2026-10-19 | Codex | QUA-02 terminé : setters numériques typés dans les éditeurs, fixtures historiques assainies et tests de caractérisation ajoutés ; preuve en 9.13. |
 ## 9. Protocole de non-régression et conditions de sortie
 
 Cette section complète les sections 6 et 7. Une action n'est cochée `[x] Terminé` que si TOUS ses critères de sortie (9.3) ET la définition de terminé commune (9.2) sont satisfaits, avec preuve notée (9.5). Un critère non satisfait = statut inchangé, jamais de coche "presque".
@@ -269,9 +271,9 @@ En cas d'échec d'un critère : ne pas cocher, corriger ou `git revert` le commi
 - **Avant** : tests de caractérisation des éditeurs (`src/features/queues/QueueEditor.tsx:38-39`, `src/features/onboarding/components/SiteEditor.tsx:71`) : modifier un champ texte et un champ numérique met à jour le bon état.
 - **Faire** : typer les setters par clé (`K extends keyof T`, valeur `T[K]`) ou séparer les setters numériques.
 - **Sortie** :
-  - [ ] Plus aucun `as never` dans `src/` (recherche reproductible).
-  - [ ] Aucun `any`, `@ts-ignore` ni `@ts-expect-error` ajouté ; typecheck strict vert.
-  - [ ] Tests de caractérisation inchangés et verts.
+  - [x] Plus aucun `as never` dans `src/` (recherche reproductible).
+  - [x] Aucun `any`, `@ts-ignore` ni `@ts-expect-error` ajouté ; typecheck strict vert.
+  - [x] Tests de caractérisation inchangés et verts.
 
 #### SEC-01 : effacement du stockage à l'expiration de session
 - **Avant** : inventorier toutes les clés possédées par Dorify (localStorage et sessionStorage), dont celles de `src/core/scope/scope-store.ts:12-13,38-40` et `src/core/auth/session-actions.ts:64-73`.
@@ -450,6 +452,33 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 - **Écart** : aucun commit créé dans le worktree partagé.
 - **Statut** : [x] Terminé.
 
+### 9.12 Preuve REU-04
+
+- **ID** : REU-04
+- **Date** : 2026-10-19
+- **Inventaire reproductible** : recherche des définitions, imports, usages JSX, barrels et tests pour `FilterDrawer`, `RequiredMark`, `PhoneInput`, `DateInput`, `TimeInput`, `CurrencyInput` et `EntityPicker`. Aucun barrel design-system n'existe ; aucun import dynamique n'a été trouvé.
+- **Décisions** : `FilterDrawer` a été supprimé car il n'avait aucun consommateur. `PhoneInput`, `DateInput`, `TimeInput` et `CurrencyInput` ont été retirés de `FormField.tsx` car ils n'étaient jamais importés et dupliquaient des contrôles natifs ou `InternationalPhoneInput`. `RequiredMark`, utilisé uniquement par `FormField`, est conservé comme fonction interne non exportée. `EntityPicker` est conservé car `PersonPickerOrCreate` l'utilise réellement.
+- **Nettoyage associé** : les règles CSS exclusivement liées à `FilterDrawer` (`filter-count`, `drawer-content`) ont été supprimées. Une recherche globale ne trouve plus aucun symbole/export mort ciblé.
+- **Tests** : nouveau test `EntityPicker` vérifiant le rôle `listbox`, les options, `aria-selected` et la sélection utilisateur. Les tests `FormField`, `EntityPicker` et `PersonPickerOrCreate` sont verts (**8/8**) ; le parcours E2E walk-in consommateur est vert (**3/3**).
+- **Commandes** : lint vert ; typecheck vert ; 57 fichiers / 188 tests verts ; build et génération Orval verts ; audits i18n et phase11 verts. Bundle : JS initial 118,97 kB gzip (stable/en baisse), CSS 34,00 kB gzip (baisse de 0,05 kB).
+- **UI/captures** : aucune UI active n'utilisait les composants/styles supprimés. `EntityPicker` n'a pas changé ; son parcours visible est couvert par les tests et l'E2E walk-in.
+- **Écart** : aucun commit créé dans le worktree partagé.
+- **Statut** : [x] Terminé.
+
+### 9.13 Preuve QUA-02
+
+- **ID** : QUA-02
+- **Date** : 2026-10-19
+- **Implémentation** : `QueueEditor` sépare les clés numériques obligatoires et optionnelles dans deux unions explicites ; `SiteEditor` limite son setter numérique aux trois réglages concernés. Les conversions conservent les comportements historiques (`Number`, valeur vide optionnelle vers `undefined`) sans assertion impossible.
+- **Caractérisation** : les nouveaux tests `QueueEditor.test.tsx` et `SiteEditor.test.tsx` modifient chacun un champ texte et un champ numérique, parcourent l'assistant puis vérifient le payload transmis. Les fixtures historiques de notification et de cartes de guichet ont également été typées sans `as never`, avec des contrats minimaux correspondant aux propriétés réellement lues.
+- **Recherche reproductible** : `rg -n "as never" src --glob '!src/api/generated/**'` ne retourne aucune occurrence. Aucun `any`, `@ts-ignore` ni `@ts-expect-error` n'a été ajouté dans les fichiers modifiés.
+- **Commandes** : lint global vert ; typecheck strict vert ; 59 fichiers / 190 tests verts ; build vert ; audits i18n et phase11 verts. Contrôle ciblé final : 4 fichiers / 6 tests verts.
+- **E2E** : `npx playwright test e2e/ergonomics-regressions.spec.ts` vert (**3/3**), dont la réouverture et modification d'une file brouillon depuis l'onboarding.
+- **Bundle** : JS initial 118,97 kB gzip et CSS 34,00 kB gzip, sans hausse par rapport à REU-04.
+- **UI/captures** : non applicables ; aucun JSX, CSS, libellé ou structure DOM n'a changé.
+- **Écart** : aucun commit créé dans le worktree partagé.
+- **Statut** : [x] Terminé.
+
 <!-- CHECKPOINT id="ckpt_mvezekch_ghscwq" time="2026-10-19T08:17:35.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvezrfb6_twt6oi" time="2026-10-19T08:27:35.106Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -495,3 +524,9 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvfep345_ueqm9o" time="2026-10-19T15:25:40.229Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvff1y2x_v4l5qs" time="2026-10-19T15:35:40.233Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvffet1t_9v2zm8" time="2026-10-19T15:45:40.241Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvffro0q_g7xm52" time="2026-10-19T15:55:40.250Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfg4izh_xkywhk" time="2026-10-19T16:05:40.254Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

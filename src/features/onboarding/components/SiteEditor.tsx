@@ -8,6 +8,10 @@ import { notify } from '@/core/notifications/notification-store';
 const time = (value?: string) => value?.slice(0, 5) ?? '';
 const optionalTime = (value?: string) => value ? value.slice(0, 5) : undefined;
 const integer = (value: number): number => Math.trunc(parseFloat(String(value)));
+type SiteNumberKey =
+  | 'defaultAppointmentSlotDuration'
+  | 'defaultSlotCapacity'
+  | 'defaultLateToleranceMinutes';
 
 function sitePayload(value: UpdateSiteDto): UpdateSiteDto {
   return {
@@ -68,7 +72,7 @@ export function SiteEditor({ open, site, onOpenChange, onSave }: {
   const [error, setError] = useState('');
   const [value, setValue] = useState<UpdateSiteDto>(() => initialValue(site));
   const field = <K extends keyof UpdateSiteDto>(key: K, next: UpdateSiteDto[K]) => { setValue((current) => ({ ...current, [key]: next })); };
-  const number = (key: keyof UpdateSiteDto, raw: string) => { field(key, Number(raw) as never); };
+  const number = (key: SiteNumberKey, raw: string) => { field(key, Number(raw)); };
   const submit = async () => {
     if (step < 3) { setStep((current) => current + 1); return; }
     setSaving(true); setError('');

@@ -5,7 +5,7 @@ import {
   transitionNotificationWizard,
 } from './notification-wizard-machine';
 
-const person = { personId: 1, phoneNumber: '+33600000000', email: 'a@b.test' } as never;
+const person = { phoneNumber: '+33600000000', email: 'a@b.test' };
 
 describe('notification wizard machine', () => {
   it('navigates forward, backward and resets without leaving its bounds', () => {
@@ -42,7 +42,7 @@ describe('notification wizard machine', () => {
       canSendManualNotification({
         hasRegistration: true,
         content: 'Message',
-        person: { personId: 2 } as never,
+        person: {},
         channel: 'email',
         pending: false,
       }),

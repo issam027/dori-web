@@ -1,5 +1,7 @@
 import type { PersonResponseDto, SendManualNotificationDtoChannel } from '@/api/generated/models';
 
+type NotificationRecipient = Pick<PersonResponseDto, 'phoneNumber' | 'email'>;
+
 export type NotificationWizardStep = 'audience' | 'registration' | 'content';
 export type NotificationWizardEvent = 'next' | 'back' | 'reset';
 
@@ -16,7 +18,7 @@ export function transitionNotificationWizard(
 }
 
 export function notificationRecipient(
-  person: PersonResponseDto | undefined,
+  person: NotificationRecipient | undefined,
   channel: SendManualNotificationDtoChannel,
 ): string | undefined {
   return channel === 'sms' ? (person?.phoneNumber ?? undefined) : (person?.email ?? undefined);
@@ -31,7 +33,7 @@ export function canSendManualNotification({
 }: {
   hasRegistration: boolean;
   content: string;
-  person: PersonResponseDto | undefined;
+  person: NotificationRecipient | undefined;
   channel: SendManualNotificationDtoChannel;
   pending: boolean;
 }): boolean {

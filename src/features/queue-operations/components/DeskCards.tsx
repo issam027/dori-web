@@ -146,8 +146,8 @@ export function QueueDeskCard({
   onFinishCall,
   onNotes,
 }: {
-  queue: QueueResponseDto;
-  session?: QueueSessionResponseDto;
+  queue: Pick<QueueResponseDto, 'queueId' | 'queueName'>;
+  session?: Pick<QueueSessionResponseDto, 'sessionId' | 'threadNumber' | 'counterName'>;
   occupied?: QueueSessionResponseDto;
   active: boolean;
   activeCall?: CallNextRegistrationResponseDto;

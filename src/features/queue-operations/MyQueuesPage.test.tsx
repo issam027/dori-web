@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MyQueuesPage } from './MyQueuesPage';
 
-const useWaitingRegistrations = vi.fn();
+const useWaitingRegistrations = vi.fn<(options: unknown) => unknown>();
 
 vi.mock('@/features/queues/hooks/useQueues', () => ({
   useQueues: () => ({
@@ -12,7 +12,7 @@ vi.mock('@/features/queues/hooks/useQueues', () => ({
 }));
 
 vi.mock('./hooks/useQueueOperations', () => ({
-  useWaitingRegistrations: (options: unknown) => useWaitingRegistrations(options) as never,
+  useWaitingRegistrations: (options: unknown) => useWaitingRegistrations(options),
 }));
 
 vi.mock('@/features/persons/PersonNotesViewer', () => ({ PersonNotesViewer: () => null }));

@@ -1,6 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
 import { ActiveCallCard, QueueDeskCard } from './DeskCards';
+
+const activeCall: CallNextRegistrationResponseDto = {
+  registrationId: 1,
+  ticketNumber: 'A001',
+  entryType: 'walkin',
+  calledEarly: false,
+  tier: {},
+  status: 'called',
+  sessionId: 4,
+  threadNumber: 2,
+  priorityScore: 0,
+  calledAt: new Date().toISOString(),
+  person: {},
+};
 
 describe('desk cockpit cards', () => {
   it('keeps served and absent as the primary active-call commands', async () => {
@@ -9,9 +24,7 @@ describe('desk cockpit cards', () => {
     const onNoShow = vi.fn();
     render(
       <ActiveCallCard
-        call={
-          { ticketNumber: 'A001', threadNumber: 2, calledAt: new Date().toISOString() } as never
-        }
+        call={activeCall}
         personName="Ada Lovelace"
         noteCount={3}
         pending={false}
@@ -32,8 +45,8 @@ describe('desk cockpit cards', () => {
     const onCallNext = vi.fn();
     const { container } = render(
       <QueueDeskCard
-        queue={{ queueId: 1, queueName: 'Accueil' } as never}
-        session={{ sessionId: 4, threadNumber: 1, counterName: 'Bureau A' } as never}
+        queue={{ queueId: 1, queueName: 'Accueil' }}
+        session={{ sessionId: 4, threadNumber: 1, counterName: 'Bureau A' }}
         active
         waitingCount={2}
         estimatedWaitMinutes={6}

@@ -177,7 +177,6 @@
   animation: overlay-reveal 0.2s ease-out;
 }
 .dialog-content,
-.drawer-content,
 .command-palette {
   position: fixed;
   z-index: 51;

@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UsersAdminPage } from './UsersAdminPage';
 
-const findUsers = vi.fn();
+const findUsers = vi.fn<(...args: unknown[]) => unknown>();
 
 vi.mock('./api/onboarding-api', () => ({
-  findUsers: (...args: unknown[]) => findUsers(...args) as never,
+  findUsers: (...args: unknown[]) => findUsers(...args),
   findUserById: vi.fn(),
   deleteUser: vi.fn(),
   logoutUserSessions: vi.fn(),

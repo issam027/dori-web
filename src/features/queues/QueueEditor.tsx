@@ -8,6 +8,15 @@ import { notify } from '@/core/notifications/notification-store';
 const defaults: CreateQueueDto = { queueCode: '', queueName: '', averageWaitTime: 10, threadCount: 1, currency: null, locale: null };
 const time = (value?: string) => value ? value.slice(0, 5) : undefined;
 type QueueEditorValue = CreateQueueDto;
+type RequiredNumberKey = 'threadCount' | 'averageWaitTime';
+type OptionalNumberKey =
+  | 'appointmentSlotDuration'
+  | 'slotCapacity'
+  | 'lateToleranceMinutes'
+  | 'baseWeightWalkin'
+  | 'baseWeightAppointment'
+  | 'escalationRateWalkin'
+  | 'escalationRateAppointment';
 const payload = (value: QueueEditorValue): CreateQueueDto => ({
   queueCode: value.queueCode.trim().toUpperCase(), queueName: value.queueName?.trim(),
   averageWaitTime: value.averageWaitTime, threadCount: value.threadCount,
@@ -35,8 +44,8 @@ export function QueueEditor({ open, onOpenChange, initial, onSave }: { open: boo
   const [error, setError] = useState('');
   const [value, setValue] = useState<QueueEditorValue>(() => initialValue(initial));
   const field = <K extends keyof QueueEditorValue>(key: K, next: QueueEditorValue[K]) => { setValue((current) => ({ ...current, [key]: next })); };
-  const number = (key: keyof QueueEditorValue, raw: string) => { field(key, Number(raw) as never); };
-  const optionalNumber = (key: keyof QueueEditorValue, raw: string) => { field(key, (raw === '' ? undefined : Number(raw)) as never); };
+  const number = (key: RequiredNumberKey, raw: string) => { field(key, Number(raw)); };
+  const optionalNumber = (key: OptionalNumberKey, raw: string) => { field(key, raw === '' ? undefined : Number(raw)); };
   const submit = async () => {
     if (step < 3) { setStep((current) => current + 1); return; }
     setSaving(true); setError('');

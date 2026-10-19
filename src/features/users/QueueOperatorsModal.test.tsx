@@ -3,19 +3,19 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueueOperatorsModal } from './QueueOperatorsModal';
 
-const findUsers = vi.fn();
-const assignOperator = vi.fn();
-const getOperators = vi.fn().mockResolvedValue({
+const findUsers = vi.fn<(...args: unknown[]) => unknown>();
+const assignOperator = vi.fn<(...args: unknown[]) => unknown>();
+const getOperators = vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue({
   data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] },
 });
 
 vi.mock('@/api/generated/users/users', () => ({
-  usersControllerFindUsers: (...args: unknown[]) => findUsers(...args) as never,
+  usersControllerFindUsers: (...args: unknown[]) => findUsers(...args),
 }));
 
 vi.mock('@/api/generated/queues/queues', () => ({
-  queuesControllerGetOperators: (...args: unknown[]) => getOperators(...args) as never,
-  queuesControllerAssignOperator: (...args: unknown[]) => assignOperator(...args) as never,
+  queuesControllerGetOperators: (...args: unknown[]) => getOperators(...args),
+  queuesControllerAssignOperator: (...args: unknown[]) => assignOperator(...args),
   queuesControllerRemoveOperator: vi.fn(),
 }));
 
