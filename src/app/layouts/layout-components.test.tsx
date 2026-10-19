@@ -72,7 +72,9 @@ describe('application layout', () => {
       </Modal>,
     );
     expect(screen.getByRole('dialog', { name: 'Confirmation' })).toBeVisible();
-    await userEvent.click(screen.getByRole('button', { name: /annuler|cancel|common.cancel/i }));
+    const dismiss = screen.getByRole('button', { name: /annuler|cancel|common.cancel/i });
+    expect(dismiss).toHaveClass('button');
+    await userEvent.click(dismiss);
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
@@ -90,7 +92,9 @@ describe('application layout', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Terminer' })).toBeVisible();
-    expect(screen.queryByRole('button', { name: /annuler|cancel|common.cancel/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /annuler|cancel|common.cancel/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('groups profile, language and logout in the compact account menu', async () => {
@@ -112,6 +116,8 @@ describe('application layout', () => {
 
     const compactAccount = document.querySelector('.mobile-account-trigger');
     expect(compactAccount).toBeInTheDocument();
+    expect(compactAccount).toHaveClass('topbar-icon-button', 'mobile-account-trigger');
+    expect(compactAccount).not.toHaveClass('button');
     await userEvent.click(compactAccount as HTMLElement);
     const menu = screen.getByRole('menu');
     expect(menu).toHaveTextContent(/mon profil/i);

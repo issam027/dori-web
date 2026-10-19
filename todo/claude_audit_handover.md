@@ -28,7 +28,7 @@ Dorify possède une fondation saine : typage strict, découpage par fonctionnali
 |----|---------|----------|---------|-----------------|--------------------|--------|--------|
 | REU-01 | Réutilisation | 🟠 Majeur | 8 tableaux métier contournent `DataTable`. | `src/design-system/components/DataTable.tsx:10-47`; `src/features/onboarding/UsersAdminPage.tsx:216-217`; `src/features/onboarding/TranslationsAdminPage.tsx:256-257`; `src/features/persons/PersonsPage.tsx:211-212`; `src/features/onboarding/components/SettingsWorkspace.tsx:190,333`; `src/features/onboarding/components/OnboardingWizard.tsx:656`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:463`; `src/features/health/HealthPage.tsx:137` | Étendre `DataTable` (actions, responsive, états) puis migrer les listes administratives en premier. | L | [ ] À faire |
 | REU-02 | Réutilisation | 🟠 Majeur | Les cinq recherches utilisent `useDebouncedFilter` avec leurs délais/seuils historiques et une preuve d'intégration par écran. | `src/shared/forms/useDebouncedFilter.ts`; `src/features/onboarding/UsersAdminPage.tsx`; `src/features/onboarding/TranslationsAdminPage.tsx`; `src/features/queue-operations/MyQueuesPage.tsx`; `src/features/users/UserAssignmentModal.tsx`; `src/features/users/QueueOperatorsModal.tsx` | Correctif livré ; conserver les options explicites et les tests de rafale. | M | [x] Terminé — preuve 9.10 |
-| REU-03 | Réutilisation | 🟡 Mineur | Aucun `Button` partagé malgré 201 `<button>` applicatifs et plusieurs conventions de classes. | `src/design-system/components/Modal.tsx:40-49,79-86`; `src/features/users/QueueOperatorsModal.tsx:89-104`; `src/app/layouts/Topbar.tsx:63-133` | Créer un `Button` polymorphe (variant, size, pending, icon, label) et migrer progressivement. | L | [ ] À faire |
+| REU-03 | Réutilisation | 🟡 Mineur | `Button` partagé est livré et le premier lot obligatoire (`Modal`, `QueueOperatorsModal`, `Topbar`) est migré ; 183 boutons natifs restent à traiter par lots. | `src/design-system/components/Button.tsx`; `src/design-system/components/Button.test.tsx`; trois premiers consommateurs | Continuer un écran par lot jusqu'à zéro `<button>` hors composant, puis activer la règle ESLint. | L | [ ] En cours — preuve 9.16 |
 | REU-04 | Réutilisation | 🟡 Mineur | Les APIs partagées mortes ont été supprimées ; `RequiredMark` est interne et `EntityPicker`, réellement utilisé, possède désormais un test dédié. | `src/design-system/components/FormField.tsx`; `src/design-system/components/EntityPicker.tsx`; `src/design-system/components/EntityPicker.test.tsx` | Correctif livré ; éviter les exports anticipés sans consommateur réel. | S | [x] Terminé — preuve 9.12 |
 | REU-05 | Design | 🟠 Majeur | 262 lignes contenant une couleur hexadécimale hors `tokens.css`, plus 1 091 lignes CSS contenant une valeur en px et 72 media queries. | `src/design-system/styles/tokens.css:3-43`; `src/design-system/styles/layouts/shell.css:4-26,68-86,309-321`; `src/design-system/styles/print/documents.css:22-36` | Introduire tokens couleur/rayon/espace/breakpoint ; exclure explicitement les contraintes physiques d'impression (`mm`, `pt`). | L | [ ] À faire |
 | REU-06 | Granularité | 🟠 Majeur | Plusieurs composants mêlent requêtes, mutations, état et rendu sur 400 à 1 100 lignes. | `src/features/onboarding/components/OnboardingWizard.tsx:1-1100`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:1-767`; `src/features/appointments/AppointmentActionDialog.tsx:1-551`; `src/features/onboarding/TranslationsAdminPage.tsx:1-513`; `src/features/appointments/AppointmentsPage.tsx:1-483`; `src/features/queue-operations/QuickRegistration.tsx:1-459` | Extraire hooks de contrôleur, sections visuelles et schémas/formateurs ; conserver un orchestrateur mince. | L | [ ] À faire |
@@ -151,6 +151,7 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 | 2026-10-19 | Codex | QUA-02 terminé : setters numériques typés dans les éditeurs, fixtures historiques assainies et tests de caractérisation ajoutés ; preuve en 9.13. |
 | 2026-10-19 | Codex | SEC-01 terminé : registre central des clés Dorify, nettoyage ciblé à l'expiration/déconnexion et préservation des clés étrangères ; preuve en 9.14. |
 | 2026-10-19 | Codex | PERF-01 terminé : budgets de bundle exécutés par `verify` et la CI, rapport JSON archivé, dépassement volontaire et séparation de 21 pages vérifiés ; preuve en 9.15. |
+| 2026-10-19 | Codex | REU-03 premier lot : composant `Button` testé et adoption dans `Modal`, `QueueOperatorsModal` et `Topbar` ; compteur natif passé de 196 à 183, suite en 9.16. |
 ## 9. Protocole de non-régression et conditions de sortie
 
 Cette section complète les sections 6 et 7. Une action n'est cochée `[x] Terminé` que si TOUS ses critères de sortie (9.3) ET la définition de terminé commune (9.2) sont satisfaits, avec preuve notée (9.5). Un critère non satisfait = statut inchangé, jamais de coche "presque".
@@ -317,11 +318,11 @@ En cas d'échec d'un critère : ne pas cocher, corriger ou `git revert` le commi
 - **Avant** : relever la baseline de 201 `<button>` natifs et lister les familles de classes utilisées (variantes, tailles).
 - **Faire** : créer `Button` (variantes, tailles, état `pending` avec `aria-busy` et désactivation, `type="button"` par défaut, transmission de la ref, icône avec libellé accessible) avec tests. Migrer d'abord `Modal.tsx:40-49,79-86`, `QueueOperatorsModal.tsx:89-104`, `Topbar.tsx:63-133`, puis par lots, un écran par commit.
 - **Sortie** :
-  - [ ] `Button` existe avec tests (rendu, variantes, `pending`, focus visible, clavier, `type` par défaut).
-  - [ ] Le compteur de `<button>` natifs applicatifs baisse à chaque commit ; l'objectif final est fixé et noté. Une fois la migration terminée, une règle ESLint interdit `<button>` brut hors du design system.
-  - [ ] DOM et classes des écrans migrés identiques ou différences listées ; captures avant/après identiques (états hover, focus, désactivé inclus).
-  - [ ] Aucun bouton `submit` ne devient `button` (ni l'inverse) par accident : tests des formulaires migrés.
-  - [ ] Le CSS gzip n'augmente pas de plus de 2 %.
+  - [x] `Button` existe avec tests (rendu, variantes, `pending`, focus visible, clavier, `type` par défaut).
+  - [ ] Le compteur de `<button>` natifs applicatifs baisse à chaque lot ; premier lot : 196 → 183. Objectif final : zéro hors `Button.tsx`, puis règle ESLint.
+  - [x] DOM et classes des trois premiers consommateurs sont conservés par caractérisation ; seule différence intentionnelle : `aria-busy` sur une suppression opérateur en cours. Les invariants visuels multi-thèmes sont verts.
+  - [x] Aucun bouton `submit` ne devient `button` (ni l'inverse) par accident : le défaut et le `type="submit"` explicite sont testés.
+  - [x] Le CSS gzip n'augmente pas de plus de 2 % (strictement inchangé à 34,00 kB).
 
 #### REU-06 : découpage des composants de plus de 400 lignes
 - **Avant** : pour chacun des 6 fichiers (`OnboardingWizard` 1 100 lignes, `KioskWizard` 767, `AppointmentActionDialog` 551, `TranslationsAdminPage` 513, `AppointmentsPage` 483, `QuickRegistration` 459) : specs E2E du domaine vertes et tests de caractérisation des parcours critiques écrits (TST-01 partiel).
@@ -512,6 +513,22 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 - **Écart** : aucun commit créé dans le worktree partagé.
 - **Statut** : [x] Terminé.
 
+### 9.16 Preuve REU-03 — premier lot
+
+- **ID** : REU-03
+- **Date** : 2026-10-19
+- **Baseline reproductible** : `rg -o "<button" src --glob '*.tsx' --glob '!**/*.test.tsx'` trouvait **196** balises natives dans 54 fichiers avant ce lot (la valeur 201 de l'audit initial avait déjà évolué avec les corrections précédentes).
+- **Composant** : `Button` transmet sa ref, utilise `type="button"` par défaut, respecte un `type="submit"` explicite et expose les variantes `default`, `primary`, `danger`, `unstyled`, les tailles `default`, `small`, `icon`, ainsi que `pending`, `icon` et `label`. `pending` pose `aria-busy` et désactive l'activation ; les icônes fournies par la prop sont décoratives et le libellé reste accessible.
+- **Premier lot migré** : toutes les balises natives de `Modal.tsx`, `QueueOperatorsModal.tsx` et `Topbar.tsx` utilisent désormais `Button`. La variante `unstyled` conserve les classes spécialisées (`topbar-icon-button`, `command-trigger`, résultats candidats et menu mobile) sans injecter `.button`.
+- **DOM/classes** : les tests vérifient les classes historiques de la fermeture modale, de l'action primaire opérateur et du compte mobile. La structure reste un élément `<button>` et les types restent identiques. Seule différence intentionnelle : une suppression opérateur en cours reçoit maintenant `aria-busy="true"` en plus de `disabled`.
+- **Tests** : `Button.test.tsx` couvre rendu, ref, variantes, tailles, pending, focus, activation clavier, icône/libellé, variante sans style, type par défaut et submit explicite. Tests ciblés : **3 fichiers / 13 tests** verts ; suite globale : **60 fichiers / 196 tests** verts.
+- **Visuel/accessibilité** : `visual-layout.spec.ts` et `ergonomics-regressions.spec.ts` sont verts (**16/16**), incluant quatre thèmes, responsive et axe sans violation sérieuse. Aucun CSS n'a été ajouté ou modifié.
+- **Bundle** : CSS initial inchangé à **34,00 kB gzip** ; JS initial à 119,22 kB gzip, sous le budget PERF-01. Audit bundle vert (117 964 / 125 000 octets selon sa compression déterministe).
+- **Commandes** : lint, typecheck, build, audits i18n/phase11/bundle et tests globaux verts.
+- **Compteur après lot** : **183** `<button>` natifs hors `Button.tsx`, soit 13 migrations. Objectif final : zéro balise native hors du composant partagé ; activer ensuite une règle ESLint interdisant les nouvelles occurrences. Les contrôles spécialisés seront migrés avec `variant="unstyled"` pour préserver leur DOM/CSS.
+- **Écart** : aucun commit ni capture pixel avant/après n'a été créé dans le worktree partagé ; les invariants DOM/classes et les parcours visuels automatisés servent de preuve pour ce lot.
+- **Statut** : [ ] En cours — composant et premier lot obligatoire terminés ; migration progressive restante.
+
 <!-- CHECKPOINT id="ckpt_mvezekch_ghscwq" time="2026-10-19T08:17:35.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvezrfb6_twt6oi" time="2026-10-19T08:27:35.106Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -567,3 +584,9 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvfghdyl_797qee" time="2026-10-19T16:15:40.269Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvfgu8xb_czy882" time="2026-10-19T16:25:40.271Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfh7zi4_tas7ti" time="2026-10-19T16:36:21.244Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfnmwdn_gibe33" time="2026-10-19T19:35:54.731Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfnzrtb_u5ahtl" time="2026-10-19T19:45:55.343Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

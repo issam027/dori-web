@@ -16,6 +16,7 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { queryKeys } from '@/api/client/query-keys';
+import { Button } from '@/design-system/components/Button';
 
 type View = 'assigned' | 'add';
 
@@ -48,12 +49,25 @@ export function QueueOperatorsModal({
   const operatorsKey = queryKeys.queueOperators.byQueue(queue?.queueId);
   const operators = useQuery({
     queryKey: operatorsKey,
-    queryFn: ({ signal }) => queuesControllerGetOperators(queue?.queueId ?? 0, undefined, undefined, signal),
+    queryFn: ({ signal }) =>
+      queuesControllerGetOperators(queue?.queueId ?? 0, undefined, undefined, signal),
     enabled: Boolean(queue),
   });
   const users = useQuery({
     queryKey: queryKeys.queueOperators.candidates(queue?.queueId, queue?.siteId, debounced, page),
-    queryFn: ({ signal }) => usersControllerFindUsers({ search: debounced, siteIds: String(queue?.siteId ?? 0), isActive: true, page, pageSize: 5, sort: 'username:asc' }, undefined, signal),
+    queryFn: ({ signal }) =>
+      usersControllerFindUsers(
+        {
+          search: debounced,
+          siteIds: String(queue?.siteId ?? 0),
+          isActive: true,
+          page,
+          pageSize: 5,
+          sort: 'username:asc',
+        },
+        undefined,
+        signal,
+      ),
     enabled: Boolean(queue && view === 'add' && debounced.length >= 4),
   });
   const assigned = operators.data?.data.items ?? [];
@@ -68,9 +82,17 @@ export function QueueOperatorsModal({
     try {
       await queuesControllerAssignOperator(queue.queueId, { userId: selectedUser.userId });
       await refresh();
-      notify({ tone: 'success', title: t('settings.queueOperators.assigned'), message: getUserDisplayName(selectedUser) });
+      notify({
+        tone: 'success',
+        title: t('settings.queueOperators.assigned'),
+        message: getUserDisplayName(selectedUser),
+      });
       resetAddView();
-    } catch (error) { notifyError(error); } finally { setPendingId(undefined); }
+    } catch (error) {
+      notifyError(error);
+    } finally {
+      setPendingId(undefined);
+    }
   };
   const remove = async (userId: number, username: string) => {
     if (!queue) return;
@@ -79,26 +101,151 @@ export function QueueOperatorsModal({
       await queuesControllerRemoveOperator(queue.queueId, userId);
       await refresh();
       notify({ tone: 'success', title: t('settings.queueOperators.removed'), message: username });
-    } catch (error) { notifyError(error); } finally { setPendingId(undefined); }
+    } catch (error) {
+      notifyError(error);
+    } finally {
+      setPendingId(undefined);
+    }
   };
 
-  return <Modal
-    open={Boolean(queue)}
-    onOpenChange={(open) => { if (!open && pendingId === undefined) close(); }}
-    title={view === 'assigned' ? t('settings.queueOperators.title') : t('settings.queueOperators.addTitle')}
-    description={queue?.queueName}
-    actions={view === 'assigned' ? <button className="button button-primary" type="button" onClick={() => { setView('add'); }}><UserPlus aria-hidden="true" />{t('settings.queueOperators.addAssignment')}</button> : <><button className="button" type="button" disabled={pendingId !== undefined} onClick={resetAddView}><ArrowLeft aria-hidden="true" />{t('common.retour')}</button><button className="button button-primary" type="button" disabled={!selectedUser || pendingId !== undefined} onClick={() => { void assign(); }}><UserPlus aria-hidden="true" />{t('settings.confirmAssignment')}</button></>}
-  >
-    {view === 'assigned' ? <section className="queue-operators-assigned">
-      <h3><Users aria-hidden="true" /> {t('settings.queueOperators.assignedTitle')}</h3>
-      {assigned.length ? <ul className="manager-list">{assigned.map((operator) => <li key={operator.userId}><div><strong>{operator.username}</strong><span>{operator.email}</span></div><span className="status-badge status-success">{t('common.active')}</span><button className="button button-small button-danger" type="button" disabled={pendingId === operator.userId} onClick={() => { void remove(operator.userId, operator.username); }}><UserMinus aria-hidden="true" /> {t('common.remove')}</button></li>)}</ul> : <p className="muted">{t('settings.queueOperators.empty')}</p>}
-    </section> : <div className="assignment-flow queue-operator-assignment-flow">
-      <section>
-        <span className="eyebrow">{t('settings.queueOperators.availableTitle')}</span>
-        <label>{t('settings.searchUser')}<span className="input-with-icon"><Search aria-hidden="true" /><input type="search" value={search} placeholder={t('settings.searchUserPlaceholder')} autoComplete="off" onChange={(event) => { setSearch(event.target.value); setPage(1); setSelectedUser(undefined); }} /></span></label>
-        {search.trim().length < 4 ? <p className="muted">{t('settings.searchUserMinimum')}</p> : searchPending || users.isFetching ? <p className="muted" role="status">{t('common.loading')}</p> : candidates.length ? <div className="assignment-user-results">{candidates.map((user) => <button type="button" className={selectedUser?.userId === user.userId ? 'selected' : ''} aria-pressed={selectedUser?.userId === user.userId} key={user.userId} onClick={() => { setSelectedUser(user); }}><span className="profile-avatar">{getUserInitials(user)}</span><span><strong>{getUserDisplayName(user)}</strong><small>{user.fullName ? `@${user.username} · ` : ''}{user.email ?? t('settings.noEmail')}</small></span><span className="status-badge status-success">{t('settings.active')}</span></button>)}</div> : <p className="muted">{t('settings.noUserFound')}</p>}
-        {(users.data?.data.totalPages ?? 0) > 1 ? <Pagination page={page} totalPages={users.data?.data.totalPages ?? 1} onPageChange={setPage} /> : null}
-      </section>
-    </div>}
-  </Modal>;
+  return (
+    <Modal
+      open={Boolean(queue)}
+      onOpenChange={(open) => {
+        if (!open && pendingId === undefined) close();
+      }}
+      title={
+        view === 'assigned'
+          ? t('settings.queueOperators.title')
+          : t('settings.queueOperators.addTitle')
+      }
+      description={queue?.queueName}
+      actions={
+        view === 'assigned' ? (
+          <Button
+            variant="primary"
+            onClick={() => {
+              setView('add');
+            }}
+          >
+            <UserPlus aria-hidden="true" />
+            {t('settings.queueOperators.addAssignment')}
+          </Button>
+        ) : (
+          <>
+            <Button disabled={pendingId !== undefined} onClick={resetAddView}>
+              <ArrowLeft aria-hidden="true" />
+              {t('common.retour')}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!selectedUser || pendingId !== undefined}
+              onClick={() => {
+                void assign();
+              }}
+            >
+              <UserPlus aria-hidden="true" />
+              {t('settings.confirmAssignment')}
+            </Button>
+          </>
+        )
+      }
+    >
+      {view === 'assigned' ? (
+        <section className="queue-operators-assigned">
+          <h3>
+            <Users aria-hidden="true" /> {t('settings.queueOperators.assignedTitle')}
+          </h3>
+          {assigned.length ? (
+            <ul className="manager-list">
+              {assigned.map((operator) => (
+                <li key={operator.userId}>
+                  <div>
+                    <strong>{operator.username}</strong>
+                    <span>{operator.email}</span>
+                  </div>
+                  <span className="status-badge status-success">{t('common.active')}</span>
+                  <Button
+                    variant="danger"
+                    size="small"
+                    pending={pendingId === operator.userId}
+                    onClick={() => {
+                      void remove(operator.userId, operator.username);
+                    }}
+                  >
+                    <UserMinus aria-hidden="true" /> {t('common.remove')}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted">{t('settings.queueOperators.empty')}</p>
+          )}
+        </section>
+      ) : (
+        <div className="assignment-flow queue-operator-assignment-flow">
+          <section>
+            <span className="eyebrow">{t('settings.queueOperators.availableTitle')}</span>
+            <label>
+              {t('settings.searchUser')}
+              <span className="input-with-icon">
+                <Search aria-hidden="true" />
+                <input
+                  type="search"
+                  value={search}
+                  placeholder={t('settings.searchUserPlaceholder')}
+                  autoComplete="off"
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setPage(1);
+                    setSelectedUser(undefined);
+                  }}
+                />
+              </span>
+            </label>
+            {search.trim().length < 4 ? (
+              <p className="muted">{t('settings.searchUserMinimum')}</p>
+            ) : searchPending || users.isFetching ? (
+              <p className="muted" role="status">
+                {t('common.loading')}
+              </p>
+            ) : candidates.length ? (
+              <div className="assignment-user-results">
+                {candidates.map((user) => (
+                  <Button
+                    variant="unstyled"
+                    className={selectedUser?.userId === user.userId ? 'selected' : ''}
+                    aria-pressed={selectedUser?.userId === user.userId}
+                    key={user.userId}
+                    onClick={() => {
+                      setSelectedUser(user);
+                    }}
+                  >
+                    <span className="profile-avatar">{getUserInitials(user)}</span>
+                    <span>
+                      <strong>{getUserDisplayName(user)}</strong>
+                      <small>
+                        {user.fullName ? `@${user.username} · ` : ''}
+                        {user.email ?? t('settings.noEmail')}
+                      </small>
+                    </span>
+                    <span className="status-badge status-success">{t('settings.active')}</span>
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p className="muted">{t('settings.noUserFound')}</p>
+            )}
+            {(users.data?.data.totalPages ?? 0) > 1 ? (
+              <Pagination
+                page={page}
+                totalPages={users.data?.data.totalPages ?? 1}
+                onPageChange={setPage}
+              />
+            ) : null}
+          </section>
+        </div>
+      )}
+    </Modal>
+  );
 }

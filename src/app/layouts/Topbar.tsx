@@ -6,6 +6,7 @@ import { LocaleSwitcher } from '@/design-system/components/LocaleSwitcher';
 import { ThemeSwitcher } from '@/design-system/components/ThemeSwitcher';
 import { LogOut, Menu, RefreshCw, UserRound } from 'lucide-react';
 import { getUserInitials } from '@/features/users/user-display';
+import { Button } from '@/design-system/components/Button';
 
 export function Topbar({
   sites,
@@ -60,14 +61,14 @@ export function Topbar({
   }, [accountMenuOpen]);
   return (
     <header className="topbar">
-      <button
+      <Button
+        variant="unstyled"
         className="topbar-icon-button mobile-menu-trigger"
-        type="button"
         onClick={onOpenNavigation}
         aria-label={__t('shell.layouts.topbar.ouvrirLeMenu')}
       >
         <Menu aria-hidden="true" />
-      </button>
+      </Button>
       <div className="topbar-title">
         <span className="eyebrow">
           {sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite')}
@@ -75,34 +76,34 @@ export function Topbar({
         <h1>{t(routeLabel)}</h1>
       </div>
       <div className="topbar-actions">
-        <button
+        <Button
+          variant="unstyled"
           className="topbar-icon-button"
-          type="button"
           onClick={onRefresh}
           disabled={refreshing}
           aria-label={refreshing ? t('common.refreshing') : t('common.refreshPage')}
           title={refreshing ? t('common.refreshing') : t('common.refreshPage')}
         >
           <RefreshCw aria-hidden="true" className={refreshing ? 'is-spinning' : undefined} />
-        </button>
-        <button className="command-trigger" type="button" onClick={onOpenCommands}>
+        </Button>
+        <Button variant="unstyled" className="command-trigger" onClick={onOpenCommands}>
           {t('commands.open')} <kbd>{__t('shell.layouts.topbar.k')}</kbd>
-        </button>
+        </Button>
         <ThemeSwitcher />
         <div className="topbar-desktop-account">
           <LocaleSwitcher />
           <Link className="avatar" to="/profile" aria-label={t('profile.title')}>
             {initials}
           </Link>
-          <button className="button" type="button" onClick={onLogout}>
+          <Button onClick={onLogout}>
             <LogOut aria-hidden="true" />
             {t('auth.logout')}
-          </button>
+          </Button>
         </div>
         <div className="mobile-account" ref={accountMenuRef}>
-          <button
+          <Button
+            variant="unstyled"
             className="topbar-icon-button mobile-account-trigger"
-            type="button"
             aria-label={t('profile.title')}
             aria-haspopup="menu"
             aria-expanded={accountMenuOpen}
@@ -111,7 +112,7 @@ export function Topbar({
             }}
           >
             <UserRound aria-hidden="true" />
-          </button>
+          </Button>
           {accountMenuOpen ? (
             <div className="mobile-account-menu" role="menu">
               <Link
@@ -130,10 +131,10 @@ export function Topbar({
                 <span>{t('locale.label')}</span>
                 <LocaleSwitcher />
               </div>
-              <button type="button" role="menuitem" onClick={onLogout}>
+              <Button variant="unstyled" role="menuitem" onClick={onLogout}>
                 <LogOut aria-hidden="true" />
                 {t('auth.logout')}
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>

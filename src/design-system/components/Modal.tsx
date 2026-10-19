@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import { Check, CircleAlert, X } from 'lucide-react';
+import { Button } from './Button';
 
 interface ModalProps {
   open: boolean;
@@ -40,10 +41,10 @@ export function Modal({
           <footer className="dialog-actions">
             {!hideDismissAction ? (
               <Dialog.Close asChild>
-                <button className="button" type="button" title={t('common.cancel')}>
+                <Button title={t('common.cancel')}>
                   <X aria-hidden="true" />
                   <span className="button-label">{t('common.cancel')}</span>
-                </button>
+                </Button>
               </Dialog.Close>
             ) : null}
             {actions}
@@ -76,14 +77,10 @@ export function ConfirmDialog({
       className="confirmation-dialog"
       actions={
         <>
-          <button
-            className={`button ${destructive ? 'button-danger' : 'button-primary'}`}
-            type="button"
-            onClick={onConfirm}
-          >
+          <Button variant={destructive ? 'danger' : 'primary'} onClick={onConfirm}>
             {destructive ? <CircleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}
             {confirmLabel}
-          </button>
+          </Button>
         </>
       }
     >

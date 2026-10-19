@@ -40,7 +40,9 @@ it('issues one candidate request after a typing burst reaches four characters', 
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   renderModal(client);
 
-  await userEvent.click(screen.getByRole('button', { name: /ajouter une affectation/i }));
+  const addAssignment = screen.getByRole('button', { name: /ajouter une affectation/i });
+  expect(addAssignment).toHaveClass('button', 'button-primary');
+  await userEvent.click(addAssignment);
   await userEvent.type(screen.getByRole('searchbox'), 'abcd');
 
   await waitFor(() => {
