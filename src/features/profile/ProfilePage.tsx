@@ -1,16 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Check, Globe2, KeyRound, Languages, ListChecks, Palette, Save } from 'lucide-react';
+import { Check, Globe2, KeyRound, Languages, ListChecks, LogOut, Palette, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { changePassword, updateUser } from './api/profile-api';
-import { hydrateSession } from '@/core/auth/session-actions';
+import { changePassword, logoutAllSessions, updateUser } from './api/profile-api';
+import { expireSession, hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
@@ -39,11 +42,15 @@ type PasswordForm = z.infer<ReturnType<typeof createPasswordSchema>>;
 
 export function ProfilePage() {
   const { t: __t } = useTranslation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
   const accentColor = usePreferencesStore((state) => state.accentColor);
   const setAccentColor = usePreferencesStore((state) => state.setAccentColor);
   const [saved, setSaved] = useState(false);
   const [passwordEditing, setPasswordEditing] = useState(false);
+  const [globalLogoutOpen, setGlobalLogoutOpen] = useState(false);
+  const [globalLogoutPending, setGlobalLogoutPending] = useState(false);
   const {
     register,
     handleSubmit,
@@ -85,6 +92,18 @@ export function ProfilePage() {
       notifyError(error);
     }
   });
+  const globalLogout = async () => {
+    if (globalLogoutPending) return;
+    setGlobalLogoutPending(true);
+    try {
+      await logoutAllSessions({ userId: user.userId });
+      await expireSession(queryClient);
+      void navigate('/login', { replace: true });
+    } catch (error) {
+      notifyError(error);
+      setGlobalLogoutPending(false);
+    }
+  };
   return (
     <div className="page-stack">
       <PageHeader
@@ -132,6 +151,13 @@ export function ProfilePage() {
               </dd>
             </div>
           </dl>
+          <footer className="profile-identity-footer">
+            <p>{__t('profile.globalLogout.help')}</p>
+            <button className="button button-danger" type="button" onClick={() => { setGlobalLogoutOpen(true); }}>
+              <LogOut aria-hidden="true" />
+              {__t('profile.globalLogout.action')}
+            </button>
+          </footer>
         </Card>
         <Card className="profile-settings-card">
           <div className="card-heading">
@@ -327,6 +353,15 @@ export function ProfilePage() {
           icon={<Languages />}
         />
       </div>
+      <Modal
+        open={globalLogoutOpen}
+        onOpenChange={(open) => { if (!globalLogoutPending) setGlobalLogoutOpen(open); }}
+        title={__t('profile.globalLogout.confirmTitle')}
+        description={__t('profile.globalLogout.confirmDescription')}
+        actions={<button className="button button-danger" type="button" disabled={globalLogoutPending} onClick={() => { void globalLogout(); }}><LogOut aria-hidden="true" />{globalLogoutPending ? __t('profile.globalLogout.pending') : __t('profile.globalLogout.confirmAction')}</button>}
+      >
+        <span />
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Activity, CalendarRange, Check, Clock3, ListChecks, MonitorUp, RotateCcw, SlidersHorizontal, UsersRound } from 'lucide-react';
+import { Activity, CalendarRange, Check, Clock3, ListChecks, MonitorUp, RefreshCw, RotateCcw, SlidersHorizontal, UsersRound } from 'lucide-react';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useScopeStore } from '@/core/scope/scope-store';
@@ -16,6 +16,21 @@ import { useMonitoringLive, useMonitoringSeries, useResetQueue } from './hooks/u
 
 type PressureFilter = 'all' | 'danger' | 'warning' | 'healthy';
 type Period = '2h' | '8h' | 'today' | '24h' | '7d';
+type RefreshInterval = false | 30_000 | 60_000 | 300_000;
+
+const refreshIntervals = {
+  off: false,
+  '30s': 30_000,
+  '1m': 60_000,
+  '5m': 300_000,
+} as const satisfies Record<string, RefreshInterval>;
+
+function refreshIntervalKey(value: RefreshInterval): keyof typeof refreshIntervals {
+  if (value === 30_000) return '30s';
+  if (value === 60_000) return '1m';
+  if (value === 300_000) return '5m';
+  return 'off';
+}
 
 function periodRange(period: Period, now: number) {
   const to = new Date(now);
@@ -33,16 +48,17 @@ export function ControlRoomPage() {
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [pressure, setPressure] = useState<PressureFilter>('all');
   const [period, setPeriod] = useState<Period>('8h');
-  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState<RefreshInterval>(false);
+  const [scopeOpen, setScopeOpen] = useState(false);
   const [rangeAnchor, setRangeAnchor] = useState(() => Date.now());
   const [resetTarget, setResetTarget] = useState<{ queueId: number; queueName: string }>();
   const range = useMemo(() => periodRange(period, rangeAnchor), [period, rangeAnchor]);
   useEffect(() => {
-    if (!autoRefresh) return;
-    const interval = window.setInterval(() => { setRangeAnchor(Date.now()); }, 15_000);
+    if (!refreshInterval) return;
+    const interval = window.setInterval(() => { setRangeAnchor(Date.now()); }, refreshInterval);
     return () => { window.clearInterval(interval); };
-  }, [autoRefresh]);
-  const live = useMonitoringLive(siteId, autoRefresh);
+  }, [refreshInterval]);
+  const live = useMonitoringLive(siteId, refreshInterval);
   const snapshot = live.data?.data;
   const items = snapshot?.queues ?? [];
   const series = useMonitoringSeries({ siteId, queueIds: selectedQueueIds, userIds: selectedUserIds, ...range, timezone: snapshot?.timezone });
@@ -58,27 +74,23 @@ export function ControlRoomPage() {
   const updatedAt = snapshot?.generatedAt ? new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(snapshot.generatedAt)) : '—';
   return <div className="page-stack control-room-page">
     <PageHeader eyebrow={t('common.pilotage')} title={t('supervision.controlRoom.supervisionTempsReel')} description={t('controlRoom.liveDescription')} actions={<StatusBadge tone={dangerCount ? 'danger' : 'success'}><Activity />{dangerCount ? t('controlRoom.attentionRequired', { count: dangerCount }) : t('controlRoom.allOperational')}</StatusBadge>} />
-    <Card className="control-room-toolbar">
-      <div className="control-room-toolbar-head">
-        <div className="control-room-toolbar-title">
-          <span className="control-room-toolbar-icon"><SlidersHorizontal aria-hidden="true" /></span>
-          <div><span className="eyebrow">{t('controlRoom.filtersEyebrow')}</span><h2>{t('controlRoom.scopeTitle')}</h2><p className="muted">{t('controlRoom.scopeDescription')}</p></div>
-        </div>
-        <div className="control-room-sync-status">
-          <span className="control-room-live-dot" aria-hidden="true" />
-          <span>{t('controlRoom.updatedAt', { time: updatedAt })}</span>
-          <label className="control-room-auto-refresh"><input type="checkbox" checked={autoRefresh} onChange={(event) => { setAutoRefresh(event.target.checked); }} /><span aria-hidden="true" />{t('controlRoom.autoRefresh')}</label>
-        </div>
-      </div>
+    <Card className="admin-filter-card control-room-toolbar">
+      <details onToggle={(event) => { setScopeOpen(event.currentTarget.open); }}>
+        <summary><span><SlidersHorizontal aria-hidden="true" />{t('controlRoom.scopeTitle')}</span><small>{scopeOpen ? t('controlRoom.scopeDescription') : t('controlRoom.scopeSummary', { period: t(`controlRoom.period.${period}`), refresh: t(`controlRoom.refreshFrequency.${refreshInterval === false ? 'off' : refreshInterval === 30_000 ? '30s' : refreshInterval === 60_000 ? '1m' : '5m'}`), count: filtered.length })}</small></summary>
+      <div className="control-room-scope-body">
       <div className="control-room-quick-filters">
-        <section className="control-room-filter-block">
+        <label className="control-room-filter-block">
+          <div className="control-room-filter-heading"><RefreshCw aria-hidden="true" /><span>{t('controlRoom.refreshFrequency')}</span><small>{t('controlRoom.updatedAt', { time: updatedAt })}</small></div>
+          <select value={refreshIntervalKey(refreshInterval)} onChange={(event) => { setRefreshInterval(refreshIntervals[event.target.value as keyof typeof refreshIntervals]); }}>{(Object.keys(refreshIntervals) as Array<keyof typeof refreshIntervals>).map((value) => <option key={value} value={value}>{t(`controlRoom.refreshFrequency.${value}`)}</option>)}</select>
+        </label>
+        <label className="control-room-filter-block">
           <div className="control-room-filter-heading"><CalendarRange aria-hidden="true" /><span>{t('controlRoom.period')}</span></div>
-          <div className="segmented-control">{(['2h', '8h', 'today', '24h', '7d'] as const).map((value) => <button key={value} type="button" className={period === value ? 'active' : ''} onClick={() => { setPeriod(value); setRangeAnchor(Date.now()); }}>{t(`controlRoom.period.${value}`)}</button>)}</div>
-        </section>
-        <section className="control-room-filter-block">
+          <select value={period} onChange={(event) => { setPeriod(event.target.value as Period); setRangeAnchor(Date.now()); }}>{(['2h', '8h', 'today', '24h', '7d'] as const).map((value) => <option key={value} value={value}>{t(`controlRoom.period.${value}`)}</option>)}</select>
+        </label>
+        <label className="control-room-filter-block">
           <div className="control-room-filter-heading"><Activity aria-hidden="true" /><span>{t('controlRoom.operationalState')}</span></div>
-          <div className="segmented-control" role="group" aria-label={t('controlRoom.filterPressure')}>{(['all', 'danger', 'warning', 'healthy'] as const).map((value) => <button key={value} className={pressure === value ? 'active' : ''} type="button" onClick={() => { setPressure(value); }}>{t(`controlRoom.pressure.${value}`)}</button>)}</div>
-        </section>
+          <select value={pressure} onChange={(event) => { setPressure(event.target.value as PressureFilter); }}>{(['all', 'danger', 'warning', 'healthy'] as const).map((value) => <option key={value} value={value}>{t(`controlRoom.pressure.${value}`)}</option>)}</select>
+        </label>
       </div>
       <div className="control-room-selections">
         <fieldset className="control-room-queue-picker">
@@ -87,6 +99,8 @@ export function ControlRoomPage() {
         </fieldset>
         {snapshot?.operators.length ? <fieldset className="control-room-queue-picker"><legend><span>{t('controlRoom.filterOperators')}</span></legend><div className="queue-choice-list"><button className={!selectedUserIds.length ? 'active' : ''} type="button" aria-pressed={!selectedUserIds.length} onClick={() => { setSelectedUserIds([]); }}><Check />{t('controlRoom.allOperators')}</button>{snapshot.operators.map((operator) => <button key={operator.userId} className={selectedUserIds.includes(operator.userId) ? 'active' : ''} type="button" aria-pressed={selectedUserIds.includes(operator.userId)} onClick={() => { toggle(selectedUserIds, operator.userId, setSelectedUserIds); }}><Check /><span>{operator.displayName}</span></button>)}</div></fieldset> : null}
       </div>
+      </div>
+      </details>
     </Card>
     <div className="metric-grid control-room-metrics">
       <MetricCard label={t('common.activeQueues')} value={snapshot?.totals.activeQueues ?? 0} icon={<ListChecks />} />

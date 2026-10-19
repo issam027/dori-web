@@ -418,6 +418,10 @@ table td small {
   border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-line)) !important;
   background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface)) !important;
 }
+.queue-operators-assigned { display: grid; gap: 12px; }
+.queue-operators-assigned h3 { display: flex; align-items: center; gap: 8px; margin: 0; }
+.queue-operators-assigned h3 svg { width: 19px; color: var(--color-accent); }
+.queue-operator-assignment-flow .input-with-icon { font-weight: 400; }
 .sms-preview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
@@ -693,6 +697,22 @@ table td small {
   float: left;
   margin-right: 12px;
 }
+.translation-catalog-heading {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+.translation-catalog-heading .translation-heading-icon {
+  flex: 0 0 auto;
+  float: none;
+  margin: 0;
+}
+.translation-catalog-heading > div {
+  min-width: 0;
+}
+.translation-catalog-heading p {
+  white-space: nowrap;
+}
 .translation-heading-icon svg,
 .translation-modal-intro svg {
   width: 20px;
@@ -795,7 +815,7 @@ table td small {
   padding: 18px;
 }
 .users-admin-page .admin-filter-grid {
-  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
 }
 .row-user-actions { display: flex; align-items: center; gap: 6px; }
 .assignment-choice-card { position: relative; min-height: 92px; }
@@ -822,6 +842,7 @@ table td small {
   gap: 10px;
 }
 @media (max-width: 760px) {
+  .translation-catalog-heading p { white-space: normal; }
   .admin-filter-card summary {
     align-items: flex-start;
     flex-direction: column;

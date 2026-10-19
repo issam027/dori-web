@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { Eye, Plus, RotateCcw, Search, StickyNote } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Eye, Plus, Search, StickyNote } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { DataTable } from '@/design-system/components/DataTable';
 import { Card } from '@/design-system/components/Card';
@@ -27,15 +27,22 @@ export function MyQueuesPage() {
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [searchDraft, setSearchDraft] = useState('');
   const [search, setSearch] = useState('');
-  const [statusDraft, setStatusDraft] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
   const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
-  const [sortDraft, setSortDraft] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
   const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
   const [registrationDetails, setRegistrationDetails] = useState<{
     id: number;
     queueName: string;
   } | null>(null);
   const queues = useQueues({ siteId });
+  useEffect(() => {
+    const value = searchDraft.trim();
+    if (value.length <= 3) return;
+    const timeout = window.setTimeout(() => {
+      setSearch(value);
+      setPage(1);
+    }, 350);
+    return () => { window.clearTimeout(timeout); };
+  }, [searchDraft]);
   const registrations = useWaitingRegistrations({
     siteId,
     queueId,
@@ -59,46 +66,6 @@ export function MyQueuesPage() {
         />
       ) : null}
       {queues.data?.data.items.length ? (
-        <Card className="queue-filter-banner">
-          <div>
-            <h2>{__t('queue-operations.myQueues.perimetreDeLaFile')}</h2>
-            <p>{__t('queue-operations.myQueues.affichezToutesLesFilesAutoriseesOuConcentr')}</p>
-          </div>
-          <div
-            className="queue-filter-tabs"
-            role="group"
-            aria-label={__t('queue-operations.myQueues.filtrerParFile')}
-          >
-            <button
-              className={`button${queueId === undefined ? ' button-primary' : ''}`}
-              type="button"
-              aria-pressed={queueId === undefined}
-              onClick={() => {
-                setQueueId(undefined);
-                setPage(1);
-              }}
-            >
-              {__t('queue-operations.myQueues.toutes')}
-              {queues.data.data.total}
-            </button>
-            {queues.data.data.items.map((queue) => (
-              <button
-                className={`button${queueId === queue.queueId ? ' button-primary' : ''}`}
-                type="button"
-                aria-pressed={queueId === queue.queueId}
-                key={queue.queueId}
-                onClick={() => {
-                  setQueueId(queue.queueId);
-                  setPage(1);
-                }}
-              >
-                {queue.queueName}
-              </button>
-            ))}
-          </div>
-        </Card>
-      ) : null}
-      {queues.data?.data.items.length ? (
         <Card className="admin-filter-card queue-customer-search">
           <details>
             <summary>
@@ -107,16 +74,15 @@ export function MyQueuesPage() {
               </span>
               <small>{__t('queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre')}</small>
             </summary>
-            <form
-              className="queue-customer-search-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                setSearch(searchDraft.trim());
-                setStatus(statusDraft);
-                setSort(sortDraft);
-                setPage(1);
-              }}
-            >
+            <div className="queue-customer-filter-body">
+            <div className="queue-customer-search-form">
+              <label>
+                {__t('queue-operations.myQueues.perimetreDeLaFile')}
+                <select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); setPage(1); }}>
+                  <option value="">{__t('queue-operations.myQueues.toutes')} {queues.data.data.total}</option>
+                  {queues.data.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueName}</option>)}
+                </select>
+              </label>
               <label>
                 {__t('queues.myQueues.clientOuTicket')}
                 <input
@@ -124,13 +90,18 @@ export function MyQueuesPage() {
                   value={searchDraft}
                   placeholder={__t('queues.search.example')}
                   onChange={(event) => {
-                    setSearchDraft(event.target.value);
+                    const value = event.target.value;
+                    setSearchDraft(value);
+                    if (value.trim().length <= 3) {
+                      setSearch('');
+                      setPage(1);
+                    }
                   }}
                 />
               </label>
               <label>
                 {__t('common.status')}
-                <select value={statusDraft} onChange={(event) => { setStatusDraft(event.target.value as '' | RegistrationsControllerFindRegistrationsStatus); }}>
+                <select value={status} onChange={(event) => { setStatus(event.target.value as '' | RegistrationsControllerFindRegistrationsStatus); setPage(1); }}>
                   <option value="">{__t('common.all')}</option>
                   <option value="waiting">{__t('common.waiting')}</option>
                   <option value="booked">{__t('appointments.status.booked')}</option>
@@ -143,7 +114,7 @@ export function MyQueuesPage() {
               </label>
               <label>
                 {__t('notifications.filters.sort')}
-                <select value={sortDraft} onChange={(event) => { setSortDraft(event.target.value as RegistrationsControllerFindRegistrationsSort); }}>
+                <select value={sort} onChange={(event) => { setSort(event.target.value as RegistrationsControllerFindRegistrationsSort); setPage(1); }}>
                   <option value="priorityReferenceTime:asc">{__t('common.position')}</option>
                   <option value="createdAt:desc">{__t('notifications.filters.newest')}</option>
                   <option value="createdAt:asc">{__t('notifications.filters.oldest')}</option>
@@ -152,27 +123,8 @@ export function MyQueuesPage() {
                   <option value="status:asc">{__t('common.status')} · {__t('common.sortAscending')}</option>
                 </select>
               </label>
-              <div className="admin-filter-actions">
-                <button
-                  className="button"
-                  type="button"
-                  onClick={() => {
-                    setSearchDraft('');
-                    setSearch('');
-                    setStatusDraft('waiting');
-                    setStatus('waiting');
-                    setSortDraft('priorityReferenceTime:asc');
-                    setSort('priorityReferenceTime:asc');
-                    setPage(1);
-                  }}
-                >
-                  <RotateCcw aria-hidden="true" /> {__t('common.reset')}
-                </button>
-                <button className="button button-primary" type="submit">
-                  <Search aria-hidden="true" /> {__t('common.search')}
-                </button>
-              </div>
-            </form>
+            </div>
+            </div>
           </details>
         </Card>
       ) : null}

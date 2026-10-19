@@ -48,5 +48,11 @@ export const profile: DomainTranslations<typeof import('../fr/profile').profile>
   "profile.passwordLength": "يجب أن تكون كلمة المرور بين 10 و20 حرفاً.",
   "profile.updatePassword": "تحديث كلمة المرور",
   "profile.passwordUpdated": "تم تحديث كلمة المرور",
+  "profile.globalLogout.action": "تسجيل الخروج من جميع الجلسات",
+  "profile.globalLogout.help": "يلغي الجلسات المفتوحة على جميع أجهزتك.",
+  "profile.globalLogout.confirmTitle": "تسجيل الخروج من جميع الجلسات؟",
+  "profile.globalLogout.confirmDescription": "سيتم تسجيل خروجك فوراً من هذا الجهاز ومن جميع الأجهزة الأخرى.",
+  "profile.globalLogout.confirmAction": "تسجيل الخروج من الجميع",
+  "profile.globalLogout.pending": "جارٍ تسجيل الخروج…",
   "profile.title": "ملفي الشخصي",
 };

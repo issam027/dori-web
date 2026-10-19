@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, Languages, Pencil, Plus, RotateCcw, Save, Search, Trash2 } from 'lucide-react';
+import { Check, Languages, Pencil, Plus, Save, Search, Trash2 } from 'lucide-react';
 import type {
   CreateTranslationDto,
   TranslationResponseDto,
@@ -55,6 +55,15 @@ export function TranslationsAdminPage() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [createLocale, setCreateLocale] = useState<'fr' | 'en' | 'ar'>('fr');
+  useEffect(() => {
+    const key = filterDraft.key.trim();
+    if (key.length <= 3) return;
+    const timeout = window.setTimeout(() => {
+      setFilters((current) => ({ ...current, key }));
+      setPage(1);
+    }, 350);
+    return () => { window.clearTimeout(timeout); };
+  }, [filterDraft.key]);
   const categoryLabel = (category: CreateTranslationDto['category']) =>
     t(`admin.translations.categories.${category}`);
   const translations = useQuery({
@@ -187,20 +196,18 @@ export function TranslationsAdminPage() {
             </span>
             <small>{t('admin.translations.cleCategorieOuLangue')}</small>
           </summary>
-          <form
-            className="admin-filter-grid"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setPage(1);
-              setFilters(filterDraft);
-            }}
-          >
+          <div className="admin-filter-grid">
             <label>
               {t('onboarding.settings.cle')}
               <input
                 value={filterDraft.key}
                 onChange={(event) => {
-                  setFilterDraft({ ...filterDraft, key: event.target.value });
+                  const key = event.target.value;
+                  setFilterDraft({ ...filterDraft, key });
+                  if (key.trim().length <= 3) {
+                    setFilters((current) => ({ ...current, key: '' }));
+                    setPage(1);
+                  }
                 }}
               />
             </label>
@@ -209,7 +216,10 @@ export function TranslationsAdminPage() {
               <select
                 value={filterDraft.category}
                 onChange={(event) => {
-                  setFilterDraft({ ...filterDraft, category: event.target.value });
+                  const category = event.target.value;
+                  setFilterDraft({ ...filterDraft, category });
+                  setFilters((current) => ({ ...current, category }));
+                  setPage(1);
                 }}
               >
                 <option value="">{t('profile.profile.toutes')}</option>
@@ -220,41 +230,25 @@ export function TranslationsAdminPage() {
             </label>
             <label>
               {t('common.language')}
-              <input
+              <select
                 value={filterDraft.locale}
-                placeholder={t('common.fr')}
-                maxLength={10}
                 onChange={(event) => {
-                  setFilterDraft({ ...filterDraft, locale: event.target.value });
-                }}
-              />
-            </label>
-            <div className="admin-filter-actions">
-              <button
-                className="button"
-                type="button"
-                onClick={() => {
-                  const empty = { key: '', category: '', locale: '' };
-                  setFilterDraft(empty);
-                  setFilters(empty);
+                  const locale = event.target.value;
+                  setFilterDraft({ ...filterDraft, locale });
+                  setFilters((current) => ({ ...current, locale }));
                   setPage(1);
                 }}
-              >
-                <RotateCcw /> {t('admin.translations.reinitialiser')}
-              </button>
-              <button className="button button-primary" type="submit">
-                <Search /> {t('public-experiences.track.appliquer')}
-              </button>
-            </div>
-          </form>
+              ><option value="">{t('common.all')}</option><option value="fr">{t('locale.fr')}</option><option value="en">{t('common.english')}</option><option value="ar">{t('locale.ar')}</option></select>
+            </label>
+          </div>
         </details>
       </Card>{' '}
       <Card className="settings-card">
-        <div className="card-heading">
+        <div className="card-heading translation-catalog-heading">
+          <span className="translation-heading-icon">
+            <Languages />
+          </span>
           <div>
-            <span className="translation-heading-icon">
-              <Languages />
-            </span>
             <h2>{t('admin.translations.catalogueDesTraductions')}</h2>
             <p>{t('admin.translations.remoteOverrideNotice')}</p>
           </div>

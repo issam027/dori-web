@@ -4,12 +4,12 @@ import { invalidateControlRoom } from '@/api/client/query-invalidations';
 import { monitoringControllerLive, monitoringControllerSeries } from '@/api/generated/monitoring/monitoring';
 import { resetQueue } from '../api/control-room-api';
 
-export function useMonitoringLive(siteId: number | null, autoRefresh = true) {
+export function useMonitoringLive(siteId: number | null, refreshInterval: number | false = 30_000) {
   return useQuery({
     queryKey: ['monitoring', 'live', siteId],
     queryFn: ({ signal }) => monitoringControllerLive({ siteId: siteId ?? 0 }, undefined, signal),
     enabled: siteId !== null,
-    refetchInterval: autoRefresh ? 15_000 : false,
+    refetchInterval: refreshInterval,
   });
 }
 

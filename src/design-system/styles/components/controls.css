@@ -155,11 +155,6 @@ textarea:disabled {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   gap: var(--space-4);
 }
-.queue-filter-tabs .button[aria-pressed='true'] {
-  border-color: var(--color-accent);
-  color: var(--color-primary-contrast);
-  background: var(--color-accent);
-}
 .note-pagination {
   display: flex;
   align-items: center;

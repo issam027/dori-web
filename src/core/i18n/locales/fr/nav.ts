@@ -22,7 +22,7 @@ export const nav = {
   "nav.pilotage": "Pilotage",
   "nav.administration": "Administration",
   "nav.desk": "Cockpit guichet",
-  "nav.myQueues": "Mes files",
+  "nav.myQueues": "Suivi du jour",
   "nav.persons": "Annuaire",
   "nav.appointments": "Rendez-vous",
   "nav.controlRoom": "Supervision",

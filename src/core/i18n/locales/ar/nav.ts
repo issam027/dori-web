@@ -23,7 +23,7 @@ export const nav: DomainTranslations<typeof import('../fr/nav').nav> = {
   "nav.pilotage": "القيادة",
   "nav.administration": "الإدارة",
   "nav.desk": "شباك الاستقبال",
-  "nav.myQueues": "قوائم انتظاري",
+  "nav.myQueues": "متابعة اليوم",
   "nav.persons": "الدليل",
   "nav.appointments": "المواعيد",
   "nav.controlRoom": "الإشراف",

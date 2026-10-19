@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { MonitoringLiveQueueDto, MonitoringSeriesBucketDto } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
+import { formatReportNumber } from './report-number';
 import { slaTone } from './sla';
 
 type FlowMetric = 'registered' | 'served' | 'noShow' | 'cancelled';
@@ -11,17 +12,23 @@ const colors: Record<FlowMetric, string> = { registered: 'var(--color-primary)',
 function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] }) {
   const { t, i18n } = useTranslation();
   const [visible, setVisible] = useState<FlowMetric[]>(['registered', 'served']);
+  const [hovered, setHovered] = useState<number>();
   const metrics: FlowMetric[] = ['registered', 'served', 'noShow', 'cancelled'];
   const values = visible.flatMap((metric) => buckets.map((bucket) => bucket[metric]));
   const max = Math.max(...values, 1);
   const x = (index: number) => 42 + (buckets.length < 2 ? 330 : index / (buckets.length - 1) * 650);
   const y = (value: number) => 20 + 190 - value / max * 190;
+  const band = buckets.length < 2 ? 650 : 650 / Math.max(buckets.length - 1, 1);
   const formatTime = (value: string) => new Intl.DateTimeFormat(i18n.language, { weekday: buckets.length > 24 ? 'short' : undefined, hour: '2-digit', minute: buckets.length > 24 ? undefined : '2-digit' }).format(new Date(value));
+  const formatTooltipTime = (value: string) => new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   return <>
     <div className="control-room-chart"><svg viewBox="0 0 735 250" role="img" aria-label={t('controlRoom.flowChart')}>
-      {[0, 1, 2, 3].map((line) => <line key={line} x1="42" x2="692" y1={20 + line * 63.33} y2={20 + line * 63.33} className="report-grid-line" />)}
-      {visible.map((metric) => <polyline key={metric} points={buckets.map((bucket, index) => `${String(x(index))},${String(y(bucket[metric]))}`).join(' ')} className="report-line" style={{ stroke: colors[metric] }} />)}
+      {[0, 1, 2, 3, 4].map((line) => { const value = max - (max * line) / 4; const py = 20 + (190 * line) / 4; return <g key={line}><line x1="42" x2="692" y1={py} y2={py} className="report-grid-line" /><text x="34" y={py + 4} textAnchor="end" className="report-axis-label">{formatReportNumber(value, i18n.language)}</text></g>; })}
+      <line x1="42" x2="42" y1="20" y2="210" className="report-axis" /><line x1="42" x2="692" y1="210" y2="210" className="report-axis" />
+      {visible.map((metric) => <g key={metric}><polyline points={buckets.map((bucket, index) => `${String(x(index))},${String(y(bucket[metric]))}`).join(' ')} className="report-line" style={{ stroke: colors[metric] }} />{buckets.map((bucket, index) => <circle key={bucket.periodStart} cx={x(index)} cy={y(bucket[metric])} r="3.5" className="report-point" style={{ fill: colors[metric] }} />)}</g>)}
+      {buckets.map((bucket, index) => <rect key={bucket.periodStart} x={Math.max(42, x(index) - band / 2)} y="20" width={Math.min(band, 692 - Math.max(42, x(index) - band / 2))} height="190" className="report-hover-band" tabIndex={0} onPointerEnter={() => { setHovered(index); }} onPointerMove={() => { setHovered(index); }} onPointerLeave={() => { setHovered(undefined); }} onFocus={() => { setHovered(index); }} onBlur={() => { setHovered(undefined); }} />)}
       {buckets.filter((_, index) => index === 0 || index === buckets.length - 1 || index === Math.floor(buckets.length / 2)).map((bucket) => { const index = buckets.indexOf(bucket); return <text key={bucket.periodStart} x={x(index)} y="238" textAnchor="middle" className="report-axis-label">{formatTime(bucket.periodStart)}</text>; })}
+      {hovered !== undefined && buckets[hovered] ? <g className="report-chart-tooltip" transform={`translate(${String(Math.min(x(hovered) + 8, 515))},24)`}><rect width="170" height={36 + visible.length * 20} rx="9" /><text x="12" y="20">{formatTooltipTime(buckets[hovered].periodStart)}</text>{visible.map((metric, index) => <text key={metric} x="12" y={42 + index * 20}>{t(`controlRoom.flow.${metric}`)}: {formatReportNumber(buckets[hovered]?.[metric] ?? 0, i18n.language)}</text>)}</g> : null}
     </svg></div>
     <div className="report-series-picker">{metrics.map((metric) => <button key={metric} type="button" className={visible.includes(metric) ? 'active' : ''} aria-pressed={visible.includes(metric)} onClick={() => { setVisible((current) => current.includes(metric) ? (current.length > 1 ? current.filter((item) => item !== metric) : current) : [...current, metric]); }}><i style={{ background: colors[metric] }} />{t(`controlRoom.flow.${metric}`)}</button>)}</div>
   </>;

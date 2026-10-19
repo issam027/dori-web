@@ -8,7 +8,6 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
-  RotateCcw,
   Save,
   Search,
   UserCheck,
@@ -64,6 +63,15 @@ export function UsersAdminPage() {
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [openActionsUserId, setOpenActionsUserId] = useState<number>();
   const [pending, setPending] = useState(false);
+  useEffect(() => {
+    const search = draft.search.trim();
+    if (search.length <= 3) return;
+    const timeout = window.setTimeout(() => {
+      setFilters((currentFilters) => ({ ...currentFilters, search }));
+      setPage(1);
+    }, 350);
+    return () => { window.clearTimeout(timeout); };
+  }, [draft.search]);
   useEffect(() => {
     if (openActionsUserId === undefined) return;
     const close = (event: PointerEvent) => {
@@ -150,21 +158,19 @@ export function UsersAdminPage() {
             </span>
             <small>{t('admin.users.nomEmailOuTypeDeCompte')}</small>
           </summary>
-          <form
-            className="admin-filter-grid"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setPage(1);
-              setFilters(draft);
-            }}
-          >
+          <div className="admin-filter-grid">
             <label>
               {t('admin.users.recherche')}
               <input
                 value={draft.search}
                 placeholder={t('admin.users.nomDUtilisateurOuEmail')}
                 onChange={(event) => {
-                  setDraft({ ...draft, search: event.target.value });
+                  const search = event.target.value;
+                  setDraft({ ...draft, search });
+                  if (search.trim().length <= 3) {
+                    setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
+                    setPage(1);
+                  }
                 }}
               />
             </label>
@@ -173,7 +179,10 @@ export function UsersAdminPage() {
               <select
                 value={draft.userType}
                 onChange={(event) => {
-                  setDraft({ ...draft, userType: event.target.value });
+                  const userType = event.target.value;
+                  setDraft({ ...draft, userType });
+                  setFilters((currentFilters) => ({ ...currentFilters, userType }));
+                  setPage(1);
                 }}
               >
                 <option value="">{t('supervision.notifications.tous')}</option>
@@ -183,7 +192,7 @@ export function UsersAdminPage() {
             </label>
             <label>
               {t('notifications.filters.sort')}
-              <select value={draft.sort} onChange={(event) => { setDraft({ ...draft, sort: event.target.value }); }}>
+              <select value={draft.sort} onChange={(event) => { const sort = event.target.value; setDraft({ ...draft, sort }); setFilters((currentFilters) => ({ ...currentFilters, sort })); setPage(1); }}>
                 <option value="username:asc">{t('common.name')} · {t('common.sortAscending')}</option>
                 <option value="username:desc">{t('common.name')} · {t('common.sortDescending')}</option>
                 <option value="lastLogin:desc">{t('admin.users.lastLogin')} ↓</option>
@@ -191,24 +200,7 @@ export function UsersAdminPage() {
                 <option value="createdAt:desc">{t('common.createdAt')} ↓</option>
               </select>
             </label>
-            <div className="admin-filter-actions">
-              <button
-                className="button"
-                type="button"
-                onClick={() => {
-                  const empty = { search: '', userType: '', sort: 'username:asc' };
-                  setDraft(empty);
-                  setFilters(empty);
-                  setPage(1);
-                }}
-              >
-                <RotateCcw /> {t('admin.translations.reinitialiser')}
-              </button>
-              <button className="button button-primary" type="submit">
-                <Search /> {t('public-experiences.track.appliquer')}
-              </button>
-            </div>
-          </form>
+          </div>
         </details>
       </Card>
       <Card className="settings-card">

@@ -48,5 +48,11 @@ export const profile: DomainTranslations<typeof import('../fr/profile').profile>
   "profile.passwordLength": "The password must contain between 10 and 20 characters.",
   "profile.updatePassword": "Update password",
   "profile.passwordUpdated": "Password updated",
+  "profile.globalLogout.action": "Sign out of all sessions",
+  "profile.globalLogout.help": "Revokes sessions open on all your devices.",
+  "profile.globalLogout.confirmTitle": "Sign out of all sessions?",
+  "profile.globalLogout.confirmDescription": "You will be signed out immediately on this device and every other device.",
+  "profile.globalLogout.confirmAction": "Sign out everywhere",
+  "profile.globalLogout.pending": "Signing out…",
   "profile.title": "My profile",
 };
