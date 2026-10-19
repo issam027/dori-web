@@ -24,6 +24,7 @@ import {
   updateTranslation,
 } from './api/onboarding-api';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 
 const PAGE_SIZE = 10;
 const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
@@ -249,16 +250,18 @@ export function TranslationsAdminPage() {
             <p>{t('admin.translations.remoteOverrideNotice')}</p>
           </div>
         </div>
-        <div className="table-wrap admin-table-wrap">
-          <table>
+        <DataTable
+          caption={t('admin.translations.catalogueDesTraductions')}
+          containerClassName="table-wrap admin-table-wrap"
+        >
             <thead>
               <tr>
-                <th>{t('onboarding.settings.cle')}</th>
-                <th>{t('onboarding.settings.categorie')}</th>
-                <th>{t('common.language')}</th>
-                <th>{t('common.contenu')}</th>
-                <th>{t('common.etat')}</th>
-                <th>{t('onboarding.settings.action')}</th>
+                <th scope="col">{t('onboarding.settings.cle')}</th>
+                <th scope="col">{t('onboarding.settings.categorie')}</th>
+                <th scope="col">{t('common.language')}</th>
+                <th scope="col">{t('common.contenu')}</th>
+                <th scope="col">{t('common.etat')}</th>
+                <th scope="col">{t('onboarding.settings.action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -306,8 +309,7 @@ export function TranslationsAdminPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+        </DataTable>
         {totalPages > 1 ? (
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         ) : null}

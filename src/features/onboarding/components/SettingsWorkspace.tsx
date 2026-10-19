@@ -24,6 +24,7 @@ import { SettingsNavigation } from './SettingsNavigation';
 import { QueueServiceSettings } from './QueueServiceSettings';
 import { SiteEditor } from './SiteEditor';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
@@ -187,16 +188,18 @@ function SitesPanel({
         title={__t('onboarding.settings.sitesManagers')}
         text={__t('settings.siteHelp')}
       />
-      <div className="table-wrap admin-table-wrap">
-        <table>
+      <DataTable
+        caption={__t('onboarding.settings.sitesManagers')}
+        containerClassName="table-wrap admin-table-wrap"
+      >
           <thead>
             <tr>
-              <th>{__t('sites.singular')}</th>
-              <th>{__t('common.localisation')}</th>
-              <th>{__t('onboarding.settings.fuseau')}</th>
-              <th>{__t('common.devise')}</th>
-              <th>{__t('common.etat')}</th>
-              <th>{__t('onboarding.settings.action')}</th>
+              <th scope="col">{__t('sites.singular')}</th>
+              <th scope="col">{__t('common.localisation')}</th>
+              <th scope="col">{__t('onboarding.settings.fuseau')}</th>
+              <th scope="col">{__t('common.devise')}</th>
+              <th scope="col">{__t('common.etat')}</th>
+              <th scope="col">{__t('onboarding.settings.action')}</th>
             </tr>
           </thead>
           <tbody>
@@ -249,8 +252,7 @@ function SitesPanel({
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+      </DataTable>
       {items[0] ? (
         <Card className="site-managers-card">
           <div className="card-heading">
@@ -330,16 +332,18 @@ function QueuesPanel({
           ))}
         </div>
       </Card>
-      <div className="table-wrap admin-table-wrap">
-        <table>
+      <DataTable
+        caption={__t('onboarding.settings.filesDAttente')}
+        containerClassName="table-wrap admin-table-wrap"
+      >
           <thead>
             <tr>
-              <th>{__t('queues.singular')}</th>
-              <th>{__t('common.guichets')}</th>
-              <th>{__t('common.rdv')}</th>
-              <th>{__t('common.deviseLocale')}</th>
-              <th>{__t('onboarding.settings.origines')}</th>
-              <th>{__t('common.actions')}</th>
+              <th scope="col">{__t('queues.singular')}</th>
+              <th scope="col">{__t('common.guichets')}</th>
+              <th scope="col">{__t('common.rdv')}</th>
+              <th scope="col">{__t('common.deviseLocale')}</th>
+              <th scope="col">{__t('onboarding.settings.origines')}</th>
+              <th scope="col">{__t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -405,8 +409,7 @@ function QueuesPanel({
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+      </DataTable>
       {items.length > ADMIN_PAGE_SIZE ? (
         <Pagination
           page={pagination.currentPage}

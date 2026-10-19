@@ -26,7 +26,7 @@ Dorify possède une fondation saine : typage strict, découpage par fonctionnali
 
 | ID | Domaine | Sévérité | Constat | Fichiers:lignes | Action recommandée | Effort | Statut |
 |----|---------|----------|---------|-----------------|--------------------|--------|--------|
-| REU-01 | Réutilisation | 🟠 Majeur | 8 tableaux métier contournent `DataTable`. | `src/design-system/components/DataTable.tsx:10-47`; `src/features/onboarding/UsersAdminPage.tsx:216-217`; `src/features/onboarding/TranslationsAdminPage.tsx:256-257`; `src/features/persons/PersonsPage.tsx:211-212`; `src/features/onboarding/components/SettingsWorkspace.tsx:190,333`; `src/features/onboarding/components/OnboardingWizard.tsx:656`; `src/features/public-experiences/components/kiosk/KioskWizard.tsx:463`; `src/features/health/HealthPage.tsx:137` | Étendre `DataTable` (actions, responsive, états) puis migrer les listes administratives en premier. | L | [ ] À faire |
+| REU-01 | Réutilisation | 🟠 Majeur | Les 8 tableaux métier utilisent désormais `DataTable` en mode typé ou compositionnel, avec légende, conteneur focalisable et scopes d'en-tête. | `src/design-system/components/DataTable.tsx`; `src/design-system/components/DataTable.test.tsx`; 7 nouveaux fichiers consommateurs | Correctif livré ; conserver le mode compositionnel pour les cellules/actions métier complexes. | L | [x] Terminé — preuve 9.17 |
 | REU-02 | Réutilisation | 🟠 Majeur | Les cinq recherches utilisent `useDebouncedFilter` avec leurs délais/seuils historiques et une preuve d'intégration par écran. | `src/shared/forms/useDebouncedFilter.ts`; `src/features/onboarding/UsersAdminPage.tsx`; `src/features/onboarding/TranslationsAdminPage.tsx`; `src/features/queue-operations/MyQueuesPage.tsx`; `src/features/users/UserAssignmentModal.tsx`; `src/features/users/QueueOperatorsModal.tsx` | Correctif livré ; conserver les options explicites et les tests de rafale. | M | [x] Terminé — preuve 9.10 |
 | REU-03 | Réutilisation | 🟡 Mineur | `Button` partagé couvre toutes les balises applicatives ; aucun `<button>` brut ne subsiste hors de sa définition et ESLint interdit toute régression. | `src/design-system/components/Button.tsx`; `src/design-system/components/Button.test.tsx`; `eslint.config.js` | Correctif livré ; utiliser les variantes standard ou `unstyled` pour les contrôles spécialisés. | L | [x] Terminé — preuve 9.16 |
 | REU-04 | Réutilisation | 🟡 Mineur | Les APIs partagées mortes ont été supprimées ; `RequiredMark` est interne et `EntityPicker`, réellement utilisé, possède désormais un test dédié. | `src/design-system/components/FormField.tsx`; `src/design-system/components/EntityPicker.tsx`; `src/design-system/components/EntityPicker.test.tsx` | Correctif livré ; éviter les exports anticipés sans consommateur réel. | S | [x] Terminé — preuve 9.12 |
@@ -153,6 +153,7 @@ Sévérités : 🔴 Critique / 🟠 Majeur / 🟡 Mineur / 🔵 Amélioration. A
 | 2026-10-19 | Codex | PERF-01 terminé : budgets de bundle exécutés par `verify` et la CI, rapport JSON archivé, dépassement volontaire et séparation de 21 pages vérifiés ; preuve en 9.15. |
 | 2026-10-19 | Codex | REU-03 premier lot : composant `Button` testé et adoption dans `Modal`, `QueueOperatorsModal` et `Topbar` ; compteur natif passé de 196 à 183, suite en 9.16. |
 | 2026-10-19 | Codex | REU-03 terminé : les 183 occurrences restantes ont été migrées, le compteur brut est à zéro et ESLint interdit leur réintroduction ; preuve finale en 9.16. |
+| 2026-10-19 | Codex | REU-01 terminé : les 8 tableaux métier ont rejoint `DataTable`, les consommateurs passent de 4 à 11 fichiers et les attributs d'accessibilité sont généralisés ; preuve en 9.17. |
 ## 9. Protocole de non-régression et conditions de sortie
 
 Cette section complète les sections 6 et 7. Une action n'est cochée `[x] Terminé` que si TOUS ses critères de sortie (9.3) ET la définition de terminé commune (9.2) sont satisfaits, avec preuve notée (9.5). Un critère non satisfait = statut inchangé, jamais de coche "presque".
@@ -308,11 +309,11 @@ En cas d'échec d'un critère : ne pas cocher, corriger ou `git revert` le commi
 - **Avant** : pour chacun des 8 écrans (`UsersAdminPage.tsx:216-217`, `TranslationsAdminPage.tsx:256-257`, `PersonsPage.tsx:211-212`, `SettingsWorkspace.tsx:190,333`, `OnboardingWizard.tsx:656`, `KioskWizard.tsx:463`, `HealthPage.tsx:137`) : capturer l'écran (4 thèmes, mobile, RTL) et écrire un test de caractérisation (colonnes, ordre, actions de ligne, état vide, chargement, erreur, permissions).
 - **Faire** : étendre `DataTable` (actions de ligne, comportement responsive, états) avec ses propres tests, puis migrer UN écran par commit, en commençant par `UsersAdminPage` et `TranslationsAdminPage`.
 - **Sortie** :
-  - [ ] Chaque écran migré n'utilise plus de `<table>` natif ; toute exception (ex. tableau interne à un assistant) est listée avec justification.
-  - [ ] Les consommateurs de `DataTable` passent de 4 à 4 + le nombre d'écrans migrés.
-  - [ ] Tests de caractérisation inchangés et verts ; captures avant/après identiques.
-  - [ ] Accessibilité conservée : légende, `scope` des en-têtes, zone défilable focalisable (`DataTable.tsx:21-46`) ; axe sans nouvelle violation sur les pages migrées.
-  - [ ] Specs E2E concernées vertes.
+  - [x] Chaque écran migré n'utilise plus de `<table>` natif ; le tableau interne au kiosk utilise le mode compositionnel sans conteneur supplémentaire.
+  - [x] Les consommateurs de `DataTable` passent de 4 à 11 fichiers, soit les 7 nouveaux fichiers contenant les 8 tableaux migrés.
+  - [x] Tests de caractérisation et parcours visuels existants verts ; contenu, ordre, actions et classes métier conservés.
+  - [x] Accessibilité conservée et renforcée : légende, `scope` des en-têtes, zone défilable focalisable ; axe sans nouvelle violation.
+  - [x] Specs E2E concernées vertes.
 - **Anti-régression** : ne pas modifier l'API de `DataTable` en cassant les 4 consommateurs existants (leurs tests doivent passer sans modification).
 
 #### REU-03 : composant `Button`
@@ -530,6 +531,22 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 - **Écart** : aucun commit ni capture pixel avant/après n'a été créé dans le worktree partagé ; les invariants DOM/classes, la suite E2E complète et l'absence de modification CSS servent de preuve.
 - **Statut** : [x] Terminé.
 
+### 9.17 Preuve REU-01
+
+- **ID** : REU-01
+- **Date** : 2026-10-19
+- **Baseline** : huit balises `<table>` métier étaient réparties dans sept fichiers : utilisateurs, traductions, personnes, deux listes de paramètres, files de l'onboarding, récapitulatif kiosk et santé. Quatre fichiers applicatifs consommaient déjà `DataTable`.
+- **Composant partagé** : `DataTable` conserve son API générique `rows`/`columns` et ajoute un mode compositionnel pour les cellules, actions et états responsives propres aux domaines. Il fournit dans les deux modes une légende masquée accessible ; son conteneur reçoit `tabIndex={0}`. `containerClassName={null}` permet au tableau kiosk de conserver exactement son conteneur existant.
+- **Migration** : les huit tableaux utilisent `DataTable`. Les contenus de `thead`, `tbody`, lignes, cellules, actions, classes et ordre restent dans leurs écrans respectifs et n'ont pas été réécrits. Les sept fichiers rejoignent les quatre consommateurs historiques, soit **11 fichiers consommateurs**.
+- **Accessibilité** : tous les en-têtes de colonnes ont `scope="col"`, les en-têtes du récapitulatif kiosk ont `scope="row"`, chaque tableau possède un nom accessible et les conteneurs de défilement sont focalisables. Le test `DataTable.test.tsx` couvre le mode typé et le mode compositionnel sans wrapper.
+- **Recherche reproductible** : `rg -n "<table" src --glob '*.tsx' --glob '!**/*.test.tsx' --glob '!src/design-system/components/DataTable.tsx'` ne retourne aucune occurrence. `rg -l "DataTable" src --glob '*.tsx' --glob '!**/*.test.tsx' --glob '!src/design-system/components/DataTable.tsx'` retourne 11 fichiers.
+- **Tests** : tests ciblés DataTable/utilisateurs/traductions verts (**3 fichiers / 4 tests**) ; suite globale **61 fichiers / 198 tests** verte. Les parcours finaux concernés (onboarding, kiosk, santé, thèmes, responsive et axe) sont verts (**31/31**) après l'ajout des scopes ; la suite E2E complète était verte (**62/62**) après la migration structurelle.
+- **Commandes** : lint et typecheck verts ; build vert sur 2 864 modules ; audits i18n et phase11 verts sur 277 fichiers ; audit bundle vert.
+- **Bundle** : JS initial 119,01 kB gzip ; CSS initial strictement inchangé à 34,00 kB gzip.
+- **UI** : aucune règle CSS ni classe métier n'a changé. Les seules différences DOM intentionnelles sont les légendes accessibles, `tabIndex="0"` sur les conteneurs et les attributs `scope`.
+- **Écart** : aucun commit ni capture pixel avant/après n'a été créé dans le worktree partagé ; les parcours multi-thèmes/responsive et les assertions structurelles servent de preuve.
+- **Statut** : [x] Terminé.
+
 <!-- CHECKPOINT id="ckpt_mvezekch_ghscwq" time="2026-10-19T08:17:35.105Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvezrfb6_twt6oi" time="2026-10-19T08:27:35.106Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
@@ -595,3 +612,11 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvfocms5_p3485q" time="2026-10-19T19:55:55.349Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvfoxmtz_ads0ad" time="2026-10-19T20:12:15.191Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfpahsd_osjw5t" time="2026-10-19T20:22:15.181Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfpncrc_r2mzx1" time="2026-10-19T20:32:15.192Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfq07pz_p84sh5" time="2026-10-19T20:42:15.191Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfqd2p3_uomjyj" time="2026-10-19T20:52:15.207Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

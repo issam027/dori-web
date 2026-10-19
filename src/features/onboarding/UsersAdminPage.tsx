@@ -40,6 +40,7 @@ import {
   updateUserStatus,
 } from './api/onboarding-api';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
@@ -209,15 +210,17 @@ export function UsersAdminPage() {
             <p>{t('admin.users.sensitiveActionsNotice')}</p>
           </div>
         </div>
-        <div className="table-wrap admin-table-wrap">
-          <table>
+        <DataTable
+          caption={t('admin.users.comptesUtilisateurs')}
+          containerClassName="table-wrap admin-table-wrap"
+        >
             <thead>
               <tr>
-                <th>{t('users.singular')}</th>
-                <th>{t('common.type')}</th>
-                <th>{t('common.language')}</th>
-                <th>{t('admin.users.lastLogin')}</th>
-                <th>{t('common.actions')}</th>
+                <th scope="col">{t('users.singular')}</th>
+                <th scope="col">{t('common.type')}</th>
+                <th scope="col">{t('common.language')}</th>
+                <th scope="col">{t('admin.users.lastLogin')}</th>
+                <th scope="col">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -305,8 +308,7 @@ export function UsersAdminPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+        </DataTable>
         {totalPages > 1 ? (
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         ) : null}

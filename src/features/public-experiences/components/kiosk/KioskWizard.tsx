@@ -39,6 +39,7 @@ import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
 import { trackingUrlFromToken } from '../../tracking-url';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
   trackingUrl: string | null;
   queueName?: string;
@@ -461,10 +462,13 @@ export function KioskWizard() {
           {walkinStep === 4 ? (
             <KioskReviewStep>
               <div className="kiosk-review">
-                <table>
+                <DataTable
+                  caption={__t('public-experiences.kiosk.creerMonTicket')}
+                  containerClassName={null}
+                >
                   <tbody>
                     <tr>
-                      <th>{__t('public-experiences.kiosk.service')}</th>
+                      <th scope="row">{__t('public-experiences.kiosk.service')}</th>
                       <td>
                         {
                           queues.data?.data.items.find((item) => item.queueId === queueId)
@@ -473,7 +477,7 @@ export function KioskWizard() {
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('public-experiences.kiosk.attenteEstimee')}</th>
+                      <th scope="row">{__t('public-experiences.kiosk.attenteEstimee')}</th>
                       <td>
                         {queueId
                           ? __t('common.durationMinutes', {
@@ -489,23 +493,23 @@ export function KioskWizard() {
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('common.name')}</th>
+                      <th scope="row">{__t('common.name')}</th>
                       <td>{lastName}</td>
                     </tr>
                     <tr>
-                      <th>{__t('common.firstName')}</th>
+                      <th scope="row">{__t('common.firstName')}</th>
                       <td>{firstName || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
-                      <th>{__t('common.email')}</th>
+                      <th scope="row">{__t('common.email')}</th>
                       <td>{email || __t('public-experiences.kiosk.nonRenseigne')}</td>
                     </tr>
                     <tr>
-                      <th>{__t('common.phone')}</th>
+                      <th scope="row">{__t('common.phone')}</th>
                       <td>{phone}</td>
                     </tr>
                     <tr>
-                      <th>{__t('public-experiences.kiosk.niveauDeService')}</th>
+                      <th scope="row">{__t('public-experiences.kiosk.niveauDeService')}</th>
                       <td>
                         {tier?.tier?.tierName ??
                           __t('kiosk.tier.name', {
@@ -514,7 +518,7 @@ export function KioskWizard() {
                       </td>
                     </tr>
                     <tr>
-                      <th>{__t('public-experiences.kiosk.tarif')}</th>
+                      <th scope="row">{__t('public-experiences.kiosk.tarif')}</th>
                       <td>
                         {tier
                           ? new Intl.NumberFormat(undefined, {
@@ -525,7 +529,7 @@ export function KioskWizard() {
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                </DataTable>
               </div>
             </KioskReviewStep>
           ) : null}

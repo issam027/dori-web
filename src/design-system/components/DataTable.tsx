@@ -7,24 +7,29 @@ export interface DataColumn<TRow> {
   align?: 'start' | 'center' | 'end';
 }
 
-export function DataTable<TRow>({
-  rows,
-  columns,
-  getRowKey,
-  caption,
-}: {
+interface DataTableRowsProps<TRow> {
   rows: readonly TRow[];
   columns: readonly DataColumn<TRow>[];
   getRowKey: (row: TRow) => Key;
   caption: string;
-}) {
-  return (
-    <div className="table-scroll" tabIndex={0}>
+}
+
+interface DataTableCompositionProps {
+  children: ReactNode;
+  caption: string;
+  containerClassName?: string | null;
+}
+
+type DataTableProps<TRow> = DataTableRowsProps<TRow> | DataTableCompositionProps;
+
+export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
+  const table =
+    'rows' in props ? (
       <table>
-        <caption className="sr-only">{caption}</caption>
+        <caption className="sr-only">{props.caption}</caption>
         <thead>
           <tr>
-            {columns.map((column) => (
+            {props.columns.map((column) => (
               <th key={column.key} scope="col" data-align={column.align}>
                 {column.header}
               </th>
@@ -32,9 +37,9 @@ export function DataTable<TRow>({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr key={getRowKey(row)}>
-              {columns.map((column) => (
+          {props.rows.map((row) => (
+            <tr key={props.getRowKey(row)}>
+              {props.columns.map((column) => (
                 <td key={column.key} data-align={column.align}>
                   {column.render(row)}
                 </td>
@@ -43,6 +48,19 @@ export function DataTable<TRow>({
           ))}
         </tbody>
       </table>
+    ) : (
+      <table>
+        <caption className="sr-only">{props.caption}</caption>
+        {props.children}
+      </table>
+    );
+
+  if ('containerClassName' in props && props.containerClassName === null) return table;
+  const containerClassName =
+    'containerClassName' in props ? (props.containerClassName ?? 'table-scroll') : 'table-scroll';
+  return (
+    <div className={containerClassName} tabIndex={0}>
+      {table}
     </div>
   );
 }

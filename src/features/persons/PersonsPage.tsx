@@ -34,6 +34,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 
 const PAGE_SIZE = 10;
 
@@ -181,16 +182,18 @@ export function PersonsPage() {
         ) : !persons.isLoading && items.length === 0 ? (
           <EmptyState title={t('persons.admin.empty')} description={t('persons.admin.emptyHint')} />
         ) : (
-          <div className="table-wrap admin-table-wrap">
-            <table>
+          <DataTable
+            caption={t('persons.admin.title')}
+            containerClassName="table-wrap admin-table-wrap"
+          >
               <thead>
                 <tr>
-                  <th>{t('persons.admin.person')}</th>
-                  <th>{t('common.contact')}</th>
-                  <th>{t('persons.personPickerOrCreate.birthDate')}</th>
-                  <th>{t('common.language')}</th>
-                  <th>{t('common.status')}</th>
-                  <th>{t('common.actions')}</th>
+                  <th scope="col">{t('persons.admin.person')}</th>
+                  <th scope="col">{t('common.contact')}</th>
+                  <th scope="col">{t('persons.personPickerOrCreate.birthDate')}</th>
+                  <th scope="col">{t('common.language')}</th>
+                  <th scope="col">{t('common.status')}</th>
+                  <th scope="col">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -250,8 +253,7 @@ export function PersonsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+          </DataTable>
         )}
         {totalPages > 1 ? (
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />

@@ -38,6 +38,7 @@ import {
   recordCreatedQueue,
 } from '../model/onboarding-workflow';
 import { Button } from '@/design-system/components/Button';
+import { DataTable } from '@/design-system/components/DataTable';
 
 const stepKeys = [
   'onboarding.steps.identity',
@@ -653,17 +654,19 @@ function QueuesStep({
         <b>{__t('onboarding.onboarding.principeDHeritage')}</b>
         <p>{__t('onboarding.onboarding.uneValeurAbsenteOuRemiseAHeriterUtiliseL')}</p>
       </div>
-      <div className="table-wrap admin-table-wrap onboarding-queue-table">
-        <table>
+      <DataTable
+        caption={__t('onboarding.onboarding.filesGuichets')}
+        containerClassName="table-wrap admin-table-wrap onboarding-queue-table"
+      >
           <thead>
             <tr>
-              <th>{__t('onboarding.onboarding.code')}</th>
-              <th>{__t('common.name')}</th>
-              <th>{__t('common.guichets')}</th>
-              <th>{__t('common.rdv')}</th>
-              <th>{__t('common.devise')}</th>
-              <th>{__t('common.api')}</th>
-              <th className="table-action-column">{__t('onboarding.queueActions')}</th>
+              <th scope="col">{__t('onboarding.onboarding.code')}</th>
+              <th scope="col">{__t('common.name')}</th>
+              <th scope="col">{__t('common.guichets')}</th>
+              <th scope="col">{__t('common.rdv')}</th>
+              <th scope="col">{__t('common.devise')}</th>
+              <th scope="col">{__t('common.api')}</th>
+              <th scope="col" className="table-action-column">{__t('onboarding.queueActions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -708,8 +711,7 @@ function QueuesStep({
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+      </DataTable>
     </section>
   );
 }

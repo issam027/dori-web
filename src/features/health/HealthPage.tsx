@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { DataTable } from '@/design-system/components/DataTable';
 import { CalendarClock, Clock3, Database, HeartPulse } from 'lucide-react';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
@@ -133,13 +134,12 @@ export function HealthPage() {
           </div>
           <span className="status-badge">{__t('health.health.lectureSeule')}</span>
         </div>
-        <div className="table-scroll">
-          <table>
+        <DataTable caption={__t('health.health.donneesEffectivementRetourneesParLEndpoint')}>
             <thead>
               <tr>
-                <th>{__t('health.health.champApi')}</th>
-                <th>{__t('common.valeur')}</th>
-                <th>{__t('health.health.interpretation')}</th>
+                <th scope="col">{__t('health.health.champApi')}</th>
+                <th scope="col">{__t('common.valeur')}</th>
+                <th scope="col">{__t('health.health.interpretation')}</th>
               </tr>
             </thead>
             <tbody>
@@ -188,8 +188,7 @@ export function HealthPage() {
                 </td>
               </tr>
             </tbody>
-          </table>
-        </div>
+        </DataTable>
       </Card>
     </div>
   );
