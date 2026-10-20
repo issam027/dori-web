@@ -266,7 +266,7 @@ test('calling and serving a person shows details, disables mutation and builds a
   let active = page.locator('.queue-card-active-call');
   await expect(active).toContainText('Martin');
   await expect(active).toContainText(/15 min/i);
-  await expect(active.getByLabel(/3 note/i)).toBeVisible();
+  await expect(active.getByRole('button', { name: /notes \(3\)/i })).toBeVisible();
   await page.getByRole('button', { name: /actualiser/i }).click();
   await expect(active).toContainText('E001');
   await page.reload();
