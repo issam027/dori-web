@@ -3346,15 +3346,15 @@
 .report-hover-band:focus {
   fill: color-mix(in srgb, var(--color-primary) 7%, transparent);
 }
-.report-chart-tooltip {
+.chart-tooltip {
   pointer-events: none;
   animation: report-reveal 0.15s ease-out both;
 }
-.report-chart-tooltip rect {
+.chart-tooltip rect {
   fill: var(--color-text);
   opacity: 0.94;
 }
-.report-chart-tooltip text {
+.chart-tooltip text {
   fill: var(--color-surface);
   font-size: 12px;
   font-weight: 600;

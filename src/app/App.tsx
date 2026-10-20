@@ -40,7 +40,7 @@ const ControlRoomPage = lazyNamed(
   () => import('@/features/supervision/ControlRoomPage'),
   'ControlRoomPage',
 );
-const ReportsPage = lazyNamed(() => import('@/features/supervision/ReportsPage'), 'ReportsPage');
+const ReportsPage = lazyNamed(() => import('@/features/reports/ReportsPage'), 'ReportsPage');
 const NotificationsPage = lazyNamed(
   () => import('@/features/supervision/NotificationsPage'),
   'NotificationsPage',

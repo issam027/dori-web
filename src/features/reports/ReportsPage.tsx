@@ -1,31 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import {
-  CircleCheck,
-  Download,
-  Gauge,
-  Timer,
-  UserPlus,
-  UserX,
-} from 'lucide-react';
+import { CircleCheck, Download, Gauge, Timer, UserPlus, UserX } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
-import {
-  addDays,
-  groupsToQueueRows,
-  reportPeriodDates,
-  reportsToCsv,
-} from './report-utils';
+import { addDays, groupsToQueueRows, reportPeriodDates, reportsToCsv } from './report-utils';
 import { dateInTimeZone } from '@/features/appointments/appointment-rules';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useReports } from './hooks/useReports';
 import { ReportVisualizations } from './ReportVisualizations';
 import { ReportAnalyticsSections } from './ReportAnalyticsSections';
-import { formatReportNumber, formatReportPercent } from './report-number';
+import { formatReportNumber, formatReportPercent } from '@/core/i18n/number-format';
 import { Button } from '@/design-system/components/Button';
 
 const fallbackTimeZone = 'UTC';
@@ -60,7 +48,9 @@ export function ReportsPage() {
   const totals = reports.data?.data.summary;
   const exportCsv = () => {
     const url = URL.createObjectURL(
-      new Blob([reportsToCsv(queueItems, reports.data?.data.buckets, totals)], { type: 'text/csv;charset=utf-8' }),
+      new Blob([reportsToCsv(queueItems, reports.data?.data.buckets, totals)], {
+        type: 'text/csv;charset=utf-8',
+      }),
     );
     const link = document.createElement('a');
     link.href = url;
@@ -69,11 +59,7 @@ export function ReportsPage() {
     URL.revokeObjectURL(url);
   };
   if (queues.isError || reports.isError)
-    return (
-      <ErrorState
-        onRetry={() => void Promise.all([queues.refetch(), reports.refetch()])}
-      />
-    );
+    return <ErrorState onRetry={() => void Promise.all([queues.refetch(), reports.refetch()])} />;
   return (
     <div className="page-stack">
       <PageHeader
@@ -81,7 +67,13 @@ export function ReportsPage() {
         title={__t('supervision.reports.rapports')}
         description={__t('reports.periodDescription')}
         actions={
-          <Button variant="unstyled" type="button" className="button" disabled={!queueItems.length} onClick={exportCsv}>
+          <Button
+            variant="unstyled"
+            type="button"
+            className="button"
+            disabled={!queueItems.length}
+            onClick={exportCsv}
+          >
             <Download aria-hidden="true" />
             {__t('supervision.reports.exporterCsvLocal')}
           </Button>
@@ -111,7 +103,9 @@ export function ReportsPage() {
               type="date"
               value={effectiveEndDate}
               min={effectiveStartDate}
-              max={addDays(effectiveStartDate, 365) < today ? addDays(effectiveStartDate, 365) : today}
+              max={
+                addDays(effectiveStartDate, 365) < today ? addDays(effectiveStartDate, 365) : today
+              }
               onChange={(event) => {
                 setEndDate(event.target.value);
               }}
@@ -119,7 +113,12 @@ export function ReportsPage() {
           </label>
           <label>
             {__t('reports.granularity')}
-            <select value={granularity} onChange={(event) => { setGranularity(event.target.value as 'day' | 'week' | 'month'); }}>
+            <select
+              value={granularity}
+              onChange={(event) => {
+                setGranularity(event.target.value as 'day' | 'week' | 'month');
+              }}
+            >
               <option value="day">{__t('reports.granularity.day')}</option>
               <option value="week">{__t('reports.granularity.week')}</option>
               <option value="month">{__t('reports.granularity.month')}</option>
@@ -127,9 +126,18 @@ export function ReportsPage() {
           </label>
           <label>
             {__t('queues.singular')}
-            <select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); }}>
+            <select
+              value={queueId ?? ''}
+              onChange={(event) => {
+                setQueueId(event.target.value ? Number(event.target.value) : undefined);
+              }}
+            >
               <option value="">{__t('common.all')}</option>
-              {queues.data?.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueCode} · {queue.queueName}</option>)}
+              {queues.data?.data.items.map((queue) => (
+                <option key={queue.queueId} value={queue.queueId}>
+                  {queue.queueCode} · {queue.queueName}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -140,17 +148,26 @@ export function ReportsPage() {
           { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
           {
             label: __t('reports.averageWaitAbbreviation'),
-            value: totals?.timing.averageWaitMinutes == null ? '—' : `${number(totals.timing.averageWaitMinutes)} ${__t('common.min')}`,
+            value:
+              totals?.timing.averageWaitMinutes == null
+                ? '—'
+                : `${number(totals.timing.averageWaitMinutes)} ${__t('common.min')}`,
             icon: Timer,
           },
           {
             label: __t('reports.averageServiceAbbreviation'),
-            value: totals?.timing.averageServiceMinutes == null ? '—' : `${number(totals.timing.averageServiceMinutes)} ${__t('common.min')}`,
+            value:
+              totals?.timing.averageServiceMinutes == null
+                ? '—'
+                : `${number(totals.timing.averageServiceMinutes)} ${__t('common.min')}`,
             icon: Gauge,
           },
           {
             label: __t('common.noShow'),
-            value: totals?.rates.noShowRate == null ? '—' : formatReportPercent(totals.rates.noShowRate, i18n.language),
+            value:
+              totals?.rates.noShowRate == null
+                ? '—'
+                : formatReportPercent(totals.rates.noShowRate, i18n.language),
             icon: UserX,
           },
         ].map(({ label, value, icon: Icon }) => (
@@ -158,17 +175,60 @@ export function ReportsPage() {
         ))}
       </div>
       {reports.data ? (
-        <ReportVisualizations buckets={reports.data.data.buckets} groups={reports.data.data.groups} summary={reports.data.data.summary} queues={queues.data?.data.items ?? []} />
+        <ReportVisualizations
+          buckets={reports.data.data.buckets}
+          groups={reports.data.data.groups}
+          summary={reports.data.data.summary}
+          queues={queues.data?.data.items ?? []}
+        />
       ) : null}
       {totals ? (
         <div className="metric-grid report-percentiles">
-          <MetricCard label={__t('reports.medianWait')} value={totals.timing.medianWaitMinutes == null ? '—' : `${number(totals.timing.medianWaitMinutes)} ${__t('common.min')}`} icon={<Timer />} />
-          <MetricCard label={__t('reports.p90Wait')} value={totals.timing.p90WaitMinutes == null ? '—' : `${number(totals.timing.p90WaitMinutes)} ${__t('common.min')}`} icon={<Timer />} />
-          <MetricCard label={__t('reports.medianService')} value={totals.timing.medianServiceMinutes == null ? '—' : `${number(totals.timing.medianServiceMinutes)} ${__t('common.min')}`} icon={<Gauge />} />
-          <MetricCard label={__t('reports.p90Service')} value={totals.timing.p90ServiceMinutes == null ? '—' : `${number(totals.timing.p90ServiceMinutes)} ${__t('common.min')}`} icon={<Gauge />} />
+          <MetricCard
+            label={__t('reports.medianWait')}
+            value={
+              totals.timing.medianWaitMinutes == null
+                ? '—'
+                : `${number(totals.timing.medianWaitMinutes)} ${__t('common.min')}`
+            }
+            icon={<Timer />}
+          />
+          <MetricCard
+            label={__t('reports.p90Wait')}
+            value={
+              totals.timing.p90WaitMinutes == null
+                ? '—'
+                : `${number(totals.timing.p90WaitMinutes)} ${__t('common.min')}`
+            }
+            icon={<Timer />}
+          />
+          <MetricCard
+            label={__t('reports.medianService')}
+            value={
+              totals.timing.medianServiceMinutes == null
+                ? '—'
+                : `${number(totals.timing.medianServiceMinutes)} ${__t('common.min')}`
+            }
+            icon={<Gauge />}
+          />
+          <MetricCard
+            label={__t('reports.p90Service')}
+            value={
+              totals.timing.p90ServiceMinutes == null
+                ? '—'
+                : `${number(totals.timing.p90ServiceMinutes)} ${__t('common.min')}`
+            }
+            icon={<Gauge />}
+          />
         </div>
       ) : null}
-      {totals && queueItems.length ? <ReportAnalyticsSections summary={totals} buckets={reports.data?.data.buckets ?? []} queues={queueItems} /> : null}
+      {totals && queueItems.length ? (
+        <ReportAnalyticsSections
+          summary={totals}
+          buckets={reports.data?.data.buckets ?? []}
+          queues={queueItems}
+        />
+      ) : null}
       {!reports.isLoading && !queueItems.length ? (
         <EmptyState title={__t('reports.noDataForPeriod')} />
       ) : (
@@ -206,19 +266,28 @@ export function ReportsPage() {
                 key: 'wait',
                 header: __t('reports.averageWaitAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageWaitMinutes == null ? '—' : `${number(row.timing.averageWaitMinutes)} ${__t('common.min')}`,
+                render: (row) =>
+                  row.timing.averageWaitMinutes == null
+                    ? '—'
+                    : `${number(row.timing.averageWaitMinutes)} ${__t('common.min')}`,
               },
               {
                 key: 'service',
                 header: __t('reports.averageServiceAbbreviation'),
                 align: 'end',
-                render: (row) => row.timing.averageServiceMinutes == null ? '—' : `${number(row.timing.averageServiceMinutes)} ${__t('common.min')}`,
+                render: (row) =>
+                  row.timing.averageServiceMinutes == null
+                    ? '—'
+                    : `${number(row.timing.averageServiceMinutes)} ${__t('common.min')}`,
               },
               {
                 key: 'noShow',
                 header: __t('common.noShow'),
                 align: 'end',
-                render: (row) => row.rates.noShowRate == null ? '—' : formatReportPercent(row.rates.noShowRate, i18n.language),
+                render: (row) =>
+                  row.rates.noShowRate == null
+                    ? '—'
+                    : formatReportPercent(row.rates.noShowRate, i18n.language),
               },
               {
                 key: 'chart',

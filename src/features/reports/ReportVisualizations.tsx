@@ -8,8 +8,9 @@ import type {
 import { BarChart3, ChartPie, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/design-system/components/Card';
-import { formatReportNumber } from './report-number';
+import { formatReportNumber } from '@/core/i18n/number-format';
 import { Button } from '@/design-system/components/Button';
+import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
 
 type View = 'trend' | 'comparison' | 'distribution';
 type Metric =
@@ -73,8 +74,6 @@ function Chart({
     45 + (buckets.length <= 1 ? width / 2 : (index / (buckets.length - 1)) * width);
   const y = (value: number) => 20 + height - (value / max) * height;
   const band = buckets.length <= 1 ? width : width / Math.max(buckets.length - 1, 1);
-  const rtl = i18n.dir() === 'rtl';
-  const tooltipTextX = rtl ? 178 : 12;
   return (
     <div className="report-chart-canvas">
       <svg viewBox="0 0 780 315" role="img">
@@ -161,26 +160,16 @@ function Chart({
             );
           })}
         {hovered !== undefined && buckets[hovered] ? (
-          <g
-            className="report-chart-tooltip"
-            transform={`translate(${String(Math.min(x(hovered) + 8, 545))},28)`}
-          >
-            <rect width="190" height={36 + series.length * 20} rx="9" />
-            <text x={tooltipTextX} y="20" textAnchor="start" direction={rtl ? 'rtl' : 'ltr'}>
-              {buckets[hovered].periodStart.slice(0, 10)}
-            </text>
-            {series.map((item, index) => (
-              <text
-                key={item.id}
-                x={tooltipTextX}
-                y={42 + index * 20}
-                textAnchor="start"
-                direction={rtl ? 'rtl' : 'ltr'}
-              >
-                {item.label}: {formatReportNumber(item.values[hovered] ?? 0, i18n.language)}
-              </text>
-            ))}
-          </g>
+          <SvgChartTooltip
+            x={Math.min(x(hovered) + 8, 545)}
+            y={28}
+            width={190}
+            header={buckets[hovered].periodStart.slice(0, 10)}
+            rows={series.map((item) => ({
+              key: item.id,
+              label: `${item.label}: ${formatReportNumber(item.values[hovered] ?? 0, i18n.language)}`,
+            }))}
+          />
         ) : null}
       </svg>
       {showLegend ? (

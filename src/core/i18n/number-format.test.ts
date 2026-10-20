@@ -1,4 +1,4 @@
-import { formatReportNumber, formatReportPercent } from './report-number';
+import { formatReportNumber, formatReportPercent } from './number-format';
 
 describe('report number formatting', () => {
   it('does not add or remove decimal digits', () => {

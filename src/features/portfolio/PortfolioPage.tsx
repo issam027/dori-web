@@ -15,7 +15,7 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { ConfirmDialog } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { useActiveSite, useSites } from './hooks/useSites';
-import { useDashboardSummaries } from '@/features/supervision/hooks/useReports';
+import { usePortfolioSummaries } from './hooks/usePortfolioSummaries';
 import { deactivateSite, reactivateSite } from './api/sites-api';
 import { Button } from '@/design-system/components/Button';
 
@@ -47,7 +47,7 @@ export function PortfolioPage() {
       )
     : activeSites;
   const summarySiteIds = activeSites.map((site) => site.siteId);
-  const summaries = useDashboardSummaries(summarySiteIds, canViewSummary);
+  const summaries = usePortfolioSummaries(summarySiteIds, canViewSummary);
   const summariesBySite = new Map(
     summarySiteIds.map((siteId, index) => [siteId, summaries[index]?.data]),
   );
@@ -121,7 +121,8 @@ export function PortfolioPage() {
                 ['all', __t('portfolio.allSites'), allowed.length],
               ] as const
             ).map(([value, label, count]) => (
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 key={value}
                 type="button"
                 className={filter === value ? 'is-active' : ''}
@@ -159,7 +160,8 @@ export function PortfolioPage() {
             className={`${site.siteId === activeSiteId ? 'site-card site-card-active' : 'site-card'}${site.isActive ? '' : ' site-card-inactive'}${site.isActive && canDeactivate ? ' site-card-has-deactivate' : ''}`}
           >
             {site.isActive && canDeactivate ? (
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button button-small site-deactivate-button"
                 type="button"
                 title={__t('portfolio.deactivateSite')}
@@ -218,7 +220,8 @@ export function PortfolioPage() {
             ) : null}
             <div className="site-card-actions">
               {user && site.isActive && allowed.length > 1 ? (
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className={site.siteId === activeSiteId ? 'button button-primary' : 'button'}
                   type="button"
                   disabled={site.siteId === activeSiteId}
@@ -231,7 +234,8 @@ export function PortfolioPage() {
                 </Button>
               ) : null}
               {!site.isActive && canReactivate ? (
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button button-primary"
                   type="button"
                   onClick={() => {

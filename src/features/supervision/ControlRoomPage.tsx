@@ -59,6 +59,10 @@ function periodRange(period: Period, now: number) {
   };
 }
 
+function uniqueOperatorsByUser<T extends { userId: number }>(operators: readonly T[]): T[] {
+  return Array.from(new Map(operators.map((operator) => [operator.userId, operator])).values());
+}
+
 export function ControlRoomPage() {
   const { t, i18n } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
@@ -87,6 +91,7 @@ export function ControlRoomPage() {
   const live = useMonitoringLive(siteId, refreshInterval);
   const snapshot = live.data?.data;
   const items = snapshot?.queues ?? [];
+  const uniqueOperators = uniqueOperatorsByUser(snapshot?.operators ?? []);
   const series = useMonitoringSeries({
     siteId,
     queueIds: selectedQueueIds,
@@ -107,8 +112,9 @@ export function ControlRoomPage() {
   const operational = items.map((queue) => ({
     queue,
     tone: slaTone(queue.waiting, queue.estimatedWaitMinutes ?? 0),
-    operators:
+    operators: uniqueOperatorsByUser(
       snapshot?.operators.filter((operator) => operator.queueIds.includes(queue.queueId)) ?? [],
+    ),
   }));
   const dangerCount = operational.filter((item) => item.tone === 'danger').length;
   const queueNames = new Map(items.map((queue) => [queue.queueId, queue.queueName]));
@@ -281,7 +287,7 @@ export function ControlRoomPage() {
                   ))}
                 </div>
               </fieldset>
-              {snapshot?.operators.length ? (
+              {uniqueOperators.length ? (
                 <fieldset className="control-room-queue-picker">
                   <legend>
                     <span>{t('controlRoom.filterOperators')}</span>
@@ -299,7 +305,7 @@ export function ControlRoomPage() {
                       <Check />
                       {t('controlRoom.allOperators')}
                     </Button>
-                    {snapshot.operators.map((operator) => (
+                    {uniqueOperators.map((operator) => (
                       <Button
                         variant="unstyled"
                         key={operator.userId}

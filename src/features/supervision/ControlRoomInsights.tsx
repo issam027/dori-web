@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import type { MonitoringLiveQueueDto, MonitoringSeriesBucketDto } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { ErrorState } from '@/design-system/components/FeedbackState';
-import { formatReportNumber } from './report-number';
+import { formatReportNumber } from '@/core/i18n/number-format';
 import { slaTone } from './sla';
 import { Button } from '@/design-system/components/Button';
+import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
 
 type FlowMetric = 'registered' | 'served' | 'noShow' | 'cancelled';
 const colors: Record<FlowMetric, string> = {
@@ -26,8 +27,6 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
     42 + (buckets.length < 2 ? 330 : (index / (buckets.length - 1)) * 650);
   const y = (value: number) => 20 + 190 - (value / max) * 190;
   const band = buckets.length < 2 ? 650 : 650 / Math.max(buckets.length - 1, 1);
-  const rtl = i18n.dir() === 'rtl';
-  const tooltipTextX = rtl ? 158 : 12;
   const formatTime = (value: string) =>
     new Intl.DateTimeFormat(i18n.language, {
       weekday: buckets.length > 24 ? 'short' : undefined,
@@ -125,27 +124,16 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
               );
             })}
           {hovered !== undefined && buckets[hovered] ? (
-            <g
-              className="report-chart-tooltip"
-              transform={`translate(${String(Math.min(x(hovered) + 8, 515))},24)`}
-            >
-              <rect width="170" height={36 + visible.length * 20} rx="9" />
-              <text x={tooltipTextX} y="20" textAnchor="start" direction={rtl ? 'rtl' : 'ltr'}>
-                {formatTooltipTime(buckets[hovered].periodStart)}
-              </text>
-              {visible.map((metric, index) => (
-                <text
-                  key={metric}
-                  x={tooltipTextX}
-                  y={42 + index * 20}
-                  textAnchor="start"
-                  direction={rtl ? 'rtl' : 'ltr'}
-                >
-                  {t(`controlRoom.flow.${metric}`)}:{' '}
-                  {formatReportNumber(buckets[hovered]?.[metric] ?? 0, i18n.language)}
-                </text>
-              ))}
-            </g>
+            <SvgChartTooltip
+              x={Math.min(x(hovered) + 8, 515)}
+              y={24}
+              width={170}
+              header={formatTooltipTime(buckets[hovered].periodStart)}
+              rows={visible.map((metric) => ({
+                key: metric,
+                label: `${t(`controlRoom.flow.${metric}`)}: ${formatReportNumber(buckets[hovered]?.[metric] ?? 0, i18n.language)}`,
+              }))}
+            />
           ) : null}
         </svg>
       </div>
