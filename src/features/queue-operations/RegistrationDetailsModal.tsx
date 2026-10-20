@@ -8,6 +8,7 @@ import { useRegistration } from './hooks/useQueueOperations';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
+import { formatDate, formatDateTime } from '@/core/i18n/date-format';
 
 const safeText = (value: unknown, fallback = '—') =>
   typeof value === 'string' || typeof value === 'number' ? String(value) : fallback;
@@ -23,20 +24,13 @@ export function RegistrationDetailsModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const registration = useRegistration(registrationId, open);
   const item = registration.data?.data;
   const person = usePerson(item?.personId, open && Boolean(item));
   const customer = person.data?.data;
-  const formatDate = (value?: string, dateOnly = false) => {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '—';
-    return new Intl.DateTimeFormat(
-      undefined,
-      dateOnly ? { dateStyle: 'long' } : { dateStyle: 'medium', timeStyle: 'short' },
-    ).format(date);
-  };
+  const formatRegistrationDate = (value?: string, dateOnly = false) =>
+    (dateOnly ? formatDate(value, i18n.language) : formatDateTime(value, i18n.language)) ?? '—';
   const status = safeText(item?.status);
   const tone =
     status === 'served'
@@ -98,7 +92,11 @@ export function RegistrationDetailsModal({
               <Detail
                 icon={<MapPin />}
                 label={t('common.language')}
-                value={typeof customer?.preferredLanguage === 'string' ? customer.preferredLanguage.toUpperCase() : '—'}
+                value={
+                  typeof customer?.preferredLanguage === 'string'
+                    ? customer.preferredLanguage.toUpperCase()
+                    : '—'
+                }
               />
             </div>
           </section>
@@ -115,25 +113,39 @@ export function RegistrationDetailsModal({
               <Detail
                 icon={<CalendarDays />}
                 label={t('common.businessDate')}
-                value={formatDate(item.businessDate, true)}
+                value={formatRegistrationDate(item.businessDate, true)}
               />
               <Detail
                 icon={<Clock3 />}
                 label={t('common.createdAt')}
-                value={formatDate(item.createdAt)}
+                value={formatRegistrationDate(item.createdAt)}
               />
               <Detail
                 icon={<Clock3 />}
                 label={t('common.updatedAt')}
-                value={formatDate(item.updatedAt)}
+                value={formatRegistrationDate(item.updatedAt)}
               />
-              <Detail icon={<Ticket />} label={t('common.entryType')} value={safeText(item.entryType)} />
-              <Detail icon={<Hash />} label={t('common.tier')} value={<span className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}>{item.tierName ?? `#${String(item.tierId)}`}</span>} />
+              <Detail
+                icon={<Ticket />}
+                label={t('common.entryType')}
+                value={safeText(item.entryType)}
+              />
+              <Detail
+                icon={<Hash />}
+                label={t('common.tier')}
+                value={
+                  <span
+                    className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
+                  >
+                    {item.tierName ?? `#${String(item.tierId)}`}
+                  </span>
+                }
+              />
               {item.scheduledTime ? (
                 <Detail
                   icon={<CalendarDays />}
                   label={t('appointments.title')}
-                  value={formatDate(item.scheduledTime)}
+                  value={formatRegistrationDate(item.scheduledTime)}
                 />
               ) : null}
               {item.appointmentStatus ? (

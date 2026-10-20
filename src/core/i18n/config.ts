@@ -43,10 +43,6 @@ export function toBackendLocale(locale: SupportedLocale): string {
   return BACKEND_LOCALE_CODES[locale] ?? locale;
 }
 
-export function fromBackendLocale(code: string): SupportedLocale {
-  return normalizeLocale(code);
-}
-
 export function isRtl(locale: string): boolean {
   return RTL_LOCALES.has(normalizeLocale(locale));
 }

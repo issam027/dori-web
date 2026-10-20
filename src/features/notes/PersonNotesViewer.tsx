@@ -24,6 +24,7 @@ import {
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { Button } from '@/design-system/components/Button';
+import { formatDateTime } from '@/core/i18n/date-format';
 
 export function PersonNotesViewer({
   personId,
@@ -36,7 +37,7 @@ export function PersonNotesViewer({
   onOpenChange: (open: boolean) => void;
   initialMode?: 'view' | 'add';
 }) {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const canManage = hasPermission(
     useSessionStore((state) => state.user),
     'person_note_manage',
@@ -203,7 +204,7 @@ export function PersonNotesViewer({
                 __t('persons.notes.userReference', {
                   value0: String(current.createdByUserId),
                 })}{' '}
-              · {new Date(current.createdAt).toLocaleString()}
+              · {formatDateTime(current.createdAt, i18n.language)}
             </small>
             {canManage ? (
               <div className="note-inline-actions">

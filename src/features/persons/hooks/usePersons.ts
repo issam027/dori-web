@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { findPerson, findPersons } from '../api/persons-api';
 
@@ -33,14 +33,5 @@ export function usePerson(personId: number | null | undefined, enabled = true) {
     queryKey: queryKeys.persons.detail(personId),
     queryFn: ({ signal }) => findPerson(personId ?? 0, signal),
     enabled: enabled && Boolean(personId),
-  });
-}
-
-export function usePersonsByIds(personIds: readonly number[]) {
-  return useQueries({
-    queries: personIds.map((personId) => ({
-      queryKey: queryKeys.persons.detail(personId),
-      queryFn: ({ signal }: { signal: AbortSignal }) => findPerson(personId, signal),
-    })),
   });
 }

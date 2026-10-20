@@ -20,6 +20,7 @@ import { useNotification, useNotifications, useResendNotification } from './hook
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { Button } from '@/design-system/components/Button';
+import { formatDateTime } from '@/core/i18n/date-format';
 
 const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger' =>
   status === 'delivered'
@@ -31,7 +32,7 @@ const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger
         : 'neutral';
 
 export function NotificationsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useSessionStore((state) => state.user);
   const canSend = hasPermission(user, 'notification_send');
   const siteId = useScopeStore((state) => state.activeSiteId);
@@ -238,7 +239,7 @@ export function NotificationsPage() {
             {
               key: 'created',
               header: t('common.createdAt'),
-              render: (row) => new Date(row.createdAt).toLocaleString(),
+              render: (row) => formatDateTime(row.createdAt, i18n.language) ?? '—',
             },
             {
               key: 'ticket',

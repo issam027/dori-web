@@ -1,4 +1,4 @@
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidatePersonNotes } from '@/api/client/query-invalidations';
 import { queryKeys } from '@/api/client/query-keys';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
@@ -22,16 +22,6 @@ export function usePersonNotes(
         signal,
       ),
     enabled: options.enabled !== false,
-  });
-}
-
-export function usePersonNotesPresence(personIds: readonly number[]) {
-  return useQueries({
-    queries: personIds.map((personId) => ({
-      queryKey: queryKeys.persons.notes(personId, 'presence'),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        findPersonNotes(personId, { page: 1, pageSize: 1, sort: 'createdAt:desc' }, signal),
-    })),
   });
 }
 

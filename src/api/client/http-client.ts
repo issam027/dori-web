@@ -74,7 +74,8 @@ export function onAuthenticationExpired(listener: AuthenticationExpiredListener)
 
 httpClient.interceptors.request.use((config) => {
   const token = getAccessToken();
-  if (token && !isPublicOperation(config.url)) config.headers.set('Authorization', `Bearer ${token}`);
+  if (token && !isPublicOperation(config.url))
+    config.headers.set('Authorization', `Bearer ${token}`);
   if (!config.headers.has('X-Correlation-Id')) {
     config.headers.set('X-Correlation-Id', createCorrelationId());
   }
@@ -119,6 +120,3 @@ export async function request<T>(
   const response = await httpClient.request<T>({ ...config, ...options });
   return response.data;
 }
-
-export type ApiError<T> = AxiosError<T>;
-export type ApiBody<T> = T;

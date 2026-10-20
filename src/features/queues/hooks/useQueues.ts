@@ -27,15 +27,6 @@ export function useQueues(options: {
   });
 }
 
-export function useQueueStatus(queueId: number, enabled = true) {
-  return useQuery({
-    queryKey: queryKeys.queueStatus.detail(queueId),
-    queryFn: ({ signal }) => findQueueStatus(queueId, signal),
-    enabled,
-    refetchInterval: 15_000,
-  });
-}
-
 export function useQueueStatuses(queueIds: readonly number[]) {
   return useQueries({
     queries: queueIds.map((queueId) => ({

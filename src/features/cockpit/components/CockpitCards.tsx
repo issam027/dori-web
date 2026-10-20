@@ -1,4 +1,4 @@
-import { Check, PhoneCall, StickyNote, UserX } from 'lucide-react';
+import { Check, PhoneCall, UserX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type {
   CallNextRegistrationResponseDto,
@@ -10,6 +10,7 @@ import type {
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { useRegistration } from '@/features/queue-operations/hooks/useQueueOperations';
+import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
 import { Button } from '@/design-system/components/Button';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {
@@ -117,21 +118,12 @@ export function ActiveCallCard({
             </Button>
           </div>
           {onNotes ? (
-            <Button
-              variant="unstyled"
-              className="button active-call-notes"
-              type="button"
+            <PersonNotesButton
+              variant="cockpit"
+              className="active-call-notes"
+              noteCount={noteCount}
               onClick={onNotes}
-            >
-              <StickyNote aria-hidden="true" />
-              {t('queue-operations.desk.consulterLesNotes')}
-              <span
-                className="note-count"
-                aria-label={t('persons.notes.count', { count: noteCount })}
-              >
-                {noteCount}
-              </span>
-            </Button>
+            />
           ) : null}
         </div>
       ) : (
@@ -330,19 +322,13 @@ function QueueActiveCall({
           <span className="button-label">{t('common.absent')}</span>
         </Button>
         {personId ? (
-          <Button
-            variant="unstyled"
-            className="button"
-            type="button"
-            aria-label={t('persons.notes.count', { count: noteCount })}
+          <PersonNotesButton
+            variant="cockpit"
+            noteCount={noteCount}
             onClick={() => {
               onNotes(personId);
             }}
-          >
-            <StickyNote aria-hidden="true" />
-            <span className="button-label">{t('queue-operations.desk.consulterLesNotes')}</span>
-            <span className="note-count">{noteCount}</span>
-          </Button>
+          />
         ) : null}
       </div>
     </div>

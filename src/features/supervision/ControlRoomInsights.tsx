@@ -7,6 +7,7 @@ import { formatReportNumber } from '@/core/i18n/number-format';
 import { slaTone } from './sla';
 import { Button } from '@/design-system/components/Button';
 import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
+import { formatDateTime, formatDateValue } from '@/core/i18n/date-format';
 
 type FlowMetric = 'registered' | 'served' | 'noShow' | 'cancelled';
 const colors: Record<FlowMetric, string> = {
@@ -28,15 +29,12 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
   const y = (value: number) => 20 + 190 - (value / max) * 190;
   const band = buckets.length < 2 ? 650 : 650 / Math.max(buckets.length - 1, 1);
   const formatTime = (value: string) =>
-    new Intl.DateTimeFormat(i18n.language, {
+    formatDateValue(value, i18n.language, {
       weekday: buckets.length > 24 ? 'short' : undefined,
       hour: '2-digit',
       minute: buckets.length > 24 ? undefined : '2-digit',
-    }).format(new Date(value));
-  const formatTooltipTime = (value: string) =>
-    new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
-      new Date(value),
-    );
+    }) ?? '—';
+  const formatTooltipTime = (value: string) => formatDateTime(value, i18n.language) ?? '—';
   return (
     <>
       <div className="control-room-chart">

@@ -42,6 +42,7 @@ import {
 } from './appointment-actions';
 import { useAvailability } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
+import { printDocument } from '@/shared/printing/print-document';
 
 type ActionMode = 'summary' | 'reschedule' | 'cancel';
 
@@ -185,13 +186,7 @@ export function AppointmentActionDialog({
         type="button"
         disabled={!printReady}
         onClick={() => {
-          document.body.dataset.printKioskTicket = 'true';
-          const cleanup = () => {
-            delete document.body.dataset.printKioskTicket;
-          };
-          window.addEventListener('afterprint', cleanup, { once: true });
-          window.print();
-          window.setTimeout(cleanup, 30_000);
+          printDocument({ datasetKey: 'printKioskTicket' });
         }}
       >
         <Printer aria-hidden="true" />

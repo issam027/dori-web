@@ -6,6 +6,7 @@ import { ErrorState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { APP_VERSION_LABEL } from '@/core/config/app-version';
+import { formatDateTime } from '@/core/i18n/date-format';
 import { useHealth } from './hooks/useHealth';
 
 const bytes = (value: number) => `${(value / 1024 / 1024).toFixed(1)} MiB`;
@@ -17,7 +18,7 @@ const duration = (seconds: number) => {
 };
 
 export function HealthPage() {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const health = useHealth();
   if (health.isError && !health.data) return <ErrorState onRetry={() => void health.refetch()} />;
   const data = health.data;
@@ -65,7 +66,7 @@ export function HealthPage() {
         />
         <MetricCard
           label={__t('health.health.horodatageApi')}
-          value={data ? new Date(data.timestamp).toLocaleString() : '—'}
+          value={formatDateTime(data?.timestamp, i18n.language) ?? '—'}
           icon={<CalendarClock />}
         />
       </div>
@@ -135,59 +136,57 @@ export function HealthPage() {
           <span className="status-badge">{__t('health.health.lectureSeule')}</span>
         </div>
         <DataTable caption={__t('health.health.donneesEffectivementRetourneesParLEndpoint')}>
-            <thead>
-              <tr>
-                <th scope="col">{__t('health.health.champApi')}</th>
-                <th scope="col">{__t('common.valeur')}</th>
-                <th scope="col">{__t('health.health.interpretation')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label={__t('health.health.champApi')}>
-                  <code>{__t('health.health.status')}</code>
-                </td>
-                <td data-label={__t('common.valeur')}>{data?.status ?? '—'}</td>
-                <td data-label={__t('health.health.interpretation')}>
-                  {__t('health.health.etatGlobalDuService')}
-                </td>
-              </tr>
-              <tr>
-                <td data-label={__t('health.health.champApi')}>
-                  <code>{__t('health.health.checksDatabase')}</code>
-                </td>
-                <td data-label={__t('common.valeur')}>{data?.checks.database ?? '—'}</td>
-                <td data-label={__t('health.health.interpretation')}>
-                  {__t('health.health.connectivitePostgresql')}
-                </td>
-              </tr>
-              <tr>
-                <td data-label={__t('health.health.champApi')}>
-                  <code>{__t('health.health.uptime')}</code>
-                </td>
-                <td data-label={__t('common.valeur')}>
-                  {data
-                    ? __t('health.durationSeconds', {
-                        value0: String(data.uptime),
-                      })
-                    : '—'}
-                </td>
-                <td data-label={__t('health.health.interpretation')}>
-                  {__t('health.health.dureeDeVieDuProcessus')}
-                </td>
-              </tr>
-              <tr>
-                <td data-label={__t('health.health.champApi')}>
-                  <code>{__t('health.health.checksMemoryusage')}</code>
-                </td>
-                <td data-label={__t('common.valeur')}>
-                  {data ? __t('health.counterCount') : '—'}
-                </td>
-                <td data-label={__t('health.health.interpretation')}>
-                  {__t('health.health.memoireNodeJsBrute')}
-                </td>
-              </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th scope="col">{__t('health.health.champApi')}</th>
+              <th scope="col">{__t('common.valeur')}</th>
+              <th scope="col">{__t('health.health.interpretation')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label={__t('health.health.champApi')}>
+                <code>{__t('health.health.status')}</code>
+              </td>
+              <td data-label={__t('common.valeur')}>{data?.status ?? '—'}</td>
+              <td data-label={__t('health.health.interpretation')}>
+                {__t('health.health.etatGlobalDuService')}
+              </td>
+            </tr>
+            <tr>
+              <td data-label={__t('health.health.champApi')}>
+                <code>{__t('health.health.checksDatabase')}</code>
+              </td>
+              <td data-label={__t('common.valeur')}>{data?.checks.database ?? '—'}</td>
+              <td data-label={__t('health.health.interpretation')}>
+                {__t('health.health.connectivitePostgresql')}
+              </td>
+            </tr>
+            <tr>
+              <td data-label={__t('health.health.champApi')}>
+                <code>{__t('health.health.uptime')}</code>
+              </td>
+              <td data-label={__t('common.valeur')}>
+                {data
+                  ? __t('health.durationSeconds', {
+                      value0: String(data.uptime),
+                    })
+                  : '—'}
+              </td>
+              <td data-label={__t('health.health.interpretation')}>
+                {__t('health.health.dureeDeVieDuProcessus')}
+              </td>
+            </tr>
+            <tr>
+              <td data-label={__t('health.health.champApi')}>
+                <code>{__t('health.health.checksMemoryusage')}</code>
+              </td>
+              <td data-label={__t('common.valeur')}>{data ? __t('health.counterCount') : '—'}</td>
+              <td data-label={__t('health.health.interpretation')}>
+                {__t('health.health.memoireNodeJsBrute')}
+              </td>
+            </tr>
+          </tbody>
         </DataTable>
       </Card>
     </div>

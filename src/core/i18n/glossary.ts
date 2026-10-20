@@ -1,16 +1,3 @@
-/**
- * Terminology enforced by tests. One concept = one word per language.
- * The mapping documents the intended term; `forbidden` is what the tests reject.
- */
-export const GLOSSARY = {
-  queue: { fr: 'file', en: 'queue', ar: 'قائمة انتظار', 'ar-TN': 'قائمة انتظار' },
-  counter: { fr: 'guichet', en: 'desk / counter', ar: 'شباك', 'ar-TN': 'شباك' },
-  ticket: { fr: 'ticket', en: 'ticket', ar: 'تذكرة', 'ar-TN': 'تذكرة' },
-  customer: { fr: 'client / personne', en: 'customer / person', ar: 'عميل / شخص', 'ar-TN': 'حريف' },
-  serviceLevel: { fr: 'niveau de service', en: 'service level', ar: 'مستوى الخدمة', 'ar-TN': 'مستوى الخدمة' },
-  brand: { fr: 'DORIFY', en: 'DORIFY', ar: 'DORIFY', 'ar-TN': 'DORIFY' },
-} as const;
-
 type Forbidden = { pattern: RegExp; reason: string };
 const AR_LETTERS = '\\u0600-\\u06FF';
 const arWord = (w: string) => new RegExp(`(?<![${AR_LETTERS}])${w}`);

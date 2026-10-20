@@ -45,10 +45,11 @@ import {
 } from '@/features/onboarding/api/onboarding-api';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { formatDateTime } from '@/core/i18n/date-format';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const current = useSessionStore((state) => state.user);
@@ -274,7 +275,7 @@ export function UsersAdminPage() {
                 <td>{user.languagePreference.toUpperCase()}</td>
                 <td>
                   {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleString()
+                    ? formatDateTime(user.lastLogin, i18n.language)
                     : t('common.notProvided')}
                 </td>
                 <td>
@@ -420,7 +421,7 @@ export function UsersAdminPage() {
         description={userDetail.data ? getUserDisplayName(userDetail.data.data) : undefined}
       >
         {userDetail.data ? (
-          <UserDetail user={userDetail.data.data} t={t} />
+          <UserDetail user={userDetail.data.data} locale={i18n.language} t={t} />
         ) : (
           <p className="muted">{t('common.loading')}</p>
         )}
@@ -578,9 +579,11 @@ export function UsersAdminPage() {
 
 function UserDetail({
   user,
+  locale,
   t,
 }: {
   user: UserResponseDto;
+  locale: string;
   t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   return (
@@ -604,9 +607,7 @@ function UserDetail({
         </div>
         <div>
           <dt>{t('admin.users.lastLogin')}</dt>
-          <dd>
-            {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : t('common.notProvided')}
-          </dd>
+          <dd>{formatDateTime(user.lastLogin, locale) ?? t('common.notProvided')}</dd>
         </div>
       </dl>
       <div className="user-detail-scopes">

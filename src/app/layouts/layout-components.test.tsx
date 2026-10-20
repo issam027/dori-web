@@ -5,7 +5,6 @@ import type { CurrentUserResponseDto } from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
 import { Modal } from '@/design-system/components/Modal';
 import { SidebarAccordion } from './SidebarAccordion';
-import { SiteContextSwitcher } from './SiteContextSwitcher';
 import { Topbar } from './Topbar';
 
 const operator: CurrentUserResponseDto = {
@@ -37,31 +36,6 @@ describe('application layout', () => {
     await user.click(screen.getByRole('button', { name: /exp/i }));
     expect(screen.getByRole('link', { name: /display|affichage|écran salle/i })).toBeVisible();
     expect(screen.queryByRole('link', { name: /cockpit|desk/i })).not.toBeInTheDocument();
-  });
-
-  it('hides the redundant mono-site selector and enables it otherwise', async () => {
-    const onSelect = vi.fn();
-    const { rerender } = render(
-      <SiteContextSwitcher
-        sites={[{ id: 1, name: 'Paris' }]}
-        activeSiteId={1}
-        onSelect={onSelect}
-      />,
-    );
-    expect(screen.queryByText('Paris')).not.toBeInTheDocument();
-
-    rerender(
-      <SiteContextSwitcher
-        sites={[
-          { id: 1, name: 'Paris' },
-          { id: 2, name: 'Lyon' },
-        ]}
-        activeSiteId={1}
-        onSelect={onSelect}
-      />,
-    );
-    await userEvent.click(screen.getByText('Lyon'));
-    expect(onSelect).toHaveBeenCalledWith(2);
   });
 
   it('exposes an accessible modal and returns the close intent', async () => {

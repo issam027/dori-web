@@ -3,7 +3,16 @@ import type { TFunction } from 'i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Check, Globe2, KeyRound, Languages, ListChecks, LogOut, Palette, Save } from 'lucide-react';
+import {
+  Check,
+  Globe2,
+  KeyRound,
+  Languages,
+  ListChecks,
+  LogOut,
+  Palette,
+  Save,
+} from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -20,6 +29,7 @@ import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
 import { getUserDisplayName, getUserInitials } from '@/features/users/user-display';
 import { Button } from '@/design-system/components/Button';
+import { formatDateTime } from '@/core/i18n/date-format';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -42,7 +52,7 @@ const createPasswordSchema = (t: TFunction) =>
 type PasswordForm = z.infer<ReturnType<typeof createPasswordSchema>>;
 
 export function ProfilePage() {
-  const { t: __t } = useTranslation();
+  const { t: __t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
@@ -58,7 +68,11 @@ export function ProfilePage() {
     formState: { errors, isSubmitting },
   } = useForm<ProfileForm>({
     resolver: zodResolver(createSchema(__t)),
-    values: { fullName: user?.fullName ?? '', email: user?.email ?? '', languagePreference: user?.languagePreference ?? 'fr' },
+    values: {
+      fullName: user?.fullName ?? '',
+      email: user?.email ?? '',
+      languagePreference: user?.languagePreference ?? 'fr',
+    },
   });
   const {
     register: registerPassword,
@@ -138,7 +152,7 @@ export function ProfilePage() {
             </div>
             <div>
               <dt>{__t('profile.profile.derniereConnexion')}</dt>
-              <dd>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '—'}</dd>
+              <dd>{formatDateTime(user.lastLogin, i18n.language) ?? '—'}</dd>
             </div>
             <div>
               <dt>{__t('common.scope')}</dt>
@@ -154,7 +168,14 @@ export function ProfilePage() {
           </dl>
           <footer className="profile-identity-footer">
             <p>{__t('profile.globalLogout.help')}</p>
-            <Button variant="unstyled" className="button button-danger" type="button" onClick={() => { setGlobalLogoutOpen(true); }}>
+            <Button
+              variant="unstyled"
+              className="button button-danger"
+              type="button"
+              onClick={() => {
+                setGlobalLogoutOpen(true);
+              }}
+            >
               <LogOut aria-hidden="true" />
               {__t('profile.globalLogout.action')}
             </Button>
@@ -193,7 +214,12 @@ export function ProfilePage() {
               </select>
             </FormField>
             {saved ? <p role="status">{__t('profile.profile.profilEnregistre')}</p> : null}
-            <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
+            <Button
+              variant="unstyled"
+              className="button button-primary"
+              disabled={isSubmitting}
+              type="submit"
+            >
               <Save aria-hidden="true" />
               {__t('common.save')}
             </Button>
@@ -217,7 +243,8 @@ export function ProfilePage() {
                 const selected = color.id === accentColor;
                 const label = __t(color.labelKey);
                 return (
-                  <Button variant="unstyled"
+                  <Button
+                    variant="unstyled"
                     key={color.id}
                     className={'profile-color-swatch' + (selected ? ' is-selected' : '')}
                     type="button"
@@ -252,7 +279,8 @@ export function ProfilePage() {
                   <strong>{__t('profile.profile.securiteDuCompte')}</strong>
                   <p>{__t('profile.profile.modifiezVotreMotDePasseDepuisUnParcoursD')}</p>
                 </div>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button button-primary"
                   type="button"
                   onClick={() => {
@@ -305,7 +333,8 @@ export function ProfilePage() {
                     />
                   </FormField>
                   <div className="profile-password-actions">
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       className="button"
                       type="button"
                       disabled={passwordSubmitting}
@@ -316,7 +345,8 @@ export function ProfilePage() {
                     >
                       {__t('common.cancel')}
                     </Button>
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       className="button button-primary"
                       type="submit"
                       disabled={passwordSubmitting}
@@ -356,10 +386,27 @@ export function ProfilePage() {
       </div>
       <Modal
         open={globalLogoutOpen}
-        onOpenChange={(open) => { if (!globalLogoutPending) setGlobalLogoutOpen(open); }}
+        onOpenChange={(open) => {
+          if (!globalLogoutPending) setGlobalLogoutOpen(open);
+        }}
         title={__t('profile.globalLogout.confirmTitle')}
         description={__t('profile.globalLogout.confirmDescription')}
-        actions={<Button variant="unstyled" className="button button-danger" type="button" disabled={globalLogoutPending} onClick={() => { void globalLogout(); }}><LogOut aria-hidden="true" />{globalLogoutPending ? __t('profile.globalLogout.pending') : __t('profile.globalLogout.confirmAction')}</Button>}
+        actions={
+          <Button
+            variant="unstyled"
+            className="button button-danger"
+            type="button"
+            disabled={globalLogoutPending}
+            onClick={() => {
+              void globalLogout();
+            }}
+          >
+            <LogOut aria-hidden="true" />
+            {globalLogoutPending
+              ? __t('profile.globalLogout.pending')
+              : __t('profile.globalLogout.confirmAction')}
+          </Button>
+        }
       >
         <span />
       </Modal>

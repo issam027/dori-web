@@ -5,30 +5,40 @@ import { Button } from '@/design-system/components/Button';
 export function PersonNotesButton({
   noteCount,
   onClick,
+  variant = 'default',
+  className,
 }: {
   noteCount: number | null | undefined;
   onClick: () => void;
+  variant?: 'default' | 'cockpit';
+  className?: string;
 }) {
   const { t } = useTranslation();
   const count = Math.max(0, noteCount ?? 0);
   const accessibleLabel = count
     ? t('queues.myQueues.viewNotes', { count })
     : t('queues.myQueues.addNote');
+  const cockpit = variant === 'cockpit';
+  const classes = cockpit
+    ? ['button', className].filter(Boolean).join(' ')
+    : ['button', 'button-small', 'person-notes-button', className].filter(Boolean).join(' ');
 
   return (
     <Button
       variant="unstyled"
       aria-label={accessibleLabel}
-      className="button button-small person-notes-button"
+      className={classes}
       type="button"
       title={accessibleLabel}
       onClick={onClick}
     >
-      {count ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
-      <span>{t('persons.admin.notes')}</span>
+      {cockpit || count ? <StickyNote aria-hidden="true" /> : <Plus aria-hidden="true" />}
+      <span className={cockpit ? 'button-label' : undefined}>
+        {cockpit ? t('queue-operations.desk.consulterLesNotes') : t('persons.admin.notes')}
+      </span>
       <span
         aria-hidden="true"
-        className={`note-count note-count-compact${count === 0 ? ' note-count-empty' : ''}`}
+        className={`note-count${cockpit ? '' : ' note-count-compact'}${count === 0 ? ' note-count-empty' : ''}`}
       >
         {count}
       </span>

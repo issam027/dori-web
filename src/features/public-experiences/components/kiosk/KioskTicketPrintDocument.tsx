@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { TrackingQr } from '../../TrackingQr';
+import { formatDateTime } from '@/core/i18n/date-format';
 
 export function KioskTicketPrintDocument({
   ticketNumber,
@@ -15,7 +16,7 @@ export function KioskTicketPrintDocument({
   trackingUrl?: string | null;
   onReady: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return createPortal(
     <article className="kiosk-ticket-print-document" aria-hidden="true">
@@ -30,7 +31,11 @@ export function KioskTicketPrintDocument({
         <p>{t('kiosk.print.guidance')}</p>
       </main>
       <footer>
-        <span>{t('kiosk.print.printedAt', { date: new Date().toLocaleString() })}</span>
+        <span>
+          {t('kiosk.print.printedAt', {
+            date: formatDateTime(new Date(), i18n.language) ?? '—',
+          })}
+        </span>
         <small>{t('kiosk.print.footer')}</small>
       </footer>
     </article>,

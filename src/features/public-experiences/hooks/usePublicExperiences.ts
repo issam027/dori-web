@@ -4,7 +4,6 @@ import type {
   CreateRegistrationDto,
   CreateRegistrationResponseDto,
   RegistrationsControllerLookupParams,
-  QueueTierResponseDto,
   RegistrationPositionResponseDto,
   RegistrationResponseDto,
 } from '@/api/generated/models';
@@ -193,5 +192,3 @@ export function useKioskRegistration(options: {
   });
   return { register, lookup, checkIn };
 }
-
-export type KioskTier = QueueTierResponseDto;

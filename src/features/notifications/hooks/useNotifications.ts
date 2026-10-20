@@ -44,19 +44,6 @@ export function useNotification(notificationId: number | undefined) {
   });
 }
 
-export function useRecentNotifications() {
-  return useQuery({
-    queryKey: queryKeys.notifications.controlRoom,
-    queryFn: ({ signal }) =>
-      notificationsControllerFindNotifications(
-        { page: 1, pageSize: 5, sort: 'createdAt:desc' },
-        undefined,
-        signal,
-      ),
-    refetchInterval: 15_000,
-  });
-}
-
 export function usePersonRegistrations(siteId: number | null, personId: number | undefined) {
   return useQuery({
     queryKey: queryKeys.registrations.list({

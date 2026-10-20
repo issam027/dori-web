@@ -6,6 +6,7 @@ import { Card } from '@/design-system/components/Card';
 import type { PassageSummary } from '@/features/queue-operations/operation-store';
 import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
 import { Button } from '@/design-system/components/Button';
+import { printDocument } from '@/shared/printing/print-document';
 
 export function CockpitPassages({
   passages,
@@ -26,20 +27,14 @@ export function CockpitPassages({
 
   useEffect(() => {
     if (!printingPassage) return;
-    document.body.dataset.printPassage = String(printingPassage.registrationId);
-    const finish = () => {
-      delete document.body.dataset.printPassage;
-      setPrintingId(null);
-    };
-    window.addEventListener('afterprint', finish, { once: true });
-    const timer = window.setTimeout(() => {
-      window.print();
-    }, 50);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener('afterprint', finish);
-      delete document.body.dataset.printPassage;
-    };
+    return printDocument({
+      datasetKey: 'printPassage',
+      datasetValue: String(printingPassage.registrationId),
+      delayMs: 50,
+      onAfterPrint: () => {
+        setPrintingId(null);
+      },
+    });
   }, [printingPassage]);
 
   if (totalCount === 0) return null;
