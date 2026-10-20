@@ -1,7 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Ban, CalendarClock, CalendarPlus, Check, CheckCircle2, Printer, Save, UserCheck } from 'lucide-react';
+import {
+  ArrowLeft,
+  Ban,
+  CalendarClock,
+  CalendarPlus,
+  Check,
+  CheckCircle2,
+  Printer,
+  Save,
+  UserCheck,
+} from 'lucide-react';
 import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated/models';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { notifyError } from '@/core/notifications/error-presentation';
@@ -166,46 +176,49 @@ export function AppointmentActionDialog({
     }
   };
 
-  const actions =
-    checkedIn ? (
-      <>
-        <Button variant="unstyled"
-          className="button button-small"
-          type="button"
-          disabled={!printReady}
-          onClick={() => {
-            document.body.dataset.printKioskTicket = 'true';
-            const cleanup = () => {
-              delete document.body.dataset.printKioskTicket;
-            };
-            window.addEventListener('afterprint', cleanup, { once: true });
-            window.print();
-            window.setTimeout(cleanup, 30_000);
-          }}
-        >
-          <Printer aria-hidden="true" />
-          <span className="button-label">{t('public-experiences.kiosk.imprimerMonTicket')}</span>
-        </Button>
-        <Button variant="unstyled"
-          className="button button-small button-primary"
-          type="button"
-          onClick={() => {
-            onOpenChange(false);
-          }}
-        >
-          <Check aria-hidden="true" />
-          <span className="button-label">{t('common.terminer')}</span>
-        </Button>
-      </>
-    ) : mode === 'summary' ? (
-      <>
-        {manageable ? (
-          <>
-            <Button variant="unstyled"
+  const actions = checkedIn ? (
+    <>
+      <Button
+        variant="unstyled"
+        className="button button-small"
+        type="button"
+        disabled={!printReady}
+        onClick={() => {
+          document.body.dataset.printKioskTicket = 'true';
+          const cleanup = () => {
+            delete document.body.dataset.printKioskTicket;
+          };
+          window.addEventListener('afterprint', cleanup, { once: true });
+          window.print();
+          window.setTimeout(cleanup, 30_000);
+        }}
+      >
+        <Printer aria-hidden="true" />
+        <span className="button-label">{t('public-experiences.kiosk.imprimerMonTicket')}</span>
+      </Button>
+      <Button
+        variant="unstyled"
+        className="button button-small button-primary"
+        type="button"
+        onClick={() => {
+          onOpenChange(false);
+        }}
+      >
+        <Check aria-hidden="true" />
+        <span className="button-label">{t('common.terminer')}</span>
+      </Button>
+    </>
+  ) : mode === 'summary' ? (
+    <>
+      {manageable ? (
+        <>
+          {checkInAllowed ? (
+            <Button
+              variant="unstyled"
               className="button button-small button-primary"
               type="button"
               title={t('appointments.actions.markPresent')}
-              disabled={!checkInAllowed || pending}
+              disabled={pending}
               onClick={() => {
                 void checkIn();
               }}
@@ -213,127 +226,135 @@ export function AppointmentActionDialog({
               <UserCheck aria-hidden="true" />
               <span className="button-label">{t('appointments.actions.markPresent')}</span>
             </Button>
-            <Button variant="unstyled"
-              className="button button-small"
-              type="button"
-              title={t('appointments.actions.reschedule')}
-              disabled={pending}
-              onClick={() => {
-                setMode('reschedule');
-              }}
-            >
-              <CalendarClock aria-hidden="true" />
-              <span className="button-label">{t('appointments.actions.reschedule')}</span>
-            </Button>
-            <Button variant="unstyled"
-              className="button button-small button-danger"
-              type="button"
-              title={t('appointments.actions.cancelAppointment')}
-              disabled={pending}
-              onClick={() => {
-                setMode('cancel');
-              }}
-            >
-              <Ban aria-hidden="true" />
-              <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
-            </Button>
-          </>
-        ) : null}
-        {isTerminalAppointment(appointment) && details && onCreateFollowUp ? (
-          <Button variant="unstyled"
-            className="button button-small button-primary"
+          ) : null}
+          <Button
+            variant="unstyled"
+            className="button button-small"
             type="button"
+            title={t('appointments.actions.reschedule')}
+            disabled={pending}
             onClick={() => {
-              onCreateFollowUp({
-                person: details,
-                queueId: appointment.queueId,
-                tierId: appointment.tierId,
-              });
+              setMode('reschedule');
             }}
           >
-            <CalendarPlus aria-hidden="true" />
-            <span className="button-label">{t('appointments.actions.createFollowUp')}</span>
+            <CalendarClock aria-hidden="true" />
+            <span className="button-label">{t('appointments.actions.reschedule')}</span>
           </Button>
-        ) : null}
-      </>
-    ) : mode === 'cancel' ? (
-      <>
-        <Button variant="unstyled"
-          className="button button-small"
-          type="button"
-          title={t('common.previous')}
-          disabled={pending}
-          onClick={goBack}
-        >
-          <ArrowLeft aria-hidden="true" />
-          <span className="button-label">{t('common.previous')}</span>
-        </Button>
-        <Button variant="unstyled"
-          className="button button-small button-danger"
-          type="button"
-          title={t('appointments.actions.confirmCancellation')}
-          disabled={!cancellationReason.trim() || pending}
-          onClick={() => {
-            void perform({
-              action: () => cancelAppointment(appointment.registrationId),
-              successMessage: t('appointments.actions.cancelSuccess'),
-              note: t('appointments.notes.cancelled', {
-                ticket: appointment.ticketNumber,
-                date: initial.date,
-                time: initial.time,
-                reason: cancellationReason.trim(),
-              }),
-            });
-          }}
-        >
-          <Ban aria-hidden="true" />
-          <span className="button-label">
-            {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
-          </span>
-        </Button>
-      </>
-    ) : (
-      <>
-        <Button variant="unstyled"
-          className="button button-small"
-          type="button"
-          title={t('common.previous')}
-          disabled={pending}
-          onClick={goBack}
-        >
-          <ArrowLeft aria-hidden="true" />
-          <span className="button-label">{t('common.previous')}</span>
-        </Button>
-        <Button variant="unstyled"
+          <Button
+            variant="unstyled"
+            className="button button-small button-danger"
+            type="button"
+            title={t('appointments.actions.cancelAppointment')}
+            disabled={pending}
+            onClick={() => {
+              setMode('cancel');
+            }}
+          >
+            <Ban aria-hidden="true" />
+            <span className="button-label">{t('appointments.actions.cancelAppointment')}</span>
+          </Button>
+        </>
+      ) : null}
+      {isTerminalAppointment(appointment) && details && onCreateFollowUp ? (
+        <Button
+          variant="unstyled"
           className="button button-small button-primary"
           type="button"
-          title={t('appointments.actions.confirmReschedule')}
-          disabled={!time || pending}
           onClick={() => {
-            void perform({
-              action: () =>
-                rescheduleAppointment(appointment.registrationId, {
-                  scheduledTime: appointmentUtcIso(date, time, serviceTimeZone),
-                }),
-              successMessage: t('appointments.actions.rescheduleSuccess'),
-              note: t('appointments.notes.rescheduled', {
-                ticket: appointment.ticketNumber,
-                oldDate: initial.date,
-                oldTime: initial.time,
-                newDate: date,
-                newTime: time,
-              }),
-              slotSensitive: true,
+            onCreateFollowUp({
+              person: details,
+              queueId: appointment.queueId,
+              tierId: appointment.tierId,
             });
           }}
         >
-          <Save aria-hidden="true" />
-          <span className="button-label">
-            {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
-          </span>
+          <CalendarPlus aria-hidden="true" />
+          <span className="button-label">{t('appointments.actions.createFollowUp')}</span>
         </Button>
-      </>
-    );
+      ) : null}
+    </>
+  ) : mode === 'cancel' ? (
+    <>
+      <Button
+        variant="unstyled"
+        className="button button-small"
+        type="button"
+        title={t('common.previous')}
+        disabled={pending}
+        onClick={goBack}
+      >
+        <ArrowLeft aria-hidden="true" />
+        <span className="button-label">{t('common.previous')}</span>
+      </Button>
+      <Button
+        variant="unstyled"
+        className="button button-small button-danger"
+        type="button"
+        title={t('appointments.actions.confirmCancellation')}
+        disabled={!cancellationReason.trim() || pending}
+        onClick={() => {
+          void perform({
+            action: () => cancelAppointment(appointment.registrationId),
+            successMessage: t('appointments.actions.cancelSuccess'),
+            note: t('appointments.notes.cancelled', {
+              ticket: appointment.ticketNumber,
+              date: initial.date,
+              time: initial.time,
+              reason: cancellationReason.trim(),
+            }),
+          });
+        }}
+      >
+        <Ban aria-hidden="true" />
+        <span className="button-label">
+          {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
+        </span>
+      </Button>
+    </>
+  ) : (
+    <>
+      <Button
+        variant="unstyled"
+        className="button button-small"
+        type="button"
+        title={t('common.previous')}
+        disabled={pending}
+        onClick={goBack}
+      >
+        <ArrowLeft aria-hidden="true" />
+        <span className="button-label">{t('common.previous')}</span>
+      </Button>
+      <Button
+        variant="unstyled"
+        className="button button-small button-primary"
+        type="button"
+        title={t('appointments.actions.confirmReschedule')}
+        disabled={!time || pending}
+        onClick={() => {
+          void perform({
+            action: () =>
+              rescheduleAppointment(appointment.registrationId, {
+                scheduledTime: appointmentUtcIso(date, time, serviceTimeZone),
+              }),
+            successMessage: t('appointments.actions.rescheduleSuccess'),
+            note: t('appointments.notes.rescheduled', {
+              ticket: appointment.ticketNumber,
+              oldDate: initial.date,
+              oldTime: initial.time,
+              newDate: date,
+              newTime: time,
+            }),
+            slotSensitive: true,
+          });
+        }}
+      >
+        <Save aria-hidden="true" />
+        <span className="button-label">
+          {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
+        </span>
+      </Button>
+    </>
+  );
 
   return (
     <Modal
@@ -344,10 +365,10 @@ export function AppointmentActionDialog({
         checkedIn
           ? t('appointments.actions.checkInConfirmedDescription')
           : mode === 'summary'
-          ? t('appointments.actions.description')
-          : mode === 'cancel'
-            ? t('appointments.actions.cancelStepDescription')
-            : t('appointments.actions.rescheduleStepDescription')
+            ? t('appointments.actions.description')
+            : mode === 'cancel'
+              ? t('appointments.actions.cancelStepDescription')
+              : t('appointments.actions.rescheduleStepDescription')
       }
       hideDismissAction={Boolean(checkedIn)}
       actions={actions}
@@ -406,7 +427,11 @@ export function AppointmentActionDialog({
                   {t(appointmentStatusKey(appointment))}
                 </span>
                 {appointment.tierName ? (
-                  <span className={`service-tier-badge ${serviceTierVisualClass(appointment.tierId, appointment.tierName)}`}>{appointment.tierName}</span>
+                  <span
+                    className={`service-tier-badge ${serviceTierVisualClass(appointment.tierId, appointment.tierName)}`}
+                  >
+                    {appointment.tierName}
+                  </span>
                 ) : null}
               </div>
             </div>
@@ -433,7 +458,9 @@ export function AppointmentActionDialog({
                 <CheckCircle2 aria-hidden="true" />
                 <div>
                   <strong>{t('appointments.actions.treatmentCompleted')}</strong>
-                  <span>{t('appointments.actions.treatmentCompletedAt', { date: treatmentCompletedAt })}</span>
+                  <span>
+                    {t('appointments.actions.treatmentCompletedAt', { date: treatmentCompletedAt })}
+                  </span>
                 </div>
                 <small>
                   {[
@@ -521,7 +548,8 @@ export function AppointmentActionDialog({
               {slots.map((slot) => {
                 const value = slotTime(slot.time, serviceTimeZone);
                 return (
-                  <Button variant="unstyled"
+                  <Button
+                    variant="unstyled"
                     className="button"
                     aria-pressed={time === value}
                     type="button"

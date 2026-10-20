@@ -650,3 +650,15 @@ Ajouter aussi une ligne au tableau de la section 8 : `| date | auteur | ID : ré
 <!-- CHECKPOINT id="ckpt_mvfs5dlt_a4lnnj" time="2026-10-19T21:42:15.329Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
 
 <!-- CHECKPOINT id="ckpt_mvfsi8l7_lbklqw" time="2026-10-19T21:52:15.355Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfsv3jo_vi91sl" time="2026-10-19T22:02:15.348Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvft7yij_k3sq6g" time="2026-10-19T22:12:15.355Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvftkth5_6xps39" time="2026-10-19T22:22:15.353Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvftxog8_zckqve" time="2026-10-19T22:32:15.368Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfuajf7_a9n9t2" time="2026-10-19T22:42:15.379Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvfunee8_ylz3ab" time="2026-10-19T22:52:15.392Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

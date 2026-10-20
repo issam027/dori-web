@@ -303,7 +303,7 @@
 .profile-identity-footer p {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: .78rem;
+  font-size: 0.78rem;
   line-height: 1.45;
 }
 .profile-identity-footer .button {
@@ -522,12 +522,13 @@
 
 .desk-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
   align-items: stretch;
   gap: var(--space-4);
 }
 .desk-operational-card {
   display: flex;
+  min-width: 0;
   min-height: 18rem;
   flex-direction: column;
   gap: 14px;
@@ -548,12 +549,11 @@
 }
 .queue-desk-card.has-active-call {
   border-color: color-mix(in srgb, var(--color-primary) 62%, var(--color-line));
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
-      var(--color-surface) 58%
-    );
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
+    var(--color-surface) 58%
+  );
   box-shadow: 0 14px 34px color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 .queue-desk-summary {
@@ -577,6 +577,7 @@
 }
 .queue-card-active-call {
   display: grid;
+  min-width: 0;
   gap: var(--space-3);
   padding: var(--space-3);
   border: 1px solid color-mix(in srgb, var(--color-primary) 26%, var(--color-line));
@@ -590,6 +591,12 @@
   text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.queue-card-active-call .active-call-heading > * {
+  min-width: 0;
+}
+.queue-card-active-call .active-call-heading strong {
+  overflow-wrap: anywhere;
 }
 .queue-card-call-actions {
   display: flex;

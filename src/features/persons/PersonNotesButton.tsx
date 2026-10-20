@@ -16,7 +16,8 @@ export function PersonNotesButton({
     : t('queues.myQueues.addNote');
 
   return (
-    <Button variant="unstyled"
+    <Button
+      variant="unstyled"
       aria-label={accessibleLabel}
       className="button button-small person-notes-button"
       type="button"
@@ -27,7 +28,7 @@ export function PersonNotesButton({
       <span>{t('persons.admin.notes')}</span>
       <span
         aria-hidden="true"
-        className={`note-count${count === 0 ? ' note-count-empty' : ''}`}
+        className={`note-count note-count-compact${count === 0 ? ' note-count-empty' : ''}`}
       >
         {count}
       </span>
