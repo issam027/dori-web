@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Printer } from 'lucide-react';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { Card } from '@/design-system/components/Card';
-import type { PassageSummary } from '../operation-store';
+import type { PassageSummary } from '@/features/queue-operations/operation-store';
 import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
 import { Button } from '@/design-system/components/Button';
 
-export function DeskPassages({
+export function CockpitPassages({
   passages,
   site,
   status,
@@ -54,8 +54,26 @@ export function DeskPassages({
         </div>
         <div className="passage-summary-controls">
           <div className="segmented-control passage-filter">
-            <Button variant="unstyled" type="button" className={status === 'served' ? 'is-active' : ''} onClick={() => { onStatusChange('served'); }}>{t('common.servedPlural')}</Button>
-            <Button variant="unstyled" type="button" className={status === 'no_show' ? 'is-active' : ''} onClick={() => { onStatusChange('no_show'); }}>{t('common.noShow')}</Button>
+            <Button
+              variant="unstyled"
+              type="button"
+              className={status === 'served' ? 'is-active' : ''}
+              onClick={() => {
+                onStatusChange('served');
+              }}
+            >
+              {t('common.servedPlural')}
+            </Button>
+            <Button
+              variant="unstyled"
+              type="button"
+              className={status === 'no_show' ? 'is-active' : ''}
+              onClick={() => {
+                onStatusChange('no_show');
+              }}
+            >
+              {t('common.noShow')}
+            </Button>
           </div>
           <StatusBadge tone="neutral">{passages.length}</StatusBadge>
         </div>
@@ -70,7 +88,9 @@ export function DeskPassages({
               <div>
                 <small>
                   {passage.ticketNumber}
-                  {passage.threadNumber > 0 ? ` · ${t('common.guichetLabel')}${String(passage.threadNumber)}` : ''}
+                  {passage.threadNumber > 0
+                    ? ` · ${t('common.guichetLabel')}${String(passage.threadNumber)}`
+                    : ''}
                 </small>
                 <h3>{passage.personName}</h3>
               </div>
@@ -112,7 +132,8 @@ export function DeskPassages({
             </dl>
             <footer>
               <small>{t('queue-operations.desk.justificatifDePassageDoriDocumentNonFiscal')}</small>
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button print-hidden"
                 type="button"
                 disabled={!site?.siteName}

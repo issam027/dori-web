@@ -5,7 +5,7 @@ import { UsersAdminPage } from './UsersAdminPage';
 
 const findUsers = vi.fn<(...args: unknown[]) => unknown>();
 
-vi.mock('./api/onboarding-api', () => ({
+vi.mock('@/features/onboarding/api/onboarding-api', () => ({
   findUsers: (...args: unknown[]) => findUsers(...args),
   findUserById: vi.fn(),
   deleteUser: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock('./api/onboarding-api', () => ({
   updateUserStatus: vi.fn(),
 }));
 
-vi.mock('./hooks/useSettingsData', () => ({
+vi.mock('@/features/onboarding/hooks/useSettingsData', () => ({
   useSettingsData: () => ({ sites: [], queues: [], roles: [] }),
 }));
 

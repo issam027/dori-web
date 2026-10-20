@@ -95,7 +95,8 @@ export function ManualNotificationWizard({
       actions={
         <>
           {step !== 'audience' ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               type="button"
               className="button"
               onClick={() => {
@@ -107,7 +108,8 @@ export function ManualNotificationWizard({
             </Button>
           ) : null}
           {step !== 'content' ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               type="button"
               className="button button-primary"
               disabled={nextDisabled}
@@ -119,7 +121,8 @@ export function ManualNotificationWizard({
               <ArrowRight aria-hidden="true" />
             </Button>
           ) : (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               type="button"
               className="button button-primary"
               disabled={!canSend}
@@ -229,7 +232,8 @@ function NotificationAudienceStep({
       </label>
       <div className="picker-list">
         {persons.map((item) => (
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             type="button"
             className={
               person?.personId === item.personId ? 'picker-option selected' : 'picker-option'
@@ -284,7 +288,8 @@ function NotificationRegistrationStep({
       </Card>
       <div className="picker-list">
         {registrations.map((item) => (
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             type="button"
             className={
               registration?.registrationId === item.registrationId

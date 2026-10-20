@@ -9,7 +9,7 @@ import type {
 } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
-import { useRegistration } from '../hooks/useQueueOperations';
+import { useRegistration } from '@/features/queue-operations/hooks/useQueueOperations';
 import { Button } from '@/design-system/components/Button';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {
@@ -95,7 +95,9 @@ export function ActiveCallCard({
             </dl>
           ) : null}
           <div className="active-call-primary-actions">
-            <Button variant="unstyled" type="submit"
+            <Button
+              variant="unstyled"
+              type="submit"
               className="button button-primary active-call-action"
               disabled={pending}
               onClick={onServed}
@@ -103,7 +105,9 @@ export function ActiveCallCard({
               <Check aria-hidden="true" />
               {t('common.servi')}
             </Button>
-            <Button variant="unstyled" type="submit"
+            <Button
+              variant="unstyled"
+              type="submit"
               className="button button-danger active-call-action"
               disabled={pending}
               onClick={onNoShow}
@@ -113,7 +117,12 @@ export function ActiveCallCard({
             </Button>
           </div>
           {onNotes ? (
-            <Button variant="unstyled" className="button active-call-notes" type="button" onClick={onNotes}>
+            <Button
+              variant="unstyled"
+              className="button active-call-notes"
+              type="button"
+              onClick={onNotes}
+            >
               <StickyNote aria-hidden="true" />
               {t('queue-operations.desk.consulterLesNotes')}
               <span
@@ -197,16 +206,34 @@ export function QueueDeskCard({
         />
       ) : session ? (
         <>
-          <Button variant="unstyled" type="submit" className="button" disabled={pending} onClick={onRelease}>
+          <Button
+            variant="unstyled"
+            type="submit"
+            className="button"
+            disabled={pending}
+            onClick={onRelease}
+          >
             {t('queue-operations.desk.liberer')}
           </Button>
-          <Button variant="unstyled" type="submit" className="button button-primary" disabled={!active || pending} onClick={onCallNext}>
+          <Button
+            variant="unstyled"
+            type="submit"
+            className="button button-primary"
+            disabled={!active || pending}
+            onClick={onCallNext}
+          >
             <PhoneCall aria-hidden="true" />
             <span className="button-label">{t('queue-operations.desk.appelerLeSuivant')}</span>
           </Button>
         </>
       ) : (
-        <Button variant="unstyled" type="submit" className="button" disabled={pending} onClick={onOccupy}>
+        <Button
+          variant="unstyled"
+          type="submit"
+          className="button"
+          disabled={pending}
+          onClick={onOccupy}
+        >
           {occupied
             ? t('queue-operations.desk.reprendreLeGuichet')
             : t('queue-operations.desk.occuperLeGuichet')}
@@ -278,7 +305,8 @@ function QueueActiveCall({
         </dl>
       ) : null}
       <div className="queue-card-call-actions">
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={pending}
@@ -289,7 +317,8 @@ function QueueActiveCall({
           <Check aria-hidden="true" />
           <span className="button-label">{t('common.servi')}</span>
         </Button>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button button-danger"
           type="button"
           disabled={pending}
@@ -301,7 +330,8 @@ function QueueActiveCall({
           <span className="button-label">{t('common.absent')}</span>
         </Button>
         {personId ? (
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button"
             type="button"
             aria-label={t('persons.notes.count', { count: noteCount })}

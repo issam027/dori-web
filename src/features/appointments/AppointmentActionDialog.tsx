@@ -20,7 +20,8 @@ import { Modal } from '@/design-system/components/Modal';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
-import { useAddPersonNote, usePerson } from '@/features/persons/hooks/usePersons';
+import { useAddPersonNote } from '@/features/notes/hooks/usePersonNotes';
+import { usePerson } from '@/features/persons/hooks/usePersons';
 import {
   appointmentLocalParts,
   appointmentStatusKey,

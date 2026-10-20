@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
-import { ActiveCallCard, QueueDeskCard } from './DeskCards';
+import { ActiveCallCard, QueueDeskCard } from './CockpitCards';
 
 const activeCall: CallNextRegistrationResponseDto = {
   registrationId: 1,

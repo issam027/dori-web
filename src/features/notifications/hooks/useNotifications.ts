@@ -1,5 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { NotificationsControllerFindNotificationsParams, SendManualNotificationDto } from '@/api/generated/models';
+import type {
+  NotificationsControllerFindNotificationsParams,
+  SendManualNotificationDto,
+} from '@/api/generated/models';
 import {
   notificationsControllerFindNotificationById,
   notificationsControllerFindNotifications,
@@ -11,7 +14,9 @@ import { invalidateNotifications } from '@/api/client/query-invalidations';
 import { registrationsControllerFindRegistrations } from '@/api/generated/registrations/registrations';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
 
-export function useNotifications(filters: NotificationsControllerFindNotificationsParams & { page: number }) {
+export function useNotifications(
+  filters: NotificationsControllerFindNotificationsParams & { page: number },
+) {
   return useQuery({
     queryKey: queryKeys.notifications.list(filters),
     queryFn: ({ signal }) =>

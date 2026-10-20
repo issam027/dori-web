@@ -1,11 +1,26 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Pencil, Plus, Save, StickyNote, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Plus,
+  Save,
+  StickyNote,
+  Trash2,
+} from 'lucide-react';
 import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { useAddPersonNote, useDeletePersonNote, usePerson, usePersonNotes, useUpdatePersonNote } from './hooks/usePersons';
-import { normalizePersonText } from './person-display';
+import { usePerson } from '@/features/persons/hooks/usePersons';
+import { normalizePersonText } from '@/features/persons/person-display';
+import {
+  useAddPersonNote,
+  useDeletePersonNote,
+  usePersonNotes,
+  useUpdatePersonNote,
+} from './hooks/usePersonNotes';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { Button } from '@/design-system/components/Button';
@@ -22,7 +37,10 @@ export function PersonNotesViewer({
   initialMode?: 'view' | 'add';
 }) {
   const { t: __t } = useTranslation();
-  const canManage = hasPermission(useSessionStore((state) => state.user), 'person_note_manage');
+  const canManage = hasPermission(
+    useSessionStore((state) => state.user),
+    'person_note_manage',
+  );
   const [index, setIndex] = useState(0);
   const [adding, setAdding] = useState(initialMode === 'add');
   const [content, setContent] = useState('');
@@ -62,9 +80,12 @@ export function PersonNotesViewer({
     if (!editingNoteId || !content.trim()) return;
     try {
       await updateNote.execute({ noteId: editingNoteId, content: content.trim() });
-      setEditingNoteId(undefined); setContent('');
+      setEditingNoteId(undefined);
+      setContent('');
       notify({ tone: 'success', title: __t('persons.notes.updated') });
-    } catch (error) { notifyError(error); }
+    } catch (error) {
+      notifyError(error);
+    }
   };
   const remove = async () => {
     if (!current) return;
@@ -72,7 +93,9 @@ export function PersonNotesViewer({
       await deleteNote.execute(current.noteId);
       setIndex(Math.max(0, index - 1));
       notify({ tone: 'success', title: __t('persons.notes.deleted') });
-    } catch (error) { notifyError(error); }
+    } catch (error) {
+      notifyError(error);
+    }
   };
   return (
     <Modal
@@ -91,7 +114,8 @@ export function PersonNotesViewer({
       actions={
         <>
           {adding && items.length > 0 ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -103,9 +127,19 @@ export function PersonNotesViewer({
             </Button>
           ) : null}
           {editingNoteId ? (
-            <Button variant="unstyled" className="button button-primary" type="button" disabled={!content.trim()} onClick={() => void saveEdit()}><Save aria-hidden="true" />{__t('common.save')}</Button>
+            <Button
+              variant="unstyled"
+              className="button button-primary"
+              type="button"
+              disabled={!content.trim()}
+              onClick={() => void saveEdit()}
+            >
+              <Save aria-hidden="true" />
+              {__t('common.save')}
+            </Button>
           ) : adding ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!content.trim()}
@@ -115,7 +149,8 @@ export function PersonNotesViewer({
               {__t('persons.personNotesViewer.enregistrerLaNote')}
             </Button>
           ) : (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               onClick={() => {
@@ -136,7 +171,11 @@ export function PersonNotesViewer({
               <StickyNote />
             </span>
             <div>
-              <h3>{editingNoteId ? __t('persons.notes.editTitle') : __t('persons.personNotesViewer.nouvelleNote')}</h3>
+              <h3>
+                {editingNoteId
+                  ? __t('persons.notes.editTitle')
+                  : __t('persons.personNotesViewer.nouvelleNote')}
+              </h3>
               <p>{__t('persons.personNotesViewer.cetteInformationSeraVisibleLorsDesProchain')}</p>
             </div>
           </div>
@@ -159,21 +198,45 @@ export function PersonNotesViewer({
             <blockquote>{current.content}</blockquote>
           </div>
           <div className="note-meta-row">
-          <small className="note-meta">
-            {current.authorUsername ??
-              __t('persons.notes.userReference', {
-                value0: String(current.createdByUserId),
-              })}{' '}
-            · {new Date(current.createdAt).toLocaleString()}
-          </small>
-          {canManage ? <div className="note-inline-actions">
-            <Button variant="unstyled" className="icon-button" type="button" title={__t('common.edit')} aria-label={__t('common.edit')} onClick={() => { setEditingNoteId(current.noteId); setContent(current.content); }}><Pencil aria-hidden="true" /></Button>
-            <Button variant="unstyled" className="icon-button icon-button-danger" type="button" title={__t('common.delete')} aria-label={__t('common.delete')} onClick={() => void remove()}><Trash2 aria-hidden="true" /></Button>
-          </div> : null}
+            <small className="note-meta">
+              {current.authorUsername ??
+                __t('persons.notes.userReference', {
+                  value0: String(current.createdByUserId),
+                })}{' '}
+              · {new Date(current.createdAt).toLocaleString()}
+            </small>
+            {canManage ? (
+              <div className="note-inline-actions">
+                <Button
+                  variant="unstyled"
+                  className="icon-button"
+                  type="button"
+                  title={__t('common.edit')}
+                  aria-label={__t('common.edit')}
+                  onClick={() => {
+                    setEditingNoteId(current.noteId);
+                    setContent(current.content);
+                  }}
+                >
+                  <Pencil aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="unstyled"
+                  className="icon-button icon-button-danger"
+                  type="button"
+                  title={__t('common.delete')}
+                  aria-label={__t('common.delete')}
+                  onClick={() => void remove()}
+                >
+                  <Trash2 aria-hidden="true" />
+                </Button>
+              </div>
+            ) : null}
           </div>
           {items.length > 1 ? (
             <div className="note-pagination">
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button"
                 type="button"
                 disabled={index >= items.length - 1}
@@ -187,7 +250,8 @@ export function PersonNotesViewer({
               <span>
                 {index + 1} / {items.length}
               </span>
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button"
                 type="button"
                 disabled={index === 0}

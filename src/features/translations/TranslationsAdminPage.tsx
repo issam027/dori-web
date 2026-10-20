@@ -22,7 +22,7 @@ import {
   deleteTranslation,
   findTranslations,
   updateTranslation,
-} from './api/onboarding-api';
+} from './api/translations-api';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 
@@ -180,7 +180,12 @@ export function TranslationsAdminPage() {
         title={t('onboarding.settings.traductions')}
         description={t('admin.translations.pageDescription')}
         actions={
-          <Button variant="unstyled" className="button button-primary" type="button" onClick={showCreate}>
+          <Button
+            variant="unstyled"
+            className="button button-primary"
+            type="button"
+            onClick={showCreate}
+          >
             <Plus /> {t('onboarding.settings.nouvelleTraduction')}
           </Button>
         }
@@ -221,7 +226,9 @@ export function TranslationsAdminPage() {
               >
                 <option value="">{t('profile.profile.toutes')}</option>
                 {TRANSLATION_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>{categoryLabel(category)}</option>
+                  <option key={category} value={category}>
+                    {categoryLabel(category)}
+                  </option>
                 ))}
               </select>
             </label>
@@ -235,7 +242,12 @@ export function TranslationsAdminPage() {
                   setFilters((current) => ({ ...current, locale }));
                   setPage(1);
                 }}
-              ><option value="">{t('common.all')}</option><option value="fr">{t('locale.fr')}</option><option value="en">{t('common.english')}</option><option value="ar">{t('locale.ar')}</option></select>
+              >
+                <option value="">{t('common.all')}</option>
+                <option value="fr">{t('locale.fr')}</option>
+                <option value="en">{t('common.english')}</option>
+                <option value="ar">{t('locale.ar')}</option>
+              </select>
             </label>
           </div>
         </details>
@@ -254,61 +266,63 @@ export function TranslationsAdminPage() {
           caption={t('admin.translations.catalogueDesTraductions')}
           containerClassName="table-wrap admin-table-wrap"
         >
-            <thead>
-              <tr>
-                <th scope="col">{t('onboarding.settings.cle')}</th>
-                <th scope="col">{t('onboarding.settings.categorie')}</th>
-                <th scope="col">{t('common.language')}</th>
-                <th scope="col">{t('common.contenu')}</th>
-                <th scope="col">{t('common.etat')}</th>
-                <th scope="col">{t('onboarding.settings.action')}</th>
+          <thead>
+            <tr>
+              <th scope="col">{t('onboarding.settings.cle')}</th>
+              <th scope="col">{t('onboarding.settings.categorie')}</th>
+              <th scope="col">{t('common.language')}</th>
+              <th scope="col">{t('common.contenu')}</th>
+              <th scope="col">{t('common.etat')}</th>
+              <th scope="col">{t('onboarding.settings.action')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.translationId}>
+                <td>
+                  <code>{item.translationKey}</code>
+                </td>
+                <td>
+                  <span className="status-badge status-info">{categoryLabel(item.category)}</span>
+                </td>
+                <td>{item.locale.toUpperCase()}</td>
+                <td className="translation-content-cell">{item.content}</td>
+                <td>
+                  <span className={`status-badge ${item.isActive ? 'status-success' : ''}`}>
+                    {item.isActive
+                      ? t('admin.translations.active')
+                      : t('admin.translations.inactive')}
+                  </span>
+                </td>
+                <td>
+                  <div className="table-actions responsive-table-actions">
+                    <Button
+                      variant="unstyled"
+                      className="button button-small"
+                      type="button"
+                      title={t('common.edit')}
+                      onClick={() => {
+                        showEdit(item);
+                      }}
+                    >
+                      <Pencil aria-hidden="true" /> {t('common.edit')}
+                    </Button>
+                    <Button
+                      variant="unstyled"
+                      className="button button-small button-danger"
+                      type="button"
+                      title={t('common.delete')}
+                      onClick={() => {
+                        setDeleting(item);
+                      }}
+                    >
+                      <Trash2 aria-hidden="true" /> {t('common.delete')}
+                    </Button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.translationId}>
-                  <td>
-                    <code>{item.translationKey}</code>
-                  </td>
-                  <td>
-                    <span className="status-badge status-info">{categoryLabel(item.category)}</span>
-                  </td>
-                  <td>{item.locale.toUpperCase()}</td>
-                  <td className="translation-content-cell">{item.content}</td>
-                  <td>
-                    <span className={`status-badge ${item.isActive ? 'status-success' : ''}`}>
-                      {item.isActive
-                        ? t('admin.translations.active')
-                        : t('admin.translations.inactive')}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="table-actions responsive-table-actions">
-                      <Button variant="unstyled"
-                        className="button button-small"
-                        type="button"
-                        title={t('common.edit')}
-                        onClick={() => {
-                          showEdit(item);
-                        }}
-                      >
-                        <Pencil aria-hidden="true" /> {t('common.edit')}
-                      </Button>
-                      <Button variant="unstyled"
-                        className="button button-small button-danger"
-                        type="button"
-                        title={t('common.delete')}
-                        onClick={() => {
-                          setDeleting(item);
-                        }}
-                      >
-                        <Trash2 aria-hidden="true" /> {t('common.delete')}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            ))}
+          </tbody>
         </DataTable>
         {totalPages > 1 ? (
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
@@ -341,7 +355,8 @@ export function TranslationsAdminPage() {
         }
         actions={
           <>
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={
@@ -388,7 +403,9 @@ export function TranslationsAdminPage() {
               }}
             >
               {TRANSLATION_CATEGORIES.map((category) => (
-                <option key={category} value={category}>{categoryLabel(category)}</option>
+                <option key={category} value={category}>
+                  {categoryLabel(category)}
+                </option>
               ))}
             </select>
           </label>
@@ -445,7 +462,8 @@ export function TranslationsAdminPage() {
                 ).map(([locale, flag, label]) => {
                   const completed = Boolean(form.contents[locale].trim());
                   return (
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       key={locale}
                       type="button"
                       role="tab"

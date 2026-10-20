@@ -5,7 +5,7 @@ import { TranslationsAdminPage } from './TranslationsAdminPage';
 
 const findTranslations = vi.fn<(...args: unknown[]) => unknown>();
 
-vi.mock('./api/onboarding-api', () => ({
+vi.mock('./api/translations-api', () => ({
   findTranslations: (...args: unknown[]) => findTranslations(...args),
   createTranslation: vi.fn(),
   deleteTranslation: vi.fn(),

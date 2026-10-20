@@ -15,7 +15,7 @@ vi.mock('./hooks/useQueueOperations', () => ({
   useWaitingRegistrations: (options: unknown) => useWaitingRegistrations(options),
 }));
 
-vi.mock('@/features/persons/PersonNotesViewer', () => ({ PersonNotesViewer: () => null }));
+vi.mock('@/features/notes/PersonNotesViewer', () => ({ PersonNotesViewer: () => null }));
 vi.mock('./RegistrationDetailsModal', () => ({ RegistrationDetailsModal: () => null }));
 
 it('publishes one registration search after a typing burst reaches four characters', async () => {

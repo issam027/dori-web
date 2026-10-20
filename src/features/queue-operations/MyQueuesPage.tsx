@@ -8,8 +8,8 @@ import { EmptyState } from '@/design-system/components/FeedbackState';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
-import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
-import { PersonNotesButton } from '@/features/persons/PersonNotesButton';
+import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
+import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { useWaitingRegistrations } from './hooks/useQueueOperations';
@@ -37,8 +37,12 @@ export function MyQueuesPage() {
   const search = useDebouncedFilter(searchDraft);
   const today = localIsoDate();
   const [selectedDate, setSelectedDate] = useState(today);
-  const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>('waiting');
-  const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>('priorityReferenceTime:asc');
+  const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>(
+    'waiting',
+  );
+  const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>(
+    'priorityReferenceTime:asc',
+  );
   const [registrationDetails, setRegistrationDetails] = useState<{
     id: number;
     queueName: string;
@@ -78,63 +82,95 @@ export function MyQueuesPage() {
               <small>{__t('queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre')}</small>
             </summary>
             <div className="queue-customer-filter-body">
-            <div className="queue-customer-search-form">
-              <label>
-                {__t('common.date')}
-                <input
-                  type="date"
-                  value={selectedDate}
-                  max={today}
-                  onChange={(event) => {
-                    setSelectedDate(event.target.value || today);
-                    setPage(1);
-                  }}
-                />
-              </label>
-              <label>
-                {__t('queue-operations.myQueues.perimetreDeLaFile')}
-                <select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); setPage(1); }}>
-                  <option value="">{__t('queue-operations.myQueues.toutes')} {queues.data.data.total}</option>
-                  {queues.data.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueName}</option>)}
-                </select>
-              </label>
-              <label>
-                {__t('queues.myQueues.clientOuTicket')}
-                <input
-                  type="search"
-                  value={searchDraft}
-                  placeholder={__t('queues.search.example')}
-                  onChange={(event) => {
-                    setSearchDraft(event.target.value);
-                    setPage(1);
-                  }}
-                />
-              </label>
-              <label>
-                {__t('common.status')}
-                <select value={status} onChange={(event) => { setStatus(event.target.value as '' | RegistrationsControllerFindRegistrationsStatus); setPage(1); }}>
-                  <option value="">{__t('common.all')}</option>
-                  <option value="waiting">{__t('common.waiting')}</option>
-                  <option value="booked">{__t('appointments.status.booked')}</option>
-                  <option value="in_progress">{__t('appointments.status.in-progress')}</option>
-                  <option value="served">{__t('appointments.status.served')}</option>
-                  <option value="no_show">{__t('appointments.status.no-show')}</option>
-                  <option value="cancelled">{__t('appointments.status.cancelled')}</option>
-                  <option value="expired">{__t('appointments.status.expired')}</option>
-                </select>
-              </label>
-              <label>
-                {__t('notifications.filters.sort')}
-                <select value={sort} onChange={(event) => { setSort(event.target.value as RegistrationsControllerFindRegistrationsSort); setPage(1); }}>
-                  <option value="priorityReferenceTime:asc">{__t('common.position')}</option>
-                  <option value="createdAt:desc">{__t('notifications.filters.newest')}</option>
-                  <option value="createdAt:asc">{__t('notifications.filters.oldest')}</option>
-                  <option value="ticketNumber:asc">{__t('common.ticket')} · {__t('common.sortAscending')}</option>
-                  <option value="ticketNumber:desc">{__t('common.ticket')} · {__t('common.sortDescending')}</option>
-                  <option value="status:asc">{__t('common.status')} · {__t('common.sortAscending')}</option>
-                </select>
-              </label>
-            </div>
+              <div className="queue-customer-search-form">
+                <label>
+                  {__t('common.date')}
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    max={today}
+                    onChange={(event) => {
+                      setSelectedDate(event.target.value || today);
+                      setPage(1);
+                    }}
+                  />
+                </label>
+                <label>
+                  {__t('queue-operations.myQueues.perimetreDeLaFile')}
+                  <select
+                    value={queueId ?? ''}
+                    onChange={(event) => {
+                      setQueueId(event.target.value ? Number(event.target.value) : undefined);
+                      setPage(1);
+                    }}
+                  >
+                    <option value="">
+                      {__t('queue-operations.myQueues.toutes')} {queues.data.data.total}
+                    </option>
+                    {queues.data.data.items.map((queue) => (
+                      <option key={queue.queueId} value={queue.queueId}>
+                        {queue.queueName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  {__t('queues.myQueues.clientOuTicket')}
+                  <input
+                    type="search"
+                    value={searchDraft}
+                    placeholder={__t('queues.search.example')}
+                    onChange={(event) => {
+                      setSearchDraft(event.target.value);
+                      setPage(1);
+                    }}
+                  />
+                </label>
+                <label>
+                  {__t('common.status')}
+                  <select
+                    value={status}
+                    onChange={(event) => {
+                      setStatus(
+                        event.target.value as '' | RegistrationsControllerFindRegistrationsStatus,
+                      );
+                      setPage(1);
+                    }}
+                  >
+                    <option value="">{__t('common.all')}</option>
+                    <option value="waiting">{__t('common.waiting')}</option>
+                    <option value="booked">{__t('appointments.status.booked')}</option>
+                    <option value="in_progress">{__t('appointments.status.in-progress')}</option>
+                    <option value="served">{__t('appointments.status.served')}</option>
+                    <option value="no_show">{__t('appointments.status.no-show')}</option>
+                    <option value="cancelled">{__t('appointments.status.cancelled')}</option>
+                    <option value="expired">{__t('appointments.status.expired')}</option>
+                  </select>
+                </label>
+                <label>
+                  {__t('notifications.filters.sort')}
+                  <select
+                    value={sort}
+                    onChange={(event) => {
+                      setSort(event.target.value as RegistrationsControllerFindRegistrationsSort);
+                      setPage(1);
+                    }}
+                  >
+                    <option value="priorityReferenceTime:asc">{__t('common.position')}</option>
+                    <option value="createdAt:desc">{__t('notifications.filters.newest')}</option>
+                    <option value="createdAt:asc">{__t('notifications.filters.oldest')}</option>
+                    <option value="ticketNumber:asc">
+                      {__t('common.ticket')} · {__t('common.sortAscending')}
+                    </option>
+                    <option value="ticketNumber:desc">
+                      {__t('common.ticket')} · {__t('common.sortDescending')}
+                    </option>
+                    <option value="status:asc">
+                      {__t('common.status')} · {__t('common.sortAscending')}
+                    </option>
+                  </select>
+                </label>
+              </div>
             </div>
           </details>
         </Card>
@@ -181,8 +217,13 @@ export function MyQueuesPage() {
               key: 'tier',
               header: __t('common.tier'),
               render: (item) => (
-                <span className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}>
-                  {item.tierName ?? __t('queue-operations.quickRegistration.serviceFallback', { id: String(item.tierId) })}
+                <span
+                  className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
+                >
+                  {item.tierName ??
+                    __t('queue-operations.quickRegistration.serviceFallback', {
+                      id: String(item.tierId),
+                    })}
                 </span>
               ),
             },
@@ -196,7 +237,8 @@ export function MyQueuesPage() {
                     ?.queueName ?? 'File #' + String(item.queueId);
                 return (
                   <div className="table-actions responsive-table-actions">
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       className="button button-small"
                       type="button"
                       title={__t('queues.myQueues.consulter')}

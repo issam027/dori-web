@@ -10,11 +10,11 @@ import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { PersonNotesViewer } from '@/features/persons/PersonNotesViewer';
+import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
 import { QuickRegistration } from './QuickRegistration';
-import { useOperationStore } from './operation-store';
+import { useOperationStore } from '@/features/queue-operations/operation-store';
 import {
   useCallNext,
   useCloseDeskSession,
@@ -23,12 +23,12 @@ import {
   useMarkServed,
   useOpenDeskSession,
   useOperatorRegistrations,
-} from './hooks/useQueueOperations';
-import { EligiblePreviewCard, QueueDeskCard } from './components/DeskCards';
-import { DeskPassages } from './components/DeskPassages';
+} from '@/features/queue-operations/hooks/useQueueOperations';
+import { EligiblePreviewCard, QueueDeskCard } from './components/CockpitCards';
+import { CockpitPassages } from './components/CockpitPassages';
 import { Button } from '@/design-system/components/Button';
 
-export function DeskPage() {
+export function CockpitPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
@@ -296,11 +296,13 @@ export function DeskPage() {
           }}
         />
       ) : null}
-      <DeskPassages
+      <CockpitPassages
         passages={(registrationHistory.data?.data.items ?? []).map((item) => ({
           registrationId: item.registrationId,
           ticketNumber: item.ticketNumber,
-          personName: [item.firstName, item.lastName].filter(Boolean).join(' ') || t('queue-operations.desk.personneNonRenseignee'),
+          personName:
+            [item.firstName, item.lastName].filter(Boolean).join(' ') ||
+            t('queue-operations.desk.personneNonRenseignee'),
           firstName: item.firstName,
           lastName: item.lastName,
           arrivedAt: item.createdAt,
@@ -309,12 +311,16 @@ export function DeskPage() {
           threadNumber: 0,
           outcome: historyStatus,
         }))}
-        site={site.data?.data ? {
-          siteName: site.data.data.siteName,
-          timezone: site.data.data.timezone,
-          siteLocation: site.data.data.siteLocation,
-          siteLogoUrl: site.data.data.siteLogoUrl,
-        } : undefined}
+        site={
+          site.data?.data
+            ? {
+                siteName: site.data.data.siteName,
+                timezone: site.data.data.timezone,
+                siteLocation: site.data.data.siteLocation,
+                siteLogoUrl: site.data.data.siteLogoUrl,
+              }
+            : undefined
+        }
         status={historyStatus}
         totalCount={(servedHistory.data?.data.total ?? 0) + (noShowHistory.data?.data.total ?? 0)}
         onStatusChange={setHistoryStatus}
@@ -330,7 +336,8 @@ export function DeskPage() {
         title={t('desk.openCounterTitle')}
         description={deskToOpen?.queueName}
         actions={
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={Boolean(pendingQueueIds.size) || !counterName.trim()}
@@ -358,7 +365,12 @@ export function DeskPage() {
               setCounterName(event.target.value);
             }}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && counterName.trim() && deskToOpen && !pendingQueueIds.size) {
+              if (
+                event.key === 'Enter' &&
+                counterName.trim() &&
+                deskToOpen &&
+                !pendingQueueIds.size
+              ) {
                 event.preventDefault();
                 occupyDesk(
                   deskToOpen.queueId,

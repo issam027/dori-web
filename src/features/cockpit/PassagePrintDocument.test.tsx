@@ -54,11 +54,15 @@ describe('PassagePrintDocument', () => {
   });
 
   it('conserve les textes longs dans les blocs de l’attestation', () => {
-    const longSiteName = 'Centre intercommunal d’accueil et de services administratifs de la métropole';
+    const longSiteName =
+      'Centre intercommunal d’accueil et de services administratifs de la métropole';
     const longLastName = 'Dupont de la Vallière-Montmorency';
     render(
       <PassagePrintDocument
-        site={{ siteName: longSiteName, siteLocation: 'Bâtiment principal, aile des services aux usagers' }}
+        site={{
+          siteName: longSiteName,
+          siteLocation: 'Bâtiment principal, aile des services aux usagers',
+        }}
         passage={{
           registrationId: 88,
           ticketNumber: 'LONG0088',

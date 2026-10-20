@@ -26,7 +26,7 @@ const PortfolioPage = lazyNamed(
   () => import('@/features/portfolio/PortfolioPage'),
   'PortfolioPage',
 );
-const DeskPage = lazyNamed(() => import('@/features/queue-operations/DeskPage'), 'DeskPage');
+const CockpitPage = lazyNamed(() => import('@/features/cockpit/CockpitPage'), 'CockpitPage');
 const MyQueuesPage = lazyNamed(
   () => import('@/features/queue-operations/MyQueuesPage'),
   'MyQueuesPage',
@@ -42,7 +42,7 @@ const ControlRoomPage = lazyNamed(
 );
 const ReportsPage = lazyNamed(() => import('@/features/reports/ReportsPage'), 'ReportsPage');
 const NotificationsPage = lazyNamed(
-  () => import('@/features/supervision/NotificationsPage'),
+  () => import('@/features/notifications/NotificationsPage'),
   'NotificationsPage',
 );
 const KioskPage = lazyNamed(() => import('@/features/public-experiences/KioskPage'), 'KioskPage');
@@ -62,12 +62,9 @@ const OnboardingPage = lazyNamed(
   'OnboardingPage',
 );
 const SettingsPage = lazyNamed(() => import('@/features/onboarding/SettingsPage'), 'SettingsPage');
-const UsersAdminPage = lazyNamed(
-  () => import('@/features/onboarding/UsersAdminPage'),
-  'UsersAdminPage',
-);
+const UsersAdminPage = lazyNamed(() => import('@/features/users/UsersAdminPage'), 'UsersAdminPage');
 const TranslationsAdminPage = lazyNamed(
-  () => import('@/features/onboarding/TranslationsAdminPage'),
+  () => import('@/features/translations/TranslationsAdminPage'),
   'TranslationsAdminPage',
 );
 
@@ -160,7 +157,7 @@ type RouteView = {
 const protectedRouteViews: Record<string, RouteView> = {
   '/device-mode': { component: DeviceModePage, frame: 'public', publicMode: 'device' },
   '/portfolio': { component: PortfolioPage, frame: 'shell' },
-  '/desk': { component: DeskPage, frame: 'shell' },
+  '/desk': { component: CockpitPage, frame: 'shell' },
   '/my-queues': { component: MyQueuesPage, frame: 'shell' },
   '/persons': { component: PersonsPage, frame: 'shell' },
   '/appointments': { component: AppointmentsPage, frame: 'shell' },

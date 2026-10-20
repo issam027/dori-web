@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCcw, RotateCcw, Search } from 'lucide-react';
-import type { NotificationResponseDto, NotificationsControllerFindNotificationsSort } from '@/api/generated/models';
+import type {
+  NotificationResponseDto,
+  NotificationsControllerFindNotificationsSort,
+} from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { notify } from '@/core/notifications/notification-store';
@@ -36,7 +39,9 @@ export function NotificationsPage() {
   const queues = useQueues({ siteId, enabled: filtersOpen });
   const [page, setPage] = useState(1);
   const [channel, setChannel] = useState<'' | 'sms' | 'email'>('');
-  const [status, setStatus] = useState<'' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed'>('');
+  const [status, setStatus] = useState<
+    '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed'
+  >('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [queueId, setQueueId] = useState<number>();
@@ -73,31 +78,154 @@ export function NotificationsPage() {
         description={t('supervision.notifications.journalDEnvoiDetailEtEmissionManuelle')}
         actions={
           canSend ? (
-              <Button variant="unstyled"
-                type="button"
-                className="button button-primary"
-                onClick={() => {
-                  setWizard(true);
-                }}
-              >
-                <Plus aria-hidden="true" />
-                {t('supervision.notifications.nouvelEnvoi')}
-              </Button>
-            ) : null
+            <Button
+              variant="unstyled"
+              type="button"
+              className="button button-primary"
+              onClick={() => {
+                setWizard(true);
+              }}
+            >
+              <Plus aria-hidden="true" />
+              {t('supervision.notifications.nouvelEnvoi')}
+            </Button>
+          ) : null
         }
       />
       <Card className="admin-filter-card notification-filter-card">
-        <details onToggle={(event) => { setFiltersOpen(event.currentTarget.open); }}>
-          <summary><span><Search aria-hidden="true" /> {t('notifications.filters.title')}</span><small>{t('notifications.filters.help')}</small></summary>
+        <details
+          onToggle={(event) => {
+            setFiltersOpen(event.currentTarget.open);
+          }}
+        >
+          <summary>
+            <span>
+              <Search aria-hidden="true" /> {t('notifications.filters.title')}
+            </span>
+            <small>{t('notifications.filters.help')}</small>
+          </summary>
           <div className="admin-filter-grid notification-filter-grid">
-            <label>{t('common.canal')}<select value={channel} onChange={(event) => { setChannel(event.target.value as '' | 'sms' | 'email'); setPage(1); }}><option value="">{t('common.all')}</option><option value="sms">{t('common.sms')}</option><option value="email">{t('common.email')}</option></select></label>
-            <label>{t('common.status')}<select value={status} onChange={(event) => { setStatus(event.target.value as '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed'); setPage(1); }}><option value="">{t('common.all')}</option>{['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => <option key={value}>{value}</option>)}</select></label>
-            <label>{t('reports.startDate')}<input type="date" value={dateFrom} max={dateTo || undefined} onChange={(event) => { setDateFrom(event.target.value); setPage(1); }} /></label>
-            <label>{t('reports.endDate')}<input type="date" value={dateTo} min={dateFrom || undefined} onChange={(event) => { setDateTo(event.target.value); setPage(1); }} /></label>
-            <label>{t('queues.singular')}<select value={queueId ?? ''} onChange={(event) => { setQueueId(event.target.value ? Number(event.target.value) : undefined); setPage(1); }}><option value="">{t('common.all')}</option>{queues.data?.data.items.map((queue) => <option key={queue.queueId} value={queue.queueId}>{queue.queueName}</option>)}</select></label>
-            <label>{t('notifications.filters.registrationId')}<input type="number" min="1" value={registrationId} onChange={(event) => { setRegistrationId(event.target.value); setPage(1); }} /></label>
-            <label>{t('notifications.filters.sort')}<select value={sort} onChange={(event) => { setSort(event.target.value as NotificationsControllerFindNotificationsSort); setPage(1); }}><option value="createdAt:desc">{t('notifications.filters.newest')}</option><option value="createdAt:asc">{t('notifications.filters.oldest')}</option><option value="notificationStatus:asc">{t('common.status')}</option><option value="channel:asc">{t('common.canal')}</option><option value="sentAt:desc">{t('notifications.filters.recentlySent')}</option></select></label>
-            <div className="admin-filter-actions"><Button variant="unstyled" className="button" type="button" onClick={() => { setChannel(''); setStatus(''); setDateFrom(''); setDateTo(''); setQueueId(undefined); setRegistrationId(''); setSort('createdAt:desc'); setPage(1); }}><RotateCcw aria-hidden="true" />{t('common.reset')}</Button></div>
+            <label>
+              {t('common.canal')}
+              <select
+                value={channel}
+                onChange={(event) => {
+                  setChannel(event.target.value as '' | 'sms' | 'email');
+                  setPage(1);
+                }}
+              >
+                <option value="">{t('common.all')}</option>
+                <option value="sms">{t('common.sms')}</option>
+                <option value="email">{t('common.email')}</option>
+              </select>
+            </label>
+            <label>
+              {t('common.status')}
+              <select
+                value={status}
+                onChange={(event) => {
+                  setStatus(
+                    event.target.value as
+                      '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed',
+                  );
+                  setPage(1);
+                }}
+              >
+                <option value="">{t('common.all')}</option>
+                {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
+                  <option key={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('reports.startDate')}
+              <input
+                type="date"
+                value={dateFrom}
+                max={dateTo || undefined}
+                onChange={(event) => {
+                  setDateFrom(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </label>
+            <label>
+              {t('reports.endDate')}
+              <input
+                type="date"
+                value={dateTo}
+                min={dateFrom || undefined}
+                onChange={(event) => {
+                  setDateTo(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </label>
+            <label>
+              {t('queues.singular')}
+              <select
+                value={queueId ?? ''}
+                onChange={(event) => {
+                  setQueueId(event.target.value ? Number(event.target.value) : undefined);
+                  setPage(1);
+                }}
+              >
+                <option value="">{t('common.all')}</option>
+                {queues.data?.data.items.map((queue) => (
+                  <option key={queue.queueId} value={queue.queueId}>
+                    {queue.queueName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('notifications.filters.registrationId')}
+              <input
+                type="number"
+                min="1"
+                value={registrationId}
+                onChange={(event) => {
+                  setRegistrationId(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </label>
+            <label>
+              {t('notifications.filters.sort')}
+              <select
+                value={sort}
+                onChange={(event) => {
+                  setSort(event.target.value as NotificationsControllerFindNotificationsSort);
+                  setPage(1);
+                }}
+              >
+                <option value="createdAt:desc">{t('notifications.filters.newest')}</option>
+                <option value="createdAt:asc">{t('notifications.filters.oldest')}</option>
+                <option value="notificationStatus:asc">{t('common.status')}</option>
+                <option value="channel:asc">{t('common.canal')}</option>
+                <option value="sentAt:desc">{t('notifications.filters.recentlySent')}</option>
+              </select>
+            </label>
+            <div className="admin-filter-actions">
+              <Button
+                variant="unstyled"
+                className="button"
+                type="button"
+                onClick={() => {
+                  setChannel('');
+                  setStatus('');
+                  setDateFrom('');
+                  setDateTo('');
+                  setQueueId(undefined);
+                  setRegistrationId('');
+                  setSort('createdAt:desc');
+                  setPage(1);
+                }}
+              >
+                <RotateCcw aria-hidden="true" />
+                {t('common.reset')}
+              </Button>
+            </div>
           </div>
         </details>
       </Card>
@@ -147,7 +275,8 @@ export function NotificationsPage() {
               header: t('common.actions'),
               render: (row) => (
                 <div className="action-row">
-                  <Button variant="unstyled"
+                  <Button
+                    variant="unstyled"
                     type="button"
                     className="button button-small"
                     onClick={() => {
@@ -158,7 +287,8 @@ export function NotificationsPage() {
                     {t('supervision.notifications.detail')}
                   </Button>
                   {canResendNotification(row.notificationStatus, canSend) ? (
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       type="button"
                       className="button button-small"
                       disabled={resend.isPending}

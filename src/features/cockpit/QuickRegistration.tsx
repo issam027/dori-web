@@ -18,7 +18,11 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { appointmentUtcIso, isSlotAvailable, slotTime } from '@/features/appointments/appointment-rules';
+import {
+  appointmentUtcIso,
+  isSlotAvailable,
+  slotTime,
+} from '@/features/appointments/appointment-rules';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { findPersons } from '@/features/persons/api/persons-api';
@@ -69,10 +73,8 @@ export function QuickRegistration({
     queryFn: () => getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
     enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
   });
-  const serviceTimeZone =
-    availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
-  const availableSlots =
-    availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
+  const serviceTimeZone = availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
+  const availableSlots = availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
   const submit = async () => {
     if (!choice || !queueId || !tierId || submissionInFlight.current) return;
     submissionInFlight.current = true;
@@ -167,7 +169,8 @@ export function QuickRegistration({
           <h2>{__t('queue-operations.quickRegistration.accueilRapide')}</h2>
           <p>{__t('quickRegistration.description')}</p>
         </div>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button button-primary"
           type="button"
           onClick={() => {
@@ -194,7 +197,8 @@ export function QuickRegistration({
         actions={
           <>
             {step === 1 ? (
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button button-primary"
                 type="button"
                 disabled={!choice}
@@ -208,7 +212,8 @@ export function QuickRegistration({
             ) : null}
             {step === 2 ? (
               <>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button"
                   type="button"
                   onClick={() => {
@@ -217,7 +222,8 @@ export function QuickRegistration({
                 >
                   {__t('queue-operations.quickRegistration.modifierLaPersonne')}
                 </Button>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button button-primary"
                   type="button"
                   disabled={!canSubmit}
@@ -232,7 +238,8 @@ export function QuickRegistration({
             ) : null}
             {step === 3 ? (
               <>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button"
                   type="button"
                   disabled={!printReady}
@@ -249,7 +256,8 @@ export function QuickRegistration({
                   <Printer aria-hidden="true" />
                   {__t('public-experiences.kiosk.imprimerMonTicket')}
                 </Button>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   className="button button-primary"
                   type="button"
                   onClick={() => {
