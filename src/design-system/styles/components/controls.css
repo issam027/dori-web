@@ -129,35 +129,12 @@ textarea:disabled {
   width: auto;
 }
 
-.checkbox-row {
-  display: inline-flex;
-  width: fit-content;
-  min-height: 40px;
-  align-items: center;
-  gap: var(--space-2);
-  cursor: pointer;
-}
-
-.checkbox-row input[type='checkbox'] {
-  width: 18px;
-  min-width: 18px;
-  height: 18px;
-  min-height: 18px;
-  margin: 0;
-  padding: 0;
-  accent-color: var(--color-accent);
-}
-
 .text-button {
   width: fit-content;
   padding: 0;
   border: 0;
   background: none;
   color: var(--color-text-muted);
-}
-.site-select-button {
-  width: 100%;
-  margin-top: auto;
 }
 
 .queue-card-grid,
@@ -191,7 +168,6 @@ textarea:disabled {
 .calendar-toolbar select {
   width: min(100%, 22rem);
 }
-.calendar-add-button,
 .calendar-date-button {
   width: 100%;
   min-height: 34px;
@@ -202,15 +178,9 @@ textarea:disabled {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
   cursor: pointer;
 }
-.calendar-add-button:hover,
 .calendar-date-button:hover {
   border-color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface));
-}
-.calendar-add-button {
-  border-style: dashed;
-  color: var(--color-accent);
-  font-weight: 800;
 }
 .calendar-event-button {
   --appointment-tier-color: var(--color-accent);
@@ -228,7 +198,10 @@ textarea:disabled {
   align-items: center;
   gap: 6px;
   text-align: start;
-  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.1s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -279,13 +252,19 @@ textarea:disabled {
 }
 .calendar-event-button.service-tier-free,
 .service-tier-badge.service-tier-free,
-.service-tier-label.service-tier-free { --appointment-tier-color: var(--color-success); }
+.service-tier-label.service-tier-free {
+  --appointment-tier-color: var(--color-success);
+}
 .calendar-event-button.service-tier-standard,
 .service-tier-badge.service-tier-standard,
-.service-tier-label.service-tier-standard { --appointment-tier-color: var(--color-info); }
+.service-tier-label.service-tier-standard {
+  --appointment-tier-color: var(--color-info);
+}
 .calendar-event-button.service-tier-premium,
 .service-tier-badge.service-tier-premium,
-.service-tier-label.service-tier-premium { --appointment-tier-color: var(--color-warning); }
+.service-tier-label.service-tier-premium {
+  --appointment-tier-color: var(--color-warning);
+}
 .service-tier-label {
   padding-inline-start: 10px;
   border-inline-start: 4px solid var(--appointment-tier-color, var(--color-accent));
@@ -315,7 +294,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-scheduled {
   border-color: color-mix(in srgb, var(--k) 28%, var(--color-line));
   border-inline-start-color: var(--k);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--k) 18%, var(--color-surface)), color-mix(in srgb, var(--k) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--k) 18%, var(--color-surface)),
+    color-mix(in srgb, var(--k) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-scheduled:hover {
   border-color: var(--k);
@@ -327,7 +310,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-confirmed {
   border-color: color-mix(in srgb, var(--l) 28%, var(--color-line));
   border-inline-start-color: var(--l);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--l) 18%, var(--color-surface)), color-mix(in srgb, var(--l) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--l) 18%, var(--color-surface)),
+    color-mix(in srgb, var(--l) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-confirmed:hover {
   border-color: var(--l);
@@ -339,7 +326,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-present {
   border-color: color-mix(in srgb, var(--i) 28%, var(--color-line));
   border-inline-start-color: var(--i);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--i) 19%, var(--color-surface)), color-mix(in srgb, var(--i) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--i) 19%, var(--color-surface)),
+    color-mix(in srgb, var(--i) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-present:hover {
   border-color: var(--i);
@@ -351,7 +342,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-in-progress {
   border-color: color-mix(in srgb, var(--n) 28%, var(--color-line));
   border-inline-start-color: var(--n);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--n) 19%, var(--color-surface)), color-mix(in srgb, var(--n) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--n) 19%, var(--color-surface)),
+    color-mix(in srgb, var(--n) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-in-progress:hover {
   border-color: var(--n);
@@ -363,7 +358,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-served {
   border-color: color-mix(in srgb, var(--h) 28%, var(--color-line));
   border-inline-start-color: var(--h);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--h) 18%, var(--color-surface)), color-mix(in srgb, var(--h) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--h) 18%, var(--color-surface)),
+    color-mix(in srgb, var(--h) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-served:hover {
   border-color: var(--h);
@@ -375,7 +374,11 @@ textarea:disabled {
 .calendar-event-button.appointment-status-no-show {
   border-color: color-mix(in srgb, var(--o) 28%, var(--color-line));
   border-inline-start-color: var(--o);
-  background: linear-gradient(110deg, color-mix(in srgb, var(--o) 18%, var(--color-surface)), color-mix(in srgb, var(--o) 7%, var(--color-surface)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--o) 18%, var(--color-surface)),
+    color-mix(in srgb, var(--o) 7%, var(--color-surface))
+  );
 }
 .calendar-event-button.appointment-status-no-show:hover {
   border-color: var(--o);
@@ -430,7 +433,11 @@ textarea:disabled {
   opacity: 0.76;
 }
 .calendar-event-button.appointment-status-no-show {
-  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--appointment-tier-color) 17%, var(--color-surface)) 0 6px, color-mix(in srgb, var(--appointment-tier-color) 8%, var(--color-surface)) 6px 12px);
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--appointment-tier-color) 17%, var(--color-surface)) 0 6px,
+    color-mix(in srgb, var(--appointment-tier-color) 8%, var(--color-surface)) 6px 12px
+  );
   opacity: 0.82;
 }
 .calendar-event-button.appointment-status-expired {
@@ -444,7 +451,15 @@ textarea:disabled {
   filter: grayscale(0.78);
   opacity: 0.48;
 }
-.calendar-event-button:is(.appointment-status-booked, .appointment-status-scheduled, .appointment-status-confirmed, .appointment-status-present, .appointment-status-in-progress, .appointment-status-served, .appointment-status-no-show):hover {
+.calendar-event-button:is(
+    .appointment-status-booked,
+    .appointment-status-scheduled,
+    .appointment-status-confirmed,
+    .appointment-status-present,
+    .appointment-status-in-progress,
+    .appointment-status-served,
+    .appointment-status-no-show
+  ):hover {
   border-color: var(--appointment-tier-color, var(--color-accent));
   background: color-mix(in srgb, var(--appointment-tier-color) 28%, var(--color-surface));
 }
@@ -1007,28 +1022,16 @@ select option {
   transition: background-color 9999s ease-out;
 }
 
-.form-grid,
-.form-grid--two {
+.form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   align-items: start;
 }
 
-.form-grid__full,
-.form-field--full {
-  grid-column: 1 / -1;
-}
-
 @media (max-width: 680px) {
-  .form-grid,
-  .form-grid--two {
+  .form-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .form-grid__full,
-  .form-field--full {
-    grid-column: auto;
   }
 }
 

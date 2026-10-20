@@ -4,14 +4,6 @@
   margin-inline-end: 7px;
 }
 
-.alert-inline {
-  padding: var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--color-danger) 40%, transparent);
-  border-radius: var(--radius-md);
-  color: var(--color-danger);
-  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
-}
-
 .detail-list {
   display: grid;
   grid-template-columns: minmax(7rem, auto) 1fr;
@@ -263,9 +255,6 @@
     text-align: start;
   }
 }
-.experience-preview-header .status-badge {
-  white-space: nowrap;
-}
 .note-editor-panel,
 .note-viewer-panel,
 .note-empty-state {
@@ -310,7 +299,6 @@
   width: 100%;
   justify-content: center;
 }
-.appointment-event-status,
 .appointment-status-pill {
   width: fit-content;
   border-radius: 999px;
@@ -358,9 +346,6 @@
   opacity: 0.72;
 }
 @media (max-width: 680px) {
-  .appointment-person-summary .appointment-status-pill {
-    grid-column: 1 / -1;
-  }
   .appointment-record-heading .appointment-status-pill {
     grid-column: 1 / -1;
   }
