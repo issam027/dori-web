@@ -178,6 +178,7 @@ export function MyQueuesPage() {
       {queues.data?.data.items.length ? (
         <DataTable
           caption={__t('queue-operations.myQueues.inscriptionsDansMesFiles')}
+          containerClassName="table-scroll queue-registrations-table"
           rows={items}
           getRowKey={(item) => item.registrationId}
           columns={[

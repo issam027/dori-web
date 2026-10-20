@@ -2433,6 +2433,18 @@
 .queue-customer-search-form label {
   max-width: 44rem;
 }
+.queue-registrations-table th,
+.queue-registrations-table td {
+  white-space: normal;
+}
+.queue-registrations-table th:first-child,
+.queue-registrations-table td:first-child,
+.queue-registrations-table th:nth-child(3),
+.queue-registrations-table td:nth-child(3),
+.queue-registrations-table th:last-child,
+.queue-registrations-table td:last-child {
+  white-space: nowrap;
+}
 .registration-detail {
   display: grid;
   gap: 10px;
