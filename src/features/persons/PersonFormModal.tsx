@@ -15,7 +15,6 @@ interface PersonForm {
   phoneNumber: string;
   birthDate: string;
   languagePreference: string;
-  isActive: boolean;
 }
 
 const emptyForm: PersonForm = {
@@ -25,7 +24,6 @@ const emptyForm: PersonForm = {
   phoneNumber: '',
   birthDate: '',
   languagePreference: 'fr',
-  isActive: true,
 };
 
 export function PersonFormModal({
@@ -51,7 +49,6 @@ export function PersonFormModal({
           phoneNumber: normalizePersonText(person.phoneNumber),
           birthDate: normalizePersonText(person.birthDate).slice(0, 10),
           languagePreference: normalizePersonText(person.preferredLanguage) || 'fr',
-          isActive: person.isActive,
         }
       : emptyForm,
   );
@@ -74,7 +71,8 @@ export function PersonFormModal({
       title={t(person ? 'persons.admin.editTitle' : 'persons.admin.createTitle')}
       description={t(person ? 'persons.admin.editDescription' : 'persons.admin.createDescription')}
       actions={
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={!valid || pending}
@@ -86,7 +84,6 @@ export function PersonFormModal({
               phoneNumber: form.phoneNumber,
               birthDate: form.birthDate || undefined,
               languagePreference: form.languagePreference,
-              ...(person ? { isActive: form.isActive } : {}),
             });
           }}
         >
@@ -179,18 +176,6 @@ export function PersonFormModal({
             <option value="ar">{t('locale.ar')}</option>
           </select>
         </label>
-        {person ? (
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={form.isActive}
-              onChange={(event) => {
-                setForm({ ...form, isActive: event.target.checked });
-              }}
-            />
-            <span>{t('persons.admin.activePerson')}</span>
-          </label>
-        ) : null}
       </div>
     </Modal>
   );

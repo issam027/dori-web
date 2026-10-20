@@ -9,13 +9,19 @@ import {
   Pencil,
   Phone,
   Plus,
+  RotateCcw,
   Save,
   Search,
   Trash2,
   UserRound,
   UsersRound,
 } from 'lucide-react';
-import type { CreatePersonDto, PersonResponseDto, PersonsControllerFindPersonsSort, UpdatePersonDto } from '@/api/generated/models';
+import type {
+  CreatePersonDto,
+  PersonResponseDto,
+  PersonsControllerFindPersonsSort,
+  UpdatePersonDto,
+} from '@/api/generated/models';
 import { queryKeys } from '@/api/client/query-keys';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { notifyError } from '@/core/notifications/error-presentation';
@@ -42,7 +48,10 @@ export function PersonsPage() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
-  const canDelete = hasPermission(useSessionStore((state) => state.user), 'registration_delete');
+  const canDelete = hasPermission(
+    useSessionStore((state) => state.user),
+    'registration_delete',
+  );
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
   const search = useDebouncedFilter(searchDraft);
@@ -98,6 +107,18 @@ export function PersonsPage() {
       setPending(false);
     }
   };
+  const reactivate = async (person: PersonResponseDto) => {
+    setPending(true);
+    try {
+      await updatePerson(person.personId, { isActive: true });
+      await refresh();
+      notify({ tone: 'success', title: t('persons.admin.reactivated') });
+    } catch (error) {
+      notifyError(error);
+    } finally {
+      setPending(false);
+    }
+  };
   const formatDate = (value?: string | null) =>
     formatPersonDate(value, i18n.language) ?? t('common.notProvided');
   const formatLanguage = (value?: string | null) =>
@@ -110,7 +131,8 @@ export function PersonsPage() {
         title={t('persons.admin.title')}
         description={t('persons.admin.description')}
         actions={
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-primary"
             type="button"
             onClick={() => {
@@ -129,9 +151,7 @@ export function PersonsPage() {
             </span>
             <small>{t('persons.admin.searchHint')}</small>
           </summary>
-          <div
-            className="admin-filter-grid persons-filter-grid"
-          >
+          <div className="admin-filter-grid persons-filter-grid">
             <label>
               {t('common.search')}
               <input
@@ -145,7 +165,13 @@ export function PersonsPage() {
             </label>
             <label>
               {t('persons.admin.statusFilter')}
-              <select value={status} onChange={(event) => { setStatus(event.target.value as 'all' | 'active' | 'inactive'); setPage(1); }}>
+              <select
+                value={status}
+                onChange={(event) => {
+                  setStatus(event.target.value as 'all' | 'active' | 'inactive');
+                  setPage(1);
+                }}
+              >
                 <option value="all">{t('persons.admin.allStatuses')}</option>
                 <option value="active">{t('common.active')}</option>
                 <option value="inactive">{t('common.inactive')}</option>
@@ -153,7 +179,13 @@ export function PersonsPage() {
             </label>
             <label>
               {t('persons.admin.sort')}
-              <select value={sort} onChange={(event) => { setSort(event.target.value as PersonsControllerFindPersonsSort); setPage(1); }}>
+              <select
+                value={sort}
+                onChange={(event) => {
+                  setSort(event.target.value as PersonsControllerFindPersonsSort);
+                  setPage(1);
+                }}
+              >
                 <option value="lastName:asc">{t('persons.admin.sort.lastNameAsc')}</option>
                 <option value="lastName:desc">{t('persons.admin.sort.lastNameDesc')}</option>
                 <option value="firstName:asc">{t('persons.admin.sort.firstNameAsc')}</option>
@@ -186,73 +218,100 @@ export function PersonsPage() {
             caption={t('persons.admin.title')}
             containerClassName="table-wrap admin-table-wrap"
           >
-              <thead>
-                <tr>
-                  <th scope="col">{t('persons.admin.person')}</th>
-                  <th scope="col">{t('common.contact')}</th>
-                  <th scope="col">{t('persons.personPickerOrCreate.birthDate')}</th>
-                  <th scope="col">{t('common.language')}</th>
-                  <th scope="col">{t('common.status')}</th>
-                  <th scope="col">{t('common.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((person) => (
-                  <tr key={person.personId}>
-                    <td>
-                      <b>{[person.firstName, person.lastName].filter(Boolean).join(' ')}</b>
-                      <small>#{person.personId}</small>
-                    </td>
-                    <td>
-                      <span>{person.phoneNumber ?? t('common.notProvided')}</span>
-                      <small>{person.email ?? t('settings.noEmail')}</small>
-                    </td>
-                    <td>{formatDate(person.birthDate)}</td>
-                    <td>{formatLanguage(person.preferredLanguage)}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${person.isActive ? 'status-success' : 'status-warning'}`}
+            <thead>
+              <tr>
+                <th scope="col">{t('persons.admin.person')}</th>
+                <th scope="col">{t('common.contact')}</th>
+                <th scope="col">{t('persons.personPickerOrCreate.birthDate')}</th>
+                <th scope="col">{t('common.language')}</th>
+                <th scope="col">{t('common.status')}</th>
+                <th scope="col">{t('common.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((person) => (
+                <tr key={person.personId}>
+                  <td>
+                    <b>{[person.firstName, person.lastName].filter(Boolean).join(' ')}</b>
+                    <small>#{person.personId}</small>
+                  </td>
+                  <td>
+                    <span>{person.phoneNumber ?? t('common.notProvided')}</span>
+                    <small>{person.email ?? t('settings.noEmail')}</small>
+                  </td>
+                  <td>{formatDate(person.birthDate)}</td>
+                  <td>{formatLanguage(person.preferredLanguage)}</td>
+                  <td>
+                    <span
+                      className={`status-badge ${person.isActive ? 'status-success' : 'status-warning'}`}
+                    >
+                      {t(person.isActive ? 'common.active' : 'common.inactive')}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="table-actions responsive-table-actions">
+                      <Button
+                        variant="unstyled"
+                        className="button button-small"
+                        type="button"
+                        title={t('common.view')}
+                        onClick={() => {
+                          setViewing(person);
+                        }}
                       >
-                        {t(person.isActive ? 'common.active' : 'common.inactive')}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="table-actions responsive-table-actions">
-                        <Button variant="unstyled"
-                          className="button button-small"
-                          type="button"
-                          title={t('common.view')}
-                          onClick={() => {
-                            setViewing(person);
-                          }}
-                        >
-                          <Eye aria-hidden="true" /> {t('common.view')}
-                        </Button>
-                        <Button variant="unstyled"
-                          className="button button-small"
-                          type="button"
-                          title={t('common.edit')}
-                          onClick={() => {
-                            setEditing(person);
-                          }}
-                        >
-                          <Pencil aria-hidden="true" /> {t('common.edit')}
-                        </Button>
-                        <PersonNotesButton
-                          noteCount={person.activeNoteCount}
-                          onClick={() => {
-                            setNotesMode(person.activeNoteCount ? 'view' : 'add');
-                            setNotesPerson(person);
-                          }}
-                        />
-                        {canDelete ? <Button variant="unstyled" className="button button-small button-danger" type="button" title={t('common.delete')} onClick={() => { setDeleting(person); }}>
-                          <Trash2 aria-hidden="true" /> {t('common.delete')}
-                        </Button> : null}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        <Eye aria-hidden="true" /> {t('common.view')}
+                      </Button>
+                      <Button
+                        variant="unstyled"
+                        className="button button-small"
+                        type="button"
+                        title={t('common.edit')}
+                        onClick={() => {
+                          setEditing(person);
+                        }}
+                      >
+                        <Pencil aria-hidden="true" /> {t('common.edit')}
+                      </Button>
+                      <PersonNotesButton
+                        noteCount={person.activeNoteCount}
+                        onClick={() => {
+                          setNotesMode(person.activeNoteCount ? 'view' : 'add');
+                          setNotesPerson(person);
+                        }}
+                      />
+                      {canDelete ? (
+                        person.isActive ? (
+                          <Button
+                            variant="unstyled"
+                            className="button button-small button-danger"
+                            type="button"
+                            title={t('common.delete')}
+                            onClick={() => {
+                              setDeleting(person);
+                            }}
+                          >
+                            <Trash2 aria-hidden="true" /> {t('common.delete')}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="unstyled"
+                            className="button button-small"
+                            type="button"
+                            title={t('persons.admin.reactivate')}
+                            disabled={pending}
+                            onClick={() => {
+                              void reactivate(person);
+                            }}
+                          >
+                            <RotateCcw aria-hidden="true" /> {t('persons.admin.reactivate')}
+                          </Button>
+                        )
+                      ) : null}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </DataTable>
         )}
         {totalPages > 1 ? (
@@ -285,14 +344,38 @@ export function PersonsPage() {
       ) : null}
       <Modal
         open={Boolean(deleting)}
-        onOpenChange={(open) => { if (!open && !pending) setDeleting(undefined); }}
+        onOpenChange={(open) => {
+          if (!open && !pending) setDeleting(undefined);
+        }}
         title={t('persons.admin.deleteTitle')}
-        description={deleting ? [deleting.firstName, deleting.lastName].filter(Boolean).join(' ') : undefined}
-        actions={<Button variant="unstyled" className="button button-danger" type="button" disabled={pending} onClick={() => {
-          if (!deleting) return;
-          setPending(true);
-          void deletePerson(deleting.personId).then(async () => { await refresh(); notify({ tone: 'success', title: t('persons.admin.deleted') }); setDeleting(undefined); }).catch(notifyError).finally(() => { setPending(false); });
-        }}><Trash2 aria-hidden="true" />{t('common.delete')}</Button>}
+        description={
+          deleting ? [deleting.firstName, deleting.lastName].filter(Boolean).join(' ') : undefined
+        }
+        actions={
+          <Button
+            variant="unstyled"
+            className="button button-danger"
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              if (!deleting) return;
+              setPending(true);
+              void deletePerson(deleting.personId)
+                .then(async () => {
+                  await refresh();
+                  notify({ tone: 'success', title: t('persons.admin.deleted') });
+                  setDeleting(undefined);
+                })
+                .catch(notifyError)
+                .finally(() => {
+                  setPending(false);
+                });
+            }}
+          >
+            <Trash2 aria-hidden="true" />
+            {t('common.delete')}
+          </Button>
+        }
       >
         <p className="admin-message">{t('persons.admin.deleteDescription')}</p>
       </Modal>
@@ -307,7 +390,8 @@ export function PersonsPage() {
         }
         actions={
           viewing ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               onClick={() => {
