@@ -114,6 +114,8 @@ export const ALLOW_IDENTICAL = {
     "pagination.label",
     "locale.en",
     "locale.ar",
+    "locale.ar-TN",
+    "common.europeParis",
     "site.fallback",
     "common.duration.minutes",
     "common.duration.minutes_one",
@@ -158,5 +160,6 @@ export const ALLOW_IDENTICAL = {
     "errorBoundary.http",
     "locale.en",
     "locale.ar",
+    "locale.ar-TN",
   ],
 } as const;

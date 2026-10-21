@@ -572,6 +572,7 @@ export function UsersAdminPage() {
               <option value="fr">{t('locale.fr')}</option>
               <option value="en">{t('common.english')}</option>
               <option value="ar">{t('locale.ar')}</option>
+              <option value="ar-TN">{t('locale.ar-TN')}</option>
             </select>
           </label>
         </div>

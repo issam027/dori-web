@@ -212,6 +212,9 @@ export function ProfilePage() {
                   <option value="ar" aria-label="العربية">
                     {String.fromCodePoint(0x1f1f9, 0x1f1f3)}
                   </option>
+                  <option value="ar-TN" aria-label={__t('locale.ar-TN')}>
+                    😊
+                  </option>
                 </select>
               </FormField>
               {saved ? <p role="status">{__t('profile.profile.profilEnregistre')}</p> : null}

@@ -174,6 +174,7 @@ export function PersonFormModal({
             <option value="fr">{t('locale.fr')}</option>
             <option value="en">{t('locale.en')}</option>
             <option value="ar">{t('locale.ar')}</option>
+            <option value="ar-TN">{t('locale.ar-TN')}</option>
           </select>
         </label>
       </div>

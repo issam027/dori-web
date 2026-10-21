@@ -29,7 +29,7 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   "queue-operations.desk.passageS": "زيارة/زيارات",
   "queue-operations.desk.personneNonRenseignee": "شخص غير محدد",
   "queue-operations.desk.priseEnCharge": "بدء الخدمة",
-  "queue-operations.desk.prochainsEligibles": "العملاء المؤهلون التاليون",
+  "queue-operations.desk.prochainsEligibles": "المؤهلون التاليون",
   "queue-operations.desk.recapitulatifDesPassages": "ملخص الزيارات",
   "queue-operations.desk.reprendreLeGuichet": "استلام الشباك",
   "queue-operations.desk.sessionEnCours": "الجلسة الحالية",

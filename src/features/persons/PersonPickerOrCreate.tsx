@@ -182,6 +182,7 @@ export function PersonPickerOrCreate({
               <option value="fr">{__t('locale.fr')}</option>
               <option value="en">{__t('locale.en')}</option>
               <option value="ar">{__t('locale.ar')}</option>
+              <option value="ar-TN">{__t('locale.ar-TN')}</option>
             </select>
           </FormField>
           <p

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { Button } from '@/design-system/components/Button';
 
-const locales = ['fr', 'en', 'ar'] as const;
+const locales = ['fr', 'en', 'ar', 'ar-TN'] as const;
 
 function CountryFlag({ locale }: { locale: (typeof locales)[number] }) {
   if (locale === 'fr') {
@@ -23,6 +23,68 @@ function CountryFlag({ locale }: { locale: (typeof locales)[number] }) {
         <path stroke="#c8102e" strokeWidth="2" d="m0 0 30 20M30 0 0 20" />
         <path stroke="#fff" strokeWidth="7" d="M15 0v20M0 10h30" />
         <path stroke="#c8102e" strokeWidth="4" d="M15 0v20M0 10h30" />
+      </svg>
+    );
+  }
+  if (locale === 'ar-TN') {
+    return (
+      <svg
+        viewBox="0 0 30 20"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {/* Fond rouge tunisien */}
+        <rect
+          width="30"
+          height="20"
+          fill="#E70013"
+        />
+
+        {/* Disque blanc centré (base du drapeau tunisien) */}
+        <circle
+          cx="15"
+          cy="10"
+          r="6.5"
+          fill="#FFFFFF"
+        />
+
+        {/* Smiley visage jaune jovial */}
+        <circle
+          cx="15"
+          cy="10"
+          r="5"
+          fill="#FFC800"
+          stroke="#E6A800"
+          strokeWidth="0.4"
+        />
+
+        {/* Yeux souriants */}
+        <circle
+          cx="13.2"
+          cy="8.7"
+          r="0.75"
+          fill="#1A1A1A"
+        />
+        <circle
+          cx="16.8"
+          cy="8.7"
+          r="0.75"
+          fill="#1A1A1A"
+        />
+
+        {/* Grand sourire expressif */}
+        <path
+          d="M 12.5 10.5 C 13 13.2 17 13.2 17.5 10.5"
+          fill="#D32F2F"
+          stroke="#1A1A1A"
+          strokeWidth="0.5"
+          strokeLinecap="round"
+        />
+        {/* Dents blanches du sourire */}
+        <path
+          d="M 13 10.7 C 13.8 11.6 16.2 11.6 17 10.7 Z"
+          fill="#FFFFFF"
+        />
       </svg>
     );
   }

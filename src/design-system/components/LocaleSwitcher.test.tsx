@@ -13,10 +13,14 @@ describe('LocaleSwitcher', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /langue.*français/i }));
     expect(screen.getByRole('listbox')).toBeVisible();
-    expect(screen.getAllByRole('option')).toHaveLength(3);
+    expect(screen.getAllByRole('option')).toHaveLength(4);
 
     await userEvent.click(screen.getByRole('option', { name: /english/i }));
     expect(usePreferencesStore.getState().locale).toBe('en');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /langue.*english/i }));
+    await userEvent.click(screen.getByRole('option', { name: /تونسي/i }));
+    expect(usePreferencesStore.getState().locale).toBe('ar-TN');
   });
 });

@@ -155,6 +155,7 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   "locale.label": "Language",
   "locale.en": "English",
   "locale.ar": "العربية",
+  "locale.ar-TN": "تونسي (دارجة)",
   "site.change": "Change site",
   "site.fallback": "Site {{id}}",
   "common.lastName": "Last name",

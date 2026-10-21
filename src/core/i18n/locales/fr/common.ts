@@ -154,6 +154,7 @@ export const common = {
   "locale.label": "Langue",
   "locale.en": "English",
   "locale.ar": "العربية",
+  "locale.ar-TN": "تونسي (دارجة)",
   "site.change": "Changer de site",
   "site.fallback": "Site {{id}}",
   "common.lastName": "Nom de famille",
