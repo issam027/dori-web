@@ -28,7 +28,10 @@ describe('PassagePrintDocument', () => {
     expect(screen.getByText('A0042')).toBeInTheDocument();
     expect(screen.getByText('Centre DORIFY Lyon')).toBeInTheDocument();
     expect(screen.getByText('DORIFY-PASSAGE-42', { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/Signature du responsable/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Signature du responsable/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Justificatif de passage dans un établissement'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText(/Cachet de l’établissement/i)).toBeInTheDocument();
   });
 

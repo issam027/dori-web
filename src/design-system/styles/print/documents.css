@@ -4,71 +4,306 @@ body[data-print-kiosk-ticket] > #root {
   display: none !important;
 }
 
-/* A4 attendance certificate. Kept last to override the former compact receipt rules. */
+/* Formal single-page passage certificate. */
 @media print {
-  @page { size: A4 portrait; margin: 12mm; }
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
   body[data-print-passage],
-  body[data-print-passage] #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: var(--a) !important; }
-  body[data-print-passage] > .passage-print-document {
+  body[data-print-passage] #root {
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  body[data-print-passage] * {
+    display: none !important;
+  }
+
+  body[data-print-passage] > .passage-print-document,
+  body[data-print-passage] > .passage-print-document * {
+    display: revert !important;
+    visibility: visible !important;
+  }
+
+  html body[data-print-passage] > .passage-print-document.passage-print-document {
     position: absolute;
     inset: 0;
     display: flex !important;
     width: 100% !important;
-    min-height: 273mm;
-    box-sizing: border-box;
+    height: 273mm;
+    min-height: 0;
+    max-height: 273mm;
     flex-direction: column;
-    padding: 10mm 11mm 8mm;
+    padding: 3mm 4mm 2mm;
     overflow: hidden;
-    color: var(--cl) !important;
-    background: var(--a) !important;
-    font: 9.5pt/1.42 Arial, sans-serif;
+    color: #111 !important;
+    background: #fff !important;
+    font: 9pt/1.35 Arial, Helvetica, sans-serif;
   }
-  body[data-print-passage] > .passage-print-document * { box-sizing: border-box; }
-  .passage-print-document .attestation-header { display: flex !important; align-items: center; justify-content: space-between; gap: 8mm; padding: 0 0 5mm; border-bottom: 1.2mm solid var(--d); }
-  .passage-print-document .attestation-brand { display: flex !important; align-items: center; gap: 3mm; }
-  .passage-print-document .attestation-brand img { display: block !important; width: 13mm; height: 13mm; object-fit: contain; }
-  .passage-print-document .attestation-brand strong { color: var(--d) !important; font-size: 18pt; letter-spacing: .09em; }
-  .passage-print-document .attestation-brand span { color: var(--dc) !important; font-size: 7.5pt; }
-  .passage-print-document .attestation-official { max-width: 62mm; color: var(--cz) !important; font-size: 7.5pt; font-weight: 700; letter-spacing: .08em; text-align: right; }
-  .passage-print-document .attestation-title { padding: 7mm 0 5mm; text-align: center; }
-  .passage-print-document .attestation-title h1 { margin: 0; color: var(--d) !important; font-size: 23pt; letter-spacing: .04em; }
-  .passage-print-document .attestation-title p { margin: 1.5mm 0 0; color: var(--af) !important; font-size: 10pt; }
-  .passage-print-document .attestation-establishment { display: grid !important; gap: .8mm; padding: 4mm 5mm; border: .3mm solid var(--dw); border-radius: 3mm; background: var(--bf) !important; }
-  .passage-print-document .attestation-establishment > span,
-  .passage-print-document .attestation-panel h2,
-  .passage-print-document .attestation-timeline h2,
-  .passage-print-document .attestation-purpose h2 { color: var(--d) !important; font-size: 7.5pt; font-weight: 800; letter-spacing: .09em; }
-  .passage-print-document .attestation-establishment strong { font-size: 14pt; }
-  .passage-print-document .attestation-establishment small { color: var(--af) !important; }
-  .passage-print-document .attestation-establishment time { font-weight: 700; }
-  .passage-print-document .attestation-introduction { margin: 5mm 0; color: var(--cr) !important; font-size: 10pt; }
-  .passage-print-document .attestation-two-columns { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4mm; }
-  .passage-print-document .attestation-panel { padding: 4mm; border: .3mm solid var(--bc); border-radius: 2.5mm; break-inside: avoid; }
-  .passage-print-document .attestation-panel h2,
-  .passage-print-document .attestation-timeline h2,
-  .passage-print-document .attestation-purpose h2 { margin: 0 0 3mm; }
-  .passage-print-document .attestation-panel dl { margin: 0; }
-  .passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
-  .passage-print-document .attestation-panel dt { min-width: 0; color: var(--dg) !important; font-size: 8.5pt; }
-  .passage-print-document .attestation-panel dd { margin: 0; font-size: 10pt; font-weight: 700; overflow-wrap: anywhere; }
-  .passage-print-document .attestation-ticket dd { color: var(--d) !important; font-size: 12pt; }
-  .passage-print-document .attestation-timeline { margin-top: 5mm; }
-  .passage-print-document .attestation-events { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
-  .passage-print-document .attestation-events > div { position: relative; min-height: 27mm; padding: 3.5mm 3mm 3mm 9mm; border: .3mm solid var(--bc); border-radius: 2.5mm; background: var(--eu) !important; }
-  .passage-print-document .attestation-events > div > span { position: absolute; top: 3.5mm; left: 3mm; display: grid !important; width: 4.5mm; height: 4.5mm; place-items: center; border-radius: 50%; color: var(--a) !important; background: var(--d) !important; font-size: 7pt; font-weight: 800; }
-  .passage-print-document .attestation-events small { display: block !important; color: var(--de) !important; font-size: 6.8pt; font-weight: 800; letter-spacing: .04em; }
-  .passage-print-document .attestation-events strong { display: block !important; margin: 1mm 0; color: var(--d) !important; font-size: 15pt; }
-  .passage-print-document .attestation-events p { margin: 0; color: var(--dh) !important; font-size: 7pt; }
-  .passage-print-document .attestation-purpose { margin-top: 5mm; padding: 4mm 5mm; border-left: 1.2mm solid var(--d); background: var(--bf) !important; break-inside: avoid; }
-  .passage-print-document .attestation-purpose p { margin: 0 0 2mm; font-size: 8pt; }
-  .passage-print-document .attestation-purpose p:last-child { margin-bottom: 0; }
-  .passage-print-document .attestation-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 18mm; margin-top: 7mm; break-inside: avoid; }
-  .passage-print-document .attestation-signatures > div { display: flex !important; min-height: 18mm; align-items: flex-end; justify-content: center; border-bottom: .3mm solid var(--di); }
-  .passage-print-document .attestation-signatures span { transform: translateY(5mm); color: var(--af) !important; font-size: 7.5pt; }
-  .passage-print-document .attestation-trace { display: block !important; margin-top: auto; padding-top: 6mm; border-top: .3mm solid var(--dy); color: var(--dd) !important; }
-  .passage-print-document .attestation-trace > div { display: flex !important; justify-content: space-between; gap: 5mm; font-size: 7pt; }
-  .passage-print-document .attestation-trace p { margin: 2mm 0 0; font-size: 6.8pt; line-height: 1.35; }
+
+  html body[data-print-passage] > .passage-print-document.passage-print-document *,
+  html body[data-print-passage] > .passage-print-document.passage-print-document *::before,
+  html body[data-print-passage] > .passage-print-document.passage-print-document *::after {
+    box-sizing: border-box;
+    color: #111 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body[data-print-passage] .attestation-header {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10mm;
+    padding: 0 0 3mm;
+    border-bottom: 0.3mm solid #111;
+  }
+
+  html body[data-print-passage] .attestation-brand {
+    display: flex !important;
+    align-items: center;
+    gap: 3mm;
+  }
+
+  html body[data-print-passage] .attestation-brand img {
+    display: block !important;
+    width: 11mm;
+    height: 11mm;
+    filter: grayscale(1);
+    object-fit: contain;
+  }
+
+  html body[data-print-passage] .attestation-brand strong {
+    display: block !important;
+    font-size: 14pt;
+    letter-spacing: 0.06em;
+  }
+
+  html body[data-print-passage] .attestation-brand span {
+    display: block !important;
+    font-size: 7pt;
+    letter-spacing: 0.06em;
+  }
+
+  html body[data-print-passage] .attestation-title {
+    padding: 9mm 0 4mm;
+    text-align: center;
+  }
+
+  html body[data-print-passage] .attestation-title h1 {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 19pt;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  html body[data-print-passage] .attestation-establishment {
+    display: grid !important;
+    grid-template-columns: 35mm 1fr auto;
+    align-items: baseline;
+    gap: 1mm 4mm;
+    padding: 2.5mm 0;
+    border: 0;
+    border-block: 0.2mm solid #999;
+    border-radius: 0;
+  }
+
+  html body[data-print-passage] .attestation-establishment > span {
+    grid-row: 1 / span 2;
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  html body[data-print-passage] .attestation-establishment strong {
+    font-size: 11pt;
+  }
+
+  html body[data-print-passage] .attestation-establishment small {
+    grid-column: 2;
+    font-size: 8pt;
+  }
+
+  html body[data-print-passage] .attestation-establishment time {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    font-weight: 700;
+  }
+
+  html body[data-print-passage] .attestation-introduction {
+    margin: 3.5mm 0;
+    font-size: 9pt;
+    text-align: justify;
+  }
+
+  html body[data-print-passage] .attestation-two-columns {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-block: 0.2mm solid #999;
+    break-inside: avoid;
+  }
+
+  html body[data-print-passage] .attestation-panel {
+    padding: 3mm 4mm 2.5mm 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  html body[data-print-passage] .attestation-panel + .attestation-panel {
+    padding-inline: 4mm 0;
+    border-inline-start: 0.2mm solid #bbb;
+  }
+
+  html body[data-print-passage] :is(.attestation-panel, .attestation-timeline, .attestation-purpose) h2 {
+    margin: 0 0 2mm;
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+  }
+
+  html body[data-print-passage] .attestation-panel dl,
+  html body[data-print-passage] .attestation-panel dl > div {
+    margin: 0;
+  }
+
+  html body[data-print-passage] .attestation-panel dl > div {
+    display: grid !important;
+    grid-template-columns: 27mm 1fr;
+    gap: 2mm;
+    padding: 0.8mm 0;
+    border: 0;
+  }
+
+  html body[data-print-passage] .attestation-panel dt,
+  html body[data-print-passage] .attestation-panel dd {
+    display: block !important;
+    min-width: 0;
+    margin: 0;
+    font-size: 8.5pt;
+  }
+
+  html body[data-print-passage] .attestation-panel dt::after {
+    content: ' :';
+  }
+
+  html body[data-print-passage] .attestation-panel dd {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  html body[data-print-passage] .attestation-timeline {
+    margin-top: 6mm;
+    break-inside: avoid;
+  }
+
+  html body[data-print-passage] .attestation-events {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-block: 0.2mm solid #999;
+  }
+
+  html body[data-print-passage] .attestation-events > div {
+    position: static;
+    min-height: 0;
+    padding: 2.5mm 4mm;
+    border: 0;
+    border-radius: 0;
+  }
+
+  html body[data-print-passage] .attestation-events > div + div {
+    border-inline-start: 0.2mm solid #bbb;
+  }
+
+  html body[data-print-passage] .attestation-events > div > span {
+    display: none !important;
+  }
+
+  html body[data-print-passage] .attestation-events small,
+  html body[data-print-passage] .attestation-events strong,
+  html body[data-print-passage] .attestation-events p {
+    display: block !important;
+    margin: 0;
+  }
+
+  html body[data-print-passage] .attestation-events small {
+    font-size: 6.8pt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  html body[data-print-passage] .attestation-events strong {
+    margin: 0.8mm 0;
+    font-size: 12pt;
+  }
+
+  html body[data-print-passage] .attestation-events p {
+    font-size: 7pt;
+  }
+
+  html body[data-print-passage] .attestation-purpose {
+    margin-top: 3.5mm;
+    padding: 0;
+    border: 0;
+    break-inside: avoid;
+  }
+
+  html body[data-print-passage] .attestation-purpose p {
+    margin: 0 0 1.5mm;
+    font-size: 7.6pt;
+    text-align: justify;
+  }
+
+  html body[data-print-passage] .attestation-stamp {
+    display: flex !important;
+    width: 52mm;
+    min-height: 12mm;
+    margin: 3mm 0 0 auto;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 0.2mm solid #777;
+    break-inside: avoid;
+  }
+
+  html body[data-print-passage] .attestation-stamp span {
+    transform: translateY(4mm);
+    font-size: 7pt;
+  }
+
+  html body[data-print-passage] .attestation-trace {
+    display: block !important;
+    margin-top: auto;
+    padding-top: 3mm;
+    border-top: 0.2mm solid #999;
+  }
+
+  html body[data-print-passage] .attestation-trace > div {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 4mm;
+    font-size: 6.5pt;
+  }
+
+  html body[data-print-passage] .attestation-trace span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  html body[data-print-passage] .attestation-trace p {
+    margin: 2mm 0 0;
+    font-size: 6.2pt;
+    line-height: 1.3;
+  }
 }
+
 body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
   position: static;
   display: grid !important;
@@ -221,187 +456,13 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     font-size: 7.5pt;
   }
 }
-.passage-print-header,
-.passage-print-legal {
-  display: none;
-}
 .passage-print-document {
   display: none;
 }
 
-@media print {
-  @page {
-    margin: 14mm;
-  }
-  body[data-print-passage],
-  body[data-print-passage] #root {
-    width: 70mm;
-    min-height: 0 !important;
-    margin: 0;
-    padding: 0;
-    background: var(--a) !important;
-  }
-  body[data-print-passage] * {
-    display: none !important;
-  }
-  body[data-print-passage] #root,
-  body[data-print-passage] .app-shell,
-  body[data-print-passage] .app-column,
-  body[data-print-passage] .app-content,
-  body[data-print-passage] .page-stack,
-  body[data-print-passage] .passage-summary,
-  body[data-print-passage] .passage-summary-grid {
-    display: contents !important;
-  }
-  body[data-print-passage] .passage-summary-card.is-printing,
-  body[data-print-passage] .passage-summary-card.is-printing * {
-    display: revert !important;
-  }
-  body[data-print-passage] .passage-summary-card.is-printing {
-    width: 70mm;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 4mm;
-    border-color: var(--dq);
-    border-radius: 2mm;
-    color: var(--ao);
-    background: var(--a);
-    font-size: 9pt;
-    box-shadow: none;
-  }
-  body[data-print-passage] .passage-summary-card.is-printing > header {
-    display: flex !important;
-  }
-  body[data-print-passage] .passage-summary-card.is-printing dl {
-    display: grid !important;
-  }
-  body[data-print-passage] .passage-summary-card.is-printing .passage-print-header,
-  body[data-print-passage] .passage-summary-card.is-printing .passage-print-legal {
-    display: block !important;
-  }
-  body[data-print-passage] .passage-print-header {
-    margin: 3mm 0;
-    padding: 3mm 0;
-    border-block: 1px solid var(--dv);
-    text-align: center;
-  }
-  body[data-print-passage] .passage-print-header strong,
-  body[data-print-passage] .passage-print-header span {
-    display: block !important;
-  }
-  body[data-print-passage] .passage-print-legal {
-    margin-top: 5mm;
-    font-size: 7.5pt;
-    line-height: 1.35;
-  }
-  body[data-print-passage] .passage-print-legal p,
-  body[data-print-passage] .passage-print-legal div,
-  body[data-print-passage] .passage-print-legal span {
-    display: block !important;
-  }
-  body[data-print-passage] .passage-print-legal div {
-    height: 18mm;
-    margin-top: 5mm;
-    border-bottom: 1px solid var(--dk);
-    text-align: center;
-  }
-  body[data-print-passage] .print-hidden,
-  body[data-print-passage] .passage-summary-card > footer {
-    display: none !important;
-  }
-  body[data-print-passage] > .passage-print-document,
-  body[data-print-passage] > .passage-print-document * {
-    visibility: visible !important;
-  }
-  body[data-print-passage] > .passage-print-document {
-    display: block !important;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8mm;
-    color: var(--t);
-    background: var(--a);
-    font:
-      11pt/1.5 system-ui,
-      sans-serif;
-  }
-  body[data-print-passage] > .passage-print-document * {
-    display: revert !important;
-  }
-  body[data-print-passage] > .passage-print-document header {
-    display: flex !important;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12mm;
-    padding-bottom: 6mm;
-    border-bottom: 2px solid var(--t);
-  }
-  .passage-print-document header strong,
-  .passage-print-document header span,
-  .passage-print-document header small {
-    display: block !important;
-  }
-  .passage-print-document header strong {
-    font-size: 18pt;
-    letter-spacing: 0.08em;
-  }
-  .passage-print-document h1 {
-    margin: 12mm 0 5mm;
-    font-size: 24pt;
-  }
-  .passage-print-document .passage-print-statement {
-    margin: 0 0 9mm;
-    padding: 5mm;
-    border-left: 4px solid var(--cu);
-    background: var(--ep);
-    font-size: 12pt;
-  }
-  .passage-print-document dl {
-    display: block !important;
-    margin: 0;
-  }
-  .passage-print-document dl > div {
-    display: flex !important;
-    gap: 2mm;
-    padding: 2.5mm 0;
-    border-bottom: 1px dotted var(--dx);
-  }
-  .passage-print-document dt {
-    min-width: 42mm;
-    color: var(--w);
-    font-size: 9pt;
-  }
-  .passage-print-document dt::after {
-    content: ' :';
-  }
-  .passage-print-document dd {
-    margin: 0;
-    font-weight: 700;
-  }
-  .passage-print-document .passage-print-disclaimer {
-    margin-top: 10mm;
-    color: var(--w);
-    font-size: 9pt;
-  }
-  .passage-print-document footer {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 18mm;
-    margin-top: 18mm;
-  }
-  .passage-print-document footer div {
-    display: flex !important;
-    min-height: 28mm;
-    align-items: flex-end;
-    justify-content: center;
-    border-bottom: 1px solid var(--w);
-  }
-  .passage-print-document footer span {
-    transform: translateY(6mm);
-    color: var(--w);
-    font-size: 9pt;
-  }
+.passage-print-header,
+.passage-print-legal {
+  display: none;
 }
 
 @media print {
@@ -477,36 +538,6 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     font-size: 8pt;
   }
 
-  body[data-print-passage] > .passage-print-document .passage-print-statement {
-    display: none !important;
-  }
-  body[data-print-passage] > .passage-print-document dl > div {
-    display: block !important;
-    padding: 1.5mm 0;
-    border: 0;
-  }
-  body[data-print-passage] > .passage-print-document dt,
-  body[data-print-passage] > .passage-print-document dd {
-    display: inline !important;
-    min-width: 0;
-    margin: 0;
-    color: var(--t);
-    font-size: 11pt;
-  }
-  body[data-print-passage] > .passage-print-document dd {
-    font-weight: 700;
-  }
-}
-
-@media print {
-  html body[data-print-passage] > .passage-print-document.passage-print-document { display: flex !important; width: 100% !important; min-height: 273mm; flex-direction: column; padding: 10mm 11mm 8mm; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-header { display: flex !important; padding: 0 0 5mm; border-bottom: 1.2mm solid var(--d); }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dl > div { display: grid !important; grid-template-columns: 28mm 1fr; gap: 2mm; padding: 1.2mm 0; border: 0; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dt,
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-panel dd { display: block !important; margin: 0; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-events > div { display: block !important; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-signatures { display: grid !important; }
-  html body[data-print-passage] > .passage-print-document.passage-print-document .attestation-trace { display: block !important; margin-top: auto; }
 }
 
 @media print {
@@ -582,23 +613,4 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     font-size: 8pt;
   }
 
-  body[data-print-passage] > .passage-print-document .passage-print-statement {
-    display: none !important;
-  }
-  body[data-print-passage] > .passage-print-document dl > div {
-    display: block !important;
-    padding: 1.5mm 0;
-    border: 0;
-  }
-  body[data-print-passage] > .passage-print-document dt,
-  body[data-print-passage] > .passage-print-document dd {
-    display: inline !important;
-    min-width: 0;
-    margin: 0;
-    color: var(--t);
-    font-size: 11pt;
-  }
-  body[data-print-passage] > .passage-print-document dd {
-    font-weight: 700;
-  }
 }

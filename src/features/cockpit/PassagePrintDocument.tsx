@@ -56,20 +56,10 @@ export function PassagePrintDocument({
             </span>
           </div>
         </div>
-        <span className="attestation-official">
-          {t('passageCertificate.official', {
-            defaultValue: 'DOCUMENT OFFICIEL · ATTESTATION DE PASSAGE',
-          })}
-        </span>
       </header>
 
       <section className="attestation-title">
         <h1>{t('passageReceipt.title')}</h1>
-        <p>
-          {t('passageCertificate.subtitle', {
-            defaultValue: 'Justificatif de passage dans un établissement',
-          })}
-        </p>
       </section>
 
       <section className="attestation-establishment">
@@ -182,14 +172,10 @@ export function PassagePrintDocument({
         </p>
       </section>
 
-      <section className="attestation-signatures">
-        <div>
-          <span>{t('passageReceipt.signature')}</span>
-        </div>
-        <div>
-          <span>{t('passageReceipt.stamp')}</span>
-        </div>
+      <section className="attestation-stamp">
+        <span>{t('passageReceipt.stamp')}</span>
       </section>
+
       <footer className="attestation-trace">
         <div>
           <span>
