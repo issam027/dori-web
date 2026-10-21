@@ -4,6 +4,7 @@ import type { SiteResponseDto, UpdateSiteDto } from '@/api/generated/models';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { presentError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { WorkingDaysField } from '@/features/queues/WorkingDaysField';
 
 const time = (value?: string) => value?.slice(0, 5) ?? '';
 const optionalTime = (value?: string) => value ? value.slice(0, 5) : undefined;
@@ -29,6 +30,7 @@ function sitePayload(value: UpdateSiteDto): UpdateSiteDto {
     defaultBreakStart: optionalTime(value.defaultBreakStart),
     defaultBreakEnd: optionalTime(value.defaultBreakEnd),
     defaultLateToleranceMinutes: value.defaultLateToleranceMinutes,
+    defaultWorkingDays: value.defaultWorkingDays,
     defaultBaseWeightWalkin: value.defaultBaseWeightWalkin,
     defaultBaseWeightAppointment: value.defaultBaseWeightAppointment,
     defaultEscalationRateWalkin: value.defaultEscalationRateWalkin,
@@ -51,6 +53,7 @@ const initialValue = (site: SiteResponseDto): UpdateSiteDto => ({
   defaultWorkingHoursEnd: time(site.defaultWorkingHoursEnd),
   defaultBreakStart: time(site.defaultBreakStart), defaultBreakEnd: time(site.defaultBreakEnd),
   defaultLateToleranceMinutes: site.defaultLateToleranceMinutes,
+  defaultWorkingDays: site.defaultWorkingDays,
   defaultBaseWeightWalkin: integer(site.defaultBaseWeightWalkin),
   defaultBaseWeightAppointment: integer(site.defaultBaseWeightAppointment),
   defaultEscalationRateWalkin: integer(site.defaultEscalationRateWalkin),
@@ -81,7 +84,7 @@ export function SiteEditor({ open, site, onOpenChange, onSave }: {
     finally { setSaving(false); }
   };
   const heading = (index: number, title: string, help: string) => <div className="wizard-step-heading"><span>{index}</span><div><h3>{title}</h3><p>{help}</p></div></div>;
-  return <WizardModal open={open} onOpenChange={onOpenChange} title={t('siteEditor.title', { defaultValue: 'Modifier le site' })} className="settings-wizard-dialog" step={step} stepCount={3} onPrevious={step > 1 ? () => { setStep((current) => current - 1); } : undefined} onNext={() => void submit()} canContinue={!saving && Boolean(value.siteName?.trim() && value.timezone?.trim())}>
+  return <WizardModal open={open} onOpenChange={onOpenChange} title={t('siteEditor.title', { defaultValue: 'Modifier le site' })} className="settings-wizard-dialog" step={step} stepCount={3} onPrevious={step > 1 ? () => { setStep((current) => current - 1); } : undefined} onNext={() => void submit()} canContinue={!saving && Boolean(value.siteName?.trim() && value.timezone?.trim() && value.defaultWorkingDays?.length)}>
     <div className="settings-editor-wizard">
       <div className="wizard-progress">{[1, 2, 3].map((item) => <span key={item} className={item <= step ? 'is-complete' : undefined} />)}</div>
       {step === 1 ? <section>{heading(1, t('siteEditor.identity', { defaultValue: 'Identité et localisation' }), t('siteEditor.identityHelp', { defaultValue: 'Informations visibles et paramètres régionaux du site.' }))}<div className="form-grid">
@@ -102,6 +105,7 @@ export function SiteEditor({ open, site, onOpenChange, onSave }: {
         <label>{t('common.fermeture')}<input type="time" value={value.defaultWorkingHoursEnd ?? ''} onChange={(e) => { field('defaultWorkingHoursEnd', e.target.value); }} /></label>
         <label>{t('siteEditor.breakStart', { defaultValue: 'Début de pause' })}<input type="time" value={value.defaultBreakStart ?? ''} onChange={(e) => { field('defaultBreakStart', e.target.value); }} /></label>
         <label>{t('siteEditor.breakEnd', { defaultValue: 'Fin de pause' })}<input type="time" value={value.defaultBreakEnd ?? ''} onChange={(e) => { field('defaultBreakEnd', e.target.value); }} /></label>
+        <WorkingDaysField value={value.defaultWorkingDays} onChange={(days) => { field('defaultWorkingDays', days ?? []); }} />
       </div></section> : null}
       {step === 3 ? <section>{heading(3, t('siteEditor.rules', { defaultValue: 'Priorités et cycle quotidien' }), t('siteEditor.rulesHelp', { defaultValue: 'Règles de priorité, de report et de clôture quotidienne.' }))}<div className="form-grid">
         <label>{t('siteEditor.walkinWeight', { defaultValue: 'Poids sans rendez-vous' })}<input type="number" step="1" value={value.defaultBaseWeightWalkin ?? 0} onChange={(e) => { field('defaultBaseWeightWalkin', e.currentTarget.valueAsNumber); }} /></label>

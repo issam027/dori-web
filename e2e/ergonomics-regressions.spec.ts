@@ -84,6 +84,19 @@ test('a draft queue can be reopened and edited from the onboarding table', async
   await expect(dialog).toBeVisible();
   await dialog.getByLabel(/^nom$/i).fill('Accueil modifié');
   await dialog.getByRole('button', { name: /suivant/i }).click();
+  await page.setViewportSize({ width: 900, height: 600 });
+  await expect(dialog.locator('.working-days-segmented').getByRole('button')).toHaveCount(7);
+  await expect(dialog.locator('.working-days-segmented input')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: /suivant/i })).toBeVisible();
+  const dialogBounds = await dialog.boundingBox();
+  const nextBounds = await dialog.getByRole('button', { name: /suivant/i }).boundingBox();
+  expect(dialogBounds).not.toBeNull();
+  expect(nextBounds).not.toBeNull();
+  if (dialogBounds && nextBounds) {
+    expect(nextBounds.y + nextBounds.height).toBeLessThanOrEqual(
+      dialogBounds.y + dialogBounds.height,
+    );
+  }
   await dialog.getByRole('button', { name: /suivant/i }).click();
   await dialog.getByRole('button', { name: /terminer/i }).click();
   await expect(row).toContainText('Accueil modifié');

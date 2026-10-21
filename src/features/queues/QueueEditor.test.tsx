@@ -21,6 +21,8 @@ it('updates the intended text and numeric fields before saving', async () => {
   await userEvent.type(counters, '4');
 
   await userEvent.click(screen.getByRole('button', { name: /suivant/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /hériter du site/i }));
+  await userEvent.click(screen.getByRole('button', { name: /samedi/i }));
   await userEvent.click(screen.getByRole('button', { name: /suivant/i }));
   await userEvent.click(screen.getByRole('button', { name: /terminer/i }));
 
@@ -31,5 +33,6 @@ it('updates the intended text and numeric fields before saving', async () => {
     queueCode: 'ACC',
     queueName: 'Accueil',
     threadCount: 4,
+    workingDays: [1, 2, 3, 4, 5, 6],
   });
 });

@@ -78,6 +78,22 @@ export function useAvailability(queueId: number, date: string, enabled = true) {
   });
 }
 
+export function useAvailabilityRange(queueId: number | undefined, dates: readonly string[]) {
+  const dateFrom = dates[0];
+  const dateTo = dates.at(-1);
+  return useQuery({
+    queryKey: queryKeys.availabilityRange(queueId, dateFrom, dateTo),
+    queryFn: ({ signal }) =>
+      registrationsControllerGetAvailability(
+        queueId ?? 0,
+        { dateFrom: dateFrom ?? '', dateTo: dateTo ?? '' },
+        undefined,
+        signal,
+      ),
+    enabled: queueId !== undefined && Boolean(dateFrom && dateTo),
+  });
+}
+
 export function useAppointmentTiers(usage = 'appointments') {
   return useQuery({
     queryKey: queryKeys.tiers.catalog(usage),

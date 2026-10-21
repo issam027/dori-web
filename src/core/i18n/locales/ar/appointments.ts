@@ -34,6 +34,7 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   "appointments.calendar.unknownPerson": "حجز",
   "appointments.calendar.moreCount": "+{{count}} إضافي",
   "appointments.calendar.collapse": "طي",
+  "appointments.calendar.closed": "مغلق",
   "appointments.availability.loading": "جارٍ تحميل الأوقات المتاحة…",
   "appointments.availability.loaded": "تم تحميل الأوقات المتاحة",
   "appointments.status.scheduled": "مجدول",

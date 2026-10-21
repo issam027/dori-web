@@ -1203,10 +1203,15 @@
   margin-block: 4px;
 }
 .week-calendar {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(10rem, 1fr));
+  display: flex;
   gap: var(--space-2);
   overflow-x: auto;
+}
+.week-calendar .calendar-day {
+  flex: 1 0 10rem;
+}
+.week-calendar .calendar-day.is-closed {
+  flex: 0 0 5.5rem;
 }
 .calendar-day,
 .month-day {
@@ -1236,6 +1241,33 @@
 }
 .calendar-day-date {
   font-variant-numeric: tabular-nums;
+}
+.calendar-day.is-closed,
+.month-day.is-closed {
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-surface));
+}
+.calendar-day.is-closed h2 {
+  padding-inline: var(--space-2);
+  background: transparent;
+}
+.calendar-closed-day {
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  border-top: 1px solid var(--color-border);
+}
+.calendar-closed-day span,
+.calendar-closed-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+.month-day .calendar-closed-label {
+  margin: auto;
+  writing-mode: horizontal-tb;
 }
 .month-weekday-header {
   position: sticky;
@@ -1528,7 +1560,6 @@
 }
 
 @media (max-width: 48rem) {
-  .week-calendar,
   .month-calendar {
     grid-template-columns: repeat(7, minmax(8rem, 1fr));
   }

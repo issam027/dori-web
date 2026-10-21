@@ -34,6 +34,7 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   "appointments.calendar.unknownPerson": "Reservation",
   "appointments.calendar.moreCount": "+{{count}} more",
   "appointments.calendar.collapse": "Collapse",
+  "appointments.calendar.closed": "Closed",
   "appointments.availability.loading": "Loading availability…",
   "appointments.availability.loaded": "Availability loaded",
   "appointments.status.scheduled": "Scheduled",

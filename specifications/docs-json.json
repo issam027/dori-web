@@ -688,9 +688,8 @@
                         "name": "isActive",
                         "required": false,
                         "in": "query",
-                        "description": "Filtrer les sites actifs ou désactivés",
+                        "description": "Filtrer les sites par statut. Sans ce paramètre, les sites actifs et inactifs sont retournés.",
                         "schema": {
-                            "default": true,
                             "type": "boolean"
                         }
                     }
@@ -5994,7 +5993,7 @@
                     ]
                 },
                 "summary": "Lister les personnes / clients",
-                "description": "Recherche paginée de personnes par nom, téléphone ou email. Sans isActive, seules les ressources actives sont retournées ; isActive=false permet aux administrateurs de retrouver les ressources désactivées.",
+                "description": "Recherche paginée de personnes par nom, téléphone ou email. Sans isActive, retourne les personnes actives et inactives. Sans isActive, les personnes actives et inactives sont retournées. isActive=true ou isActive=false filtre explicitement selon le statut.",
                 "parameters": [
                     {
                         "name": "page",
@@ -6048,11 +6047,10 @@
                         "name": "isActive",
                         "required": false,
                         "in": "query",
+                        "description": "Filtre optionnel : true pour les personnes actives, false pour les personnes inactives. Sans valeur, retourne les deux.",
                         "schema": {
-                            "default": true,
                             "type": "boolean"
-                        },
-                        "description": "true retourne les ressources actives, false les ressources désactivées."
+                        }
                     },
                     {
                         "name": "siteId",
@@ -7705,7 +7703,7 @@
                     ]
                 },
                 "summary": "Lister les inscriptions",
-                "description": "Recherche paginée, avec dateFrom/dateTo appliqués à scheduledTime dans le fuseau du site ou de la file. dateFrom et dateTo doivent être fournies ensemble. Une recherche par période exige queueId ou siteId et couvre au maximum 366 jours. Sans isActive, seules les ressources actives sont retournées ; isActive=false permet aux administrateurs de retrouver les ressources désactivées.",
+                "description": "Recherche paginée, avec dateFrom/dateTo appliqués à businessDate pour les walk-ins et à scheduledTime dans le fuseau du site ou de la file pour les rendez-vous. dateFrom et dateTo doivent être fournies ensemble. Une recherche par période exige queueId ou siteId et couvre au maximum 366 jours. Sans isActive, seules les ressources actives sont retournées ; isActive=false permet aux administrateurs de retrouver les ressources désactivées.",
                 "parameters": [
                     {
                         "name": "page",
@@ -7791,7 +7789,7 @@
                         "name": "dateFrom",
                         "required": false,
                         "in": "query",
-                        "description": "Première schedule date incluse. Doit être fournie avec dateTo et avec queueId ou siteId.",
+                        "description": "Première date incluse : businessDate pour un walk-in, scheduledTime dans le fuseau du site pour un rendez-vous. Doit être fournie avec dateTo et avec queueId ou siteId.",
                         "schema": {
                             "format": "date",
                             "example": "2026-10-01",
@@ -7803,7 +7801,7 @@
                         "name": "dateTo",
                         "required": false,
                         "in": "query",
-                        "description": "Dernière schedule date incluse. La période complète est limitée à 366 jours.",
+                        "description": "Dernière date incluse : businessDate pour un walk-in, scheduledTime dans le fuseau du site pour un rendez-vous. La période complète est limitée à 366 jours.",
                         "schema": {
                             "format": "date",
                             "example": "2026-10-31",
@@ -15098,6 +15096,20 @@
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
                     },
+                    "defaultWorkingDays": {
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Jours ouvrés par défaut du site (1=Lundi ... 7=Dimanche)",
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
                     "defaultBaseWeightWalkin": {
                         "type": "number",
                         "example": 0,
@@ -15169,6 +15181,7 @@
                     "defaultWorkingHoursStart",
                     "defaultWorkingHoursEnd",
                     "defaultLateToleranceMinutes",
+                    "defaultWorkingDays",
                     "defaultBaseWeightWalkin",
                     "defaultBaseWeightAppointment",
                     "defaultEscalationRateWalkin",
@@ -15307,6 +15320,22 @@
                         "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
+                    },
+                    "defaultWorkingDays": {
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Jours ouvrés par défaut du site (1=Lundi ... 7=Dimanche)",
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
+                        }
                     },
                     "defaultBaseWeightWalkin": {
                         "type": "number",
@@ -15447,6 +15476,22 @@
                         "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
+                    },
+                    "defaultWorkingDays": {
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Jours ouvrés par défaut du site (1=Lundi ... 7=Dimanche)",
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
+                        }
                     },
                     "defaultBaseWeightWalkin": {
                         "type": "number",
@@ -15756,6 +15801,14 @@
                         ],
                         "description": "Valeur du champ « late tolerance minutes »."
                     },
+                    "workingDays": {
+                        "type": "string",
+                        "enum": [
+                            "inherited",
+                            "overridden"
+                        ],
+                        "description": "Valeur du champ « working days »."
+                    },
                     "baseWeightWalkin": {
                         "type": "string",
                         "enum": [
@@ -15825,6 +15878,7 @@
                     "breakStart",
                     "breakEnd",
                     "lateToleranceMinutes",
+                    "workingDays",
                     "baseWeightWalkin",
                     "baseWeightAppointment",
                     "escalationRateWalkin",
@@ -15919,6 +15973,20 @@
                         "example": 60,
                         "description": "Tolérance retard RDV en minutes"
                     },
+                    "workingDays": {
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Jours ouvrés effectifs de la file (1=Lundi ... 7=Dimanche)",
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
                     "baseWeightWalkin": {
                         "type": "number",
                         "example": 0,
@@ -15999,6 +16067,7 @@
                     "workingHoursStart",
                     "workingHoursEnd",
                     "lateToleranceMinutes",
+                    "workingDays",
                     "baseWeightWalkin",
                     "baseWeightAppointment",
                     "escalationRateWalkin",
@@ -16130,6 +16199,23 @@
                         "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
+                    },
+                    "workingDays": {
+                        "nullable": true,
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Surcharge des jours ouvrés de la file (1=Lundi ... 7=Dimanche) ; null ou absence = héritage du site",
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
+                        }
                     },
                     "baseWeightWalkin": {
                         "type": "number",
@@ -16263,6 +16349,23 @@
                         "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
+                    },
+                    "workingDays": {
+                        "nullable": true,
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "description": "Surcharge des jours ouvrés de la file (1=Lundi ... 7=Dimanche) ; null ou absence = héritage du site",
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
+                        }
                     },
                     "baseWeightWalkin": {
                         "type": "number",
@@ -16398,6 +16501,7 @@
                     },
                     "estimatedWaitMinutes": {
                         "type": "number",
+                        "nullable": true,
                         "example": 30,
                         "description": "Temps d'attente estimé en minutes"
                     },
@@ -17931,6 +18035,25 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Date et heure d’expiration du jeton public de suivi"
+                    },
+                    "estimatedWaitMinutes": {
+                        "type": "number",
+                        "nullable": true,
+                        "minimum": 0,
+                        "description": "Valeur du champ « estimated wait minutes »."
+                    },
+                    "estimationMethod": {
+                        "type": "string",
+                        "description": "Valeur du champ « estimation method »."
+                    },
+                    "estimationReliable": {
+                        "type": "boolean",
+                        "description": "Valeur du champ « estimation reliable »."
+                    },
+                    "estimationCalculatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « estimation calculated at »."
                     }
                 },
                 "required": [
@@ -18152,8 +18275,29 @@
                     },
                     "estimatedWaitMinutes": {
                         "type": "number",
+                        "nullable": true,
                         "example": 25,
                         "description": "Temps d'attente estimé en minutes"
+                    },
+                    "estimationMethod": {
+                        "type": "string",
+                        "enum": [
+                            "queue_daily_p50",
+                            "last_calculated",
+                            "theoretical_queue",
+                            "unavailable"
+                        ],
+                        "description": "Valeur du champ « estimation method »."
+                    },
+                    "estimationReliable": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Valeur du champ « estimation reliable »."
+                    },
+                    "estimationCalculatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Valeur du champ « estimation calculated at »."
                     },
                     "status": {
                         "type": "string",

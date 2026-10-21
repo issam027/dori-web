@@ -261,7 +261,7 @@ export function CockpitPage() {
                 occupied={occupied}
                 active={active}
                 waitingCount={statuses[index]?.data?.data.waitingCount}
-                estimatedWaitMinutes={statuses[index]?.data?.data.estimatedWaitMinutes}
+                estimatedWaitMinutes={statuses[index]?.data?.data.estimatedWaitMinutes ?? undefined}
                 pending={pendingQueueIds.has(queue.queueId)}
                 activeCall={activeCalls[queue.queueId]}
                 onRelease={() => {

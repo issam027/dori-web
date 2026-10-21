@@ -247,3 +247,47 @@ test('a site without appointment-enabled queues explains that appointments are u
   await expect(page.getByRole('status')).toContainText(/ne gère pas les rendez-vous/i);
   await expect(page.locator('.week-calendar')).toHaveCount(0);
 });
+
+test('the queue calendar renders API-closed days compactly and prevents appointment creation', async ({
+  page,
+}) => {
+  const closedDay: ApiScenarioHandler = async ({ method, path, url, route }) => {
+    if (method === 'GET' && path === '/api/v1/queues/10/availability') {
+      const dateFrom = url.searchParams.get('dateFrom') ?? '';
+      const dateTo = url.searchParams.get('dateTo') ?? dateFrom;
+      await route.fulfill({
+        json: apiEnvelope({
+          queueId: 10,
+          timezone: 'Europe/Paris',
+          dateFrom,
+          dateTo,
+          days: [
+            {
+              businessDate: '2026-10-06',
+              isOpen: false,
+              capacity: 0,
+              booked: 0,
+              available: 0,
+              slots: [],
+            },
+          ],
+        }),
+      });
+      return true;
+    }
+    return false;
+  };
+  await useFixedClock(page);
+  await installApiScenario(page, {
+    profile: 'operator',
+    sites: [site],
+    queues: [appointmentQueue],
+    handlers: [closedDay],
+  });
+  await page.goto('/appointments');
+  const closed = page.locator('.calendar-day.is-closed').filter({ hasText: '2026-10-06' });
+  await expect(closed).toContainText(/ferm/i);
+  await expect(closed.locator('.calendar-slot')).toHaveCount(0);
+  await closed.click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});

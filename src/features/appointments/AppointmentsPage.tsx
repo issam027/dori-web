@@ -16,7 +16,7 @@ import {
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
-import { useAppointment, useAppointments } from './hooks/useAppointments';
+import { useAppointment, useAppointments, useAvailabilityRange } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
 
 export function AppointmentsPage() {
@@ -53,6 +53,7 @@ export function AppointmentsPage() {
     [anchor, view],
   );
   const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
+  const availabilityQuery = useAvailabilityRange(selectedQueue?.queueId, dates);
   const appointments = useMemo(
     () => appointmentsQuery.data ?? [],
     [appointmentsQuery.data],
@@ -85,6 +86,15 @@ export function AppointmentsPage() {
 
   const byDate = (date: string): RegistrationResponseDto[] =>
     appointmentsByDate.get(date) ?? [];
+  const availabilityByDate = new Map(
+    (availabilityQuery.data?.data.days ?? []).map((day) => [day.businessDate, day]),
+  );
+  const isOpen = (date: string) => {
+    const availability = availabilityByDate.get(date);
+    if (availability) return availability.isOpen;
+    const weekdayNumber = new Date(`${date}T00:00:00Z`).getUTCDay() || 7;
+    return selectedQueue?.workingDays.includes(weekdayNumber) ?? true;
+  };
 
   const toggleSlot = (key: string) => {
     setExpandedSlots((prev) => {
@@ -214,13 +224,19 @@ export function AppointmentsPage() {
           </div>
           {view === 'week' ? (
             <div className="week-calendar">
-              {dates.map((date) => (
-                <section key={date} className="calendar-day">
+              {dates.map((date) => {
+                const dayIsOpen = isOpen(date);
+                return (
+                <section key={date} className={`calendar-day${dayIsOpen ? '' : ' is-closed'}`}>
                   <h2>
                     <span className="calendar-day-name">{weekday(date)}</span>
                     <span className="calendar-day-date">{date}</span>
                   </h2>
-                  {hours.map((time) => {
+                  {!dayIsOpen ? (
+                    <div className="calendar-closed-day">
+                      <span>{__t('appointments.calendar.closed')}</span>
+                    </div>
+                  ) : hours.map((time) => {
                     const isBreak = Boolean(
                       selectedQueue?.breakStart &&
                       selectedQueue.breakEnd &&
@@ -330,7 +346,8 @@ export function AppointmentsPage() {
                     );
                   })}
                 </section>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="month-calendar">
@@ -341,6 +358,7 @@ export function AppointmentsPage() {
               ))}
               {dates.map((date) => {
                 const dayAppointments = byDate(date);
+                const dayIsOpen = isOpen(date);
                 const dayKey = date;
                 const isExpanded = expandedSlots.has(dayKey);
                 const visibleAppointments = isExpanded
@@ -351,18 +369,18 @@ export function AppointmentsPage() {
                 return (
                   <section
                     key={date}
-                    className={`month-day${date.startsWith(displayedMonth) ? '' : ' is-outside-month'}`}
-                    role="button"
-                    tabIndex={0}
+                    className={`month-day${date.startsWith(displayedMonth) ? '' : ' is-outside-month'}${dayIsOpen ? '' : ' is-closed'}`}
+                    role={dayIsOpen ? 'button' : undefined}
+                    tabIndex={dayIsOpen ? 0 : undefined}
                     onClick={() => {
-                      setEditor({ date });
+                      if (dayIsOpen) setEditor({ date });
                     }}
                     onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') setEditor({ date });
+                      if (dayIsOpen && (event.key === 'Enter' || event.key === ' ')) setEditor({ date });
                     }}
                   >
                     <div className="month-day-header">
-                      <Button variant="unstyled"
+                      {dayIsOpen ? <Button variant="unstyled"
                         className="calendar-date-button"
                         type="button"
                         onClick={(event) => {
@@ -371,13 +389,14 @@ export function AppointmentsPage() {
                         }}
                       >
                         <strong>{date.slice(-2)}</strong>
-                      </Button>
+                      </Button> : <strong>{date.slice(-2)}</strong>}
                       {dayAppointments.length > 0 && (
                         <span className="calendar-slot-count">
                           {dayAppointments.length}
                         </span>
                       )}
                     </div>
+                    {!dayIsOpen ? <span className="calendar-closed-label">{__t('appointments.calendar.closed')}</span> : null}
                     <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
                       {visibleAppointments.map((item) => {
                         const name = personName(item);

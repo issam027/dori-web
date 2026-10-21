@@ -188,7 +188,10 @@
 }
 .dialog-content {
   inset: 50% auto auto 50%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: min(820px, calc(100vw - 32px));
+  max-height: min(54rem, calc(100dvh - 32px));
   transform: translate(-50%, -50%);
   overflow: hidden;
   border-radius: 20px;
@@ -221,6 +224,9 @@
 .dialog-header h2 { margin: 0; font-size: 1.2rem; }
 .dialog-header p { margin: 0; color: var(--color-text-muted); }
 .dialog-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 20px 22px 22px;
   background: color-mix(in srgb, var(--color-primary) 2.5%, var(--color-surface));
 }

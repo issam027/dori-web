@@ -33,6 +33,7 @@ export const appointments = {
   "appointments.calendar.unknownPerson": "Réservation",
   "appointments.calendar.moreCount": "+{{count}} autre",
   "appointments.calendar.collapse": "Réduire",
+  "appointments.calendar.closed": "Fermé",
   "appointments.availability.loading": "Chargement des disponibilités…",
   "appointments.availability.loaded": "Créneaux retournés pour la date sélectionnée",
   "appointments.status.scheduled": "Planifié",

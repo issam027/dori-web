@@ -877,6 +877,24 @@ table td small {
 .settings-editor-wizard .form-grid {
   padding: 0;
 }
+.working-days-segmented {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.working-days-segmented button {
+  min-width: 0;
+  min-height: 36px;
+  padding: 5px 8px;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+@media (max-width: 560px) {
+  .working-days-segmented {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
 .admin-filter-actions {
   display: flex;
   justify-content: flex-end;

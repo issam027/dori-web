@@ -83,6 +83,8 @@ export const queryKeys = {
     rules: (queueId: number, tierId: number) => ['tiers', 'rules', queueId, tierId] as const,
   },
   availability: (queueId: number, date: string) => ['availability', queueId, date] as const,
+  availabilityRange: (queueId: number | undefined, dateFrom?: string, dateTo?: string) =>
+    ['availability', queueId, dateFrom, dateTo] as const,
   appointments: {
     all: ['appointments'] as const,
     byQueueDate: (queueId: number | undefined, businessDate: string) =>

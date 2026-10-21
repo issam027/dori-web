@@ -39,6 +39,7 @@ import {
 } from '../model/onboarding-workflow';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { WorkingDaysField } from '@/features/queues/WorkingDaysField';
 
 const stepKeys = [
   'onboarding.steps.identity',
@@ -600,6 +601,12 @@ function Defaults({
             }}
           />
         </label>
+        <WorkingDaysField
+          value={s.defaultWorkingDays}
+          onChange={(days) => {
+            update('defaultWorkingDays', days ?? []);
+          }}
+        />
       </div>
       <label className="check-row">
         <span>

@@ -136,6 +136,7 @@ export function buildQueue(overrides: Record<string, unknown> = {}) {
     siteId: 1,
     isActive: true,
     appointmentsEnabled: true,
+    workingDays: [1, 2, 3, 4, 5],
     workingHoursStart: '08:00:00',
     workingHoursEnd: '17:00:00',
     ...overrides,

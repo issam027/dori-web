@@ -49,6 +49,7 @@ export const initialOnboardingDraft: OnboardingDraft = {
     defaultBreakStart: '12:00',
     defaultBreakEnd: '14:00',
     defaultLateToleranceMinutes: 60,
+    defaultWorkingDays: [1, 2, 3, 4, 5],
     defaultBaseWeightWalkin: 0,
     defaultBaseWeightAppointment: 60,
     defaultEscalationRateWalkin: 1,

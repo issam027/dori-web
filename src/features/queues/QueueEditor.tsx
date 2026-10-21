@@ -4,6 +4,7 @@ import type { CreateQueueDto, QueueResponseDto } from '@/api/generated/models';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { presentError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
+import { WorkingDaysField } from './WorkingDaysField';
 
 const defaults: CreateQueueDto = { queueCode: '', queueName: '', averageWaitTime: 10, threadCount: 1, currency: null, locale: null };
 const time = (value?: string) => value ? value.slice(0, 5) : undefined;
@@ -26,6 +27,7 @@ const payload = (value: QueueEditorValue): CreateQueueDto => ({
   workingHoursStart: time(value.workingHoursStart), workingHoursEnd: time(value.workingHoursEnd),
   breakStart: time(value.breakStart), breakEnd: time(value.breakEnd),
   lateToleranceMinutes: value.lateToleranceMinutes,
+  workingDays: value.workingDays,
   baseWeightWalkin: value.baseWeightWalkin, baseWeightAppointment: value.baseWeightAppointment,
   escalationRateWalkin: value.escalationRateWalkin,
   escalationRateAppointment: value.escalationRateAppointment,
@@ -34,7 +36,7 @@ const payload = (value: QueueEditorValue): CreateQueueDto => ({
 });
 const initialValue = (initial?: QueueResponseDto | CreateQueueDto): QueueEditorValue => {
   const source = { ...defaults, ...initial };
-  return { ...source, workingHoursStart: time(source.workingHoursStart), workingHoursEnd: time(source.workingHoursEnd), breakStart: time(source.breakStart), breakEnd: time(source.breakEnd), dailyResetTime: time(source.dailyResetTime) };
+  return { ...source, workingDays: initial && 'configOrigins' in initial && initial.configOrigins.workingDays === 'inherited' ? null : source.workingDays, workingHoursStart: time(source.workingHoursStart), workingHoursEnd: time(source.workingHoursEnd), breakStart: time(source.breakStart), breakEnd: time(source.breakEnd), dailyResetTime: time(source.dailyResetTime) };
 };
 
 export function QueueEditor({ open, onOpenChange, initial, onSave }: { open: boolean; onOpenChange: (open: boolean) => void; initial?: QueueResponseDto | CreateQueueDto; onSave: (value: QueueEditorValue) => Promise<void> | void; }) {
@@ -54,7 +56,7 @@ export function QueueEditor({ open, onOpenChange, initial, onSave }: { open: boo
     finally { setSaving(false); }
   };
   const heading = (index: number, title: string, help: string) => <div className="wizard-step-heading"><span>{index}</span><div><h3>{title}</h3><p>{help}</p></div></div>;
-  return <WizardModal open={open} onOpenChange={onOpenChange} title={initial ? t('onboarding.editQueue') : t('onboarding.settings.nouvelleFile')} className="settings-wizard-dialog" step={step} stepCount={3} onPrevious={step > 1 ? () => { setStep((current) => current - 1); } : undefined} onNext={() => void submit()} canContinue={!saving && Boolean(value.queueCode.trim() && value.queueName?.trim())}>
+  return <WizardModal open={open} onOpenChange={onOpenChange} title={initial ? t('onboarding.editQueue') : t('onboarding.settings.nouvelleFile')} className="settings-wizard-dialog" step={step} stepCount={3} onPrevious={step > 1 ? () => { setStep((current) => current - 1); } : undefined} onNext={() => void submit()} canContinue={!saving && Boolean(value.queueCode.trim() && value.queueName?.trim()) && (value.workingDays == null || value.workingDays.length > 0)}>
     <div className="settings-editor-wizard">
       <div className="wizard-progress">{[1, 2, 3].map((item) => <span key={item} className={item <= step ? 'is-complete' : undefined} />)}</div>
       {step === 1 ? <section>{heading(1, t('queueEditor.identity', { defaultValue: 'Identité et capacité' }), t('queueEditor.identityHelp', { defaultValue: 'Informations principales et capacité opérationnelle de la file.' }))}<div className="form-grid">
@@ -74,6 +76,7 @@ export function QueueEditor({ open, onOpenChange, initial, onSave }: { open: boo
         <label>{t('common.fermeture')}<input type="time" value={value.workingHoursEnd ?? ''} onChange={(e) => { field('workingHoursEnd', e.target.value || undefined); }} /></label>
         <label>{t('queueEditor.breakStart', { defaultValue: 'Début de pause' })}<input type="time" value={value.breakStart ?? ''} onChange={(e) => { field('breakStart', e.target.value || undefined); }} /></label>
         <label>{t('queueEditor.breakEnd', { defaultValue: 'Fin de pause' })}<input type="time" value={value.breakEnd ?? ''} onChange={(e) => { field('breakEnd', e.target.value || undefined); }} /></label>
+        <WorkingDaysField allowInheritance value={value.workingDays} onChange={(days) => { field('workingDays', days); }} />
       </div></section> : null}
       {step === 3 ? <section>{heading(3, t('queueEditor.rules', { defaultValue: 'Priorités et cycle quotidien' }), t('queueEditor.rulesHelp', { defaultValue: 'Surcharges de priorité, report et clôture de cette file.' }))}<div className="form-grid">
         <label>{t('queueEditor.walkinWeight', { defaultValue: 'Poids sans rendez-vous' })}<input type="number" value={value.baseWeightWalkin ?? ''} onChange={(e) => { optionalNumber('baseWeightWalkin', e.target.value); }} /></label>

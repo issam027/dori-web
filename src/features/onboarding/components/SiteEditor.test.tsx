@@ -16,6 +16,7 @@ const site: SiteResponseDto = {
   defaultWorkingHoursStart: '08:00',
   defaultWorkingHoursEnd: '18:00',
   defaultLateToleranceMinutes: 5,
+  defaultWorkingDays: [1, 2, 3, 4, 5],
   defaultBaseWeightWalkin: 1,
   defaultBaseWeightAppointment: 1,
   defaultEscalationRateWalkin: 1,
@@ -58,5 +59,6 @@ it('updates the intended text and numeric fields before saving', async () => {
   expect(onSave.mock.calls[0]?.[0]).toMatchObject({
     siteName: 'Nouveau site',
     defaultSlotCapacity: 6,
+    defaultWorkingDays: [1, 2, 3, 4, 5],
   });
 });
