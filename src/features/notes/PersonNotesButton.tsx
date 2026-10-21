@@ -19,15 +19,12 @@ export function PersonNotesButton({
     ? t('queues.myQueues.viewNotes', { count })
     : t('queues.myQueues.addNote');
   const cockpit = variant === 'cockpit';
-  const classes = cockpit
-    ? ['button', className].filter(Boolean).join(' ')
-    : ['button', 'button-small', 'person-notes-button', className].filter(Boolean).join(' ');
 
   return (
     <Button
-      variant="unstyled"
+      size={cockpit ? 'default' : 'small'}
       aria-label={accessibleLabel}
-      className={classes}
+      className={className}
       type="button"
       title={accessibleLabel}
       onClick={onClick}
