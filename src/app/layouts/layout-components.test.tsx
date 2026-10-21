@@ -131,4 +131,29 @@ describe('application layout', () => {
     );
     expect(screen.getByRole('heading', { name: /cockpit/i })).toBeVisible();
   });
+
+  it.each([
+    ['/settings', /param.tres du site/i],
+    ['/admin/users', /utilisateurs/i],
+    ['/onboarding', /cr.er un site/i],
+    ['/admin/translations', /traductions/i],
+    ['/health', /plateforme/i],
+  ])('shows the page title for the %s route', (path, title) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <Topbar
+          sites={[{ id: 1, name: 'Centre Horizon' }]}
+          activeSiteId={1}
+          pageHeaderVisible={false}
+          onLogout={vi.fn()}
+          onOpenCommands={vi.fn()}
+          onRefresh={vi.fn()}
+          refreshing={false}
+          onOpenNavigation={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: title })).toBeVisible();
+  });
 });

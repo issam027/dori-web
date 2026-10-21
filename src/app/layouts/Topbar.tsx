@@ -50,7 +50,13 @@ export function Topbar({
         '/kiosk': 'nav.kiosk',
         '/display': 'nav.display',
         '/track': 'nav.tracking',
+        '/settings': 'nav.settings',
+        '/admin/users': 'nav.usersAdmin',
+        '/onboarding': 'nav.onboarding',
+        '/admin/translations': 'nav.translations',
+        '/health': 'nav.health',
         '/profile': 'profile.title',
+        '/change-password': 'auth.changePassword.changerLeMotDePasse',
       } as Record<string, string>
     )[location.pathname] ?? 'app.name';
   useEffect(() => {
