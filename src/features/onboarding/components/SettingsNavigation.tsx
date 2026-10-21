@@ -2,6 +2,12 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SETTINGS_SECTIONS, type SettingsSection } from '../settings-routes';
 
+const sectionLabels: Record<SettingsSection, string> = {
+  sites: 'sites.plural',
+  queues: 'queues.plural',
+  tiers: 'common.niveauxDeService',
+};
+
 export function SettingsNavigation({ active }: { active: SettingsSection }) {
   const { t } = useTranslation();
   return (
@@ -12,9 +18,7 @@ export function SettingsNavigation({ active }: { active: SettingsSection }) {
           to={`/settings/${section}`}
           key={section}
         >
-          {section === 'queues'
-            ? t('queues.plural')
-            : section.charAt(0).toUpperCase() + section.slice(1)}
+          {t(sectionLabels[section])}
         </Link>
       ))}
     </nav>

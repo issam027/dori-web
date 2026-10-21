@@ -12,6 +12,7 @@ describe('FormField', () => {
 
     const input = screen.getByRole('textbox', { name: /T�l�phone/ });
     expect(input).toHaveAttribute('aria-required', 'true');
+    expect(input).toBeRequired();
     expect(input).toHaveAccessibleDescription('Format international');
   });
 

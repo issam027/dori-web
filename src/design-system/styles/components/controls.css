@@ -1004,9 +1004,20 @@ select option {
 }
 
 :is(input, select, textarea)[aria-invalid='true'],
+:is(input:not([type='checkbox']):not([type='radio']), select, textarea):user-invalid,
 .form-field.has-error :is(input, select, textarea, .international-phone-input) {
   border-color: var(--color-danger);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 16%, transparent);
+}
+
+.form-field:has(:is(input, select, textarea):user-invalid) .field-label,
+label:has(> :is(input, select, textarea):user-invalid) {
+  color: var(--color-danger);
+}
+
+input:is([type='checkbox'], [type='radio']):user-invalid {
+  outline: 2px solid color-mix(in srgb, var(--color-danger) 72%, transparent);
+  outline-offset: 2px;
 }
 
 .form-field.has-success :is(input, select, textarea, .international-phone-input) {

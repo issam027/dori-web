@@ -285,4 +285,5 @@ export const supervision: DomainTranslations<typeof import('../fr/supervision').
   'reports.noDataForPeriod': 'No data for this period',
   'reports.periodReportByQueue': 'Consolidated report by queue for the period',
   'health.applicationVersion': 'Version {{version}}',
+  'controlRoom.alertCount': '{{count}} alert(s)',
 };

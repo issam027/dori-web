@@ -197,7 +197,7 @@ export function OnboardingWizard() {
       }
       value.step = Math.min(6, draft.step + 1);
       save(value);
-      setMessage(__t('common.etapeEnregistreeAvecSucces'));
+      setMessage(__t('onboarding.onboarding.etapeEnregistreeAvecSucces'));
     } catch (error) {
       notifyError(error);
       setMessage(error instanceof Error ? error.message : __t('onboarding.errors.retryStep'));
@@ -318,7 +318,7 @@ export function OnboardingWizard() {
                   saveOnboardingDraft(draft);
                 }}
               >
-                {__t('common.enregistrerLeBrouillon')}
+                {__t('onboarding.onboarding.enregistrerLeBrouillon')}
               </Button>
               <Button variant="unstyled" type="submit"
                 className="button button-primary"
@@ -327,7 +327,7 @@ export function OnboardingWizard() {
               >
                 {draft.step === 6
                   ? __t('onboarding.onboarding.activerLeSite')
-                  : __t('common.enregistrerEtContinuer')}
+                  : __t('onboarding.onboarding.enregistrerEtContinuer')}
               </Button>
             </div>
           </div>

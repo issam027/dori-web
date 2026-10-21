@@ -134,6 +134,9 @@ describe('application layout', () => {
 
   it.each([
     ['/settings', /param.tres du site/i],
+    ['/settings/sites', /param.tres du site/i],
+    ['/settings/queues', /param.tres du site/i],
+    ['/settings/tiers', /param.tres du site/i],
     ['/admin/users', /utilisateurs/i],
     ['/onboarding', /cr.er un site/i],
     ['/admin/translations', /traductions/i],

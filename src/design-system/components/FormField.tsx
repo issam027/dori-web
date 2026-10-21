@@ -8,6 +8,7 @@ import {
 
 type DescribedControlProps = {
   id?: string;
+  required?: boolean;
   'aria-describedby'?: string;
   'aria-invalid'?: boolean | 'true' | 'false';
   'aria-required'?: boolean;
@@ -47,8 +48,9 @@ export function FormField({
   const describedBy =
     [control?.props['aria-describedby'], messageId].filter(Boolean).join(' ') || undefined;
   const enhancedControl = control
-    ? cloneElement(control, {
+      ? cloneElement(control, {
         id: controlId,
+        required: required || control.props.required || undefined,
         'aria-describedby': describedBy,
         'aria-invalid': error ? true : control.props['aria-invalid'],
         'aria-required': required || control.props['aria-required'] || undefined,

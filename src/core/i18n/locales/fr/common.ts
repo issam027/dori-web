@@ -160,4 +160,10 @@ export const common = {
   "common.duration.minutes": "{{count}} min",
   "common.duration.minutes_one": "{{count}} minute",
   "common.duration.minutes_other": "{{count}} minutes",
+  "common.europeParis": "Europe/Paris",
+  "common.none": "Aucun",
+  "common.remove": "Retirer",
+  "common.workingDays": "Jours ouvrés",
+  "common.workingDaysHelp": "Sélectionnez au moins un jour d’ouverture.",
+  "common.workingDaysInherited": "Les jours du site seront utilisés.",
 } as const;

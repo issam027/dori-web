@@ -36,8 +36,9 @@ export function Topbar({
   const initials = user ? getUserInitials(user) : 'D';
   const activeSiteName =
     sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite');
-  const routeLabel =
-    (
+  const routeLabel = location.pathname.startsWith('/settings/')
+    ? 'nav.settings'
+    : (
       {
         '/desk': 'nav.desk',
         '/my-queues': 'nav.myQueues',

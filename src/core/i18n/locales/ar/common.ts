@@ -165,4 +165,10 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   "common.duration.minutes_two": "دقيقتان",
   "common.duration.minutes_few": "{{count}} دقائق",
   "common.duration.minutes_many": "{{count}} دقيقة",
+  "common.europeParis": "أوروبا/باريس",
+  "common.none": "لا يوجد",
+  "common.remove": "إزالة",
+  "common.workingDays": "أيام العمل",
+  "common.workingDaysHelp": "حدد يوم عمل واحدًا على الأقل.",
+  "common.workingDaysInherited": "سيتم استخدام أيام عمل الموقع.",
 };

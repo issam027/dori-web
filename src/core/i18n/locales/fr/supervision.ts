@@ -288,4 +288,5 @@ export const supervision = {
   'reports.noDataForPeriod': 'Aucune donnée pour cette période',
   'reports.periodReportByQueue': 'Rapport consolidé par file sur la période',
   'health.applicationVersion': 'Version {{version}}',
+  'controlRoom.alertCount': '{{count}} alerte(s)',
 } as const;

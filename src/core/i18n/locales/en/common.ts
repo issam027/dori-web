@@ -161,4 +161,10 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   "common.duration.minutes": "{{count}} min",
   "common.duration.minutes_one": "{{count}} minute",
   "common.duration.minutes_other": "{{count}} minutes",
+  "common.europeParis": "Europe/Paris",
+  "common.none": "None",
+  "common.remove": "Remove",
+  "common.workingDays": "Working days",
+  "common.workingDaysHelp": "Select at least one opening day.",
+  "common.workingDaysInherited": "The site's working days will be used.",
 };

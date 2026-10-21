@@ -30,6 +30,7 @@ const visiblePropertyNames = new Set([
   'title',
 ]);
 const findings = new Set();
+const translationUsages = [];
 
 function filesIn(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -178,6 +179,18 @@ for (const file of filesIn(sourceRoot)) {
     }
     if (ts.isCallExpression(node)) {
       const calledName = node.expression.getText(ast);
+      const translationKey = node.arguments[0];
+      if (
+        ['t', '__t'].includes(calledName) &&
+        translationKey &&
+        (ts.isStringLiteral(translationKey) || ts.isNoSubstitutionTemplateLiteral(translationKey))
+      ) {
+        const position = ast.getLineAndCharacterOfPosition(translationKey.getStart(ast));
+        translationUsages.push({
+          key: translationKey.text,
+          source: `${path.relative(root, file)}:${String(position.line + 1)}`,
+        });
+      }
       const reportsVisibleFeedback =
         /^(?:set[A-Za-z]*(?:Error|Message)|window\.confirm)$/.test(calledName) ||
         calledName === 'confirm';
@@ -211,6 +224,7 @@ function reportDuplicateKeys(label, keys) {
 }
 
 const localesRoot = path.join(sourceRoot, 'core', 'i18n', 'locales');
+const localeKeys = new Map();
 for (const locale of ['fr', 'en', 'ar', 'ar-TN']) {
   const localeRoot = path.join(localesRoot, locale);
   const domainFiles = fs.readdirSync(localeRoot)
@@ -218,13 +232,21 @@ for (const locale of ['fr', 'en', 'ar', 'ar-TN']) {
   const keys = domainFiles.flatMap((file) =>
     declaredTranslationKeys(fs.readFileSync(path.join(localeRoot, file), 'utf8')),
   );
-  reportDuplicateKeys(`${locale}:domains`, keys);
+  localeKeys.set(locale, reportDuplicateKeys(`${locale}:domains`, keys));
+}
+
+for (const { key, source } of translationUsages) {
+  for (const locale of ['fr', 'en', 'ar']) {
+    if (!localeKeys.get(locale)?.has(key)) {
+      findings.add(`${source}: missing ${locale.toUpperCase()} translation for "${key}"`);
+    }
+  }
 }
 
 if (findings.size) {
-  console.error(`Hard-coded visible UI strings detected (${String(findings.size)}):`);
+  console.error(`i18n UI audit failed (${String(findings.size)} findings):`);
   console.error([...findings].join('\n'));
   process.exitCode = 1;
 } else {
-  console.log('i18n UI audit passed: no hard-coded JSX text, visible attribute, or toast literal.');
+  console.log('i18n UI audit passed: visible text and FR/EN/AR translation keys are valid.');
 }
