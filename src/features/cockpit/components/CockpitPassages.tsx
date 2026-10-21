@@ -48,11 +48,16 @@ export function CockpitPassages({
           <h2 id="passage-summary-title">{t('queue-operations.desk.recapitulatifDesPassages')}</h2>
         </div>
         <div className="passage-summary-controls">
-          <div className="segmented-control passage-filter">
+          <div
+            className="segmented-control passage-filter"
+            role="group"
+            aria-label={t('queue-operations.desk.recapitulatifDesPassages')}
+          >
             <Button
               variant="unstyled"
               type="button"
               className={status === 'served' ? 'is-active' : ''}
+              aria-pressed={status === 'served'}
               onClick={() => {
                 onStatusChange('served');
               }}
@@ -63,6 +68,7 @@ export function CockpitPassages({
               variant="unstyled"
               type="button"
               className={status === 'no_show' ? 'is-active' : ''}
+              aria-pressed={status === 'no_show'}
               onClick={() => {
                 onStatusChange('no_show');
               }}
@@ -70,7 +76,9 @@ export function CockpitPassages({
               {t('common.noShow')}
             </Button>
           </div>
-          <StatusBadge tone="neutral">{passages.length}</StatusBadge>
+          <span className="passage-summary-count">
+            <StatusBadge tone="neutral">{passages.length}</StatusBadge>
+          </span>
         </div>
       </div>
       <div className="passage-summary-grid">

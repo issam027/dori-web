@@ -1,7 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Layers3, ListTree, Pencil, Plus, Power, PowerOff, UserMinus, UserPlus } from 'lucide-react';
+import {
+  Layers3,
+  ListTree,
+  Pencil,
+  Plus,
+  Power,
+  PowerOff,
+  UserMinus,
+  UserPlus,
+} from 'lucide-react';
 import { sitesControllerRemoveDirectUser } from '@/api/generated/sites/sites';
 import type { SiteDirectUserResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-api';
@@ -25,6 +34,7 @@ import { QueueServiceSettings } from './QueueServiceSettings';
 import { SiteEditor } from './SiteEditor';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { QueueMobileCard, SiteMobileCard } from './SettingsResourceMobileCards';
 
 export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
@@ -39,7 +49,9 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     refreshDirectUsers,
     refresh: refreshData,
   } = useSettingsData(activeSiteId, queueStatus);
-  const refresh = () => { void Promise.all([refreshData(), refreshDirectUsers()]); };
+  const refresh = () => {
+    void Promise.all([refreshData(), refreshDirectUsers()]);
+  };
   const [queueOpen, setQueueOpen] = useState(false),
     [editQueue, setEditQueue] = useState<QueueResponseDto>(),
     [editSite, setEditSite] = useState<SiteResponseDto | null>(null),
@@ -67,7 +79,13 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
       <Card className="settings-card">
         <SettingsNavigation active={section} />
         {section === 'sites' ? (
-          <SitesPanel items={ss.filter((site) => site.siteId === activeSiteId)} directUsers={directUsers} refresh={refresh} assign={setAssignmentTarget} edit={setEditSite} />
+          <SitesPanel
+            items={ss.filter((site) => site.siteId === activeSiteId)}
+            directUsers={directUsers}
+            refresh={refresh}
+            assign={setAssignmentTarget}
+            edit={setEditSite}
+          />
         ) : null}
         {section === 'queues' ? (
           <QueuesPanel
@@ -88,29 +106,47 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         ) : null}
         {section === 'tiers' ? <TiersPanel queues={qs} tiers={ts} /> : null}
       </Card>
-      {queueOpen ? <QueueEditor
-        key={editQueue?.queueId ?? 'new'}
-        open
-        onOpenChange={setQueueOpen}
-        initial={editQueue}
-        onSave={async (v) => {
-          if (editQueue) {
-            await updateQueue(editQueue.queueId, v);
-            notify({ tone: 'success', title: __t('settings.queueSaved'), message: editQueue.queueName });
-          } else if (activeSiteId) {
-            await createQueueForSite(activeSiteId, v);
-            notify({ tone: 'success', title: __t('settings.queueCreated'), message: v.queueName });
-          }
-          refresh();
-        }}
-      /> : null}
-      {editSite ? <SiteEditor
-        key={editSite.siteId}
-        open
-        site={editSite}
-        onOpenChange={(next) => { if (!next) setEditSite(null); }}
-        onSave={async (value) => { await updateSite(editSite.siteId, value); notify({ tone: 'success', title: __t('settings.siteSaved'), message: value.siteName }); refresh(); }}
-      /> : null}
+      {queueOpen ? (
+        <QueueEditor
+          key={editQueue?.queueId ?? 'new'}
+          open
+          onOpenChange={setQueueOpen}
+          initial={editQueue}
+          onSave={async (v) => {
+            if (editQueue) {
+              await updateQueue(editQueue.queueId, v);
+              notify({
+                tone: 'success',
+                title: __t('settings.queueSaved'),
+                message: editQueue.queueName,
+              });
+            } else if (activeSiteId) {
+              await createQueueForSite(activeSiteId, v);
+              notify({
+                tone: 'success',
+                title: __t('settings.queueCreated'),
+                message: v.queueName,
+              });
+            }
+            refresh();
+          }}
+        />
+      ) : null}
+      {editSite ? (
+        <SiteEditor
+          key={editSite.siteId}
+          open
+          site={editSite}
+          onOpenChange={(next) => {
+            if (!next) setEditSite(null);
+          }}
+          onSave={async (value) => {
+            await updateSite(editSite.siteId, value);
+            notify({ tone: 'success', title: __t('settings.siteSaved'), message: value.siteName });
+            refresh();
+          }}
+        />
+      ) : null}
       <UserAssignmentModal
         target={assignmentTarget}
         roles={rs}
@@ -119,7 +155,12 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
         }}
         onAssigned={refresh}
       />
-      <QueueOperatorsModal queue={operatorsQueue} onOpenChange={(open) => { if (!open) setOperatorsQueue(null); }} />
+      <QueueOperatorsModal
+        queue={operatorsQueue}
+        onOpenChange={(open) => {
+          if (!open) setOperatorsQueue(null);
+        }}
+      />
     </div>
   );
 }
@@ -184,82 +225,152 @@ function SitesPanel({
   const pagination = useAdminPagination(items);
   return (
     <section>
-      <Header
-        title={__t('onboarding.settings.sitesManagers')}
-        text={__t('settings.siteHelp')}
-      />
+      <Header title={__t('onboarding.settings.sitesManagers')} text={__t('settings.siteHelp')} />
       <DataTable
         caption={__t('onboarding.settings.sitesManagers')}
         containerClassName="table-wrap admin-table-wrap"
+        mobileRows={pagination.pageItems}
+        getMobileRowKey={(site) => site.siteId}
+        renderMobileRow={(site) => (
+          <SiteMobileCard
+            site={site}
+            onEdit={() => {
+              edit(site);
+            }}
+            onAssign={() => {
+              assign({ kind: 'site', id: site.siteId, label: site.siteName });
+            }}
+            onToggle={() => {
+              void updateSite(site.siteId, { isActive: !site.isActive }).then(refresh);
+            }}
+          />
+        )}
       >
-          <thead>
-            <tr>
-              <th scope="col">{__t('sites.singular')}</th>
-              <th scope="col">{__t('common.localisation')}</th>
-              <th scope="col">{__t('onboarding.settings.fuseau')}</th>
-              <th scope="col">{__t('common.devise')}</th>
-              <th scope="col">{__t('common.etat')}</th>
-              <th scope="col">{__t('onboarding.settings.action')}</th>
+        <thead>
+          <tr>
+            <th scope="col">{__t('sites.singular')}</th>
+            <th scope="col">{__t('common.localisation')}</th>
+            <th scope="col">{__t('onboarding.settings.fuseau')}</th>
+            <th scope="col">{__t('common.devise')}</th>
+            <th scope="col">{__t('common.etat')}</th>
+            <th scope="col">{__t('onboarding.settings.action')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pagination.pageItems.map((s) => (
+            <tr key={s.siteId}>
+              <td>
+                <b>{s.siteName}</b>
+                <small>
+                  {s.siteType} · {s.defaultLocale}
+                </small>
+              </td>
+              <td>{s.siteLocation ?? '—'}</td>
+              <td>{s.timezone}</td>
+              <td>{s.defaultCurrency}</td>
+              <td>
+                <span className={`status-badge ${s.isActive ? 'status-success' : ''}`}>
+                  {s.isActive ? __t('common.active') : __t('common.inactive')}
+                </span>
+              </td>
+              <td>
+                <div className="table-actions responsive-table-actions">
+                  <Button
+                    variant="unstyled"
+                    className="button button-small"
+                    type="button"
+                    title={__t('common.edit')}
+                    onClick={() => {
+                      edit(s);
+                    }}
+                  >
+                    <Pencil aria-hidden="true" />
+                    {__t('common.edit')}
+                  </Button>
+                  <Button
+                    variant="unstyled"
+                    className="button button-small"
+                    type="button"
+                    title={__t('settings.assignUser')}
+                    onClick={() => {
+                      assign({ kind: 'site', id: s.siteId, label: s.siteName });
+                    }}
+                  >
+                    <UserPlus aria-hidden="true" />
+                    {__t('settings.assignUser')}
+                  </Button>
+                  <Button
+                    variant="unstyled"
+                    type="submit"
+                    className="button button-small"
+                    title={
+                      s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
+                    }
+                    onClick={() =>
+                      void updateSite(s.siteId, { isActive: !s.isActive }).then(refresh)
+                    }
+                  >
+                    {s.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
+                    {s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
+                  </Button>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {pagination.pageItems.map((s) => (
-              <tr key={s.siteId}>
-                <td>
-                  <b>{s.siteName}</b>
-                  <small>
-                    {s.siteType} · {s.defaultLocale}
-                  </small>
-                </td>
-                <td>{s.siteLocation ?? '—'}</td>
-                <td>{s.timezone}</td>
-                <td>{s.defaultCurrency}</td>
-                <td>
-                  <span className={`status-badge ${s.isActive ? 'status-success' : ''}`}>
-                    {s.isActive ? __t('common.active') : __t('common.inactive')}
-                  </span>
-                </td>
-                <td>
-                  <div className="table-actions responsive-table-actions">
-                    <Button variant="unstyled" className="button button-small" type="button" title={__t('common.edit')} onClick={() => { edit(s); }}>
-                      <Pencil aria-hidden="true" />{__t('common.edit')}
-                    </Button>
-                    <Button variant="unstyled"
-                      className="button button-small"
-                      type="button"
-                      title={__t('settings.assignUser')}
-                      onClick={() => {
-                        assign({ kind: 'site', id: s.siteId, label: s.siteName });
-                      }}
-                    >
-                      <UserPlus aria-hidden="true" />
-                      {__t('settings.assignUser')}
-                    </Button>
-                    <Button variant="unstyled" type="submit"
-                      className="button button-small"
-                      title={
-                        s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
-                      }
-                      onClick={() =>
-                        void updateSite(s.siteId, { isActive: !s.isActive }).then(refresh)
-                      }
-                    >
-                      {s.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
-                      {s.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          ))}
+        </tbody>
       </DataTable>
       {items[0] ? (
         <Card className="site-managers-card">
           <div className="card-heading">
-            <div><h3>{__t('settings.managers')}</h3><p>{__t('settings.managersHelp')}</p></div>
-            <Button variant="unstyled" className="button button-primary" type="button" onClick={() => { const site = items[0]; if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName }); }}><UserPlus />{__t('settings.addManager')}</Button>
+            <div>
+              <h3>{__t('settings.managers')}</h3>
+              <p>{__t('settings.managersHelp')}</p>
+            </div>
+            <Button
+              variant="unstyled"
+              className="button button-primary"
+              type="button"
+              onClick={() => {
+                const site = items[0];
+                if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName });
+              }}
+            >
+              <UserPlus />
+              {__t('settings.addManager')}
+            </Button>
           </div>
-          {directUsers.length ? <ul className="manager-list">{directUsers.map((user) => <li key={user.userId}><div><strong>{user.username}</strong><span>{user.email}</span></div><span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>{user.isActive ? __t('common.active') : __t('common.inactive')}</span><Button variant="unstyled" className="button button-small button-danger" type="button" onClick={() => { const site = items[0]; if (site) void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(refresh); }}><UserMinus />{__t('settings.removeManager')}</Button></li>)}</ul> : <p className="muted">{__t('settings.noManagers')}</p>}
+          {directUsers.length ? (
+            <ul className="manager-list">
+              {directUsers.map((user) => (
+                <li key={user.userId}>
+                  <div>
+                    <strong>{user.username}</strong>
+                    <span>{user.email}</span>
+                  </div>
+                  <span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>
+                    {user.isActive ? __t('common.active') : __t('common.inactive')}
+                  </span>
+                  <Button
+                    variant="unstyled"
+                    className="button button-small button-danger"
+                    type="button"
+                    onClick={() => {
+                      const site = items[0];
+                      if (site)
+                        void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(
+                          refresh,
+                        );
+                    }}
+                  >
+                    <UserMinus />
+                    {__t('settings.removeManager')}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted">{__t('settings.noManagers')}</p>
+          )}
         </Card>
       ) : null}
       {items.length > ADMIN_PAGE_SIZE ? (
@@ -290,7 +401,10 @@ function QueuesPanel({
   manageOperators: (queue: QueueResponseDto) => void;
 }) {
   const { t: __t } = useTranslation();
-  const canAssignOperators = hasPermission(useSessionStore((state) => state.user), 'user_queue_assign');
+  const canAssignOperators = hasPermission(
+    useSessionStore((state) => state.user),
+    'user_queue_assign',
+  );
   const pagination = useAdminPagination(items);
   return (
     <section>
@@ -317,7 +431,8 @@ function QueuesPanel({
               ['all', __t('common.all')],
             ] as const
           ).map(([value, label]) => (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               key={value}
               type="button"
               className={status === value ? 'is-active' : ''}
@@ -335,53 +450,74 @@ function QueuesPanel({
       <DataTable
         caption={__t('onboarding.settings.filesDAttente')}
         containerClassName="table-wrap admin-table-wrap"
+        mobileRows={pagination.pageItems}
+        getMobileRowKey={(queue) => queue.queueId}
+        renderMobileRow={(queue) => (
+          <QueueMobileCard
+            queue={queue}
+            canAssignOperators={canAssignOperators}
+            onEdit={() => {
+              edit(queue);
+            }}
+            onManageOperators={() => {
+              manageOperators(queue);
+            }}
+            onToggle={() => {
+              void updateQueue(queue.queueId, { isActive: !queue.isActive }).then(refresh);
+            }}
+          />
+        )}
       >
-          <thead>
-            <tr>
-              <th scope="col">{__t('queues.singular')}</th>
-              <th scope="col">{__t('common.guichets')}</th>
-              <th scope="col">{__t('common.rdv')}</th>
-              <th scope="col">{__t('common.deviseLocale')}</th>
-              <th scope="col">{__t('onboarding.settings.origines')}</th>
-              <th scope="col">{__t('common.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagination.pageItems.map((q) => (
-              <tr key={q.queueId}>
-                <td>
-                  <b>
-                    {q.queueCode} · {q.queueName}
-                  </b>
-                  <small>
-                    {q.averageWaitTime} {__t('common.min')}
-                  </small>
-                </td>
-                <td>{q.threadCount}</td>
-                <td>{q.appointmentsEnabled ? __t('common.actives') : __t('common.desactives')}</td>
-                <td>
-                  {q.currency} · {q.locale}
-                </td>
-                <td>
-                  <span className="status-badge status-info">
-                    {Object.values(q.configOrigins).filter((v) => v === 'site').length}{' '}
-                    {__t('onboarding.settings.herites')}
-                  </span>
-                </td>
-                <td>
-                  <div className="table-actions responsive-table-actions">
-                    <Button variant="unstyled" type="submit"
-                      className="button button-small"
-                      title={__t('common.edit')}
-                      onClick={() => {
-                        edit(q);
-                      }}
-                    >
-                      <Pencil aria-hidden="true" />
-                      {__t('common.edit')}
-                    </Button>
+        <thead>
+          <tr>
+            <th scope="col">{__t('queues.singular')}</th>
+            <th scope="col">{__t('common.guichets')}</th>
+            <th scope="col">{__t('common.rdv')}</th>
+            <th scope="col">{__t('common.deviseLocale')}</th>
+            <th scope="col">{__t('onboarding.settings.origines')}</th>
+            <th scope="col">{__t('common.actions')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pagination.pageItems.map((q) => (
+            <tr key={q.queueId}>
+              <td>
+                <b>
+                  {q.queueCode} · {q.queueName}
+                </b>
+                <small>
+                  {q.averageWaitTime} {__t('common.min')}
+                </small>
+              </td>
+              <td>{q.threadCount}</td>
+              <td>{q.appointmentsEnabled ? __t('common.actives') : __t('common.desactives')}</td>
+              <td>
+                {q.currency} · {q.locale}
+              </td>
+              <td>
+                <span className="status-badge status-info">
+                  {Object.values(q.configOrigins).filter((v) => v === 'site').length}{' '}
+                  {__t('onboarding.settings.herites')}
+                </span>
+              </td>
+              <td>
+                <div className="table-actions responsive-table-actions">
+                  <Button
+                    variant="unstyled"
+                    type="submit"
+                    className="button button-small"
+                    title={__t('common.edit')}
+                    onClick={() => {
+                      edit(q);
+                    }}
+                  >
+                    <Pencil aria-hidden="true" />
+                    {__t('common.edit')}
+                  </Button>
 
-                    {canAssignOperators ? <Button variant="unstyled"
+                  {canAssignOperators ? (
+                    <Button
+                      variant="unstyled"
                       className="button button-small"
                       type="button"
                       title={__t('settings.queueOperators.title')}
@@ -391,24 +527,27 @@ function QueuesPanel({
                     >
                       <UserPlus aria-hidden="true" />
                       {__t('settings.queueOperators.button')}
-                    </Button> : null}
-                    <Button variant="unstyled" type="submit"
-                      className="button button-small"
-                      title={
-                        q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
-                      }
-                      onClick={() =>
-                        void updateQueue(q.queueId, { isActive: !q.isActive }).then(refresh)
-                      }
-                    >
-                      {q.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
-                      {q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
                     </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                  ) : null}
+                  <Button
+                    variant="unstyled"
+                    type="submit"
+                    className="button button-small"
+                    title={
+                      q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')
+                    }
+                    onClick={() =>
+                      void updateQueue(q.queueId, { isActive: !q.isActive }).then(refresh)
+                    }
+                  >
+                    {q.isActive ? <PowerOff aria-hidden="true" /> : <Power aria-hidden="true" />}
+                    {q.isActive ? __t('onboarding.settings.desactiver') : __t('common.activate')}
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </DataTable>
       {items.length > ADMIN_PAGE_SIZE ? (
         <Pagination

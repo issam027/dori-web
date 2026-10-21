@@ -15,21 +15,13 @@ import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { ManualNotificationWizard } from './ManualNotificationWizard';
-import { canResendNotification, maskRecipient } from './notification-utils';
+import { canResendNotification, maskRecipient, notificationStatusTone } from './notification-utils';
 import { useNotification, useNotifications, useResendNotification } from './hooks/useNotifications';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { Button } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
-
-const statusTone = (status: string): 'neutral' | 'success' | 'warning' | 'danger' =>
-  status === 'delivered'
-    ? 'success'
-    : status === 'failed'
-      ? 'danger'
-      : status === 'pending' || status === 'processing'
-        ? 'warning'
-        : 'neutral';
+import { NotificationMobileCard } from './NotificationMobileCard';
 
 export function NotificationsPage() {
   const { t, i18n } = useTranslation();
@@ -235,6 +227,20 @@ export function NotificationsPage() {
           caption={t('supervision.notifications.journalDesNotifications')}
           rows={items}
           getRowKey={(row) => row.notificationId}
+          renderMobileRow={(row) => (
+            <NotificationMobileCard
+              notification={row}
+              createdAt={formatDateTime(row.createdAt, i18n.language) ?? '—'}
+              canResend={canResendNotification(row.notificationStatus, canSend)}
+              resendPending={resend.isPending}
+              onView={() => {
+                setDetailId(row.notificationId);
+              }}
+              onResend={() => {
+                resend.run(row.notificationId);
+              }}
+            />
+          )}
           columns={[
             {
               key: 'created',
@@ -260,7 +266,7 @@ export function NotificationsPage() {
               key: 'status',
               header: t('common.status'),
               render: (row) => (
-                <StatusBadge tone={statusTone(row.notificationStatus)}>
+                <StatusBadge tone={notificationStatusTone(row.notificationStatus)}>
                   {row.notificationStatus}
                 </StatusBadge>
               ),

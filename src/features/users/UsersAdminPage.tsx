@@ -46,6 +46,7 @@ import {
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { formatDateTime } from '@/core/i18n/date-format';
+import { UserMobileCard } from './UserMobileCard';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
@@ -249,6 +250,48 @@ export function UsersAdminPage() {
         <DataTable
           caption={t('admin.users.comptesUtilisateurs')}
           containerClassName="table-wrap admin-table-wrap"
+          mobileRows={items}
+          getMobileRowKey={(user) => user.userId}
+          renderMobileRow={(user) => (
+            <UserMobileCard
+              user={user}
+              lastLogin={
+                user.lastLogin
+                  ? (formatDateTime(user.lastLogin, i18n.language) ?? t('common.notProvided'))
+                  : t('common.notProvided')
+              }
+              canDelete={canDeleteUsers}
+              deleteDisabled={current?.userId === user.userId}
+              onView={() => {
+                setViewingId(user.userId);
+              }}
+              onEdit={() => {
+                edit(user);
+              }}
+              onDelete={() => {
+                setDeleting(user);
+              }}
+              onToggleStatus={() => {
+                void updateUserStatus(user.userId, { isActive: !user.isActive })
+                  .then(refresh)
+                  .catch(notifyError);
+              }}
+              onResetPassword={() => {
+                void setUserPassword(user.userId, { newPassword: 'Root@123456' })
+                  .then(() =>
+                    notify({
+                      tone: 'success',
+                      title: t('admin.users.passwordResetSuccess'),
+                      message: getUserDisplayName(user),
+                    }),
+                  )
+                  .catch(notifyError);
+              }}
+              onDisconnect={() => {
+                setDisconnecting(user);
+              }}
+            />
+          )}
         >
           <thead>
             <tr>

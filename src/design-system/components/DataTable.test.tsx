@@ -37,4 +37,27 @@ describe('DataTable', () => {
     expect(table.parentElement).toBe(container.querySelector('.kiosk-review'));
     expect(screen.getByRole('rowheader', { name: 'Service' })).toBeVisible();
   });
+
+  it('provides separate desktop table and mobile card layouts when configured', () => {
+    render(
+      <DataTable
+        caption="Personnes"
+        rows={[{ id: 7, name: 'Ada Lovelace' }]}
+        getRowKey={(row) => row.id}
+        columns={[{ key: 'name', header: 'Nom', render: (row) => row.name }]}
+        renderMobileRow={(row) => (
+          <article className="data-table-mobile-card" role="listitem">
+            {row.name}
+          </article>
+        )}
+      />,
+    );
+
+    const table = screen.getByRole('table', { name: 'Personnes' });
+    const mobileList = screen.getByRole('list', { name: 'Personnes' });
+
+    expect(table.closest('.responsive-data-table-desktop')).toBeInTheDocument();
+    expect(mobileList).toHaveClass('responsive-data-table-mobile');
+    expect(within(mobileList).getByRole('listitem')).toHaveTextContent('Ada Lovelace');
+  });
 });

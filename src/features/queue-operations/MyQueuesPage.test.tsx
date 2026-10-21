@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MyQueuesPage } from './MyQueuesPage';
 
@@ -33,4 +33,41 @@ it('publishes one registration search after a typing burst reaches four characte
       .filter(Boolean);
     expect(searches).toEqual(['abcd']);
   });
+});
+
+it('provides a mobile card with the primary registration actions', () => {
+  useWaitingRegistrations.mockReturnValue({
+    data: {
+      data: {
+        page: 1,
+        pageSize: 10,
+        total: 1,
+        totalPages: 1,
+        items: [
+          {
+            registrationId: 42,
+            personId: 7,
+            queueId: 10,
+            firstName: 'Ada',
+            lastName: 'Lovelace',
+            ticketNumber: 'A-042',
+            entryType: 'walk_in',
+            status: 'waiting',
+            tierId: 1,
+            tierName: 'Standard',
+            activeNoteCount: 2,
+          },
+        ],
+      },
+    },
+  });
+
+  render(<MyQueuesPage />);
+
+  const mobileList = screen.getByRole('list', { name: /passages de la journée/i });
+  const card = within(mobileList).getByRole('listitem');
+  expect(card).toHaveTextContent('Ada Lovelace');
+  expect(card).toHaveTextContent('A-042');
+  expect(within(card).getByRole('button', { name: /^consulter$/i })).toBeVisible();
+  expect(within(card).getByRole('button', { name: /consulter les notes/i })).toBeVisible();
 });

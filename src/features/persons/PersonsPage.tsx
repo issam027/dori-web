@@ -41,6 +41,7 @@ import { hasPermission } from '@/core/permissions/permissions';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { PersonMobileCard } from './PersonMobileCard';
 
 const PAGE_SIZE = 10;
 
@@ -217,6 +218,33 @@ export function PersonsPage() {
           <DataTable
             caption={t('persons.admin.title')}
             containerClassName="table-wrap admin-table-wrap"
+            mobileRows={items}
+            getMobileRowKey={(person) => person.personId}
+            renderMobileRow={(person) => (
+              <PersonMobileCard
+                person={person}
+                canDelete={canDelete}
+                pending={pending}
+                formatDate={formatDate}
+                formatLanguage={formatLanguage}
+                onView={() => {
+                  setViewing(person);
+                }}
+                onNotes={() => {
+                  setNotesMode(person.activeNoteCount ? 'view' : 'add');
+                  setNotesPerson(person);
+                }}
+                onEdit={() => {
+                  setEditing(person);
+                }}
+                onDelete={() => {
+                  setDeleting(person);
+                }}
+                onReactivate={() => {
+                  void reactivate(person);
+                }}
+              />
+            )}
           >
             <thead>
               <tr>

@@ -1,4 +1,4 @@
-import type { Key, ReactNode } from 'react';
+import { Fragment, type Key, type ReactNode } from 'react';
 
 export interface DataColumn<TRow> {
   key: string;
@@ -12,15 +12,19 @@ interface DataTableRowsProps<TRow> {
   columns: readonly DataColumn<TRow>[];
   getRowKey: (row: TRow) => Key;
   caption: string;
+  renderMobileRow?: (row: TRow) => ReactNode;
 }
 
-interface DataTableCompositionProps {
+interface DataTableCompositionProps<TRow> {
   children: ReactNode;
   caption: string;
   containerClassName?: string | null;
+  mobileRows?: readonly TRow[];
+  getMobileRowKey?: (row: TRow) => Key;
+  renderMobileRow?: (row: TRow) => ReactNode;
 }
 
-type DataTableProps<TRow> = DataTableRowsProps<TRow> | DataTableCompositionProps;
+type DataTableProps<TRow> = DataTableRowsProps<TRow> | DataTableCompositionProps<TRow>;
 
 export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
   const table =
@@ -55,9 +59,38 @@ export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
       </table>
     );
 
-  if ('containerClassName' in props && props.containerClassName === null) return table;
+  const mobileRows = 'rows' in props ? props.rows : props.mobileRows;
+  const getMobileRowKey = 'rows' in props ? props.getRowKey : props.getMobileRowKey;
+  const hasMobileLayout = Boolean(props.renderMobileRow && mobileRows && getMobileRowKey);
+
+  if ('containerClassName' in props && props.containerClassName === null && !hasMobileLayout) {
+    return table;
+  }
   const containerClassName =
     'containerClassName' in props ? (props.containerClassName ?? 'table-scroll') : 'table-scroll';
+
+  const tableContainer =
+    'containerClassName' in props && props.containerClassName === null ? (
+      table
+    ) : (
+      <div className={containerClassName} tabIndex={0}>
+        {table}
+      </div>
+    );
+
+  if (hasMobileLayout && mobileRows && getMobileRowKey && props.renderMobileRow) {
+    return (
+      <div className="responsive-data-table">
+        <div className="responsive-data-table-desktop">{tableContainer}</div>
+        <div className="responsive-data-table-mobile" role="list" aria-label={props.caption}>
+          {mobileRows.map((row) => (
+            <Fragment key={getMobileRowKey(row)}>{props.renderMobileRow?.(row)}</Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={containerClassName} tabIndex={0}>
       {table}

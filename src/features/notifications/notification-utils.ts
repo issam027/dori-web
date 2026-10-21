@@ -7,3 +7,13 @@ export const maskRecipient = (recipient?: string) => {
 
 export const canResendNotification = (status: string, canSend: boolean) =>
   canSend && status === 'failed';
+export const notificationStatusTone = (
+  status: string,
+): 'neutral' | 'success' | 'warning' | 'danger' =>
+  status === 'delivered'
+    ? 'success'
+    : status === 'failed'
+      ? 'danger'
+      : status === 'pending' || status === 'processing'
+        ? 'warning'
+        : 'neutral';

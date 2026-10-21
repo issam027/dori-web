@@ -20,6 +20,7 @@ import type {
 } from '@/api/generated/models';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { Button } from '@/design-system/components/Button';
+import { QueueRegistrationMobileCard } from './QueueRegistrationMobileCard';
 
 function localIsoDate(value = new Date()): string {
   const localValue = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
@@ -59,6 +60,9 @@ export function MyQueuesPage() {
     sort,
   });
   const items = registrations.data?.data.items ?? [];
+  const getQueueName = (queueId: number) =>
+    queues.data?.data.items.find((queue) => queue.queueId === queueId)?.queueName ??
+    'File #' + String(queueId);
   return (
     <div className="page-stack">
       <PageHeader
@@ -181,6 +185,24 @@ export function MyQueuesPage() {
           containerClassName="table-scroll queue-registrations-table"
           rows={items}
           getRowKey={(item) => item.registrationId}
+          renderMobileRow={(item) => {
+            const queueName = getQueueName(item.queueId);
+            const noteCount = item.activeNoteCount;
+            return (
+              <QueueRegistrationMobileCard
+                registration={item}
+                position={(page - 1) * 10 + items.indexOf(item) + 1}
+                queueName={queueName}
+                onView={() => {
+                  setRegistrationDetails({ id: item.registrationId, queueName });
+                }}
+                onNotes={() => {
+                  setNotesMode(noteCount ? 'view' : 'add');
+                  setNotesPersonId(item.personId);
+                }}
+              />
+            );
+          }}
           columns={[
             {
               key: 'position',
@@ -190,9 +212,7 @@ export function MyQueuesPage() {
             {
               key: 'queue',
               header: __t('queues.myQueues.siteAndQueue'),
-              render: (item) =>
-                queues.data.data.items.find((queue) => queue.queueId === item.queueId)?.queueName ??
-                String(item.queueId),
+              render: (item) => getQueueName(item.queueId),
             },
             {
               key: 'ticket',
@@ -233,9 +253,7 @@ export function MyQueuesPage() {
               header: __t('common.actions'),
               render: (item) => {
                 const noteCount = item.activeNoteCount;
-                const queueName =
-                  queues.data.data.items.find((queue) => queue.queueId === item.queueId)
-                    ?.queueName ?? 'File #' + String(item.queueId);
+                const queueName = getQueueName(item.queueId);
                 return (
                   <div className="table-actions responsive-table-actions">
                     <Button
