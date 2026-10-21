@@ -91,7 +91,7 @@ body[data-print-kiosk-ticket] > #root {
   }
 
   html body[data-print-passage] .attestation-title {
-    padding: 9mm 0 4mm;
+    padding: 17mm 0 16mm;
     text-align: center;
   }
 
@@ -199,7 +199,7 @@ body[data-print-kiosk-ticket] > #root {
   }
 
   html body[data-print-passage] .attestation-timeline {
-    margin-top: 6mm;
+    margin-top: 14mm;
     break-inside: avoid;
   }
 
@@ -249,7 +249,7 @@ body[data-print-kiosk-ticket] > #root {
   }
 
   html body[data-print-passage] .attestation-purpose {
-    margin-top: 3.5mm;
+    margin-top: 11.5mm;
     padding: 0;
     border: 0;
     break-inside: avoid;
@@ -265,7 +265,7 @@ body[data-print-kiosk-ticket] > #root {
     display: flex !important;
     width: 52mm;
     min-height: 12mm;
-    margin: 3mm 0 0 auto;
+    margin: 11mm 0 0 auto;
     align-items: flex-end;
     justify-content: center;
     border-bottom: 0.2mm solid #777;
