@@ -11,6 +11,7 @@ import { Button } from '@/design-system/components/Button';
 export function Topbar({
   sites,
   activeSiteId,
+  pageHeaderVisible,
   onLogout,
   onOpenCommands,
   onRefresh,
@@ -19,6 +20,7 @@ export function Topbar({
 }: {
   sites: readonly { id: number; name: string }[];
   activeSiteId: number | null;
+  pageHeaderVisible: boolean;
   onLogout: () => void;
   onOpenCommands: () => void;
   onRefresh: () => void;
@@ -32,6 +34,8 @@ export function Topbar({
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const initials = user ? getUserInitials(user) : 'D';
+  const activeSiteName =
+    sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite');
   const routeLabel =
     (
       {
@@ -69,11 +73,14 @@ export function Topbar({
       >
         <Menu aria-hidden="true" />
       </Button>
-      <div className="topbar-title">
-        <span className="eyebrow">
-          {sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite')}
-        </span>
-        <h1>{t(routeLabel)}</h1>
+      <div className={`topbar-title${pageHeaderVisible ? ' is-site-prominent' : ''}`}>
+        <div className="topbar-title-site" aria-hidden={!pageHeaderVisible}>
+          <h1>{activeSiteName}</h1>
+        </div>
+        <div className="topbar-title-route" aria-hidden={pageHeaderVisible}>
+          <span className="eyebrow">{activeSiteName}</span>
+          <h1>{t(routeLabel)}</h1>
+        </div>
       </div>
       <div className="topbar-actions">
         <Button

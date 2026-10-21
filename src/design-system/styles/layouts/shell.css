@@ -234,8 +234,36 @@
   font-size: 18px;
 }
 .topbar-title {
+  display: grid;
   min-width: 13rem;
   flex: 0 0 auto;
+}
+.topbar-title-site,
+.topbar-title-route {
+  grid-area: 1 / 1;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+.topbar-title-site {
+  align-self: center;
+  opacity: 0;
+  transform: translateY(5px);
+}
+.topbar-title-site h1 {
+  color: var(--color-accent);
+}
+.topbar-title-route {
+  opacity: 1;
+  transform: translateY(0);
+}
+.topbar-title.is-site-prominent .topbar-title-site {
+  opacity: 1;
+  transform: translateY(0);
+}
+.topbar-title.is-site-prominent .topbar-title-route {
+  opacity: 0;
+  transform: translateY(-5px);
 }
 .topbar-title .eyebrow {
   display: block;

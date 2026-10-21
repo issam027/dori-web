@@ -79,6 +79,7 @@ describe('application layout', () => {
         <Topbar
           sites={[{ id: 1, name: 'Paris' }]}
           activeSiteId={1}
+          pageHeaderVisible={false}
           onLogout={logout}
           onOpenCommands={vi.fn()}
           onRefresh={vi.fn()}
@@ -98,5 +99,36 @@ describe('application layout', () => {
     expect(menu).toHaveTextContent(/langue/i);
     await userEvent.click(screen.getByRole('menuitem', { name: /déconnexion/i }));
     expect(logout).toHaveBeenCalledOnce();
+  });
+
+  it('shows the active site prominently while the page title is visible', () => {
+    const props = {
+      sites: [{ id: 1, name: 'Centre Horizon' }],
+      activeSiteId: 1,
+      onLogout: vi.fn(),
+      onOpenCommands: vi.fn(),
+      onRefresh: vi.fn(),
+      refreshing: false,
+      onOpenNavigation: vi.fn(),
+    };
+    const { rerender } = render(
+      <MemoryRouter initialEntries={['/desk']}>
+        <Topbar {...props} pageHeaderVisible />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Centre Horizon' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: /cockpit/i })).not.toBeInTheDocument();
+
+    rerender(
+      <MemoryRouter initialEntries={['/desk']}>
+        <Topbar {...props} pageHeaderVisible={false} />
+      </MemoryRouter>,
+    );
+
+    expect(document.querySelector('.topbar-title-route .eyebrow')).toHaveTextContent(
+      'Centre Horizon',
+    );
+    expect(screen.getByRole('heading', { name: /cockpit/i })).toBeVisible();
   });
 });

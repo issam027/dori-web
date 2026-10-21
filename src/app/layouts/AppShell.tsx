@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -37,6 +37,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
   const [mobileViewport, setMobileViewport] = useState(() => mediaMatches('(max-width: 620px)'));
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+  const [pageHeaderVisible, setPageHeaderVisible] = useState(false);
+  const appContentRef = useRef<HTMLElement>(null);
   const activeSiteQuery = useSite(activeSiteId);
   const sites = useMemo(() => {
     const scoped =
@@ -73,6 +75,34 @@ export function AppShell({ children }: { children: ReactNode }) {
       mobileQuery.removeEventListener('change', synchronize);
     };
   }, []);
+  useEffect(() => {
+    const content = appContentRef.current;
+    if (!content || typeof IntersectionObserver !== 'function') return;
+
+    let observedHeader: Element | null = null;
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        setPageHeaderVisible(Boolean(entry?.isIntersecting));
+      },
+      { rootMargin: '-74px 0px 0px' },
+    );
+    const observePageHeader = () => {
+      const pageHeader = content.querySelector('.page-header');
+      if (pageHeader === observedHeader) return;
+      visibilityObserver.disconnect();
+      observedHeader = pageHeader;
+      setPageHeaderVisible(Boolean(pageHeader));
+      if (pageHeader) visibilityObserver.observe(pageHeader);
+    };
+    const contentObserver = new MutationObserver(observePageHeader);
+
+    observePageHeader();
+    contentObserver.observe(content, { childList: true, subtree: true });
+    return () => {
+      contentObserver.disconnect();
+      visibilityObserver.disconnect();
+    };
+  }, [location.pathname]);
   const requiresSite = routeRequiresActiveSite(location.pathname);
   const effectiveSidebarCollapsed = mobileViewport ? false : mediumViewport || sidebarCollapsed;
 
@@ -107,6 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Topbar
           sites={sites}
           activeSiteId={activeSiteId}
+          pageHeaderVisible={pageHeaderVisible}
           onLogout={() => {
             void clearSession(queryClient);
           }}
@@ -124,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             });
           }}
         />
-        <main className="app-content">
+        <main ref={appContentRef} className="app-content">
           <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
             {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
               <div className="site-required-card">
