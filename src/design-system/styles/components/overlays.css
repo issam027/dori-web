@@ -113,7 +113,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  overflow-x: auto;
+  overflow-x: hidden;
   white-space: nowrap;
 }
 .dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
@@ -130,43 +130,6 @@
   flex-shrink: 0;
 }
 
-@container (max-width: 680px) {
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
-    width: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    justify-content: center;
-    gap: 0;
-    padding-inline: 0;
-    font-size: 0;
-  }
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button .button-label {
-    display: none;
-  }
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-@media (max-width: 768px) {
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button {
-    width: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    justify-content: center;
-    gap: 0;
-    padding-inline: 0;
-    font-size: 0;
-  }
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button .button-label {
-    display: none;
-  }
-  .dialog-content:has(.appointment-details-dialog) .dialog-actions .button svg {
-    width: 16px;
-    height: 16px;
-  }
-}
 .dialog-overlay {
   position: fixed;
   inset: 0;
@@ -234,10 +197,12 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  overflow-x: auto;
+  min-width: 0;
+  overflow-x: hidden;
   border-top: 1px solid var(--color-line);
   white-space: nowrap;
   background: var(--color-surface);
+  container-type: inline-size;
 }
 .confirmation-dialog { width: min(520px, calc(100vw - 32px)); }
 .confirmation-dialog .dialog-body { min-height: 0; padding-block: 6px; }
@@ -305,7 +270,27 @@
 }
 @media (max-width: 620px) {
   .dialog-actions {
-    justify-content: flex-start;
+    justify-content: flex-end;
+    padding-inline: 16px;
+  }
+}
+
+/* Secondary actions yield their label space to the primary action before the
+ * footer would need horizontal scrolling. */
+@container (max-width: 28rem) {
+  .dialog-actions .button-label-responsive.button-has-icon {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    flex: 0 0 2.5rem;
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+    overflow: hidden;
+  }
+
+  .dialog-actions .button-label-responsive.button-has-icon > .button-label {
+    display: none;
   }
 }
 .app-notification-center {

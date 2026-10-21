@@ -99,13 +99,14 @@ export function ManualNotificationWizard({
               variant="unstyled"
               type="button"
               className="button"
+              icon={<ArrowLeft />}
+              label={t('common.previous')}
+              labelMode="responsive"
+              title={t('common.previous')}
               onClick={() => {
                 setStep(transitionNotificationWizard(step, 'back'));
               }}
-            >
-              <ArrowLeft aria-hidden="true" />
-              <span className="button-label">{t('common.previous')}</span>
-            </Button>
+            />
           ) : null}
           {step !== 'content' ? (
             <Button

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
@@ -218,12 +218,14 @@ export function QuickRegistration({
                   variant="unstyled"
                   className="button"
                   type="button"
+                  icon={<ArrowLeft />}
+                  label={__t('queue-operations.quickRegistration.modifierLaPersonne')}
+                  labelMode="responsive"
+                  title={__t('queue-operations.quickRegistration.modifierLaPersonne')}
                   onClick={() => {
                     setStep(1);
                   }}
-                >
-                  {__t('queue-operations.quickRegistration.modifierLaPersonne')}
-                </Button>
+                />
                 <Button
                   variant="unstyled"
                   className="button button-primary"

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from '@/design-system/components/Button';
 
@@ -37,9 +38,16 @@ export function WizardModal({
       actions={
         <>
           {onPrevious ? (
-            <Button variant="unstyled" className="button" type="button" onClick={onPrevious}>
-              {t('common.previous')}
-            </Button>
+            <Button
+              variant="unstyled"
+              className="button"
+              type="button"
+              icon={<ArrowLeft />}
+              label={t('common.previous')}
+              labelMode="responsive"
+              title={t('common.previous')}
+              onClick={onPrevious}
+            />
           ) : (
             <span />
           )}

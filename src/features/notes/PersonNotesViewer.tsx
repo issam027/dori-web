@@ -119,13 +119,14 @@ export function PersonNotesViewer({
               variant="unstyled"
               className="button"
               type="button"
+              icon={<ArrowLeft />}
+              label={__t('persons.personNotesViewer.retourAuxNotes')}
+              labelMode="responsive"
+              title={__t('persons.personNotesViewer.retourAuxNotes')}
               onClick={() => {
                 setAdding(false);
               }}
-            >
-              <ArrowLeft aria-hidden="true" />
-              {__t('persons.personNotesViewer.retourAuxNotes')}
-            </Button>
+            />
           ) : null}
           {editingNoteId ? (
             <Button

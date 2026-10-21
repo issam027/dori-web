@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import { Check, CircleAlert, X } from 'lucide-react';
-import { Button } from './Button';
+import { Button, ButtonLabelModeProvider } from './Button';
 
 interface ModalProps {
   open: boolean;
@@ -38,17 +38,21 @@ export function Modal({
             </div>
           </header>
           <div className="dialog-body">{children}</div>
-          <footer className="dialog-actions">
-            {!hideDismissAction ? (
-              <Dialog.Close asChild>
-                <Button title={t('common.cancel')}>
-                  <X aria-hidden="true" />
-                  <span className="button-label">{t('common.cancel')}</span>
-                </Button>
-              </Dialog.Close>
-            ) : null}
-            {actions}
-          </footer>
+          <ButtonLabelModeProvider value="always">
+            <footer className="dialog-actions">
+              {!hideDismissAction ? (
+                <Dialog.Close asChild>
+                  <Button
+                    icon={<X />}
+                    label={t('common.cancel')}
+                    labelMode="responsive"
+                    title={t('common.cancel')}
+                  />
+                </Dialog.Close>
+              ) : null}
+              {actions}
+            </footer>
+          </ButtonLabelModeProvider>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

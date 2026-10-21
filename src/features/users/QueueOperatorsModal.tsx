@@ -133,10 +133,14 @@ export function QueueOperatorsModal({
           </Button>
         ) : (
           <>
-            <Button disabled={pendingId !== undefined} onClick={resetAddView}>
-              <ArrowLeft aria-hidden="true" />
-              {t('common.retour')}
-            </Button>
+            <Button
+              icon={<ArrowLeft />}
+              label={t('common.retour')}
+              labelMode="responsive"
+              title={t('common.retour')}
+              disabled={pendingId !== undefined}
+              onClick={resetAddView}
+            />
             <Button
               variant="primary"
               disabled={!selectedUser || pendingId !== undefined}

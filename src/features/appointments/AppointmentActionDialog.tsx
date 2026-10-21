@@ -275,6 +275,7 @@ export function AppointmentActionDialog({
         variant="unstyled"
         className="button button-small"
         type="button"
+        labelMode="responsive"
         title={t('common.previous')}
         disabled={pending}
         onClick={goBack}
@@ -313,6 +314,7 @@ export function AppointmentActionDialog({
         variant="unstyled"
         className="button button-small"
         type="button"
+        labelMode="responsive"
         title={t('common.previous')}
         disabled={pending}
         onClick={goBack}
