@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ButtonLabelModeProvider } from './Button';
 
 export interface MobileCardField {
   label: ReactNode;
@@ -22,28 +23,30 @@ export function DataTableMobileCard({
   className?: string;
 }) {
   return (
-    <article
-      className={`data-table-mobile-card${className ? ` ${className}` : ''}`}
-      role="listitem"
-    >
-      <div className="data-table-mobile-card-body">
-        <header className="data-table-mobile-card-heading">
-          <div>
-            <strong>{title}</strong>
-            {subtitle !== undefined ? <small>{subtitle}</small> : null}
-          </div>
-          {badge}
-        </header>
-        <dl className="data-table-mobile-card-details">
-          {fields.map((field, index) => (
-            <div key={index} className={field.wide ? 'is-wide' : undefined}>
-              <dt>{field.label}</dt>
-              <dd>{field.value}</dd>
+    <ButtonLabelModeProvider value="always">
+      <article
+        className={`data-table-mobile-card${className ? ` ${className}` : ''}`}
+        role="listitem"
+      >
+        <div className="data-table-mobile-card-body">
+          <header className="data-table-mobile-card-heading">
+            <div>
+              <strong>{title}</strong>
+              {subtitle !== undefined ? <small>{subtitle}</small> : null}
             </div>
-          ))}
-        </dl>
-      </div>
-      <footer className="data-table-mobile-card-footer">{actions}</footer>
-    </article>
+            {badge}
+          </header>
+          <dl className="data-table-mobile-card-details">
+            {fields.map((field, index) => (
+              <div key={index} className={field.wide ? 'is-wide' : undefined}>
+                <dt>{field.label}</dt>
+                <dd>{field.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <footer className="data-table-mobile-card-footer">{actions}</footer>
+      </article>
+    </ButtonLabelModeProvider>
   );
 }

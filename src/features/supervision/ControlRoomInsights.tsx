@@ -139,6 +139,7 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
         {metrics.map((metric) => (
           <Button
             variant="unstyled"
+            labelMode="always"
             key={metric}
             type="button"
             className={visible.includes(metric) ? 'active' : ''}

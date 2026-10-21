@@ -301,6 +301,7 @@ function TrendChart({ buckets }: { buckets: readonly ReportBucketViewModel[] }) 
           return (
             <Button
               variant="unstyled"
+              labelMode="always"
               key={item.id}
               type="button"
               className={active ? 'active' : ''}
@@ -608,6 +609,7 @@ export function ReportVisualizations({
         <div className="segmented-control" role="group" aria-label={t('reports.visual.type')}>
           <Button
             variant="unstyled"
+            labelMode="always"
             type="submit"
             className={view === 'trend' ? 'active' : ''}
             onClick={() => {
@@ -619,6 +621,7 @@ export function ReportVisualizations({
           </Button>
           <Button
             variant="unstyled"
+            labelMode="always"
             type="submit"
             className={view === 'comparison' ? 'active' : ''}
             onClick={() => {
@@ -630,6 +633,7 @@ export function ReportVisualizations({
           </Button>
           <Button
             variant="unstyled"
+            labelMode="always"
             type="submit"
             className={view === 'distribution' ? 'active' : ''}
             onClick={() => {

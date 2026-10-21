@@ -1,7 +1,11 @@
 import {
+  Children,
+  createContext,
   forwardRef,
+  Fragment,
   isValidElement,
   cloneElement,
+  useContext,
   type ButtonHTMLAttributes,
   type ReactElement,
   type ReactNode,
@@ -9,6 +13,11 @@ import {
 
 export type ButtonVariant = 'default' | 'primary' | 'danger' | 'unstyled';
 export type ButtonSize = 'default' | 'small' | 'icon';
+export type ButtonLabelMode = 'responsive' | 'always' | 'icon-only';
+
+const ButtonLabelModeContext = createContext<ButtonLabelMode>('responsive');
+
+export const ButtonLabelModeProvider = ButtonLabelModeContext.Provider;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -16,23 +25,35 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   pending?: boolean;
   icon?: ReactElement;
   label?: ReactNode;
+  labelMode?: ButtonLabelMode;
 }
 
 function buttonClassName(
   variant: ButtonVariant,
   size: ButtonSize,
   className: string | undefined,
+  labelMode: ButtonLabelMode,
+  hasIcon: boolean,
 ): string | undefined {
-  if (variant === 'unstyled') return className;
   const classes = [
-    'button',
-    size === 'small' ? 'button-small' : undefined,
-    size === 'icon' ? 'icon-button' : undefined,
-    variant === 'primary' ? 'button-primary' : undefined,
-    variant === 'danger' ? 'button-danger' : undefined,
+    variant === 'unstyled' ? undefined : 'button',
+    variant !== 'unstyled' && size === 'small' ? 'button-small' : undefined,
+    variant !== 'unstyled' && size === 'icon' ? 'icon-button' : undefined,
+    variant !== 'unstyled' && variant === 'primary' ? 'button-primary' : undefined,
+    variant !== 'unstyled' && variant === 'danger' ? 'button-danger' : undefined,
+    `button-label-${labelMode}`,
+    hasIcon ? 'button-has-icon' : undefined,
     className,
   ].filter(Boolean);
   return classes.length ? classes.join(' ') : undefined;
+}
+
+function containsIcon(children: ReactNode): boolean {
+  return Children.toArray(children).some((child) => {
+    if (!isValidElement<{ children?: ReactNode }>(child)) return false;
+    if (child.type === Fragment) return containsIcon(child.props.children);
+    return child.type !== 'span' && child.type !== 'div';
+  });
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -45,11 +66,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     className,
     icon,
     label,
+    labelMode: requestedLabelMode,
     children,
     ...props
   },
   ref,
 ) {
+  const inheritedLabelMode = useContext(ButtonLabelModeContext);
+  const labelMode = requestedLabelMode ?? inheritedLabelMode;
+  const hasIcon = Boolean(icon) || containsIcon(children);
   const decorativeIcon = isValidElement<{ 'aria-hidden'?: boolean }>(icon)
     ? cloneElement(icon, { 'aria-hidden': true })
     : icon;
@@ -59,9 +84,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...props}
       ref={ref}
       type={type}
-      className={buttonClassName(variant, size, className)}
+      className={buttonClassName(variant, size, className, labelMode, hasIcon)}
       disabled={disabled || pending}
       aria-busy={pending || undefined}
+      aria-label={
+        props['aria-label'] ??
+        (labelMode === 'icon-only' && typeof label === 'string' ? label : undefined)
+      }
     >
       {decorativeIcon}
       {label !== undefined ? <span className="button-label">{label}</span> : children}

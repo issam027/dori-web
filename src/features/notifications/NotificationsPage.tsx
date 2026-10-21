@@ -75,6 +75,7 @@ export function NotificationsPage() {
               variant="unstyled"
               type="button"
               className="button button-primary"
+              labelMode="always"
               onClick={() => {
                 setWizard(true);
               }}

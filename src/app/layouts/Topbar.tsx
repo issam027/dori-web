@@ -38,28 +38,28 @@ export function Topbar({
     sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite');
   const routeLabel = location.pathname.startsWith('/settings/')
     ? 'nav.settings'
-    : (
-      {
-        '/desk': 'nav.desk',
-        '/my-queues': 'nav.myQueues',
-        '/persons': 'nav.persons',
-        '/appointments': 'nav.appointments',
-        '/control-room': 'nav.controlRoom',
-        '/portfolio': 'nav.portfolio',
-        '/reports': 'nav.reports',
-        '/notifications': 'nav.notifications',
-        '/kiosk': 'nav.kiosk',
-        '/display': 'nav.display',
-        '/track': 'nav.tracking',
-        '/settings': 'nav.settings',
-        '/admin/users': 'nav.usersAdmin',
-        '/onboarding': 'nav.onboarding',
-        '/admin/translations': 'nav.translations',
-        '/health': 'nav.health',
-        '/profile': 'profile.title',
-        '/change-password': 'auth.changePassword.changerLeMotDePasse',
-      } as Record<string, string>
-    )[location.pathname] ?? 'app.name';
+    : ((
+        {
+          '/desk': 'nav.desk',
+          '/my-queues': 'nav.myQueues',
+          '/persons': 'nav.persons',
+          '/appointments': 'nav.appointments',
+          '/control-room': 'nav.controlRoom',
+          '/portfolio': 'nav.portfolio',
+          '/reports': 'nav.reports',
+          '/notifications': 'nav.notifications',
+          '/kiosk': 'nav.kiosk',
+          '/display': 'nav.display',
+          '/track': 'nav.tracking',
+          '/settings': 'nav.settings',
+          '/admin/users': 'nav.usersAdmin',
+          '/onboarding': 'nav.onboarding',
+          '/admin/translations': 'nav.translations',
+          '/health': 'nav.health',
+          '/profile': 'profile.title',
+          '/change-password': 'auth.changePassword.changerLeMotDePasse',
+        } as Record<string, string>
+      )[location.pathname] ?? 'app.name');
   useEffect(() => {
     if (!accountMenuOpen) return;
     const close = (event: PointerEvent) => {
@@ -145,7 +145,7 @@ export function Topbar({
                 <span>{t('locale.label')}</span>
                 <LocaleSwitcher />
               </div>
-              <Button variant="unstyled" role="menuitem" onClick={onLogout}>
+              <Button variant="unstyled" labelMode="always" role="menuitem" onClick={onLogout}>
                 <LogOut aria-hidden="true" />
                 {t('auth.logout')}
               </Button>

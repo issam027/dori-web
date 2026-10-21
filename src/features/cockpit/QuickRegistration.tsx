@@ -173,6 +173,7 @@ export function QuickRegistration({
         <Button
           variant="unstyled"
           className="button button-primary"
+          labelMode="always"
           type="button"
           onClick={() => {
             reset();
@@ -226,6 +227,7 @@ export function QuickRegistration({
                 <Button
                   variant="unstyled"
                   className="button button-primary"
+                  labelMode="always"
                   type="button"
                   disabled={!canSubmit}
                   onClick={() => void submit()}

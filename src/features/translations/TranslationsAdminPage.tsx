@@ -36,7 +36,6 @@ type Form = {
   content: string;
   contents: Record<'fr' | 'en' | 'ar', string>;
   params: string;
-  active: boolean;
 };
 const emptyForm = (): Form => ({
   key: '',
@@ -45,7 +44,6 @@ const emptyForm = (): Form => ({
   content: '',
   contents: { fr: '', en: '', ar: '' },
   params: '',
-  active: true,
 });
 
 export function TranslationsAdminPage() {
@@ -98,7 +96,6 @@ export function TranslationsAdminPage() {
       content: item.content,
       contents: { fr: '', en: '', ar: '' },
       params: item.expectedParams?.join(', ') ?? '',
-      active: item.isActive,
     });
     setOpen(true);
   };
@@ -113,7 +110,6 @@ export function TranslationsAdminPage() {
         await updateTranslation(editing.translationId, {
           content: form.content,
           expectedParams,
-          isActive: form.active,
         });
       else
         await Promise.all(
@@ -184,6 +180,7 @@ export function TranslationsAdminPage() {
           <Button
             variant="unstyled"
             className="button button-primary"
+            labelMode="always"
             type="button"
             onClick={showCreate}
           >
@@ -525,18 +522,6 @@ export function TranslationsAdminPage() {
               </label>
             </section>
           )}
-          {editing ? (
-            <label className="check-row form-span">
-              <input
-                type="checkbox"
-                checked={form.active}
-                onChange={(event) => {
-                  setForm({ ...form, active: event.target.checked });
-                }}
-              />{' '}
-              {t('admin.translations.traductionActive')}
-            </label>
-          ) : null}
         </div>
       </Modal>
     </div>

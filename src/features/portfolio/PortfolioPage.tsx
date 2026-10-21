@@ -223,6 +223,7 @@ export function PortfolioPage() {
                 <Button
                   variant="unstyled"
                   className={site.siteId === activeSiteId ? 'button button-primary' : 'button'}
+                  labelMode="always"
                   type="button"
                   disabled={site.siteId === activeSiteId}
                   onClick={() => void activate(site.siteId, user.scope)}
@@ -237,6 +238,7 @@ export function PortfolioPage() {
                 <Button
                   variant="unstyled"
                   className="button button-primary"
+                  labelMode="always"
                   type="button"
                   onClick={() => {
                     setSelectedSite(site);

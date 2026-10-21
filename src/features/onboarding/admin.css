@@ -276,7 +276,7 @@ table td small {
 }
 
 @media (max-width: 1500px) {
-  .responsive-table-actions .button {
+  .responsive-table-actions .button-label-responsive.button-has-icon {
     width: 36px;
     min-width: 36px;
     min-height: 36px;
@@ -286,7 +286,7 @@ table td small {
     font-size: 0;
   }
 
-  .responsive-table-actions .button svg {
+  .responsive-table-actions .button-label-responsive.button-has-icon svg {
     width: 16px;
     height: 16px;
   }

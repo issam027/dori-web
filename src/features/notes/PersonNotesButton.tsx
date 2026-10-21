@@ -23,6 +23,7 @@ export function PersonNotesButton({
   return (
     <Button
       size={cockpit ? 'default' : 'small'}
+      labelMode={cockpit ? 'always' : undefined}
       aria-label={accessibleLabel}
       className={['person-notes-button', className].filter(Boolean).join(' ')}
       type="button"

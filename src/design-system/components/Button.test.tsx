@@ -2,7 +2,7 @@ import { createRef, type SyntheticEvent } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Save } from 'lucide-react';
-import { Button } from './Button';
+import { Button, ButtonLabelModeProvider } from './Button';
 
 describe('Button', () => {
   it('uses button semantics by default and forwards its ref', () => {
@@ -47,9 +47,11 @@ describe('Button', () => {
   });
 
   it('preserves an explicit submit type', async () => {
-    const onSubmit = vi.fn<(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) => void>((event) => {
-      event.preventDefault();
-    });
+    const onSubmit = vi.fn<(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) => void>(
+      (event) => {
+        event.preventDefault();
+      },
+    );
     render(
       <form onSubmit={onSubmit}>
         <Button type="submit">Valider</Button>
@@ -72,6 +74,28 @@ describe('Button', () => {
     expect(button.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     await user.keyboard('{Enter}');
     expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('uses responsive labels by default and supports explicit label modes', () => {
+    const { rerender } = render(<Button icon={<Save />} label="Enregistrer" />);
+    expect(screen.getByRole('button')).toHaveClass('button-label-responsive', 'button-has-icon');
+
+    rerender(<Button icon={<Save />} label="Enregistrer" labelMode="always" />);
+    expect(screen.getByRole('button')).toHaveClass('button-label-always', 'button-has-icon');
+
+    rerender(<Button icon={<Save />} label="Enregistrer" labelMode="icon-only" />);
+    expect(screen.getByRole('button', { name: 'Enregistrer' })).toHaveClass(
+      'button-label-icon-only',
+    );
+  });
+
+  it('inherits the label mode from its layout context', () => {
+    render(
+      <ButtonLabelModeProvider value="always">
+        <Button icon={<Save />} label="Enregistrer" />
+      </ButtonLabelModeProvider>,
+    );
+    expect(screen.getByRole('button')).toHaveClass('button-label-always');
   });
 
   it('preserves specialized classes without adding the standard button class', () => {

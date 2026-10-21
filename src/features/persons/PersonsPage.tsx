@@ -135,6 +135,7 @@ export function PersonsPage() {
           <Button
             variant="unstyled"
             className="button button-primary"
+            labelMode="always"
             type="button"
             onClick={() => {
               setCreateOpen(true);

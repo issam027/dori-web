@@ -100,6 +100,7 @@ export function ActiveCallCard({
               variant="unstyled"
               type="submit"
               className="button button-primary active-call-action"
+              labelMode="always"
               disabled={pending}
               onClick={onServed}
             >
@@ -110,6 +111,7 @@ export function ActiveCallCard({
               variant="unstyled"
               type="submit"
               className="button button-danger active-call-action"
+              labelMode="always"
               disabled={pending}
               onClick={onNoShow}
             >
@@ -211,6 +213,7 @@ export function QueueDeskCard({
             variant="unstyled"
             type="submit"
             className="button button-primary"
+            labelMode="always"
             disabled={!active || pending}
             onClick={onCallNext}
           >
@@ -300,6 +303,7 @@ function QueueActiveCall({
         <Button
           variant="unstyled"
           className="button button-primary"
+          labelMode="always"
           type="button"
           disabled={pending}
           onClick={() => {
@@ -312,6 +316,7 @@ function QueueActiveCall({
         <Button
           variant="unstyled"
           className="button button-danger"
+          labelMode="always"
           type="button"
           disabled={pending}
           onClick={() => {
