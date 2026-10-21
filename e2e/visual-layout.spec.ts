@@ -576,6 +576,29 @@ test('desktop, tablet, mobile and TV remain usable in all four themes', async ({
   }
 });
 
+test('application content keeps a denser scale without shrinking the sidebar or wasting wide screens', async ({
+  page,
+}) => {
+  await mockAuthenticatedApi(page);
+  await activateFirstSite(page);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/desk');
+  await expect(page.locator('.app-content')).toHaveCSS('zoom', '0.95');
+  await expect(page.locator('.sidebar')).toHaveCSS('zoom', '1');
+
+  await page.setViewportSize({ width: 3840, height: 1080 });
+  await page.goto('/desk');
+  const contentBounds = await page.locator('.app-content').boundingBox();
+  expect(contentBounds).not.toBeNull();
+  expect(contentBounds?.width).toBeGreaterThan(2688);
+  expect((contentBounds?.x ?? 0) + (contentBounds?.width ?? 0)).toBeLessThanOrEqual(3840);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/desk');
+  await expect(page.locator('.app-content')).toHaveCSS('zoom', '1');
+});
+
 test('sidebar keeps its state across routes and follows desktop, tablet and mobile modes', async ({
   page,
 }) => {
