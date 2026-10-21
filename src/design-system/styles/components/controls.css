@@ -1085,5 +1085,29 @@ input:is([type='checkbox'], [type='radio']):user-invalid {
     min-width: 1rem;
     padding: 0.1rem 0.25rem;
     font-size: 0.62rem;
+    z-index: 1;
+  }
+
+  .app-shell .person-notes-button {
+    position: relative;
+    overflow: visible;
+  }
+
+  .app-shell .data-table-mobile-card .row-actions-popover .button {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    flex: none;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+    overflow: visible;
+    font-size: 0.8125rem;
+    text-align: start;
+    white-space: normal;
+  }
+
+  .app-shell .data-table-mobile-card .row-actions-popover .button > .button-label {
+    display: inline;
   }
 }

@@ -24,7 +24,7 @@ export function PersonNotesButton({
     <Button
       size={cockpit ? 'default' : 'small'}
       aria-label={accessibleLabel}
-      className={className}
+      className={['person-notes-button', className].filter(Boolean).join(' ')}
       type="button"
       title={accessibleLabel}
       onClick={onClick}

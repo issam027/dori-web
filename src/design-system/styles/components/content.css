@@ -539,6 +539,10 @@
   .data-table-mobile-card-heading small {
     overflow-wrap: anywhere;
   }
+  .data-table-mobile-card-heading code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
   .data-table-mobile-card-heading small,
   .data-table-mobile-card-details dt {
     color: var(--color-text-muted);

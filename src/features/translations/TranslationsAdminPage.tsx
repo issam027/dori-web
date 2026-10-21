@@ -25,6 +25,7 @@ import {
 } from './api/translations-api';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { TranslationMobileCard } from './TranslationMobileCard';
 
 const PAGE_SIZE = 10;
 const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
@@ -265,6 +266,20 @@ export function TranslationsAdminPage() {
         <DataTable
           caption={t('admin.translations.catalogueDesTraductions')}
           containerClassName="table-wrap admin-table-wrap"
+          mobileRows={items}
+          getMobileRowKey={(item) => item.translationId}
+          renderMobileRow={(item) => (
+            <TranslationMobileCard
+              translation={item}
+              categoryLabel={categoryLabel(item.category)}
+              onEdit={() => {
+                showEdit(item);
+              }}
+              onDelete={() => {
+                setDeleting(item);
+              }}
+            />
+          )}
         >
           <thead>
             <tr>
