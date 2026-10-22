@@ -18,7 +18,7 @@ export const BACKEND_LOCALE_CODES: Partial<Record<SupportedLocale, string>> = {
   'ar-TN': 'tn',
 };
 
-export const RTL_LOCALES: ReadonlySet<SupportedLocale> = new Set<SupportedLocale>(['ar', 'ar-TN']);
+export const RTL_LOCALES: ReadonlySet<SupportedLocale> = new Set<SupportedLocale>(['ar']);
 
 /** Resolution order for a missing key. Never "translate" by silently copying French into EN/AR. */
 export const FALLBACK_CHAIN: Record<string, string[]> = {
