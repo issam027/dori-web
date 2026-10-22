@@ -31,7 +31,7 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   "common.public": "عام",
   "common.private": "خاص",
   "common.closeAll": "إغلاق الكل",
-  "common.closeServedOnly": "إغلاق الزيارات المخدومة",
+  "common.carryOverOpen": "ترحيل الزيارات المفتوحة",
   "common.sortAscending": "أ–ي",
   "common.sortDescending": "ي–أ",
   "common.enabled": "مفعّل",

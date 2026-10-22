@@ -30,7 +30,7 @@ export const common = {
   "common.public": "Public",
   "common.private": "Privé",
   "common.closeAll": "Tout clôturer",
-  "common.closeServedOnly": "Clôturer les passages servis",
+  "common.carryOverOpen": "Reporter les passages ouverts",
   "common.sortAscending": "A–Z",
   "common.sortDescending": "Z–A",
   "common.enabled": "Activé",
