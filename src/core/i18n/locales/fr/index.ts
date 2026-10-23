@@ -12,8 +12,9 @@ import { admin } from './admin';
 import { supervision } from './supervision';
 import { experiences } from './experiences';
 import { legal } from './legal';
+import { audit } from './audit';
 
-export const frDomains = { common, nav, auth, profile, errors, appointments, persons, operations, portfolio, onboarding, admin, supervision, experiences, legal };
-export const fr = { ...common, ...nav, ...auth, ...profile, ...errors, ...appointments, ...persons, ...operations, ...portfolio, ...onboarding, ...admin, ...supervision, ...experiences, ...legal };
+export const frDomains = { common, nav, auth, profile, errors, appointments, persons, operations, portfolio, onboarding, admin, supervision, experiences, legal, audit };
+export const fr = { ...common, ...nav, ...auth, ...profile, ...errors, ...appointments, ...persons, ...operations, ...portfolio, ...onboarding, ...admin, ...supervision, ...experiences, ...legal, ...audit };
 
 export type FrCatalog = typeof fr;

@@ -56,6 +56,7 @@ const DeviceModePage = lazyNamed(
 );
 const TrackPage = lazyNamed(() => import('@/features/public-experiences/TrackPage'), 'TrackPage');
 const HealthPage = lazyNamed(() => import('@/features/health/HealthPage'), 'HealthPage');
+const AuditPage = lazyNamed(() => import('@/features/audit/AuditPage'), 'AuditPage');
 const LegalPage = lazyNamed(() => import('@/features/legal/LegalPage'), 'LegalPage');
 const OnboardingPage = lazyNamed(
   () => import('@/features/onboarding/OnboardingPage'),
@@ -171,6 +172,7 @@ const protectedRouteViews: Record<string, RouteView> = {
   '/admin/users': { component: UsersAdminPage, frame: 'shell' },
   '/admin/translations': { component: TranslationsAdminPage, frame: 'shell' },
   '/health': { component: HealthPage, frame: 'shell' },
+  '/audit': { component: AuditPage, frame: 'shell' },
 };
 
 function ConfiguredProtectedPage({ path }: { path: string }) {

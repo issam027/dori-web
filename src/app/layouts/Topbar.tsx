@@ -56,6 +56,7 @@ export function Topbar({
           '/onboarding': 'nav.onboarding',
           '/admin/translations': 'nav.translations',
           '/health': 'nav.health',
+          '/audit': 'nav.audit',
           '/profile': 'profile.title',
           '/change-password': 'auth.changePassword.changerLeMotDePasse',
         } as Record<string, string>

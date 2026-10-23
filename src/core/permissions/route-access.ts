@@ -32,6 +32,7 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
   { path: '/admin/users', permissions: ['user_manage_admin'] },
   { path: '/admin/translations', permissions: ['translation_manage'] },
   { path: '/health', permissions: ['system_manage'] },
+  { path: '/audit', permissions: ['audit_view'] },
 ] as const;
 
 export function findFirstAuthorizedPath(user: CurrentUserResponseDto): string {

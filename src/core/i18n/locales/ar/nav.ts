@@ -38,6 +38,7 @@ export const nav: DomainTranslations<typeof import('../fr/nav').nav> = {
   "nav.usersAdmin": "المستخدمون والأعوان",
   "nav.translations": "الترجمات",
   "nav.health": "صحة المنصة",
+  "nav.audit": "سجل التدقيق",
   "nav.legal": "الشروط القانونية والخصوصية",
   "commands.open": "الأوامر السريعة",
   "commands.title": "لوحة الأوامر",

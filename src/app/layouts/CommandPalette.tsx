@@ -48,6 +48,7 @@ const commands = [
   { id: 'onboarding', labelKey: 'nav.onboarding', path: '/onboarding', permissions: ['site_create'] },
   { id: 'translations', labelKey: 'nav.translations', path: '/admin/translations', permissions: ['translation_manage'] },
   { id: 'health', labelKey: 'nav.health', path: '/health', permissions: ['system_manage'] },
+  { id: 'audit', labelKey: 'nav.audit', path: '/audit', permissions: ['audit_view'] },
   { id: 'profile', labelKey: 'profile.title', path: '/profile', permissions: [] },
   { id: 'password', labelKey: 'auth.changePassword.changerLeMotDePasse', path: '/change-password', permissions: [] },
   { id: 'legal', labelKey: 'nav.legal', path: '/legal', permissions: [] },

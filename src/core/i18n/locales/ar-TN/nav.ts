@@ -37,6 +37,7 @@ export const nav: Record<string, string> = {
   "nav.usersAdmin": "المستخدمين",
   "nav.translations": "الترجمات",
   "nav.health": "صحة السيستام",
+  "nav.audit": "سجلّ المراقبة",
   "nav.legal": "الشروط والخصوصية",
   "commands.open": "الأوامر السريعة",
   "commands.title": "لوحة الأوامر",

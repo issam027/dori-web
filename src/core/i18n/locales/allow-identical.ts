@@ -2,6 +2,9 @@
 // This is a ratchet: adding a key here must be a conscious review decision.
 export const ALLOW_IDENTICAL = {
   en: [
+    "audit.fields.action",
+    "audit.fields.site",
+    "audit.fields.type",
     "controlRoom.alert.info",
     "common.public",
     "common.sortAscending",

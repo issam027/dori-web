@@ -8,6 +8,7 @@ describe('active site route rules', () => {
     '/change-password',
     '/onboarding',
     '/health',
+    '/audit',
     '/legal',
     '/admin/translations',
   ])('allows %s without an active site', (pathname) => {

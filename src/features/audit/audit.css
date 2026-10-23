@@ -1,0 +1,110 @@
+.audit-detail-sections {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.audit-detail-sections section {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.audit-detail-sections h3 {
+  margin: 0 0 var(--space-3);
+}
+
+.audit-detail-sections .detail-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin: 0;
+}
+
+.audit-detail-sections .detail-list > div {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 38%) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.audit-detail-sections .detail-list > div:last-child {
+  border-bottom: 0;
+}
+
+.audit-detail-sections .detail-list dd {
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: break-word;
+}
+
+.audit-detail-sections code {
+  font-size: 0.875rem;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.audit-detail-dialog {
+  width: min(960px, calc(100vw - 32px));
+}
+
+.audit-detail-dialog .dialog-header p {
+  overflow-wrap: break-word;
+}
+
+.audit-table-card .table-scroll {
+  overflow-x: hidden;
+}
+
+.audit-table-card table {
+  table-layout: fixed;
+}
+
+.audit-table-card th,
+.audit-table-card td {
+  min-width: 0;
+  padding-inline: var(--space-3);
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.audit-table-card th:nth-child(1) {
+  width: 9.5rem;
+}
+
+.audit-table-card th:nth-child(2) {
+  width: 10rem;
+}
+
+.audit-table-card th:nth-child(5) {
+  width: 7rem;
+}
+
+.audit-table-card th:nth-child(6) {
+  width: 4.5rem;
+}
+
+.audit-table-card td:nth-child(6) .button {
+  margin-inline: auto;
+}
+
+@media (min-width: 720px) {
+  .audit-detail-sections {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .audit-detail-sections section {
+    padding: var(--space-3);
+  }
+
+  .audit-detail-sections .detail-list > div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}

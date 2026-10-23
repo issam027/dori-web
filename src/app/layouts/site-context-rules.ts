@@ -4,6 +4,7 @@ const siteIndependentPaths = new Set([
   '/change-password',
   '/onboarding',
   '/health',
+  '/audit',
   '/legal',
   '/admin/translations',
 ]);

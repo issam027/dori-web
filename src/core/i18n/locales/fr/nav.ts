@@ -37,6 +37,7 @@ export const nav = {
   "nav.usersAdmin": "Utilisateurs",
   "nav.translations": "Traductions",
   "nav.health": "État de la plateforme",
+  "nav.audit": "Journal d’audit",
   "nav.legal": "Mentions légales · Confidentialité",
   "commands.open": "Commandes",
   "commands.title": "Palette de commandes",

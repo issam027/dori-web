@@ -2,6 +2,11 @@ export const queryKeys = {
   health: {
     all: ['health'] as const,
   },
+  audit: {
+    all: ['audit'] as const,
+    list: <T extends object>(filters: T) => ['audit', 'list', filters] as const,
+    detail: (eventId: string | undefined) => ['audit', 'detail', eventId] as const,
+  },
   sites: {
     all: ['sites'] as const,
     contextSwitcher: ['sites', 'context-switcher'] as const,

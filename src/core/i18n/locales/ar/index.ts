@@ -12,7 +12,8 @@ import { admin } from './admin';
 import { supervision } from './supervision';
 import { experiences } from './experiences';
 import { legal } from './legal';
+import { audit } from './audit';
 import type { Translations } from '../../types';
 
-export const arDomains = { common, nav, auth, profile, errors, appointments, persons, operations, portfolio, onboarding, admin, supervision, experiences, legal };
-export const ar: Translations = { ...common, ...nav, ...auth, ...profile, ...errors, ...appointments, ...persons, ...operations, ...portfolio, ...onboarding, ...admin, ...supervision, ...experiences, ...legal };
+export const arDomains = { common, nav, auth, profile, errors, appointments, persons, operations, portfolio, onboarding, admin, supervision, experiences, legal, audit };
+export const ar: Translations = { ...common, ...nav, ...auth, ...profile, ...errors, ...appointments, ...persons, ...operations, ...portfolio, ...onboarding, ...admin, ...supervision, ...experiences, ...legal, ...audit };

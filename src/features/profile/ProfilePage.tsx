@@ -141,19 +141,21 @@ export function ProfilePage() {
             <dl className="detail-list">
               <div>
                 <dt>{__t('profile.profile.typeDeCompte')}</dt>
-                <dd>
+                <dd className="profile-compact-value">
                   {user.userType === 'human'
                     ? __t('common.humain')
                     : __t('profile.profile.technique')}
                 </dd>
               </div>
-              <div>
+              <div className="profile-permissions-row">
                 <dt>{__t('profile.profile.permissions')}</dt>
-                <dd>{user.permissions.length}</dd>
+                <dd className="profile-permissions-count">{user.permissions.length}</dd>
               </div>
               <div>
                 <dt>{__t('profile.profile.derniereConnexion')}</dt>
-                <dd>{formatDateTime(user.lastLogin, i18n.language) ?? '—'}</dd>
+                <dd className="profile-compact-value">
+                  {formatDateTime(user.lastLogin, i18n.language) ?? '—'}
+                </dd>
               </div>
               <div>
                 <dt>{__t('common.scope')}</dt>

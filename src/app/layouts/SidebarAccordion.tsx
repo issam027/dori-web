@@ -5,6 +5,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import {
   Activity,
+  ScrollText,
   Bell,
   BriefcaseBusiness,
   CalendarDays,
@@ -144,6 +145,7 @@ const sections: readonly NavSection[] = [
         icon: Languages,
       },
       { path: '/health', labelKey: 'nav.health', permissions: ['system_manage'], icon: HeartPulse },
+      { path: '/audit', labelKey: 'nav.audit', permissions: ['audit_view'], icon: ScrollText },
     ],
   },
 ];
