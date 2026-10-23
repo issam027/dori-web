@@ -28,14 +28,14 @@ export function AppointmentEditor({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  siteId: number;
+  siteId: string;
   queues: readonly QueueResponseDto[];
   initialDate: string;
   initialTime?: string;
   timeZone: string;
   initialPerson?: PersonResponseDto;
-  initialQueueId?: number;
-  initialTierId?: number;
+  initialQueueId?: string;
+  initialTierId?: string;
   startAtServiceStep?: boolean;
 }) {
   const { t: __t } = useTranslation();
@@ -44,8 +44,8 @@ export function AppointmentEditor({
   const [person, setPerson] = useState<PersonChoice | null>(
     initialPerson ? { kind: 'existing', person: initialPerson } : null,
   );
-  const [queueId, setQueueId] = useState(initialQueueId ?? queues[0]?.queueId ?? 0);
-  const [tierId, setTierId] = useState(initialTierId ?? 0);
+  const [queueId, setQueueId] = useState(initialQueueId ?? queues[0]?.queueId ?? '');
+  const [tierId, setTierId] = useState(initialTierId ?? '');
   const [date, setDate] = useState(initialDate);
   const [time, setTime] = useState(initialTime ?? '09:00');
   const [error, setError] = useState('');
@@ -106,7 +106,8 @@ export function AppointmentEditor({
       actions={
         <>
           {step === 2 ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -117,7 +118,8 @@ export function AppointmentEditor({
             </Button>
           ) : null}
           {step === 1 ? (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!person}
@@ -129,7 +131,8 @@ export function AppointmentEditor({
               <ArrowRight aria-hidden="true" />
             </Button>
           ) : (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-primary"
               type="button"
               disabled={!person || !queueId || !tierId}
@@ -176,7 +179,8 @@ export function AppointmentEditor({
                     : __t('common.nouvellePersonne')}
                 </span>
               </div>
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 className="button button-small"
                 type="button"
                 onClick={() => {
@@ -201,7 +205,7 @@ export function AppointmentEditor({
                 <select
                   value={queueId}
                   onChange={(e) => {
-                    setQueueId(Number(e.target.value));
+                    setQueueId(e.target.value);
                   }}
                 >
                   <option value={0}>{__t('common.choose')}</option>
@@ -219,7 +223,7 @@ export function AppointmentEditor({
                 <select
                   value={tierId}
                   onChange={(e) => {
-                    setTierId(Number(e.target.value));
+                    setTierId(e.target.value);
                   }}
                 >
                   <option value={0}>{__t('common.choose')}</option>
@@ -253,8 +257,7 @@ export function AppointmentEditor({
                     const value = slotTime(slot.time, serviceTimeZone);
                     return (
                       <option key={slot.time} value={value}>
-                        {value} ({slot.available}{' '}
-                        {__t('appointments.appointmentEditor.placeS')})
+                        {value} ({slot.available} {__t('appointments.appointmentEditor.placeS')})
                       </option>
                     );
                   })}

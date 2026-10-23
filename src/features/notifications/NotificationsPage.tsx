@@ -37,11 +37,11 @@ export function NotificationsPage() {
   >('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [queueId, setQueueId] = useState<number>();
+  const [queueId, setQueueId] = useState<string>();
   const [registrationId, setRegistrationId] = useState('');
   const [sort, setSort] = useState<NotificationsControllerFindNotificationsSort>('createdAt:desc');
   const [wizard, setWizard] = useState(false);
-  const [detailId, setDetailId] = useState<number>();
+  const [detailId, setDetailId] = useState<string>();
   const journal = useNotifications({
     page,
     channel: channel || undefined,
@@ -49,7 +49,7 @@ export function NotificationsPage() {
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
     queueId,
-    registrationId: registrationId ? Number(registrationId) : undefined,
+    registrationId: registrationId ? registrationId : undefined,
     siteId: siteId ?? undefined,
     sort,
   });
@@ -160,7 +160,7 @@ export function NotificationsPage() {
               <select
                 value={queueId ?? ''}
                 onChange={(event) => {
-                  setQueueId(event.target.value ? Number(event.target.value) : undefined);
+                  setQueueId(event.target.value || undefined);
                   setPage(1);
                 }}
               >
@@ -252,7 +252,7 @@ export function NotificationsPage() {
             {
               key: 'ticket',
               header: t('supervision.notifications.inscription'),
-              render: (row) => row.ticketNumber ?? `#${String(row.registrationId)}`,
+              render: (row) => row.ticketNumber ?? `#${row.registrationId}`,
             },
             {
               key: 'channel',

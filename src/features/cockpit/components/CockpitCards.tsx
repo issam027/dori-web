@@ -166,7 +166,7 @@ export function QueueDeskCard({
     registration: RegistrationResponseDto | undefined,
     personName: string,
   ) => void;
-  onNotes: (personId: number) => void;
+  onNotes: (personId: string) => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -251,7 +251,7 @@ function QueueActiveCall({
     registration: RegistrationResponseDto | undefined,
     personName: string,
   ) => void;
-  onNotes: (personId: number) => void;
+  onNotes: (personId: string) => void;
 }) {
   const { t } = useTranslation();
   const registration = useRegistration(call.registrationId);

@@ -7,9 +7,12 @@ describe('public experience privacy', () => {
     expect(trackingProgress(undefined)).toBe(0);
   });
   it('rejects display payloads containing PII-shaped fields', () => {
-    expect(isPublicDisplaySnapshot({ queueId: 1, activeThreads: [{ currentTicket: 'A1' }] })).toBe(
-      true,
-    );
+    expect(
+      isPublicDisplaySnapshot({
+        queueId: '00000000-0000-4000-8000-000000000001',
+        activeThreads: [{ currentTicket: 'A1' }],
+      }),
+    ).toBe(true);
     expect(isPublicDisplaySnapshot({ firstName: 'Private' })).toBe(false);
   });
 });

@@ -21,10 +21,18 @@ const reportMetrics = (registered: number, served: number) => ({
   averageServiceMinutes: 6,
 });
 
-const reportSeries = (from: string, to: string, queueId?: number) => {
+const reportSeries = (from: string, to: string, queueId?: string) => {
   const queues = [
-    { queueId: 10, queueName: 'Accueil général', ...reportMetrics(10, 8) },
-    { queueId: 11, queueName: 'Documents', ...reportMetrics(5, 4) },
+    {
+      queueId: '00000000-0000-4000-8000-000000000010',
+      queueName: 'Accueil général',
+      ...reportMetrics(10, 8),
+    },
+    {
+      queueId: '00000000-0000-4000-8000-000000000011',
+      queueName: 'Documents',
+      ...reportMetrics(5, 4),
+    },
   ];
   const selected = queueId ? queues.filter((queue) => queue.queueId === queueId) : queues;
   const totals = selected.reduce(
@@ -43,7 +51,7 @@ const reportSeries = (from: string, to: string, queueId?: number) => {
       from,
       to,
       bucket: 'day',
-      siteId: 1,
+      siteId: '00000000-0000-4000-8000-000000000001',
       queueIds: queueId ? [queueId] : [],
     },
     totals,
@@ -84,7 +92,7 @@ test('supervision renders operational cards, refreshes them and handles an empty
                 },
                 queues: [
                   {
-                    queueId: 10,
+                    queueId: '00000000-0000-4000-8000-000000000010',
                     queueName: 'Accueil général',
                     waiting: loadCalls > 1 ? 9 : 7,
                     inProgress: 1,
@@ -146,8 +154,8 @@ test('reports apply the selected period to every queue and render an empty state
 }) => {
   const requests: Array<{ from: string; to: string; queueIds: string | null }> = [];
   const queues = [
-    buildQueue({ queueId: 10, queueName: 'Accueil général' }),
-    buildQueue({ queueId: 11, queueName: 'Documents' }),
+    buildQueue({ queueId: '00000000-0000-4000-8000-000000000010', queueName: 'Accueil général' }),
+    buildQueue({ queueId: '00000000-0000-4000-8000-000000000011', queueName: 'Documents' }),
   ];
   await installApiScenario(page, {
     profile: 'manager',
@@ -161,7 +169,7 @@ test('reports apply the selected period to every queue and render an empty state
         const queueIds = url.searchParams.get('queueIds');
         requests.push({ from, to, queueIds });
         await route.fulfill({
-          json: apiEnvelope(reportSeries(from, to, queueIds ? Number(queueIds) : undefined)),
+          json: apiEnvelope(reportSeries(from, to, queueIds || undefined)),
         });
         return true;
       },
@@ -174,17 +182,21 @@ test('reports apply the selected period to every queue and render an empty state
   const endDate = page.getByLabel(/date de fin/i);
   await startDate.fill('2026-09-18');
   await endDate.fill('2026-09-20');
-  await expect.poll(() => [
-    ...new Set(
-      requests
-        .filter(
-          (request) =>
-            request.from.startsWith('2026-09-18') && request.to.startsWith('2026-09-21'),
-        )
-        .map((request) => request.queueIds)
-        .filter((queueIds): queueIds is string => Boolean(queueIds)),
-    ),
-  ].sort()).toEqual(['10', '11']);
+  await expect
+    .poll(() =>
+      [
+        ...new Set(
+          requests
+            .filter(
+              (request) =>
+                request.from.startsWith('2026-09-18') && request.to.startsWith('2026-09-21'),
+            )
+            .map((request) => request.queueIds)
+            .filter((queueIds): queueIds is string => Boolean(queueIds)),
+        ),
+      ].sort(),
+    )
+    .toEqual(['00000000-0000-4000-8000-000000000010', '00000000-0000-4000-8000-000000000011']);
   await expect(page.getByRole('main').getByRole('heading', { name: /rapports/i })).toBeVisible();
 
   await page.route('**/api/v1/monitoring/series**', async (route) => {
@@ -209,7 +221,7 @@ test('reports expose a recoverable API error', async ({ page }) => {
           const from = '2026-10-05T00:00:00.000Z';
           const to = '2026-10-12T00:00:00.000Z';
           await route.fulfill({
-            json: apiEnvelope(reportSeries(from, to, 10)),
+            json: apiEnvelope(reportSeries(from, to, '00000000-0000-4000-8000-000000000010')),
           });
         }
         return true;
@@ -245,7 +257,7 @@ async function installNotificationScenario(page: Page, failSend: () => boolean) 
             json: apiEnvelope(
               paginated([
                 buildRegistration({
-                  registrationId: 700,
+                  registrationId: '00000000-0000-4000-8000-000000000700',
                   ticketNumber: 'A700',
                   businessDate: '2026-10-10',
                 }),
@@ -257,7 +269,10 @@ async function installNotificationScenario(page: Page, failSend: () => boolean) 
         if (path === '/api/v1/notifications' && method === 'POST') {
           sentBody = route.request().postDataJSON() as Record<string, unknown>;
           if (failSend()) await route.fulfill(apiFailure(503, 'DELIVERY_UNAVAILABLE'));
-          else await route.fulfill({ json: apiEnvelope({ notificationId: 900 }) });
+          else
+            await route.fulfill({
+              json: apiEnvelope({ notificationId: '00000000-0000-4000-8000-000000000900' }),
+            });
           return true;
         }
         if (path === '/api/v1/notifications') {
@@ -286,16 +301,15 @@ test('guided notification validates the recipient and confirms a successful send
   const getSentBody = await installNotificationScenario(page, () => false);
   await page.goto('/notifications');
   await reachNotificationMessageStep(page);
-  await expect(page.getByRole('dialog').getByLabel(/canal/i).locator('option[value="email"]')).toHaveAttribute(
-    'disabled',
-    '',
-  );
+  await expect(
+    page.getByRole('dialog').getByLabel(/canal/i).locator('option[value="email"]'),
+  ).toHaveAttribute('disabled', '');
   await expect(page.getByText(/destinataire.*\+3.*78/i)).toBeVisible();
   await page.getByLabel(/message/i).fill('Votre passage approche.');
   await page.getByRole('button', { name: /envoyer la notification/i }).click();
   await expect(page.getByText(/notification mise en file/i)).toBeVisible();
   expect(getSentBody()).toEqual({
-    registrationId: 700,
+    registrationId: '00000000-0000-4000-8000-000000000700',
     channel: 'sms',
     content: 'Votre passage approche.',
   });

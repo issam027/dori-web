@@ -24,16 +24,16 @@ export function AppointmentsPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [view, setView] = useState<'week' | 'month'>('week');
   const [anchor, setAnchor] = useState(() => new Date());
-  const [queueId, setQueueId] = useState(0);
+  const [queueId, setQueueId] = useState('');
   const [editor, setEditor] = useState<{
     date: string;
     time?: string;
     person?: PersonResponseDto;
-    queueId?: number;
-    tierId?: number;
+    queueId?: string;
+    tierId?: string;
     startAtServiceStep?: boolean;
   } | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(() => new Set());
   const queues = useQueues({ siteId, isActive: true, usage: 'appointments' });
   const site = useSite(siteId);
@@ -54,10 +54,7 @@ export function AppointmentsPage() {
   );
   const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
   const availabilityQuery = useAvailabilityRange(selectedQueue?.queueId, dates);
-  const appointments = useMemo(
-    () => appointmentsQuery.data ?? [],
-    [appointmentsQuery.data],
-  );
+  const appointments = useMemo(() => appointmentsQuery.data ?? [], [appointmentsQuery.data]);
   const selected = useAppointment(selectedId);
   const personName = (appointment: RegistrationResponseDto) =>
     [appointment.firstName, appointment.lastName]
@@ -84,8 +81,7 @@ export function AppointmentsPage() {
     return map;
   }, [appointments, timeZone]);
 
-  const byDate = (date: string): RegistrationResponseDto[] =>
-    appointmentsByDate.get(date) ?? [];
+  const byDate = (date: string): RegistrationResponseDto[] => appointmentsByDate.get(date) ?? [];
   const availabilityByDate = new Map(
     (availabilityQuery.data?.data.days ?? []).map((day) => [day.businessDate, day]),
   );
@@ -139,7 +135,8 @@ export function AppointmentsPage() {
         description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
         actions={
           <div className="segmented">
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className={`button${view === 'week' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'week'}
@@ -149,7 +146,8 @@ export function AppointmentsPage() {
             >
               {__t('appointments.appointments.semaine')}
             </Button>
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className={`button${view === 'month' ? ' button-primary' : ''}`}
               type="button"
               aria-pressed={view === 'month'}
@@ -174,7 +172,7 @@ export function AppointmentsPage() {
               <strong>
                 {site.data?.data.siteName ??
                   __t('common.hashIdentifier', {
-                    value0: String(siteId),
+                    value0: siteId,
                   })}
               </strong>{' '}
               {__t('appointments.appointments.neGerePasLesRendezVous')}
@@ -187,9 +185,9 @@ export function AppointmentsPage() {
           <div className="calendar-toolbar">
             <select
               aria-label={__t('queues.singular')}
-              value={selectedQueue?.queueId ?? 0}
+              value={selectedQueue?.queueId ?? ''}
               onChange={(e) => {
-                setQueueId(Number(e.target.value));
+                setQueueId(e.target.value);
               }}
             >
               {availableQueues.map((queue) => (
@@ -198,7 +196,8 @@ export function AppointmentsPage() {
                 </option>
               ))}
             </select>
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -212,7 +211,8 @@ export function AppointmentsPage() {
                 ? displayedMonthLabel
                 : [dates[0], dates.at(-1)].filter(Boolean).join(' — ')}
             </strong>
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button"
               type="button"
               onClick={() => {
@@ -227,125 +227,134 @@ export function AppointmentsPage() {
               {dates.map((date) => {
                 const dayIsOpen = isOpen(date);
                 return (
-                <section key={date} className={`calendar-day${dayIsOpen ? '' : ' is-closed'}`}>
-                  <h2>
-                    <span className="calendar-day-name">{weekday(date)}</span>
-                    <span className="calendar-day-date">{date}</span>
-                  </h2>
-                  {!dayIsOpen ? (
-                    <div className="calendar-closed-day">
-                      <span>{__t('appointments.calendar.closed')}</span>
-                    </div>
-                  ) : hours.map((time) => {
-                    const isBreak = Boolean(
-                      selectedQueue?.breakStart &&
-                      selectedQueue.breakEnd &&
-                      time >= selectedQueue.breakStart.slice(0, 5) &&
-                      time < selectedQueue.breakEnd.slice(0, 5),
-                    );
-                    const slotAppointments = byDate(date).filter(
-                      (item) =>
-                        item.scheduledTime &&
-                        appointmentLocalParts(item.scheduledTime, timeZone).time.slice(0, 2) ===
-                          time.slice(0, 2),
-                    );
-                    const slotKey = `${date}_${time}`;
-                    const isExpanded = expandedSlots.has(slotKey);
-                    const visibleAppointments = isExpanded
-                      ? slotAppointments
-                      : slotAppointments.slice(0, 2);
-                    const hasMore = slotAppointments.length > 2;
+                  <section key={date} className={`calendar-day${dayIsOpen ? '' : ' is-closed'}`}>
+                    <h2>
+                      <span className="calendar-day-name">{weekday(date)}</span>
+                      <span className="calendar-day-date">{date}</span>
+                    </h2>
+                    {!dayIsOpen ? (
+                      <div className="calendar-closed-day">
+                        <span>{__t('appointments.calendar.closed')}</span>
+                      </div>
+                    ) : (
+                      hours.map((time) => {
+                        const isBreak = Boolean(
+                          selectedQueue?.breakStart &&
+                          selectedQueue.breakEnd &&
+                          time >= selectedQueue.breakStart.slice(0, 5) &&
+                          time < selectedQueue.breakEnd.slice(0, 5),
+                        );
+                        const slotAppointments = byDate(date).filter(
+                          (item) =>
+                            item.scheduledTime &&
+                            appointmentLocalParts(item.scheduledTime, timeZone).time.slice(0, 2) ===
+                              time.slice(0, 2),
+                        );
+                        const slotKey = `${date}_${time}`;
+                        const isExpanded = expandedSlots.has(slotKey);
+                        const visibleAppointments = isExpanded
+                          ? slotAppointments
+                          : slotAppointments.slice(0, 2);
+                        const hasMore = slotAppointments.length > 2;
 
-                    return (
-                      <div
-                        key={time}
-                        className={
-                          isBreak
-                            ? 'calendar-slot calendar-break'
-                            : slotAppointments.length
-                              ? 'calendar-slot'
-                              : 'calendar-slot calendar-slot-empty'
-                        }
-                        role={!isBreak ? 'button' : undefined}
-                        tabIndex={!isBreak ? 0 : undefined}
-                        onClick={() => {
-                          if (!isBreak) setEditor({ date, time });
-                        }}
-                        onKeyDown={(event) => {
-                          if (!isBreak && (event.key === 'Enter' || event.key === ' ')) {
-                            event.preventDefault();
-                            setEditor({ date, time });
-                          }
-                        }}
-                      >
-                        <div className="calendar-slot-header">
-                          <span className="calendar-slot-time">{time}</span>
-                          {slotAppointments.length > 0 && (
-                            <span className="calendar-slot-count">
-                              {slotAppointments.length}
-                            </span>
-                          )}
-                        </div>
-                        {isBreak ? (
-                          <em>{__t('appointments.appointments.pause')}</em>
-                        ) : slotAppointments.length ? (
-                          <>
-                            <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
-                              {visibleAppointments.map((item) => {
-                                const name = personName(item);
-                                const itemTime = item.scheduledTime
-                                  ? appointmentLocalParts(item.scheduledTime, timeZone).time
-                                  : time;
-                                const statusText = __t(appointmentStatusKey(item));
-                                return (
-                                  <Button variant="unstyled"
-                                    className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
-                                    key={item.registrationId}
+                        return (
+                          <div
+                            key={time}
+                            className={
+                              isBreak
+                                ? 'calendar-slot calendar-break'
+                                : slotAppointments.length
+                                  ? 'calendar-slot'
+                                  : 'calendar-slot calendar-slot-empty'
+                            }
+                            role={!isBreak ? 'button' : undefined}
+                            tabIndex={!isBreak ? 0 : undefined}
+                            onClick={() => {
+                              if (!isBreak) setEditor({ date, time });
+                            }}
+                            onKeyDown={(event) => {
+                              if (!isBreak && (event.key === 'Enter' || event.key === ' ')) {
+                                event.preventDefault();
+                                setEditor({ date, time });
+                              }
+                            }}
+                          >
+                            <div className="calendar-slot-header">
+                              <span className="calendar-slot-time">{time}</span>
+                              {slotAppointments.length > 0 && (
+                                <span className="calendar-slot-count">
+                                  {slotAppointments.length}
+                                </span>
+                              )}
+                            </div>
+                            {isBreak ? (
+                              <em>{__t('appointments.appointments.pause')}</em>
+                            ) : slotAppointments.length ? (
+                              <>
+                                <div
+                                  className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}
+                                >
+                                  {visibleAppointments.map((item) => {
+                                    const name = personName(item);
+                                    const itemTime = item.scheduledTime
+                                      ? appointmentLocalParts(item.scheduledTime, timeZone).time
+                                      : time;
+                                    const statusText = __t(appointmentStatusKey(item));
+                                    return (
+                                      <Button
+                                        variant="unstyled"
+                                        className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
+                                        key={item.registrationId}
+                                        type="button"
+                                        title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          setSelectedId(item.registrationId);
+                                        }}
+                                      >
+                                        <span
+                                          className="appointment-status-dot"
+                                          aria-hidden="true"
+                                        />
+                                        <span className="appointment-event-name">{name}</span>
+                                      </Button>
+                                    );
+                                  })}
+                                </div>
+                                {hasMore && (
+                                  <Button
+                                    variant="unstyled"
                                     type="button"
-                                    title={`${name} (${itemTime}) · ${statusText}${item.tierName ? ` · ${item.tierName}` : ''}`}
+                                    className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
                                     onClick={(event) => {
                                       event.stopPropagation();
-                                      setSelectedId(item.registrationId);
+                                      toggleSlot(slotKey);
                                     }}
                                   >
-                                    <span className="appointment-status-dot" aria-hidden="true" />
-                                    <span className="appointment-event-name">{name}</span>
+                                    {isExpanded ? (
+                                      <>
+                                        <span>{__t('appointments.calendar.collapse')}</span>
+                                        <span aria-hidden="true">▴</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span>
+                                          {__t('appointments.calendar.moreCount', {
+                                            count: slotAppointments.length - 2,
+                                          })}
+                                        </span>
+                                        <span aria-hidden="true">▾</span>
+                                      </>
+                                    )}
                                   </Button>
-                                );
-                              })}
-                            </div>
-                            {hasMore && (
-                              <Button variant="unstyled"
-                                type="button"
-                                className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleSlot(slotKey);
-                                }}
-                              >
-                                {isExpanded ? (
-                                  <>
-                                    <span>{__t('appointments.calendar.collapse')}</span>
-                                    <span aria-hidden="true">▴</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span>
-                                      {__t('appointments.calendar.moreCount', {
-                                        count: slotAppointments.length - 2,
-                                      })}
-                                    </span>
-                                    <span aria-hidden="true">▾</span>
-                                  </>
                                 )}
-                              </Button>
-                            )}
-                          </>
-                        ) : null}
-                      </div>
-                    );
-                  })}
-                </section>
+                              </>
+                            ) : null}
+                          </div>
+                        );
+                      })
+                    )}
+                  </section>
                 );
               })}
             </div>
@@ -376,27 +385,35 @@ export function AppointmentsPage() {
                       if (dayIsOpen) setEditor({ date });
                     }}
                     onKeyDown={(event) => {
-                      if (dayIsOpen && (event.key === 'Enter' || event.key === ' ')) setEditor({ date });
+                      if (dayIsOpen && (event.key === 'Enter' || event.key === ' '))
+                        setEditor({ date });
                     }}
                   >
                     <div className="month-day-header">
-                      {dayIsOpen ? <Button variant="unstyled"
-                        className="calendar-date-button"
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setEditor({ date });
-                        }}
-                      >
+                      {dayIsOpen ? (
+                        <Button
+                          variant="unstyled"
+                          className="calendar-date-button"
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setEditor({ date });
+                          }}
+                        >
+                          <strong>{date.slice(-2)}</strong>
+                        </Button>
+                      ) : (
                         <strong>{date.slice(-2)}</strong>
-                      </Button> : <strong>{date.slice(-2)}</strong>}
+                      )}
                       {dayAppointments.length > 0 && (
-                        <span className="calendar-slot-count">
-                          {dayAppointments.length}
-                        </span>
+                        <span className="calendar-slot-count">{dayAppointments.length}</span>
                       )}
                     </div>
-                    {!dayIsOpen ? <span className="calendar-closed-label">{__t('appointments.calendar.closed')}</span> : null}
+                    {!dayIsOpen ? (
+                      <span className="calendar-closed-label">
+                        {__t('appointments.calendar.closed')}
+                      </span>
+                    ) : null}
                     <div className={`calendar-slot-events${isExpanded ? ' is-expanded' : ''}`}>
                       {visibleAppointments.map((item) => {
                         const name = personName(item);
@@ -405,7 +422,8 @@ export function AppointmentsPage() {
                           : '—';
                         const statusText = __t(appointmentStatusKey(item));
                         return (
-                          <Button variant="unstyled"
+                          <Button
+                            variant="unstyled"
                             className={`calendar-event-button ${serviceTierVisualClass(item.tierId, item.tierName)} appointment-status-${appointmentVisualStatus(item)}`}
                             key={item.registrationId}
                             type="button"
@@ -425,7 +443,8 @@ export function AppointmentsPage() {
                       })}
                     </div>
                     {hasMore && (
-                      <Button variant="unstyled"
+                      <Button
+                        variant="unstyled"
                         type="button"
                         className={`calendar-slot-more${isExpanded ? ' is-expanded' : ''}`}
                         onClick={(event) => {

@@ -22,13 +22,13 @@ export interface OnboardingDraft {
   draftVersion: number;
   step: number;
   site: CreateSiteDto;
-  confirmedSiteId?: number;
+  confirmedSiteId?: string;
   queues: CreateQueueDto[];
-  confirmedQueueIds: Record<string, number>;
-  selectedTierIds: Record<string, number[]>;
+  confirmedQueueIds: Record<string, string>;
+  selectedTierIds: Record<string, string[]>;
   tierConfigurations: Record<string, Record<string, OnboardingTierConfiguration>>;
-  associatedTierQueueIds: number[];
-  completedUserIds: number[];
+  associatedTierQueueIds: string[];
+  completedUserIds: string[];
   testValidated: boolean;
 }
 

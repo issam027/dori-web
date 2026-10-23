@@ -11,16 +11,16 @@ import {
 } from '@/api/generated/persons/persons';
 
 export const findPersonNotes = (
-  personId: number,
+  personId: string,
   params: PersonsControllerGetNotesParams,
   signal?: AbortSignal,
 ) => personsControllerGetNotes(personId, params, undefined, signal);
 
-export const createPersonNote = (personId: number, dto: CreatePersonNoteDto) =>
+export const createPersonNote = (personId: string, dto: CreatePersonNoteDto) =>
   personsControllerCreateNote(personId, dto);
 
-export const updatePersonNote = (personId: number, noteId: number, dto: UpdatePersonNoteDto) =>
+export const updatePersonNote = (personId: string, noteId: string, dto: UpdatePersonNoteDto) =>
   personsControllerUpdateNote(personId, noteId, dto);
 
-export const deletePersonNote = (personId: number, noteId: number) =>
+export const deletePersonNote = (personId: string, noteId: string) =>
   personsControllerDeleteNote(personId, noteId);

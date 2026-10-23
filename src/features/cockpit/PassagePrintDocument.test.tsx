@@ -8,7 +8,7 @@ describe('PassagePrintDocument', () => {
       <PassagePrintDocument
         site={{ siteName: 'Centre DORIFY Lyon', timezone: 'Europe/Paris' }}
         passage={{
-          registrationId: 42,
+          registrationId: '00000000-0000-4000-8000-000000000042',
           ticketNumber: 'A0042',
           personName: 'Marie Dupont',
           arrivedAt: '2026-10-10T08:15:00Z',
@@ -27,7 +27,9 @@ describe('PassagePrintDocument', () => {
     expect(screen.getByText('Dupont')).toBeInTheDocument();
     expect(screen.getByText('A0042')).toBeInTheDocument();
     expect(screen.getByText('Centre DORIFY Lyon')).toBeInTheDocument();
-    expect(screen.getByText('DORIFY-PASSAGE-42', { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText('DORIFY-PASSAGE-00000000-0000-4000-8000-000000000042', { exact: false }),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Signature du responsable/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText('Justificatif de passage dans un établissement'),
@@ -40,7 +42,7 @@ describe('PassagePrintDocument', () => {
       <PassagePrintDocument
         site={{ siteName: 'Accueil municipal', timezone: 'Europe/Paris' }}
         passage={{
-          registrationId: 7,
+          registrationId: '00000000-0000-4000-8000-000000000007',
           ticketNumber: 'B0007',
           personName: '',
           calledAt: '2026-10-10T08:30:00Z',
@@ -53,7 +55,9 @@ describe('PassagePrintDocument', () => {
 
     expect(screen.getAllByText(/Non enregistrée/i).length).toBeGreaterThanOrEqual(2);
     expect(screen.queryByText(/^N° 0$/)).not.toBeInTheDocument();
-    expect(screen.getByText(/DORIFY-PASSAGE-7/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/DORIFY-PASSAGE-00000000-0000-4000-8000-000000000007/),
+    ).toBeInTheDocument();
   });
 
   it('conserve les textes longs dans les blocs de l’attestation', () => {
@@ -67,7 +71,7 @@ describe('PassagePrintDocument', () => {
           siteLocation: 'Bâtiment principal, aile des services aux usagers',
         }}
         passage={{
-          registrationId: 88,
+          registrationId: '00000000-0000-4000-8000-000000000088',
           ticketNumber: 'LONG0088',
           personName: `Anne-Marie ${longLastName}`,
           firstName: 'Anne-Marie',

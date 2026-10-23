@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { EntityPicker } from './EntityPicker';
 
 const entities = [
-  { id: 1, name: 'Alice' },
-  { id: 2, name: 'Bob' },
+  { id: '00000000-0000-4000-8000-000000000001', name: 'Alice' },
+  { id: '00000000-0000-4000-8000-000000000002', name: 'Bob' },
 ];
 
 it('exposes selection through listbox semantics and selects an entity', async () => {
@@ -12,7 +12,7 @@ it('exposes selection through listbox semantics and selects an entity', async ()
   render(
     <EntityPicker
       entities={entities}
-      selectedKey={1}
+      selectedKey="00000000-0000-4000-8000-000000000001"
       getKey={(entity) => entity.id}
       render={(entity) => entity.name}
       onSelect={onSelect}

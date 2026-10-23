@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { NotificationMobileCard } from './NotificationMobileCard';
 
 const notification = {
-  notificationId: 4,
-  registrationId: 12,
+  notificationId: '00000000-0000-4000-8000-000000000004',
+  registrationId: '00000000-0000-4000-8000-000000000012',
   ticketNumber: 'A-012',
   channel: 'sms' as const,
   notificationType: 'threshold' as const,

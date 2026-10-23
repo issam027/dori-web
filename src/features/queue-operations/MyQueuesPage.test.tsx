@@ -7,7 +7,12 @@ const useWaitingRegistrations = vi.fn<(options: unknown) => unknown>();
 vi.mock('@/features/queues/hooks/useQueues', () => ({
   useQueues: () => ({
     isSuccess: true,
-    data: { data: { total: 1, items: [{ queueId: 10, queueName: 'Accueil' }] } },
+    data: {
+      data: {
+        total: 1,
+        items: [{ queueId: '00000000-0000-4000-8000-000000000010', queueName: 'Accueil' }],
+      },
+    },
   }),
 }));
 
@@ -45,15 +50,15 @@ it('provides a mobile card with the primary registration actions', () => {
         totalPages: 1,
         items: [
           {
-            registrationId: 42,
-            personId: 7,
-            queueId: 10,
+            registrationId: '00000000-0000-4000-8000-000000000042',
+            personId: '00000000-0000-4000-8000-000000000007',
+            queueId: '00000000-0000-4000-8000-000000000010',
             firstName: 'Ada',
             lastName: 'Lovelace',
             ticketNumber: 'A-042',
             entryType: 'walk_in',
             status: 'waiting',
-            tierId: 1,
+            tierId: '00000000-0000-4000-8000-000000000001',
             tierName: 'Standard',
             activeNoteCount: 2,
           },

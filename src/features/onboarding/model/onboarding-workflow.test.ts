@@ -20,8 +20,14 @@ describe('onboarding workflow', () => {
     const firstQueue = draft.queues[0];
     expect(firstQueue).toBeDefined();
     if (!firstQueue) throw new Error('Fixture queue is missing');
-    const afterFirstCreation = recordCreatedQueue(draft, firstQueue, 41);
-    expect(afterFirstCreation.confirmedQueueIds).toEqual({ ACC: 41 });
+    const afterFirstCreation = recordCreatedQueue(
+      draft,
+      firstQueue,
+      '00000000-0000-4000-8000-000000000041',
+    );
+    expect(afterFirstCreation.confirmedQueueIds).toEqual({
+      ACC: '00000000-0000-4000-8000-000000000041',
+    });
     expect(afterFirstCreation.confirmedQueueIds.LAB).toBeUndefined();
   });
 
@@ -29,20 +35,34 @@ describe('onboarding workflow', () => {
     const draft = {
       ...structuredClone(initialOnboardingDraft),
       step: 4,
-      confirmedQueueIds: { ACC: 41, LAB: 42 },
-      selectedTierIds: { '41': [1] },
+      confirmedQueueIds: {
+        ACC: '00000000-0000-4000-8000-000000000041',
+        LAB: '00000000-0000-4000-8000-000000000042',
+      },
+      selectedTierIds: {
+        '00000000-0000-4000-8000-000000000041': ['00000000-0000-4000-8000-000000000001'],
+      },
     };
     expect(canAdvanceOnboarding(draft, 3)).toBe(false);
-    expect(canAdvanceOnboarding({ ...draft, selectedTierIds: { '41': [1], '42': [2] } }, 3)).toBe(
-      true,
-    );
+    expect(
+      canAdvanceOnboarding(
+        {
+          ...draft,
+          selectedTierIds: {
+            '00000000-0000-4000-8000-000000000041': ['00000000-0000-4000-8000-000000000001'],
+            '00000000-0000-4000-8000-000000000042': ['00000000-0000-4000-8000-000000000002'],
+          },
+        },
+        3,
+      ),
+    ).toBe(true);
   });
 
   it('resets the complete wizard state after activation', () => {
     const draft = {
       ...structuredClone(initialOnboardingDraft),
       step: 6,
-      confirmedSiteId: 18,
+      confirmedSiteId: '00000000-0000-4000-8000-000000000018',
       site: { ...initialOnboardingDraft.site, siteName: 'Centre Nord' },
     };
     const result = completeSiteActivation(draft);

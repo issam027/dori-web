@@ -18,8 +18,8 @@ export function Topbar({
   refreshing,
   onOpenNavigation,
 }: {
-  sites: readonly { id: number; name: string }[];
-  activeSiteId: number | null;
+  sites: readonly { id: string; name: string }[];
+  activeSiteId: string | null;
   pageHeaderVisible: boolean;
   onLogout: () => void;
   onOpenCommands: () => void;

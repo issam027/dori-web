@@ -4,5 +4,5 @@ import { queuesControllerFindAll, queuesControllerGetStatus } from '@/api/genera
 export const findQueues = (params: QueuesControllerFindAllParams, signal?: AbortSignal) =>
   queuesControllerFindAll(params, undefined, signal);
 
-export const findQueueStatus = (queueId: number, signal?: AbortSignal) =>
+export const findQueueStatus = (queueId: string, signal?: AbortSignal) =>
   queuesControllerGetStatus(queueId, undefined, signal);

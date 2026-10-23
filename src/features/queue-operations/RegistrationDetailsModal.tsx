@@ -19,7 +19,7 @@ export function RegistrationDetailsModal({
   open,
   onOpenChange,
 }: {
-  registrationId: number | null;
+  registrationId: string | null;
   queueName?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -61,7 +61,7 @@ export function RegistrationDetailsModal({
               <strong>{safeText(item.ticketNumber)}</strong>
               <span>
                 {queueName ??
-                  t('queues.registrationDetails.queueFallback', { id: String(item.queueId) })}
+                  t('queues.registrationDetails.queueFallback', { id: item.queueId })}
               </span>
             </div>
             <div className="registration-detail-qr">
@@ -108,7 +108,7 @@ export function RegistrationDetailsModal({
               <Detail
                 icon={<Hash />}
                 label={t('common.identifier')}
-                value={String(item.registrationId)}
+                value={item.registrationId}
               />
               <Detail
                 icon={<CalendarDays />}
@@ -137,7 +137,7 @@ export function RegistrationDetailsModal({
                   <span
                     className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
                   >
-                    {item.tierName ?? `#${String(item.tierId)}`}
+                    {item.tierName ?? `#${item.tierId}`}
                   </span>
                 }
               />

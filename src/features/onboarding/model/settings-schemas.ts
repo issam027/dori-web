@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const tierAssociationSchema = z.object({
-  queueId: z.number().int().positive(),
-  tierId: z.number().int().positive(),
+  queueId: z.uuid(),
+  tierId: z.uuid(),
   price: z.number().min(0),
   currency: z.union([z.literal(''), z.string().length(3)]),
   order: z.number().int().min(0),
@@ -11,8 +11,8 @@ export const tierAssociationSchema = z.object({
 
 export const notificationRuleSchema = z
   .object({
-    queueId: z.number().int().positive(),
-    tierId: z.number().int().positive(),
+    queueId: z.uuid(),
+    tierId: z.uuid(),
     type: z.enum(['welcome', 'threshold']),
     channel: z.enum(['sms', 'email']),
     threshold: z.enum(['position', 'estimatedTime']),

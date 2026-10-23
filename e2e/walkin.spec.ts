@@ -38,12 +38,12 @@ test('known-person search starts at three characters and exposes five-result pag
       await route.fulfill({
         json: apiEnvelope(
           buildRegistration({
-            personId: 20,
+            personId: '00000000-0000-4000-8000-000000000020',
             registrationTrackingToken: 'known-person-e2e',
             businessDate: '2026-10-09',
             createdAt: '2026-10-09T10:00:00Z',
             updatedAt: '2026-10-09T10:00:00Z',
-            tierId: 1,
+            tierId: '00000000-0000-4000-8000-000000000001',
           }),
         ),
       });
@@ -53,22 +53,20 @@ test('known-person search starts at three characters and exposes five-result pag
     searches.push(url);
     const currentPage = Number(url.searchParams.get('page')) || 1;
     await route.fulfill({
-      json: apiEnvelope(
-        {
-          ...paginated(
-            Array.from({ length: currentPage === 1 ? 5 : 1 }, (_, index) =>
+      json: apiEnvelope({
+        ...paginated(
+          Array.from({ length: currentPage === 1 ? 5 : 1 }, (_, index) =>
             buildPerson({
-              personId: currentPage * 10 + index,
+              personId: `00000000-0000-4000-8000-${String(currentPage * 10 + index).padStart(12, '0')}`,
               firstName: `Personne${String(index + 1)}`,
             }),
-            ),
-            currentPage,
-            5,
           ),
-          total: 6,
-          totalPages: 2,
-        },
-      ),
+          currentPage,
+          5,
+        ),
+        total: 6,
+        totalPages: 2,
+      }),
     });
     return true;
   };
@@ -84,7 +82,7 @@ test('known-person search starts at three characters and exposes five-result pag
   await expect.poll(() => searches.length).toBe(0);
   await search.fill('mar');
   await expect.poll(() => searches.length).toBe(1);
-  expect(searches[0]?.searchParams.get('siteId')).toBe('1');
+  expect(searches[0]?.searchParams.get('siteId')).toBe('00000000-0000-4000-8000-000000000001');
   expect(searches[0]?.searchParams.get('pageSize')).toBe('5');
   await expect(page.getByRole('option')).toHaveCount(5);
   await page.getByRole('button', { name: /suivant/i }).click();
@@ -94,7 +92,11 @@ test('known-person search starts at three characters and exposes five-result pag
   await reachTicketConfirmation(page);
   await page.getByRole('button', { name: /créer le ticket/i }).click();
   await expect(page.getByRole('status').getByText('E001', { exact: true })).toBeVisible();
-  expect(registrationBody).toMatchObject({ personId: 20, queueId: 10, tierId: 1 });
+  expect(registrationBody).toMatchObject({
+    personId: '00000000-0000-4000-8000-000000000020',
+    queueId: '00000000-0000-4000-8000-000000000010',
+    tierId: '00000000-0000-4000-8000-000000000001',
+  });
 });
 
 test('new-person walk-in sends every identity field once and refreshes operational data', async ({
@@ -104,8 +106,7 @@ test('new-person walk-in sends every identity field once and refreshes operation
   let registrationBody: Record<string, unknown> = {};
   let statusRefreshes = 0;
   const register: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && /^\/api\/v1\/queues\/\d+\/status$/.test(path))
-      statusRefreshes += 1;
+    if (method === 'GET' && /^\/api\/v1\/queues\/[^/]+\/status$/.test(path)) statusRefreshes += 1;
     if (method !== 'POST' || path !== '/api/v1/registrations') return false;
     registrationCalls += 1;
     registrationBody = route.request().postDataJSON() as Record<string, unknown>;
@@ -117,7 +118,7 @@ test('new-person walk-in sends every identity field once and refreshes operation
           businessDate: '2026-10-09',
           createdAt: '2026-10-09T10:00:00Z',
           updatedAt: '2026-10-09T10:00:00Z',
-          tierId: 1,
+          tierId: '00000000-0000-4000-8000-000000000001',
         }),
       ),
     });
@@ -144,8 +145,8 @@ test('new-person walk-in sends every identity field once and refreshes operation
   await expect(page.getByRole('status').getByText('E001', { exact: true })).toBeVisible();
   expect(registrationCalls).toBe(1);
   expect(registrationBody).toMatchObject({
-    queueId: 10,
-    tierId: 1,
+    queueId: '00000000-0000-4000-8000-000000000010',
+    tierId: '00000000-0000-4000-8000-000000000001',
     entryType: 'walkin',
     person: {
       lastName: 'Martin',

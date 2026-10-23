@@ -73,7 +73,7 @@ export async function expireSession(queryClient: QueryClient): Promise<void> {
 
 export async function changeActiveSite(
   queryClient: QueryClient,
-  siteId: number,
+  siteId: string,
   scope: UserScopeDto,
 ): Promise<void> {
   const previousSiteId = useScopeStore.getState().activeSiteId;

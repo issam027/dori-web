@@ -4,13 +4,13 @@ import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
 import { ActiveCallCard, QueueDeskCard } from './CockpitCards';
 
 const activeCall: CallNextRegistrationResponseDto = {
-  registrationId: 1,
+  registrationId: '00000000-0000-4000-8000-000000000001',
   ticketNumber: 'A001',
   entryType: 'walkin',
   calledEarly: false,
   tier: {},
   status: 'called',
-  sessionId: 4,
+  sessionId: '00000000-0000-4000-8000-000000000004',
   threadNumber: 2,
   priorityScore: 0,
   calledAt: new Date().toISOString(),
@@ -45,8 +45,12 @@ describe('desk cockpit cards', () => {
     const onCallNext = vi.fn();
     const { container } = render(
       <QueueDeskCard
-        queue={{ queueId: 1, queueName: 'Accueil' }}
-        session={{ sessionId: 4, threadNumber: 1, counterName: 'Bureau A' }}
+        queue={{ queueId: '00000000-0000-4000-8000-000000000001', queueName: 'Accueil' }}
+        session={{
+          sessionId: '00000000-0000-4000-8000-000000000004',
+          threadNumber: 1,
+          counterName: 'Bureau A',
+        }}
         active
         waitingCount={2}
         estimatedWaitMinutes={6}

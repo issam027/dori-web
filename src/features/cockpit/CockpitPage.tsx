@@ -36,11 +36,11 @@ export function CockpitPage() {
   const site = useSite(siteId);
   const activeCalls = useOperationStore((state) => state.activeCalls);
   const [historyStatus, setHistoryStatus] = useState<'served' | 'no_show'>('served');
-  const [pendingQueueIds, setPendingQueueIds] = useState<ReadonlySet<number>>(new Set());
+  const [pendingQueueIds, setPendingQueueIds] = useState<ReadonlySet<string>>(new Set());
   const [error, setError] = useState('');
-  const [notesPersonId, setNotesPersonId] = useState<number>();
+  const [notesPersonId, setNotesPersonId] = useState<string>();
   const [deskToOpen, setDeskToOpen] = useState<{
-    queueId: number;
+    queueId: string;
     queueName: string;
     occupiedThread?: number;
   }>();
@@ -92,7 +92,7 @@ export function CockpitPage() {
         calledEarly: false,
         tier: { tierId: data.tierId },
         status: data.status,
-        sessionId: data.servedBySessionId ?? session?.sessionId ?? 0,
+        sessionId: data.servedBySessionId ?? session?.sessionId ?? '',
         threadNumber: session?.threadNumber ?? 0,
         priorityScore: 0,
         calledAt: data.updatedAt,
@@ -102,7 +102,7 @@ export function CockpitPage() {
   }, [activeCalls, currentRegistrations.data, sessions]);
 
   const refresh = () => invalidateQueueOperations(queryClient);
-  const execute = async (queueId: number, command: () => Promise<void>) => {
+  const execute = async (queueId: string, command: () => Promise<void>) => {
     setPendingQueueIds((current) => new Set(current).add(queueId));
     setError('');
     try {
@@ -124,7 +124,7 @@ export function CockpitPage() {
     }
   };
   const finishCall = (
-    queueId: number,
+    queueId: string,
     outcome: 'served' | 'no_show',
     registration: Parameters<React.ComponentProps<typeof QueueDeskCard>['onFinishCall']>[1],
     personName: string,
@@ -156,14 +156,14 @@ export function CockpitPage() {
       await refresh();
     });
   };
-  const releaseDesk = (queueId: number, sessionId: number, queueName: string) =>
+  const releaseDesk = (queueId: string, sessionId: string, queueName: string) =>
     void execute(queueId, async () => {
       await closeSession.execute({ queueId, sessionId });
       notify({ tone: 'success', title: t('notifications.desk.released'), message: queueName });
       await refresh();
     });
   const occupyDesk = (
-    queueId: number,
+    queueId: string,
     queueName: string,
     counterNameValue: string,
     occupiedThread?: number,
@@ -175,7 +175,7 @@ export function CockpitPage() {
     openDesk(queueId, queueName, counterNameValue, occupiedThread, false);
   };
   const openDesk = (
-    queueId: number,
+    queueId: string,
     queueName: string,
     counterNameValue: string,
     occupiedThread: number | undefined,
@@ -201,7 +201,7 @@ export function CockpitPage() {
       await refresh();
     });
   };
-  const callFromQueue = (queueId: number, queueName: string) =>
+  const callFromQueue = (queueId: string, queueName: string) =>
     void execute(queueId, async () => {
       const outcome = await callNext.execute(queueId);
       notify(

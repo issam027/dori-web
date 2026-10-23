@@ -8,10 +8,12 @@ describe('serviceTierVisualClass', () => {
     ['STANDARD', 'service-tier-standard'],
     ['Premium', 'service-tier-premium'],
   ])('associe %s à une couleur métier stable', (label, expected) => {
-    expect(serviceTierVisualClass(1, label)).toBe(expected);
+    expect(serviceTierVisualClass('00000000-0000-4000-8000-000000000001', label)).toBe(expected);
   });
 
   it('conserve une couleur de repli stable pour les forfaits personnalisés', () => {
-    expect(serviceTierVisualClass(4, 'VIP')).toBe('appointment-tier-3');
+    expect(serviceTierVisualClass('00000000-0000-4000-8000-000000000004', 'VIP')).toBe(
+      'appointment-tier-2',
+    );
   });
 });

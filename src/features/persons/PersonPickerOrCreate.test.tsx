@@ -13,7 +13,11 @@ function renderPicker() {
     const [choice, setChoice] = useState<PersonChoice | null>(null);
     return (
       <>
-        <PersonPickerOrCreate siteId={17} value={choice} onChange={setChoice} />
+        <PersonPickerOrCreate
+          siteId={'00000000-0000-4000-8000-000000000017'}
+          value={choice}
+          onChange={setChoice}
+        />
         <button type="button" disabled={!choice}>
           Suivant
         </button>
@@ -45,7 +49,7 @@ it('searches automatically from the third character with the active site and fiv
   await waitFor(() => {
     expect(requests).toHaveLength(1);
   });
-  expect(requests[0]?.searchParams.get('siteId')).toBe('17');
+  expect(requests[0]?.searchParams.get('siteId')).toBe('00000000-0000-4000-8000-000000000017');
   expect(requests[0]?.searchParams.get('search')).toBe('abc');
   expect(requests[0]?.searchParams.get('pageSize')).toBe('5');
 });

@@ -24,7 +24,7 @@ export function NotificationMobileCard({
   const { t } = useTranslation();
   return (
     <DataTableMobileCard
-      title={notification.ticketNumber ?? `#${String(notification.registrationId)}`}
+      title={notification.ticketNumber ?? `#${notification.registrationId}`}
       subtitle={createdAt}
       badge={
         <StatusBadge tone={notificationStatusTone(notification.notificationStatus)}>

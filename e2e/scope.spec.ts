@@ -8,7 +8,10 @@ import {
 } from './support/scenario-fixtures';
 
 const alpha = buildSite();
-const beta = buildSite({ siteId: 2, siteName: 'Site E2E Beta' });
+const beta = buildSite({
+  siteId: '00000000-0000-4000-8000-000000000002',
+  siteName: 'Site E2E Beta',
+});
 
 test('a multi-site user without an active site is guided to the portfolio', async ({ page }) => {
   await installApiScenario(page, { profile: 'root', sites: [alpha, beta] });
@@ -25,9 +28,13 @@ test('a single authorized site is activated automatically and portfolio is hidde
   await installApiScenario(page, { profile: 'operator', sites: [alpha] });
   await page.goto('/desk');
 
-  await expect(page.getByRole('banner').getByText('Site E2E Alpha')).toBeVisible();
+  await expect(
+    page.getByRole('banner').getByRole('heading', { name: 'Site E2E Alpha' }),
+  ).toBeVisible();
   await expect(page.getByRole('link', { name: /portefeuille de sites/i })).toHaveCount(0);
-  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId'))).toBe('1');
+  await expect
+    .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+    .toBe('00000000-0000-4000-8000-000000000001');
 });
 
 test('changing site from the portfolio refreshes scoped data and the persistent topbar', async ({
@@ -40,7 +47,7 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
   };
   await page.addInitScript(() => {
     if (sessionStorage.getItem('dori.activeSiteId') === null) {
-      sessionStorage.setItem('dori.activeSiteId', '1');
+      sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
     }
   });
   await installApiScenario(page, {
@@ -50,7 +57,9 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
   });
 
   await page.goto('/desk');
-  await expect(page.getByRole('banner').getByText('Site E2E Alpha')).toBeVisible();
+  await expect(
+    page.getByRole('banner').getByRole('heading', { name: 'Site E2E Alpha' }),
+  ).toBeVisible();
   await activateSite(page, 'Site E2E Beta');
   for (const path of [
     '/desk',
@@ -66,24 +75,30 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
     '/portfolio',
   ]) {
     await page.goto(path);
-    await expect(page.getByRole('banner').getByText('Site E2E Beta')).toBeVisible();
+    await expect(
+      page.getByRole('banner').getByRole('heading', { name: 'Site E2E Beta' }),
+    ).toBeVisible();
   }
-  expect(queueSiteIds).toContain('1');
-  expect(queueSiteIds).toContain('2');
+  expect(queueSiteIds).toContain('00000000-0000-4000-8000-000000000001');
+  expect(queueSiteIds).toContain('00000000-0000-4000-8000-000000000002');
 });
 
 test('a stored site outside the authenticated scope is discarded', async ({ page }) => {
   await page.addInitScript(() => {
     if (sessionStorage.getItem('dori.activeSiteId') === null) {
-      sessionStorage.setItem('dori.activeSiteId', '999');
+      sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000999');
     }
   });
   await installApiScenario(page, { profile: 'operator', sites: [alpha] });
   await page.goto('/desk');
 
-  await expect(page.getByRole('banner').getByText('Site E2E Alpha')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId'))).toBe('1');
-  await expect(page.locator('body')).not.toContainText('999');
+  await expect(
+    page.getByRole('banner').getByRole('heading', { name: 'Site E2E Alpha' }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+    .toBe('00000000-0000-4000-8000-000000000001');
+  await expect(page.locator('body')).not.toContainText('00000000-0000-4000-8000-000000000999');
 });
 
 const routeMatrix: Array<{

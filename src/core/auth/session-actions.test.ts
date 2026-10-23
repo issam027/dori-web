@@ -31,13 +31,17 @@ describe('hydrateSession', () => {
           translationKey: null,
           translationParams: {},
           data: {
-            userId: 7,
+            userId: '00000000-0000-4000-8000-000000000007',
             username: 'sarah',
             userType: 'human',
             roles: ['operator'],
             permissions: ['queue_view'],
             mustChangePassword: false,
-            scope: { isGlobal: false, siteIds: [12], queueIds: [25] },
+            scope: {
+              isGlobal: false,
+              siteIds: ['00000000-0000-4000-8000-000000000012'],
+              queueIds: ['00000000-0000-4000-8000-000000000025'],
+            },
           },
         }),
       ),
@@ -47,9 +51,9 @@ describe('hydrateSession', () => {
 
     expect(useSessionStore.getState()).toMatchObject({
       status: 'authenticated',
-      user: { userId: 7, permissions: ['queue_view'] },
+      user: { userId: '00000000-0000-4000-8000-000000000007', permissions: ['queue_view'] },
     });
-    expect(useScopeStore.getState().activeSiteId).toBe(12);
+    expect(useScopeStore.getState().activeSiteId).toBe('00000000-0000-4000-8000-000000000012');
   });
 
   it('logs in, keeps only the remembered username locally and hydrates /auth/me', async () => {
@@ -65,7 +69,7 @@ describe('hydrateSession', () => {
             accessToken: 'access-token',
             refreshToken: 'server-cookie-token',
             user: {
-              userId: 7,
+              userId: '00000000-0000-4000-8000-000000000007',
               username: 'sarah',
               userType: 'human',
               roles: [],
@@ -81,13 +85,17 @@ describe('hydrateSession', () => {
           translationKey: null,
           translationParams: {},
           data: {
-            userId: 7,
+            userId: '00000000-0000-4000-8000-000000000007',
             username: 'sarah',
             userType: 'human',
             roles: [],
             permissions: ['queue_view'],
             mustChangePassword: false,
-            scope: { isGlobal: false, siteIds: [12], queueIds: [] },
+            scope: {
+              isGlobal: false,
+              siteIds: ['00000000-0000-4000-8000-000000000012'],
+              queueIds: [],
+            },
           },
         }),
       ),
@@ -115,7 +123,7 @@ describe('hydrateSession', () => {
     const queryClient = new QueryClient();
     queryClient.setQueryData(['sites'], ['cached']);
     useSessionStore.getState().authenticate({
-      userId: 1,
+      userId: '00000000-0000-4000-8000-000000000001',
       username: 'u',
       userType: 'human',
       roles: [],
@@ -143,18 +151,22 @@ describe('hydrateSession', () => {
     const queryClient = new QueryClient();
     queryClient.setQueryData(['private'], { secret: true });
     useSessionStore.getState().authenticate({
-      userId: 1,
+      userId: '00000000-0000-4000-8000-000000000001',
       username: 'operator',
       userType: 'human',
       roles: [],
       permissions: ['queue_view'],
       mustChangePassword: false,
-      scope: { isGlobal: false, siteIds: [12], queueIds: [25] },
+      scope: {
+        isGlobal: false,
+        siteIds: ['00000000-0000-4000-8000-000000000012'],
+        queueIds: ['00000000-0000-4000-8000-000000000025'],
+      },
     });
-    useScopeStore.getState().setActiveSite(12, {
+    useScopeStore.getState().setActiveSite('00000000-0000-4000-8000-000000000012', {
       isGlobal: false,
-      siteIds: [12],
-      queueIds: [25],
+      siteIds: ['00000000-0000-4000-8000-000000000012'],
+      queueIds: ['00000000-0000-4000-8000-000000000025'],
     });
     useBrandStore.setState({ name: 'Private site', logoUrl: 'https://invalid.test/logo.svg' });
     setAccessToken('expired-token');
@@ -183,15 +195,19 @@ describe('hydrateSession', () => {
 });
 
 describe('changeActiveSite cockpit preservation', () => {
-  const scope = { isGlobal: false, siteIds: [12, 13], queueIds: [25] };
+  const scope = {
+    isGlobal: false,
+    siteIds: ['00000000-0000-4000-8000-000000000012', '00000000-0000-4000-8000-000000000013'],
+    queueIds: ['00000000-0000-4000-8000-000000000025'],
+  };
   const activeCall = {
-    registrationId: 9,
+    registrationId: '00000000-0000-4000-8000-000000000009',
     ticketNumber: 'A009',
     entryType: 'walkin' as const,
     calledEarly: false,
     tier: {},
     status: 'called',
-    sessionId: 2,
+    sessionId: '00000000-0000-4000-8000-000000000002',
     threadNumber: 1,
     priorityScore: 1,
     calledAt: '2026-10-08T08:00:00Z',
@@ -205,12 +221,12 @@ describe('changeActiveSite cockpit preservation', () => {
           code: 'OK',
           translationKey: null,
           translationParams: {},
-          data: { siteId: Number(params.siteId), siteName: 'Site test' },
+          data: { siteId: params.siteId, siteName: 'Site test' },
         }),
       ),
     );
-    useScopeStore.getState().setActiveSite(12, scope);
-    useOperationStore.getState().startCall(4, activeCall);
+    useScopeStore.getState().setActiveSite('00000000-0000-4000-8000-000000000012', scope);
+    useOperationStore.getState().startCall('00000000-0000-4000-8000-000000000004', activeCall);
   });
 
   afterEach(() => {
@@ -219,19 +235,28 @@ describe('changeActiveSite cockpit preservation', () => {
   });
 
   it('keeps the active call when the same site context is reapplied', async () => {
-    await changeActiveSite(new QueryClient(), 12, scope);
-    expect(useOperationStore.getState().activeCalls[4]?.registrationId).toBe(9);
+    await changeActiveSite(new QueryClient(), '00000000-0000-4000-8000-000000000012', scope);
+    expect(
+      useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000004']
+        ?.registrationId,
+    ).toBe('00000000-0000-4000-8000-000000000009');
   });
 
   it('purges the active call but preserves cached page data when the operator changes site', async () => {
     const queryClient = new QueryClient();
-    queryClient.setQueryData(['queues', 'site', 12], { siteId: 12 });
+    queryClient.setQueryData(['queues', 'site', 12], {
+      siteId: '00000000-0000-4000-8000-000000000012',
+    });
 
-    await changeActiveSite(queryClient, 13, scope);
+    await changeActiveSite(queryClient, '00000000-0000-4000-8000-000000000013', scope);
 
     expect(useOperationStore.getState().activeCalls).toEqual({});
-    expect(queryClient.getQueryData(['queues', 'site', 12])).toEqual({ siteId: 12 });
-    expect(queryClient.getQueryData(['sites', 'detail', 13])).toBeDefined();
+    expect(queryClient.getQueryData(['queues', 'site', 12])).toEqual({
+      siteId: '00000000-0000-4000-8000-000000000012',
+    });
+    expect(
+      queryClient.getQueryData(['sites', 'detail', '00000000-0000-4000-8000-000000000013']),
+    ).toBeDefined();
   });
 
   it('clears the site context and site-bound state without dropping the sites cache', async () => {

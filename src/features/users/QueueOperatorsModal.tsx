@@ -24,7 +24,7 @@ export function QueueOperatorsModal({
   queue,
   onOpenChange,
 }: {
-  queue: { queueId: number; queueName: string; siteId: number } | null;
+  queue: { queueId: string; queueName: string; siteId: string } | null;
   onOpenChange: (open: boolean) => void;
 }) {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ export function QueueOperatorsModal({
   const debounced = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto>();
-  const [pendingId, setPendingId] = useState<number>();
+  const [pendingId, setPendingId] = useState<string>();
 
   const resetAddView = () => {
     setView('assigned');
@@ -50,7 +50,7 @@ export function QueueOperatorsModal({
   const operators = useQuery({
     queryKey: operatorsKey,
     queryFn: ({ signal }) =>
-      queuesControllerGetOperators(queue?.queueId ?? 0, undefined, undefined, signal),
+      queuesControllerGetOperators(queue?.queueId ?? '', undefined, undefined, signal),
     enabled: Boolean(queue),
   });
   const users = useQuery({
@@ -59,7 +59,7 @@ export function QueueOperatorsModal({
       usersControllerFindUsers(
         {
           search: debounced,
-          siteIds: String(queue?.siteId ?? 0),
+          siteIds: queue?.siteId ?? '',
           isActive: true,
           page,
           pageSize: 5,
@@ -94,7 +94,7 @@ export function QueueOperatorsModal({
       setPendingId(undefined);
     }
   };
-  const remove = async (userId: number, username: string) => {
+  const remove = async (userId: string, username: string) => {
     if (!queue) return;
     setPendingId(userId);
     try {

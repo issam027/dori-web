@@ -9,7 +9,7 @@ afterEach(() => {
 
 it('forces users flagged by the API onto the password change route', () => {
   useSessionStore.getState().authenticate({
-    userId: 1,
+    userId: '00000000-0000-4000-8000-000000000001',
     username: 'u',
     userType: 'human',
     roles: [],

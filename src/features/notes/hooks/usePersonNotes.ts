@@ -10,7 +10,7 @@ import {
 } from '../api/notes-api';
 
 export function usePersonNotes(
-  personId: number,
+  personId: string,
   options: { enabled?: boolean; pageSize?: number; usage?: string } = {},
 ) {
   return useQuery({
@@ -25,7 +25,7 @@ export function usePersonNotes(
   });
 }
 
-export function useAddPersonNote(personId: number) {
+export function useAddPersonNote(personId: string) {
   const queryClient = useQueryClient();
   return useBusinessMutation({
     mutationFn: (content: string) => createPersonNote(personId, { content }),
@@ -34,20 +34,20 @@ export function useAddPersonNote(personId: number) {
   });
 }
 
-export function useUpdatePersonNote(personId: number) {
+export function useUpdatePersonNote(personId: string) {
   const queryClient = useQueryClient();
   return useBusinessMutation({
-    mutationFn: ({ noteId, content }: { noteId: number; content: string }) =>
+    mutationFn: ({ noteId, content }: { noteId: string; content: string }) =>
       updatePersonNote(personId, noteId, { content }),
     expectedErrorStatuses: [400, 404, 422],
     invalidate: () => invalidatePersonNotes(queryClient, personId),
   });
 }
 
-export function useDeletePersonNote(personId: number) {
+export function useDeletePersonNote(personId: string) {
   const queryClient = useQueryClient();
   return useBusinessMutation({
-    mutationFn: (noteId: number) => deletePersonNote(personId, noteId),
+    mutationFn: (noteId: string) => deletePersonNote(personId, noteId),
     expectedErrorStatuses: [404, 409, 422],
     invalidate: () => invalidatePersonNotes(queryClient, personId),
   });

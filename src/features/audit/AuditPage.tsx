@@ -33,7 +33,7 @@ export function AuditPage() {
   const journal = useAuditEvents({
     page,
     search: debouncedSearch.length >= 2 ? debouncedSearch : undefined,
-    actorUserId: actorUserId ? Number(actorUserId) : undefined,
+    actorUserId: actorUserId || undefined,
     action: action || undefined,
     targetType: targetType || undefined,
     outcome: outcome || undefined,

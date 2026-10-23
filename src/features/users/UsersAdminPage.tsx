@@ -72,11 +72,11 @@ export function UsersAdminPage() {
     directUsers: false,
   });
   const [editing, setEditing] = useState<UserSummaryItemDto>();
-  const [viewingId, setViewingId] = useState<number>();
+  const [viewingId, setViewingId] = useState<string>();
   const [deleting, setDeleting] = useState<UserSummaryItemDto>();
   const [editForm, setEditForm] = useState({ fullName: '', email: '', language: 'fr' });
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
-  const [openActionsUserId, setOpenActionsUserId] = useState<number>();
+  const [openActionsUserId, setOpenActionsUserId] = useState<string>();
   const [pending, setPending] = useState(false);
   const debouncedSearch = useDebouncedFilter(draft.search, { delay: 350, minimumLength: 4 });
   const effectiveFilters = { ...filters, search: debouncedSearch };
@@ -112,7 +112,7 @@ export function UsersAdminPage() {
   });
   const userDetail = useQuery({
     queryKey: queryKeys.admin.userDetail(viewingId),
-    queryFn: ({ signal }) => findUserById(viewingId ?? 0, undefined, signal),
+    queryFn: ({ signal }) => findUserById(viewingId ?? '', undefined, signal),
     enabled: Boolean(viewingId),
   });
   const items = users.data?.data.items ?? [];

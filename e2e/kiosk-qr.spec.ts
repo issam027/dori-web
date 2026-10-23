@@ -17,22 +17,26 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
     if (pathname.endsWith('/auth/me')) {
       await route.fulfill({
         json: envelope({
-          userId: 7,
+          userId: '00000000-0000-4000-8000-000000000007',
           username: 'kiosk',
           userType: 'kiosk',
           roles: ['kiosk'],
           permissions: [],
           mustChangePassword: false,
           languagePreference: 'fr',
-          scope: { isGlobal: false, siteIds: [1], queueIds: [1] },
+          scope: {
+            isGlobal: false,
+            siteIds: ['00000000-0000-4000-8000-000000000001'],
+            queueIds: ['00000000-0000-4000-8000-000000000001'],
+          },
         }),
       });
       return;
     }
-    if (pathname.endsWith('/queues/1/status')) {
+    if (pathname.endsWith('/queues/00000000-0000-4000-8000-000000000001/status')) {
       await route.fulfill({
         json: envelope({
-          queueId: 1,
+          queueId: '00000000-0000-4000-8000-000000000001',
           waitingCount: 2,
           activeThreads: 1,
           estimatedWaitMinutes: 8,
@@ -41,13 +45,17 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
       });
       return;
     }
-    if (pathname.endsWith('/queues/1/tiers/1/notification-rules')) {
+    if (
+      pathname.endsWith(
+        '/queues/00000000-0000-4000-8000-000000000001/tiers/00000000-0000-4000-8000-000000000001/notification-rules',
+      )
+    ) {
       await route.fulfill({
         json: envelope({ page: 1, pageSize: 100, total: 0, totalPages: 0, items: [] }),
       });
       return;
     }
-    if (pathname.endsWith('/queues/1/tiers')) {
+    if (pathname.endsWith('/queues/00000000-0000-4000-8000-000000000001/tiers')) {
       await route.fulfill({
         json: envelope({
           page: 1,
@@ -56,8 +64,8 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
           totalPages: 1,
           items: [
             {
-              queueId: 1,
-              tierId: 1,
+              queueId: '00000000-0000-4000-8000-000000000001',
+              tierId: '00000000-0000-4000-8000-000000000001',
               price: 0,
               currency: 'EUR',
               currencyOverride: null,
@@ -66,7 +74,7 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
               isDefault: true,
               displayOrder: 0,
               tier: {
-                tierId: 1,
+                tierId: '00000000-0000-4000-8000-000000000001',
                 tierCode: 'standard',
                 tierName: 'Standard',
                 isSystem: false,
@@ -88,9 +96,9 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
           totalPages: 1,
           items: [
             {
-              queueId: 1,
+              queueId: '00000000-0000-4000-8000-000000000001',
               queueCode: 'ACCUEIL',
-              siteId: 1,
+              siteId: '00000000-0000-4000-8000-000000000001',
               queueName: 'Accueil général',
               averageWaitTime: 8,
               threadCount: 1,
@@ -123,7 +131,7 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
       await route.fulfill({
         status: 201,
         json: envelope({
-          registrationId: 81,
+          registrationId: '00000000-0000-4000-8000-000000000081',
           ticketNumber: 'AG081',
           businessDate: '2026-10-11',
           entryType: 'walkin',

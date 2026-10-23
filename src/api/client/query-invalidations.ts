@@ -9,7 +9,7 @@ export async function invalidateNotifications(queryClient: QueryClient) {
   await queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
 }
 
-export async function invalidatePersonNotes(queryClient: QueryClient, personId: number) {
+export async function invalidatePersonNotes(queryClient: QueryClient, personId: string) {
   await queryClient.invalidateQueries({ queryKey: queryKeys.persons.notes(personId) });
 }
 

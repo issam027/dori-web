@@ -22,37 +22,43 @@ import { invalidateQueueOperations } from '@/api/client/query-invalidations';
 import { callNextAndCommit } from '../operation-actions';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
 
-export function useRegistration(registrationId: number | null | undefined, enabled = true) {
+export function useRegistration(registrationId: string | null | undefined, enabled = true) {
   return useQuery({
     queryKey: queryKeys.registrations.detail(registrationId),
-    queryFn: ({ signal }) => registrationsControllerFindOne(registrationId ?? 0, undefined, signal),
+    queryFn: ({ signal }) =>
+      registrationsControllerFindOne(registrationId ?? '', undefined, signal),
     enabled: enabled && Boolean(registrationId),
   });
 }
 
 export function useOperatorRegistrations(
-  userId: number | undefined,
+  userId: string | undefined,
   status: 'in_progress' | 'served' | 'no_show',
-  siteId: number | null,
+  siteId: string | null,
   pageSize = 10,
 ) {
   return useQuery({
     queryKey: queryKeys.registrations.operator(userId, status, siteId, pageSize),
-    queryFn: ({ signal }) => registrationsControllerFindRegistrations({
-      servedByUserId: userId,
-      siteId: siteId ?? undefined,
-      status,
-      page: 1,
-      pageSize,
-      sort: 'createdAt:desc',
-    }, undefined, signal),
+    queryFn: ({ signal }) =>
+      registrationsControllerFindRegistrations(
+        {
+          servedByUserId: userId,
+          siteId: siteId ?? undefined,
+          status,
+          page: 1,
+          pageSize,
+          sort: 'createdAt:desc',
+        },
+        undefined,
+        signal,
+      ),
     enabled: Boolean(userId && siteId),
   });
 }
 
 export function useWaitingRegistrations(options: {
-  siteId: number | null;
-  queueId?: number;
+  siteId: string | null;
+  queueId?: string;
   dateFrom?: string;
   dateTo?: string;
   page: number;
@@ -88,11 +94,15 @@ export function useWaitingRegistrations(options: {
   });
 }
 
-export function useDeskSession(siteId: number | null, queueIds: readonly number[], includeThreads = false) {
+export function useDeskSession(
+  siteId: string | null,
+  queueIds: readonly string[],
+  includeThreads = false,
+) {
   const previews = useQuery({
     queryKey: queryKeys.queuePreview.bySite(siteId),
     queryFn: ({ signal }) =>
-      queueEngineControllerNextPreview(siteId ?? 0, { limit: 5 }, undefined, signal),
+      queueEngineControllerNextPreview(siteId ?? '', { limit: 5 }, undefined, signal),
     enabled: siteId !== null,
     refetchInterval: 15_000,
   });
@@ -109,11 +119,13 @@ export function useDeskSession(siteId: number | null, queueIds: readonly number[
     })),
   });
   const threads = useQueries({
-    queries: includeThreads ? queueIds.map((queueId) => ({
-      queryKey: queryKeys.threads.byQueue(queueId),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        queueEngineControllerGetThreads(queueId, { page: 1, pageSize: 100 }, undefined, signal),
-    })) : [],
+    queries: includeThreads
+      ? queueIds.map((queueId) => ({
+          queryKey: queryKeys.threads.byQueue(queueId),
+          queryFn: ({ signal }: { signal: AbortSignal }) =>
+            queueEngineControllerGetThreads(queueId, { page: 1, pageSize: 100 }, undefined, signal),
+        }))
+      : [],
   });
   return { previews, sessions, threads };
 }
@@ -129,29 +141,29 @@ function useQueueCommand<TVariables>(mutationFn: (variables: TVariables) => Prom
 }
 
 export function useCallNext() {
-  return useQueueCommand((queueId: number) => callNextAndCommit(queueId));
+  return useQueueCommand((queueId: string) => callNextAndCommit(queueId));
 }
 
 export function useMarkServed() {
-  return useQueueCommand((registrationId: number) =>
+  return useQueueCommand((registrationId: string) =>
     queueEngineControllerMarkServed(registrationId),
   );
 }
 
 export function useMarkNoShow() {
-  return useQueueCommand((registrationId: number) =>
+  return useQueueCommand((registrationId: string) =>
     queueEngineControllerMarkNoShow(registrationId),
   );
 }
 
 export function useOpenDeskSession() {
-  return useQueueCommand(({ queueId, dto }: { queueId: number; dto: OpenQueueSessionDto }) =>
+  return useQueueCommand(({ queueId, dto }: { queueId: string; dto: OpenQueueSessionDto }) =>
     queueEngineControllerOpenSession(queueId, dto),
   );
 }
 
 export function useCloseDeskSession() {
-  return useQueueCommand(({ queueId, sessionId }: { queueId: number; sessionId: number }) =>
+  return useQueueCommand(({ queueId, sessionId }: { queueId: string; sessionId: string }) =>
     queueEngineControllerCloseSession(queueId, sessionId),
   );
 }

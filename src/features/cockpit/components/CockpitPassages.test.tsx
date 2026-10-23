@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { CockpitPassages } from './CockpitPassages';
 
 const passage = {
-  registrationId: 12,
+  registrationId: '00000000-0000-4000-8000-000000000012',
   ticketNumber: 'A-012',
   personName: 'Ada Lovelace',
   arrivedAt: '2026-10-21T08:30:00.000Z',

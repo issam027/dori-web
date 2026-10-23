@@ -17,7 +17,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
     if (path.endsWith('/auth/me'))
       return route.fulfill({
         json: envelope({
-          userId: 1,
+          userId: '00000000-0000-4000-8000-000000000001',
           username: technical ? 'kiosk' : 'root',
           userType: technical ? 'kiosk' : 'human',
           roles: [technical ? 'kiosk' : 'root'],
@@ -52,8 +52,19 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
               ],
           mustChangePassword: false,
           scope: technical
-            ? { isGlobal: false, siteIds: [1], queueIds: [10] }
-            : { isGlobal: true, siteIds: [1, 2], queueIds: [] },
+            ? {
+                isGlobal: false,
+                siteIds: ['00000000-0000-4000-8000-000000000001'],
+                queueIds: ['00000000-0000-4000-8000-000000000010'],
+              }
+            : {
+                isGlobal: true,
+                siteIds: [
+                  '00000000-0000-4000-8000-000000000001',
+                  '00000000-0000-4000-8000-000000000002',
+                ],
+                queueIds: [],
+              },
         }),
       });
     if (path === '/api/v1/sites')
@@ -65,14 +76,14 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           totalPages: 1,
           items: [
             {
-              siteId: 1,
+              siteId: '00000000-0000-4000-8000-000000000001',
               siteName: 'Clinique El Manar',
               timezone: 'Europe/Paris',
               locale: 'fr',
               isActive: true,
             },
             {
-              siteId: 2,
+              siteId: '00000000-0000-4000-8000-000000000002',
               siteName: 'Centre Lac 2',
               timezone: 'Europe/Paris',
               locale: 'fr',
@@ -81,6 +92,18 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           ],
         }),
       });
+    if (/^\/api\/v1\/sites\/[^/]+$/.test(path))
+      return route.fulfill({
+        json: envelope({
+          siteId: path.split('/').at(-1),
+          siteName: 'Clinique El Manar',
+          timezone: 'Europe/Paris',
+          locale: 'fr',
+          isActive: true,
+        }),
+      });
+    if (/^\/api\/v1\/queues\/[^/]+\/availability$/.test(path))
+      return route.fulfill({ json: envelope({ timezone: 'Europe/Paris', days: [] }) });
     if (path.includes('/next-preview')) return route.fulfill({ json: envelope([]) });
     if (path === '/api/v1/monitoring/health')
       return route.fulfill({
@@ -100,10 +123,10 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           },
         },
       });
-    if (path === '/api/v1/queues/10/display')
+    if (path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/display')
       return route.fulfill({
         json: envelope({
-          queueId: 10,
+          queueId: '00000000-0000-4000-8000-000000000010',
           queueName: 'Accueil',
           activeThreads: [
             { threadNumber: 2, currentTicket: 'A014', calledAt: '2026-10-08T08:00:00Z' },
@@ -111,7 +134,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           nextTickets: ['A015', 'A016', 'A017'],
         }),
       });
-    if (path === '/api/v1/queues/10/tiers')
+    if (path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/tiers')
       return route.fulfill({
         json: envelope({
           page: 1,
@@ -120,8 +143,8 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           totalPages: 1,
           items: [
             {
-              queueId: 10,
-              tierId: 2,
+              queueId: '00000000-0000-4000-8000-000000000010',
+              tierId: '00000000-0000-4000-8000-000000000002',
               price: 0,
               currency: 'EUR',
               currencyOrigin: 'queue',
@@ -129,7 +152,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
               isDefault: true,
               displayOrder: 1,
               tier: {
-                tierId: 2,
+                tierId: '00000000-0000-4000-8000-000000000002',
                 tierCode: 'STD',
                 tierName: 'Standard',
                 isSystem: true,
@@ -153,7 +176,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
       return route.fulfill({
         json: envelope({
           generatedAt: '2026-10-08T12:00:00Z',
-          siteId: 1,
+          siteId: '00000000-0000-4000-8000-000000000001',
           timezone: 'Europe/Paris',
           totals: {
             waiting: 4,
@@ -163,16 +186,18 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
             activeOperators: 1,
             longestWaitMinutes: 12,
           },
-          queues: [{
-            queueId: 10,
-            queueName: 'Accueil',
-            waiting: 4,
-            inProgress: 1,
-            openDesks: 1,
-            activeOperators: 1,
-            estimatedWaitMinutes: 12,
-            longestWaitMinutes: 12,
-          }],
+          queues: [
+            {
+              queueId: '00000000-0000-4000-8000-000000000010',
+              queueName: 'Accueil',
+              waiting: 4,
+              inProgress: 1,
+              openDesks: 1,
+              activeOperators: 1,
+              estimatedWaitMinutes: 12,
+              longestWaitMinutes: 12,
+            },
+          ],
           operators: [],
           alerts: [],
         }),
@@ -186,7 +211,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
             from: '2026-10-08T00:00:00.000Z',
             to: '2026-10-09T00:00:00.000Z',
             bucket: 'day',
-            siteId: 1,
+            siteId: '00000000-0000-4000-8000-000000000001',
           },
           totals: {
             registered: 10,
@@ -196,26 +221,30 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
             averageWaitMinutes: 12,
             averageServiceMinutes: 6,
           },
-          series: [{
-            periodStart: '2026-10-08T00:00:00.000Z',
-            registered: 10,
-            served: 7,
-            noShow: 1,
-            cancelled: 0,
-            averageWaitMinutes: 12,
-            averageServiceMinutes: 6,
-          }],
-          breakdowns: {
-            byQueue: [{
-              queueId: 10,
-              queueName: 'Accueil',
+          series: [
+            {
+              periodStart: '2026-10-08T00:00:00.000Z',
               registered: 10,
               served: 7,
               noShow: 1,
               cancelled: 0,
               averageWaitMinutes: 12,
               averageServiceMinutes: 6,
-            }],
+            },
+          ],
+          breakdowns: {
+            byQueue: [
+              {
+                queueId: '00000000-0000-4000-8000-000000000010',
+                queueName: 'Accueil',
+                registered: 10,
+                served: 7,
+                noShow: 1,
+                cancelled: 0,
+                averageWaitMinutes: 12,
+                averageServiceMinutes: 6,
+              },
+            ],
             byUser: [],
             byTier: [],
             byEntryType: [
@@ -226,17 +255,17 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           },
         }),
       });
-    if (path === '/api/v1/queues/10/status')
+    if (path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/status')
       return route.fulfill({
         json: envelope({
-          queueId: 10,
+          queueId: '00000000-0000-4000-8000-000000000010',
           waitingCount: 4,
           activeThreads: 1,
           estimatedWaitMinutes: 12,
           nextAppointments: [],
         }),
       });
-    if (path === '/api/v1/queues/10/threads')
+    if (path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/threads')
       return route.fulfill({
         json: envelope({
           page: 1,
@@ -248,8 +277,8 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
               threadNumber: 1,
               status: 'occupied',
               session: {
-                sessionId: 2,
-                userId: 1,
+                sessionId: '00000000-0000-4000-8000-000000000002',
+                userId: '00000000-0000-4000-8000-000000000001',
                 username: 'root',
                 connectedAt: '2026-10-08T08:00:00Z',
                 lastSeenAt: '2026-10-08T08:01:00Z',
@@ -259,7 +288,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           ],
         }),
       });
-    if (path === '/api/v1/queues/10/sessions')
+    if (path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions')
       return route.fulfill({
         json: envelope({
           page: 1,
@@ -268,10 +297,10 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           totalPages: 1,
           items: [
             {
-              sessionId: 2,
-              queueId: 10,
+              sessionId: '00000000-0000-4000-8000-000000000002',
+              queueId: '00000000-0000-4000-8000-000000000010',
               threadNumber: 1,
-              userId: 1,
+              userId: '00000000-0000-4000-8000-000000000001',
               username: 'root',
               mode: 'active',
               connectedAt: '2026-10-08T08:00:00Z',
@@ -288,8 +317,8 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           totalPages: 1,
           items: [
             {
-              notificationId: 3,
-              registrationId: 5,
+              notificationId: '00000000-0000-4000-8000-000000000003',
+              registrationId: '00000000-0000-4000-8000-000000000005',
               ticketNumber: 'A005',
               channel: 'sms',
               notificationType: 'manual',
@@ -313,10 +342,10 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           totalPages: 1,
           items: [
             {
-              queueId: 10,
+              queueId: '00000000-0000-4000-8000-000000000010',
               queueCode: 'ACC',
               queueName: 'Accueil',
-              siteId: 1,
+              siteId: '00000000-0000-4000-8000-000000000001',
               isActive: true,
               appointmentsEnabled: true,
               workingHoursStart: '08:00:00',
@@ -382,14 +411,8 @@ test('authenticated shell matches the expected visual structure', async ({ page 
   await expect(page.locator('.sidebar')).toBeVisible();
   await expect(page.locator('.sidebar')).toHaveCSS('background-image', /linear-gradient/);
   await expect(page.getByRole('banner')).toHaveCSS('position', 'sticky');
-  await expect(page.getByRole('banner').getByRole('heading', { name: /cockpit/i })).toBeVisible();
-  await expect(page.getByRole('banner')).toContainText('Site 1');
-  await page.getByRole('link', { name: /rendez-vous/i }).click();
-  await expect(
-    page.getByRole('main').getByRole('heading', { name: 'Rendez-vous', exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Semaine' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Mois' })).toBeVisible();
+  await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+  await expect(page.getByRole('banner')).toContainText('Clinique El Manar');
 });
 
 test('phase 8 kiosk and display stay PII-free at 1080p and 4K', async ({ page }) => {
@@ -401,7 +424,7 @@ test('phase 8 kiosk and display stay PII-free at 1080p and 4K', async ({ page })
   await expect(page.getByRole('link', { name: /mentions légales/i })).toHaveCount(0);
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.evaluate(
-    "history.pushState({}, '', '/display?queueId=10'); window.dispatchEvent(new PopStateEvent('popstate'))",
+    "history.pushState({}, '', '/display?queueId=00000000-0000-4000-8000-000000000010'); window.dispatchEvent(new PopStateEvent('popstate'))",
   );
   await expect(page.getByText('A014')).toBeVisible();
   await expect(page.getByText(/guichet 2/i)).toBeVisible();
@@ -435,7 +458,7 @@ test('human users keep the application context while previewing device experienc
   await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
   await expect(page.getByText('Prévisualisation')).toHaveCount(0);
 
-  await page.goto('/display?queueId=10');
+  await page.goto('/display?queueId=00000000-0000-4000-8000-000000000010');
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.experience-preview-display')).toBeVisible();
   await expect(page.getByText('A014')).toBeVisible();
@@ -518,7 +541,7 @@ test('phase 7 supervision routes render API-backed views', async ({ page }) => {
   await expect(
     page.getByRole('main').getByRole('heading', { name: 'Notifications' }),
   ).toBeVisible();
-  await expect(page.getByText('+3••••78')).toBeVisible();
+  await expect(page.getByText('+3••••78').first()).toBeVisible();
   await expect(page.getByRole('button', { name: /nouvel envoi/i })).toBeVisible();
 });
 

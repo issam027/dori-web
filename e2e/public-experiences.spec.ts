@@ -9,29 +9,41 @@ import {
 
 async function installExperienceScenario(page: Page) {
   const queues = [
-    buildQueue({ queueId: 10, queueName: 'Accueil général' }),
-    buildQueue({ queueId: 11, queueCode: 'DOC', queueName: 'Documents' }),
+    buildQueue({ queueId: '00000000-0000-4000-8000-000000000010', queueName: 'Accueil général' }),
+    buildQueue({
+      queueId: '00000000-0000-4000-8000-000000000011',
+      queueCode: 'DOC',
+      queueName: 'Documents',
+    }),
   ];
   await installApiScenario(page, {
     profile: 'kiosk',
     queues,
     handlers: [
       async ({ path, method, route }) => {
-        const tierMatch = /^\/api\/v1\/queues\/(10|11)\/tiers$/.exec(path);
+        const tierMatch =
+          /^\/api\/v1\/queues\/(00000000-0000-4000-8000-000000000010|00000000-0000-4000-8000-000000000011)\/tiers$/.exec(
+            path,
+          );
         if (tierMatch) {
           await route.fulfill({
             json: apiEnvelope(
               paginated([
                 {
-                  queueId: Number(tierMatch[1]),
-                  tierId: 1,
+                  queueId: tierMatch[1],
+                  tierId: '00000000-0000-4000-8000-000000000001',
                   price: 4.5,
                   currency: 'EUR',
                   currencyOrigin: 'queue',
                   isActive: true,
                   isDefault: true,
                   displayOrder: 1,
-                  tier: { tierId: 1, tierCode: 'STD', tierName: 'Standard', isActive: true },
+                  tier: {
+                    tierId: '00000000-0000-4000-8000-000000000001',
+                    tierCode: 'STD',
+                    tierName: 'Standard',
+                    isActive: true,
+                  },
                 },
               ]),
             ),
@@ -43,14 +55,14 @@ async function installExperienceScenario(page: Page) {
             json: apiEnvelope(
               paginated([
                 {
-                  ruleId: 1,
+                  ruleId: '00000000-0000-4000-8000-000000000001',
                   channel: 'sms',
                   notificationType: 'welcome',
                   includeTrackingLink: true,
                   isActive: true,
                 },
                 {
-                  ruleId: 2,
+                  ruleId: '00000000-0000-4000-8000-000000000002',
                   channel: 'sms',
                   notificationType: 'threshold',
                   includeTrackingLink: true,
@@ -64,19 +76,24 @@ async function installExperienceScenario(page: Page) {
         if (path === '/api/v1/registrations' && method === 'POST') {
           await route.fulfill({
             json: apiEnvelope({
-              registrationId: 700,
+              registrationId: '00000000-0000-4000-8000-000000000700',
               ticketNumber: 'A700',
               registrationTrackingToken: 'opaque-kiosk-token',
             }),
           });
           return true;
         }
-        const displayMatch = /^\/api\/v1\/queues\/(10|11)\/display$/.exec(path);
+        const displayMatch =
+          /^\/api\/v1\/queues\/(00000000-0000-4000-8000-000000000010|00000000-0000-4000-8000-000000000011)\/display$/.exec(
+            path,
+          );
         if (displayMatch) {
-          const second = displayMatch[1] === '11';
+          const second = displayMatch[1]?.endsWith('11') === true;
           await route.fulfill({
             json: apiEnvelope({
-              queueId: second ? 11 : 10,
+              queueId: second
+                ? '00000000-0000-4000-8000-000000000011'
+                : '00000000-0000-4000-8000-000000000010',
               queueName: second ? 'Documents' : 'Accueil général',
               activeThreads: [
                 {
@@ -125,7 +142,9 @@ test('kiosk completes the walk-in journey and purges personal data', async ({ pa
     ),
   ).toMatch(/\S+\s+\S+/);
   await page.getByRole('button', { name: /créer mon ticket/i }).click();
-  await expect(page.locator('.kiosk-ticket-result').getByText('A700', { exact: true })).toBeVisible();
+  await expect(
+    page.locator('.kiosk-ticket-result').getByText('A700', { exact: true }),
+  ).toBeVisible();
   await expect(page.locator('.kiosk-ticket-result').getByAltText(/QR code/i)).toHaveAttribute(
     'src',
     /^data:image\/png/,

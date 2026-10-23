@@ -38,22 +38,22 @@ Le client OpenAPI généré contient actuellement **131 propriétés d'identifia
 
 Familles à migrer :
 
-| Identifiant | Nature / relations à contrôler |
-|---|---|
-| `siteId`, `siteIds`, `siteScopeId` | site, portée d'audit et périmètre utilisateur |
-| `queueId`, `queueIds` | file, rattachement au site, filtres et expériences publiques |
-| `tierId`, `tierIds` | niveau de service et association file/niveau |
-| `ruleId` | règle de notification d'une association file/niveau |
-| `personId` | personne et recherche de personnes |
-| `noteId` | note d'une personne |
-| `registrationId`, `currentRegistrationId`, `reassignedRegistrationId` | inscription, passage, rendez-vous et appel courant |
-| `notificationId` | notification/outbox |
-| `sessionId`, `handledBySessionId`, `servedBySessionId`, `takenOverFromSessionId` | session de guichet et traçabilité d'une inscription |
-| `userId`, `userIds`, `actorUserId`, `createdByUserId`, `handledByUserId`, `servedByUserId` | utilisateur et références d'audit/métier |
-| `roleId` | rôle utilisateur |
-| `translationId` | traduction administrable |
-| `targetId` | cible polymorphe d'audit ; voir décision obligatoire ci-dessous |
-| `id` | identifiant générique de `DeleteItemResponseDto` |
+| Identifiant                                                                                | Nature / relations à contrôler                                  |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `siteId`, `siteIds`, `siteScopeId`                                                         | site, portée d'audit et périmètre utilisateur                   |
+| `queueId`, `queueIds`                                                                      | file, rattachement au site, filtres et expériences publiques    |
+| `tierId`, `tierIds`                                                                        | niveau de service et association file/niveau                    |
+| `ruleId`                                                                                   | règle de notification d'une association file/niveau             |
+| `personId`                                                                                 | personne et recherche de personnes                              |
+| `noteId`                                                                                   | note d'une personne                                             |
+| `registrationId`, `currentRegistrationId`, `reassignedRegistrationId`                      | inscription, passage, rendez-vous et appel courant              |
+| `notificationId`                                                                           | notification/outbox                                             |
+| `sessionId`, `handledBySessionId`, `servedBySessionId`, `takenOverFromSessionId`           | session de guichet et traçabilité d'une inscription             |
+| `userId`, `userIds`, `actorUserId`, `createdByUserId`, `handledByUserId`, `servedByUserId` | utilisateur et références d'audit/métier                        |
+| `roleId`                                                                                   | rôle utilisateur                                                |
+| `translationId`                                                                            | traduction administrable                                        |
+| `targetId`                                                                                 | cible polymorphe d'audit ; voir décision obligatoire ci-dessous |
+| `id`                                                                                       | identifiant générique de `DeleteItemResponseDto`                |
 
 Décisions contractuelles obligatoires avant de modifier le front :
 
@@ -83,21 +83,21 @@ Décisions contractuelles obligatoires avant de modifier le front :
 
 Après régénération, ouvrir les modèles de `src/api/generated/models` correspondant aux groupes suivants et vérifier que chaque champ listé vaut `string`, `string[]` ou est optionnel/nullable sans perdre cette cardinalité.
 
-| Groupe de DTO | Champs à vérifier |
-|---|---|
-| Audit | `AuditControllerSearchParams.actorUserId/siteId/targetId`, `AuditEventResponseDto.actorUserId/siteScopeId`, `AuditEventDetailResponseDto.actorUserId/siteScopeId` |
-| Auth et scope | `AuthUserDto.userId`, `CurrentUserResponseDto.userId`, `LogoutDto.userId`, `UserScopeDto.siteIds/queueIds` |
-| Sites | `SiteResponseDto.siteId`, `DeleteSiteResponseDto.siteId`, `UserSiteItemDto.siteId`, DTO d'affectation directe `siteId/userId` |
-| Files | `QueueResponseDto.queueId/siteId`, `QueueStatusResponseDto.queueId`, `QueueDisplayResponseDto.queueId`, `QueuePreviewItemDto.queueId/registrationId`, `DeleteQueueResponseDto.queueId`, `ResetQueueResponseDto.queueId`, `UserQueueItemDto.queueId/siteId` |
-| Niveaux/règles | `ServiceTierResponseDto.tierId`, `QueueTierResponseDto.queueId/tierId`, `AssociateQueueTierDto.tierId`, `NotificationRuleResponseDto.ruleId/queueId/tierId`, `DeleteTierResponseDto.ruleId/queueId/tierId` |
-| Personnes/notes | `CreatePersonDto.siteId`, `PersonResponseDto.personId/siteId`, `QueueCandidatePersonItemDto.personId`, `PersonNoteResponseDto.noteId/personId/createdByUserId` |
-| Inscriptions/rendez-vous | `CreateRegistrationDto.personId/queueId/tierId`, tous les DTO de réponse portant `registrationId`, `RegistrationResponseDto.personId/queueId/tierId/servedBySessionId/servedByUserId`, `UpdateRegistrationDto.tierId`, `NextAppointmentItemDto.registrationId`, `RegistrationAvailabilityResponseDto.queueId` |
-| Sessions/guichet | `QueueSessionResponseDto.sessionId/queueId/userId/takenOverFromSessionId/reassignedRegistrationId`, `ThreadSessionItemDto.sessionId/userId/currentRegistrationId`, `CallNextRegistrationResponseDto.registrationId/sessionId`, `CloseSessionResponseDto.sessionId`, `UpdateRegistrationStatusResponseDto.registrationId/handledBySessionId/handledByUserId` |
-| Notifications | `NotificationResponseDto.notificationId/registrationId`, `SendManualNotificationDto.registrationId` |
-| Utilisateurs/rôles | tous les DTO avec `userId`, `roleId`, ainsi que `MonitoringLiveOperatorDto.userId/sessionId/currentRegistrationId/queueIds` |
-| Monitoring/rapports | `Monitoring*Dto.siteId/queueId/tierId/userId`, `MonitoringAppliedFiltersDto.siteId/queueIds/tierIds/userIds` |
-| Traductions | `TranslationResponseDto.translationId`, `DeleteTranslationResponseDto.translationId` |
-| Réponse générique | `DeleteItemResponseDto.id` |
+| Groupe de DTO            | Champs à vérifier                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Audit                    | `AuditControllerSearchParams.actorUserId/siteId/targetId`, `AuditEventResponseDto.actorUserId/siteScopeId`, `AuditEventDetailResponseDto.actorUserId/siteScopeId`                                                                                                                                                                                           |
+| Auth et scope            | `AuthUserDto.userId`, `CurrentUserResponseDto.userId`, `LogoutDto.userId`, `UserScopeDto.siteIds/queueIds`                                                                                                                                                                                                                                                  |
+| Sites                    | `SiteResponseDto.siteId`, `DeleteSiteResponseDto.siteId`, `UserSiteItemDto.siteId`, DTO d'affectation directe `siteId/userId`                                                                                                                                                                                                                               |
+| Files                    | `QueueResponseDto.queueId/siteId`, `QueueStatusResponseDto.queueId`, `QueueDisplayResponseDto.queueId`, `QueuePreviewItemDto.queueId/registrationId`, `DeleteQueueResponseDto.queueId`, `ResetQueueResponseDto.queueId`, `UserQueueItemDto.queueId/siteId`                                                                                                  |
+| Niveaux/règles           | `ServiceTierResponseDto.tierId`, `QueueTierResponseDto.queueId/tierId`, `AssociateQueueTierDto.tierId`, `NotificationRuleResponseDto.ruleId/queueId/tierId`, `DeleteTierResponseDto.ruleId/queueId/tierId`                                                                                                                                                  |
+| Personnes/notes          | `CreatePersonDto.siteId`, `PersonResponseDto.personId/siteId`, `QueueCandidatePersonItemDto.personId`, `PersonNoteResponseDto.noteId/personId/createdByUserId`                                                                                                                                                                                              |
+| Inscriptions/rendez-vous | `CreateRegistrationDto.personId/queueId/tierId`, tous les DTO de réponse portant `registrationId`, `RegistrationResponseDto.personId/queueId/tierId/servedBySessionId/servedByUserId`, `UpdateRegistrationDto.tierId`, `NextAppointmentItemDto.registrationId`, `RegistrationAvailabilityResponseDto.queueId`                                               |
+| Sessions/guichet         | `QueueSessionResponseDto.sessionId/queueId/userId/takenOverFromSessionId/reassignedRegistrationId`, `ThreadSessionItemDto.sessionId/userId/currentRegistrationId`, `CallNextRegistrationResponseDto.registrationId/sessionId`, `CloseSessionResponseDto.sessionId`, `UpdateRegistrationStatusResponseDto.registrationId/handledBySessionId/handledByUserId` |
+| Notifications            | `NotificationResponseDto.notificationId/registrationId`, `SendManualNotificationDto.registrationId`                                                                                                                                                                                                                                                         |
+| Utilisateurs/rôles       | tous les DTO avec `userId`, `roleId`, ainsi que `MonitoringLiveOperatorDto.userId/sessionId/currentRegistrationId/queueIds`                                                                                                                                                                                                                                 |
+| Monitoring/rapports      | `Monitoring*Dto.siteId/queueId/tierId/userId`, `MonitoringAppliedFiltersDto.siteId/queueIds/tierIds/userIds`                                                                                                                                                                                                                                                |
+| Traductions              | `TranslationResponseDto.translationId`, `DeleteTranslationResponseDto.translationId`                                                                                                                                                                                                                                                                        |
+| Réponse générique        | `DeleteItemResponseDto.id`                                                                                                                                                                                                                                                                                                                                  |
 
 Préserver exactement les caractères optionnel `?`, nullable et tableaux du contrat actuel. La migration du type de valeur ne doit pas rendre un champ obligatoire ni supprimer `null`.
 
@@ -181,19 +181,19 @@ Faire la même revue pour tout `Record`, `Map`, `Set`, index d'objet ou ensemble
 
 Le client généré changera automatiquement, mais les wrappers manuels doivent suivre :
 
-| Fichier | Changements |
-|---|---|
-| `src/features/portfolio/api/sites-api.ts` | `siteId` des find/deactivate/reactivate en chaîne |
-| `src/features/queues/api/queues-api.ts` | `queueId` de status en chaîne |
-| `src/features/persons/api/persons-api.ts` | `personId` de find/update/delete en chaîne |
-| `src/features/notes/api/notes-api.ts` | `personId` et `noteId` en chaîne |
-| `src/features/appointments/appointment-actions.ts` | `registrationId` (`id`) des update/cancel/reschedule/check-in en chaîne |
-| `src/features/queue-operations/operation-actions.ts` | `queueId` de call-next en chaîne |
-| `src/features/audit/api/audit-api.ts` | revoir les filtres d'IDs ; `eventId` est déjà chaîne |
-| `src/features/onboarding/api/onboarding-api.ts` | vérifier chaque site/file/tier/règle/user créé ou associé |
-| `src/features/cockpit/api/quick-registration-api.ts` | contrôler IDs du payload et réponses |
-| `src/features/supervision/api/control-room-api.ts` | `siteId`/`queueId` et reset |
-| `src/features/notifications/notification-actions.ts` ou client direct | `notificationId`, `registrationId`, `queueId`, `siteId` |
+| Fichier                                                               | Changements                                                             |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `src/features/portfolio/api/sites-api.ts`                             | `siteId` des find/deactivate/reactivate en chaîne                       |
+| `src/features/queues/api/queues-api.ts`                               | `queueId` de status en chaîne                                           |
+| `src/features/persons/api/persons-api.ts`                             | `personId` de find/update/delete en chaîne                              |
+| `src/features/notes/api/notes-api.ts`                                 | `personId` et `noteId` en chaîne                                        |
+| `src/features/appointments/appointment-actions.ts`                    | `registrationId` (`id`) des update/cancel/reschedule/check-in en chaîne |
+| `src/features/queue-operations/operation-actions.ts`                  | `queueId` de call-next en chaîne                                        |
+| `src/features/audit/api/audit-api.ts`                                 | revoir les filtres d'IDs ; `eventId` est déjà chaîne                    |
+| `src/features/onboarding/api/onboarding-api.ts`                       | vérifier chaque site/file/tier/règle/user créé ou associé               |
+| `src/features/cockpit/api/quick-registration-api.ts`                  | contrôler IDs du payload et réponses                                    |
+| `src/features/supervision/api/control-room-api.ts`                    | `siteId`/`queueId` et reset                                             |
+| `src/features/notifications/notification-actions.ts` ou client direct | `notificationId`, `registrationId`, `queueId`, `siteId`                 |
 
 Règles : aucune conversion `Number`, `parseInt`, `Math.*` ni opérateur unaire `+` sur un ID ; utiliser `encodeURIComponent` si une URL est construite à la main ; ne pas réécrire un UUID dans `http-client.ts`.
 
@@ -231,20 +231,20 @@ Toujours fournir `value={id}` et des `key={id}` sous forme de chaîne. Les compa
 
 ### 8.2 Composants/pages à modifier
 
-| Zone | Fichiers et contrôles |
-|---|---|
-| Shell/contexte | `Topbar.tsx`, `AppShell.tsx`, `site-context-rules.ts` : site/file actifs, options du sélecteur et scope |
-| Cockpit | `CockpitPage.tsx`, `QuickRegistration.tsx`, `CockpitCards.tsx` : queue/tier/session/person/registration IDs, ensembles en attente ; supprimer les `Number` sur selects queue/tier |
-| Files opérées | `MyQueuesPage.tsx`, `RegistrationDetailsModal.tsx`, `QueueRegistrationMobileCard.tsx` : queue/registration IDs ; supprimer le `Number` du filtre file |
-| Personnes/notes | `PersonsPage.tsx`, `PersonFormModal.tsx`, `PersonPickerOrCreate.tsx`, `PersonNotesButton.tsx`, `PersonNotesViewer.tsx` : site/person/note IDs |
-| Rendez-vous | `AppointmentsPage.tsx`, `AppointmentEditor.tsx`, `AppointmentActionDialog.tsx` : registration/queue/tier/person IDs ; conserver numériques les conversions d'heures/durées |
-| Notifications | `NotificationsPage.tsx`, `ManualNotificationWizard.tsx`, `NotificationMobileCard.tsx` : notification/registration/queue/person IDs ; retirer `Number(registrationId)` et `Number` du select file |
-| Supervision | `ControlRoomPage.tsx`, `ControlRoomInsights.tsx` : site/queue/user/session/registration/tier IDs, cible de reset ; `uniqueOperatorsByUser` doit accepter `userId: string` |
-| Rapports | `ReportsPage.tsx`, `report-utils.ts` : site/queue IDs et filtres ; supprimer la normalisation `typeof rawId === 'number' ? ... : Number(rawId)` et conserver la chaîne |
-| Paramétrage | `OnboardingWizard.tsx`, `QueueServiceSettings.tsx`, `SettingsWorkspace.tsx`, `onboarding-draft.ts`, `onboarding-workflow.ts` : site/queue/tier/rule/user IDs. Ne pas toucher aux `Number` utilisés pour prix, ordres, alert positions et autres valeurs quantitatives |
-| Utilisateurs | `UsersAdminPage.tsx`, `UserAccountWizard.tsx`, `UserAssignmentModal.tsx`, `QueueOperatorsModal.tsx`, cartes utilisateur : user/site/queue/role IDs ; supprimer `Number` du select rôle |
-| Portfolio | `PortfolioPage.tsx` : `siteId` et sélection de site |
-| Design system | `service-tier.ts` : `tierId` devient chaîne. Ne plus dériver une couleur via arithmétique sur l'ID ; utiliser code/nom ou un hash stable de chaîne. `EntityPicker`/`DataTable` sont génériques, mais leurs tests et consommateurs doivent accepter une clé chaîne |
+| Zone            | Fichiers et contrôles                                                                                                                                                                                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shell/contexte  | `Topbar.tsx`, `AppShell.tsx`, `site-context-rules.ts` : site/file actifs, options du sélecteur et scope                                                                                                                                                               |
+| Cockpit         | `CockpitPage.tsx`, `QuickRegistration.tsx`, `CockpitCards.tsx` : queue/tier/session/person/registration IDs, ensembles en attente ; supprimer les `Number` sur selects queue/tier                                                                                     |
+| Files opérées   | `MyQueuesPage.tsx`, `RegistrationDetailsModal.tsx`, `QueueRegistrationMobileCard.tsx` : queue/registration IDs ; supprimer le `Number` du filtre file                                                                                                                 |
+| Personnes/notes | `PersonsPage.tsx`, `PersonFormModal.tsx`, `PersonPickerOrCreate.tsx`, `PersonNotesButton.tsx`, `PersonNotesViewer.tsx` : site/person/note IDs                                                                                                                         |
+| Rendez-vous     | `AppointmentsPage.tsx`, `AppointmentEditor.tsx`, `AppointmentActionDialog.tsx` : registration/queue/tier/person IDs ; conserver numériques les conversions d'heures/durées                                                                                            |
+| Notifications   | `NotificationsPage.tsx`, `ManualNotificationWizard.tsx`, `NotificationMobileCard.tsx` : notification/registration/queue/person IDs ; retirer `Number(registrationId)` et `Number` du select file                                                                      |
+| Supervision     | `ControlRoomPage.tsx`, `ControlRoomInsights.tsx` : site/queue/user/session/registration/tier IDs, cible de reset ; `uniqueOperatorsByUser` doit accepter `userId: string`                                                                                             |
+| Rapports        | `ReportsPage.tsx`, `report-utils.ts` : site/queue IDs et filtres ; supprimer la normalisation `typeof rawId === 'number' ? ... : Number(rawId)` et conserver la chaîne                                                                                                |
+| Paramétrage     | `OnboardingWizard.tsx`, `QueueServiceSettings.tsx`, `SettingsWorkspace.tsx`, `onboarding-draft.ts`, `onboarding-workflow.ts` : site/queue/tier/rule/user IDs. Ne pas toucher aux `Number` utilisés pour prix, ordres, alert positions et autres valeurs quantitatives |
+| Utilisateurs    | `UsersAdminPage.tsx`, `UserAccountWizard.tsx`, `UserAssignmentModal.tsx`, `QueueOperatorsModal.tsx`, cartes utilisateur : user/site/queue/role IDs ; supprimer `Number` du select rôle                                                                                |
+| Portfolio       | `PortfolioPage.tsx` : `siteId` et sélection de site                                                                                                                                                                                                                   |
+| Design system   | `service-tier.ts` : `tierId` devient chaîne. Ne plus dériver une couleur via arithmétique sur l'ID ; utiliser code/nom ou un hash stable de chaîne. `EntityPicker`/`DataTable` sont génériques, mais leurs tests et consommateurs doivent accepter une clé chaîne     |
 
 ### 8.3 Routes, query strings et QR codes
 
@@ -412,3 +412,13 @@ La migration n'est terminée que si :
 - [ ] Recherches résiduelles revues une par une.
 - [ ] Pipeline complet vert et recette métier signée.
 - [ ] Plan de déploiement, observabilité et rollback validé.
+
+<!-- CHECKPOINT id="ckpt_mvlhioer_esfs15" time="2026-10-23T21:31:17.139Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvlhvjde_u2oc46" time="2026-10-23T21:41:17.138Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvli8ecb_j6rkdx" time="2026-10-23T21:51:17.147Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvlil9az_co31nn" time="2026-10-23T22:01:17.147Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvliy4a2_pk8h4w" time="2026-10-23T22:11:17.162Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->

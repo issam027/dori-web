@@ -370,7 +370,7 @@ function ComparisonChart({
   const [metric, setMetric] = useState<ComparisonMetric>('registered');
   const available = groups.map((group, index) => {
     const id = groupId(group, index);
-    const queue = queues.find((item) => String(item.queueId) === id) ?? queues[index];
+    const queue = queues.find((item) => item.queueId === id) ?? queues[index];
     return {
       group,
       id,

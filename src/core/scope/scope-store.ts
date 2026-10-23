@@ -3,19 +3,19 @@ import type { UserScopeDto } from '@/api/generated/models';
 import { storageKeys } from '@/core/storage/storage-keys';
 
 interface ScopeState {
-  activeSiteId: number | null;
-  activeQueueId: number | null;
-  setActiveSite: (siteId: number, scope: UserScopeDto) => void;
-  setActiveQueue: (queueId: number, scope: UserScopeDto) => void;
+  activeSiteId: string | null;
+  activeQueueId: string | null;
+  setActiveSite: (siteId: string, scope: UserScopeDto) => void;
+  setActiveQueue: (queueId: string, scope: UserScopeDto) => void;
   clear: () => void;
 }
 
 const activeSiteStorageKey = storageKeys.session.activeSiteId;
-const storedSiteId = Number(sessionStorage.getItem(activeSiteStorageKey));
+const storedSiteId = sessionStorage.getItem(activeSiteStorageKey);
 
 function assertScoped(
-  resourceId: number,
-  allowedIds: number[],
+  resourceId: string,
+  allowedIds: string[],
   isGlobal: boolean,
   label: string,
 ): void {
@@ -25,11 +25,11 @@ function assertScoped(
 }
 
 export const useScopeStore = create<ScopeState>((set) => ({
-  activeSiteId: Number.isInteger(storedSiteId) && storedSiteId > 0 ? storedSiteId : null,
+  activeSiteId: storedSiteId || null,
   activeQueueId: null,
   setActiveSite: (siteId, scope) => {
     assertScoped(siteId, scope.siteIds, scope.isGlobal, 'Site');
-    sessionStorage.setItem(activeSiteStorageKey, String(siteId));
+    sessionStorage.setItem(activeSiteStorageKey, siteId);
     set({ activeSiteId: siteId, activeQueueId: null });
   },
   setActiveQueue: (queueId, scope) => {

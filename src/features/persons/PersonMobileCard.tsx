@@ -26,7 +26,7 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
     <DataTableMobileCard
       className="person-mobile-card"
       title={[person.firstName, person.lastName].filter(Boolean).join(' ')}
-      subtitle={`#${String(person.personId)}`}
+      subtitle={`#${person.personId}`}
       badge={
         <span className={`status-badge ${person.isActive ? 'status-success' : 'status-warning'}`}>
           {t(person.isActive ? 'common.active' : 'common.inactive')}

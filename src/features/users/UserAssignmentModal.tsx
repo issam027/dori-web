@@ -20,7 +20,7 @@ import { Button } from '@/design-system/components/Button';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
-  id: number;
+  id: string;
   label: string;
 }
 
@@ -40,7 +40,7 @@ export function UserAssignmentModal({
   const debouncedSearch = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto | null>(null);
-  const [roleId, setRoleId] = useState(0);
+  const [roleId, setRoleId] = useState('');
   const [saving, setSaving] = useState(false);
   const compatibleRoles = roles.filter((role) =>
     target?.kind === 'site'
@@ -52,7 +52,7 @@ export function UserAssignmentModal({
     setSearch('');
     setPage(1);
     setSelectedUser(null);
-    setRoleId(0);
+    setRoleId('');
     setSaving(false);
     onOpenChange(false);
   };
@@ -133,7 +133,7 @@ export function UserAssignmentModal({
                 setSearch(event.target.value);
                 setPage(1);
                 setSelectedUser(null);
-                setRoleId(0);
+                setRoleId('');
               }}
             />
           </label>
@@ -154,7 +154,7 @@ export function UserAssignmentModal({
                   key={user.userId}
                   onClick={() => {
                     setSelectedUser(user);
-                    setRoleId(0);
+                    setRoleId('');
                   }}
                 >
                   <span className="profile-avatar">{getUserInitials(user)}</span>
@@ -184,7 +184,7 @@ export function UserAssignmentModal({
               <select
                 value={roleId}
                 onChange={(event) => {
-                  setRoleId(Number(event.target.value));
+                  setRoleId(event.target.value);
                 }}
               >
                 <option value="">{t('settings.chooseRole')}</option>

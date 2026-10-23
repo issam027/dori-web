@@ -1,15 +1,15 @@
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
 import { canCallNext, useOperationStore } from './operation-store';
 
-function call(registrationId: number): CallNextRegistrationResponseDto {
+function call(registrationId: string): CallNextRegistrationResponseDto {
   return {
     registrationId,
-    ticketNumber: `A${String(registrationId)}`,
+    ticketNumber: `A${registrationId}`,
     entryType: 'walkin',
     calledEarly: false,
     tier: {},
     status: 'called',
-    sessionId: 1,
+    sessionId: '00000000-0000-4000-8000-000000000001',
     threadNumber: 1,
     priorityScore: 1,
     calledAt: '2026-10-08T08:00:00Z',
@@ -25,24 +25,55 @@ describe('operator call lock by queue', () => {
   it('blocks only the queue that already has an active call', () => {
     expect(canCallNext(false, undefined, false)).toBe(false);
     expect(canCallNext(true, undefined, false)).toBe(true);
-    useOperationStore.getState().startCall(10, call(1));
-    expect(canCallNext(true, useOperationStore.getState().activeCalls[10], false)).toBe(false);
-    expect(canCallNext(true, useOperationStore.getState().activeCalls[11], false)).toBe(true);
+    useOperationStore
+      .getState()
+      .startCall(
+        '00000000-0000-4000-8000-000000000010',
+        call('00000000-0000-4000-8000-000000000001'),
+      );
+    expect(
+      canCallNext(
+        true,
+        useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000010'],
+        false,
+      ),
+    ).toBe(false);
+    expect(
+      canCallNext(
+        true,
+        useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000011'],
+        false,
+      ),
+    ).toBe(true);
   });
 
   it('keeps only the four latest confirmed calls', () => {
-    [1, 2, 3, 4, 5].forEach((id) => {
+    [
+      '00000000-0000-4000-8000-000000000001',
+      '00000000-0000-4000-8000-000000000002',
+      '00000000-0000-4000-8000-000000000003',
+      '00000000-0000-4000-8000-000000000004',
+      '00000000-0000-4000-8000-000000000005',
+    ].forEach((id) => {
       useOperationStore.getState().startCall(id, call(id));
     });
     expect(useOperationStore.getState().recentCalls.map((item) => item.registrationId)).toEqual([
-      5, 4, 3, 2,
+      '00000000-0000-4000-8000-000000000005',
+      '00000000-0000-4000-8000-000000000004',
+      '00000000-0000-4000-8000-000000000003',
+      '00000000-0000-4000-8000-000000000002',
     ]);
   });
 
   it('keeps completed passages while clearing the active call', () => {
-    useOperationStore.getState().startCall(10, call(8));
+    useOperationStore
+      .getState()
+      .startCall(
+        '00000000-0000-4000-8000-000000000010',
+        call('00000000-0000-4000-8000-000000000008'),
+      );
     useOperationStore.getState().addPassage({
-      registrationId: 8,
+      registrationId: '00000000-0000-4000-8000-000000000008',
       ticketNumber: 'A8',
       personName: 'Lina Martin',
       calledAt: '2026-10-08T08:00:00Z',
@@ -50,9 +81,11 @@ describe('operator call lock by queue', () => {
       threadNumber: 1,
       outcome: 'served',
     });
-    useOperationStore.getState().closeCall(10);
+    useOperationStore.getState().closeCall('00000000-0000-4000-8000-000000000010');
 
-    expect(useOperationStore.getState().activeCalls[10]).toBeUndefined();
+    expect(
+      useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000010'],
+    ).toBeUndefined();
     expect(useOperationStore.getState().passages).toHaveLength(1);
   });
 });

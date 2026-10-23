@@ -3,7 +3,7 @@ import { useOperationStore } from './operation-store';
 
 export type CallNextOutcome = 'called' | 'empty';
 
-export async function callNextAndCommit(queueId: number): Promise<CallNextOutcome> {
+export async function callNextAndCommit(queueId: string): Promise<CallNextOutcome> {
   const response = await queueEngineControllerCallNext(queueId);
   const registration = response.data as typeof response.data | null;
   // QUEUE_EMPTY is an expected business outcome returned by the API with HTTP 200.

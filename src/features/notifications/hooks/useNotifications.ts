@@ -35,16 +35,16 @@ export function useNotifications(
   });
 }
 
-export function useNotification(notificationId: number | undefined) {
+export function useNotification(notificationId: string | undefined) {
   return useQuery({
     queryKey: queryKeys.notifications.detail(notificationId ?? null),
     enabled: notificationId !== undefined,
     queryFn: ({ signal }) =>
-      notificationsControllerFindNotificationById(notificationId ?? 0, undefined, signal),
+      notificationsControllerFindNotificationById(notificationId ?? '', undefined, signal),
   });
 }
 
-export function usePersonRegistrations(siteId: number | null, personId: number | undefined) {
+export function usePersonRegistrations(siteId: string | null, personId: string | undefined) {
   return useQuery({
     queryKey: queryKeys.registrations.list({
       siteId,
@@ -77,7 +77,7 @@ export function useSendNotification(onSuccess?: () => void | Promise<void>) {
 export function useResendNotification(onSuccess?: () => void | Promise<void>) {
   const queryClient = useQueryClient();
   return useBusinessMutation({
-    mutationFn: (notificationId: number) => notificationsControllerResend(notificationId),
+    mutationFn: (notificationId: string) => notificationsControllerResend(notificationId),
     expectedErrorStatuses: [404, 409, 422],
     invalidate: () => invalidateNotifications(queryClient),
     invalidateOnConflict: () => invalidateNotifications(queryClient),

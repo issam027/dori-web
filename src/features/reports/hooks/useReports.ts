@@ -5,10 +5,10 @@ import type { ReportBucketViewModel, ReportGroupViewModel } from '../report-util
 import { addDays, toReportMetricsViewModel } from '../report-utils';
 
 export function useReports(options: {
-  siteId: number | null;
+  siteId: string | null;
   startDate: string;
   endDate: string;
-  queueId?: number;
+  queueId?: string;
   granularity: 'day' | 'week' | 'month';
   timezone: string;
   enabled: boolean;
@@ -25,7 +25,7 @@ export function useReports(options: {
     queryFn: async ({ signal }) => {
       const requestParams = {
         siteId: options.siteId ?? undefined,
-        queueIds: options.queueId ? String(options.queueId) : undefined,
+        queueIds: options.queueId ? options.queueId : undefined,
         from: new Date(`${options.startDate}T00:00:00.000Z`).toISOString(),
         to: new Date(`${addDays(options.endDate, 1)}T00:00:00.000Z`).toISOString(),
         bucket: options.granularity,
@@ -49,7 +49,7 @@ export function useReports(options: {
       const queueSeries = await Promise.all(
         data.breakdowns.byQueue.map(async (queue) => {
           const queueResponse = await monitoringControllerSeries(
-            { ...requestParams, queueIds: String(queue.queueId) },
+            { ...requestParams, queueIds: queue.queueId },
             undefined,
             signal,
           );

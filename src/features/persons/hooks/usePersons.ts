@@ -3,7 +3,7 @@ import { queryKeys } from '@/api/client/query-keys';
 import { findPerson, findPersons } from '../api/persons-api';
 
 export function usePersonsSearch(options: {
-  siteId: number | null;
+  siteId: string | null;
   search: string;
   page: number;
   pageSize?: number;
@@ -28,10 +28,10 @@ export function usePersonsSearch(options: {
   });
 }
 
-export function usePerson(personId: number | null | undefined, enabled = true) {
+export function usePerson(personId: string | null | undefined, enabled = true) {
   return useQuery({
     queryKey: queryKeys.persons.detail(personId),
-    queryFn: ({ signal }) => findPerson(personId ?? 0, signal),
+    queryFn: ({ signal }) => findPerson(personId ?? '', signal),
     enabled: enabled && Boolean(personId),
   });
 }

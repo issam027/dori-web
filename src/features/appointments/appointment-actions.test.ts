@@ -24,34 +24,51 @@ it('uses the dedicated API operations for the five appointment journeys', async 
       calls.push('create');
       return HttpResponse.json({ data: {} });
     }),
-    http.post('http://localhost:3000/api/v1/registrations/7/reschedule', () => {
-      calls.push('reschedule');
-      return HttpResponse.json({ data: {} });
-    }),
-    http.delete('http://localhost:3000/api/v1/registrations/7', () => {
-      calls.push('cancel');
-      return HttpResponse.json({ data: {} });
-    }),
-    http.patch('http://localhost:3000/api/v1/registrations/7', () => {
-      calls.push('update');
-      return HttpResponse.json({ data: {} });
-    }),
-    http.post('http://localhost:3000/api/v1/registrations/7/check-in', () => {
-      calls.push('check-in');
-      return HttpResponse.json({ data: {} });
-    }),
+    http.post(
+      'http://localhost:3000/api/v1/registrations/00000000-0000-4000-8000-000000000007/reschedule',
+      () => {
+        calls.push('reschedule');
+        return HttpResponse.json({ data: {} });
+      },
+    ),
+    http.delete(
+      'http://localhost:3000/api/v1/registrations/00000000-0000-4000-8000-000000000007',
+      () => {
+        calls.push('cancel');
+        return HttpResponse.json({ data: {} });
+      },
+    ),
+    http.patch(
+      'http://localhost:3000/api/v1/registrations/00000000-0000-4000-8000-000000000007',
+      () => {
+        calls.push('update');
+        return HttpResponse.json({ data: {} });
+      },
+    ),
+    http.post(
+      'http://localhost:3000/api/v1/registrations/00000000-0000-4000-8000-000000000007/check-in',
+      () => {
+        calls.push('check-in');
+        return HttpResponse.json({ data: {} });
+      },
+    ),
   );
   await createAppointment({
-    personId: 2,
-    queueId: 3,
-    tierId: 4,
+    personId: '00000000-0000-4000-8000-000000000002',
+    queueId: '00000000-0000-4000-8000-000000000003',
+    tierId: '00000000-0000-4000-8000-000000000004',
     entryType: 'appointment',
     scheduledTime: '2026-10-08T10:00:00Z',
   });
-  await rescheduleAppointment(7, { scheduledTime: '2026-10-08T11:00:00Z' });
-  await cancelAppointment(7);
-  await updateAppointment(7, { tierId: 5, languagePreference: 'fr' });
-  await checkInAppointment(7);
+  await rescheduleAppointment('00000000-0000-4000-8000-000000000007', {
+    scheduledTime: '2026-10-08T11:00:00Z',
+  });
+  await cancelAppointment('00000000-0000-4000-8000-000000000007');
+  await updateAppointment('00000000-0000-4000-8000-000000000007', {
+    tierId: '00000000-0000-4000-8000-000000000005',
+    languagePreference: 'fr',
+  });
+  await checkInAppointment('00000000-0000-4000-8000-000000000007');
   expect(calls).toEqual(['create', 'reschedule', 'cancel', 'update', 'check-in']);
 });
 
@@ -115,8 +132,12 @@ it('maps appointment lifecycle states to stable visual states', () => {
     'present',
   );
   expect(appointmentVisualStatus({ ...appointment, status: 'in_progress' })).toBe('in-progress');
-  expect(appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'booked' })).toBe('booked');
-  expect(appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'rescheduled' })).toBe('booked');
+  expect(
+    appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'booked' }),
+  ).toBe('booked');
+  expect(
+    appointmentVisualStatus({ ...appointment, status: 'booked', appointmentStatus: 'rescheduled' }),
+  ).toBe('booked');
   expect(appointmentVisualStatus({ ...appointment, appointmentStatus: 'expired' })).toBe('expired');
   expect(appointmentVisualStatus({ ...appointment, status: 'cancelled' })).toBe('cancelled');
   expect(canManageAppointment(appointment)).toBe(true);

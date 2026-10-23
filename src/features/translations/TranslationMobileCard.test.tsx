@@ -10,7 +10,7 @@ it('renders long translated content and delegates mobile actions', async () => {
     <div role="list">
       <TranslationMobileCard
         translation={{
-          translationId: 1,
+          translationId: '00000000-0000-4000-8000-000000000001',
           translationKey: 'queue-operations.mobile.veryLongTranslationKey',
           category: 'ihm',
           locale: 'ar',

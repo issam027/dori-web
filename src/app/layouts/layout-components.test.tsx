@@ -8,13 +8,17 @@ import { SidebarAccordion } from './SidebarAccordion';
 import { Topbar } from './Topbar';
 
 const operator: CurrentUserResponseDto = {
-  userId: 1,
+  userId: '00000000-0000-4000-8000-000000000001',
   username: 'operator',
   userType: 'human',
   roles: ['operator'],
   permissions: ['registration_call', 'queue_view'],
   mustChangePassword: false,
-  scope: { isGlobal: false, siteIds: [1], queueIds: [1] },
+  scope: {
+    isGlobal: false,
+    siteIds: ['00000000-0000-4000-8000-000000000001'],
+    queueIds: ['00000000-0000-4000-8000-000000000001'],
+  },
 };
 
 afterEach(() => {
@@ -88,8 +92,8 @@ describe('application layout', () => {
     render(
       <MemoryRouter initialEntries={['/desk']}>
         <Topbar
-          sites={[{ id: 1, name: 'Paris' }]}
-          activeSiteId={1}
+          sites={[{ id: '00000000-0000-4000-8000-000000000001', name: 'Paris' }]}
+          activeSiteId={'00000000-0000-4000-8000-000000000001'}
           pageHeaderVisible={false}
           onLogout={logout}
           onOpenCommands={vi.fn()}
@@ -114,8 +118,8 @@ describe('application layout', () => {
 
   it('shows the active site prominently while the page title is visible', () => {
     const props = {
-      sites: [{ id: 1, name: 'Centre Horizon' }],
-      activeSiteId: 1,
+      sites: [{ id: '00000000-0000-4000-8000-000000000001', name: 'Centre Horizon' }],
+      activeSiteId: '00000000-0000-4000-8000-000000000001',
       onLogout: vi.fn(),
       onOpenCommands: vi.fn(),
       onRefresh: vi.fn(),
@@ -156,8 +160,8 @@ describe('application layout', () => {
     render(
       <MemoryRouter initialEntries={[path]}>
         <Topbar
-          sites={[{ id: 1, name: 'Centre Horizon' }]}
-          activeSiteId={1}
+          sites={[{ id: '00000000-0000-4000-8000-000000000001', name: 'Centre Horizon' }]}
+          activeSiteId={'00000000-0000-4000-8000-000000000001'}
           pageHeaderVisible={false}
           onLogout={vi.fn()}
           onOpenCommands={vi.fn()}

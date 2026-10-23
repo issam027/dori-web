@@ -4,7 +4,7 @@ import type { SiteResponseDto } from '@/api/generated/models';
 import { SiteEditor } from './SiteEditor';
 
 const site: SiteResponseDto = {
-  siteId: 1,
+  siteId: '00000000-0000-4000-8000-000000000001',
   siteName: 'Ancien nom',
   siteType: 'public',
   timezone: 'Europe/Paris',

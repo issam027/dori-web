@@ -8,8 +8,8 @@ import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
 import { queryKeys } from '@/api/client/query-keys';
 
 export function useAppointments(options: {
-  siteId: number | null;
-  queueId?: number;
+  siteId: string | null;
+  queueId?: string;
   dates: readonly string[];
 }) {
   const dateFrom = options.dates[0];
@@ -50,21 +50,20 @@ export function useAppointments(options: {
       return [first, ...remaining].flatMap((response) => response.data.items);
     },
     enabled:
-      options.siteId !== null &&
-      options.queueId !== undefined &&
-      Boolean(dateFrom && dateTo),
+      options.siteId !== null && options.queueId !== undefined && Boolean(dateFrom && dateTo),
   });
 }
 
-export function useAppointment(registrationId: number | null) {
+export function useAppointment(registrationId: string | null) {
   return useQuery({
     queryKey: queryKeys.appointments.detail(registrationId),
-    queryFn: ({ signal }) => registrationsControllerFindOne(registrationId ?? 0, undefined, signal),
+    queryFn: ({ signal }) =>
+      registrationsControllerFindOne(registrationId ?? '', undefined, signal),
     enabled: registrationId !== null,
   });
 }
 
-export function useAvailability(queueId: number, date: string, enabled = true) {
+export function useAvailability(queueId: string, date: string, enabled = true) {
   return useQuery({
     queryKey: queryKeys.availability(queueId, date),
     queryFn: ({ signal }) =>
@@ -74,18 +73,18 @@ export function useAvailability(queueId: number, date: string, enabled = true) {
         undefined,
         signal,
       ),
-    enabled: enabled && queueId > 0 && date.length > 0,
+    enabled: enabled && Boolean(queueId) && date.length > 0,
   });
 }
 
-export function useAvailabilityRange(queueId: number | undefined, dates: readonly string[]) {
+export function useAvailabilityRange(queueId: string | undefined, dates: readonly string[]) {
   const dateFrom = dates[0];
   const dateTo = dates.at(-1);
   return useQuery({
     queryKey: queryKeys.availabilityRange(queueId, dateFrom, dateTo),
     queryFn: ({ signal }) =>
       registrationsControllerGetAvailability(
-        queueId ?? 0,
+        queueId ?? '',
         { dateFrom: dateFrom ?? '', dateTo: dateTo ?? '' },
         undefined,
         signal,

@@ -4,7 +4,7 @@ import { initialOnboardingDraft, type OnboardingDraft } from './onboarding-draft
 export function recordCreatedQueue(
   draft: OnboardingDraft,
   queue: CreateQueueDto,
-  queueId: number,
+  queueId: string,
 ): OnboardingDraft {
   return {
     ...draft,
@@ -33,7 +33,7 @@ export function canAdvanceOnboarding(draft: OnboardingDraft, availableTierCount:
     return (
       availableTierCount > 0 &&
       Object.values(draft.confirmedQueueIds).every(
-        (queueId) => (draft.selectedTierIds[String(queueId)] ?? []).length > 0,
+        (queueId) => (draft.selectedTierIds[queueId] ?? []).length > 0,
       )
     );
   }

@@ -2,7 +2,7 @@ import { useQueries } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { monitoringControllerLive } from '@/api/generated/monitoring/monitoring';
 
-async function loadSiteSummary(siteId: number, signal?: AbortSignal) {
+async function loadSiteSummary(siteId: string, signal?: AbortSignal) {
   const response = await monitoringControllerLive({ siteId }, undefined, signal);
   return {
     data: {
@@ -13,7 +13,7 @@ async function loadSiteSummary(siteId: number, signal?: AbortSignal) {
   };
 }
 
-export function usePortfolioSummaries(siteIds: readonly number[], enabled = true) {
+export function usePortfolioSummaries(siteIds: readonly string[], enabled = true) {
   return useQueries({
     queries: siteIds.map((siteId) => ({
       queryKey: queryKeys.reports.portfolioSummary(siteId),

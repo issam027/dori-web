@@ -6,7 +6,7 @@ import { mockServer } from '@/shared/testing/mock-server';
 import { UserAssignmentModal } from './UserAssignmentModal';
 
 const managerRole = {
-  roleId: 3,
+  roleId: '00000000-0000-4000-8000-000000000003',
   roleName: 'manager',
   rank: 3,
   isActive: true,
@@ -18,7 +18,7 @@ function renderModal() {
   return render(
     <QueryClientProvider client={queryClient}>
       <UserAssignmentModal
-        target={{ kind: 'site', id: 1, label: 'Paris' }}
+        target={{ kind: 'site', id: '00000000-0000-4000-8000-000000000001', label: 'Paris' }}
         roles={[managerRole]}
         onOpenChange={() => undefined}
         onAssigned={() => undefined}

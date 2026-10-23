@@ -15,12 +15,12 @@ export function DisplayPage() {
   const user = useSessionStore((state) => state.user);
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
-  const queryQueue = Number(new URLSearchParams(location.search).get('queueId'));
+  const queryQueue = new URLSearchParams(location.search).get('queueId');
   const { queues, allowedQueues, displays, sessions } = useDisplaySnapshot({
     siteId: activeSiteId,
     allowedQueueIds: user?.scope.queueIds ?? [],
     isGlobal: user?.scope.isGlobal ?? false,
-    selectedQueueId: Number.isInteger(queryQueue) && queryQueue > 0 ? queryQueue : undefined,
+    selectedQueueId: queryQueue || undefined,
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
   const counterNames = new Map(
@@ -28,7 +28,7 @@ export function DisplayPage() {
       (query.data?.data.items ?? []).map(
         (session) =>
           [
-            `${String(allowedQueues[index]?.queueId)}:${String(session.threadNumber)}`,
+            `${allowedQueues[index]?.queueId ?? 'unknown'}:${String(session.threadNumber)}`,
             session.counterName?.trim() || undefined,
           ] as const,
       ),
@@ -43,7 +43,7 @@ export function DisplayPage() {
           queueId: snapshot.queueId,
           queueName: snapshot.queueName,
           counterName: counterNames.get(
-            `${String(snapshot.queueId)}:${String(thread.threadNumber)}`,
+            `${snapshot.queueId}:${String(thread.threadNumber)}`,
           ),
         })),
     )
@@ -98,7 +98,7 @@ export function DisplayPage() {
   }, [activePageCount, nextPageCount]);
   useEffect(() => {
     const key = current?.currentTicket
-      ? `${current.currentTicket}:${String(current.threadNumber)}:${current.counterName ?? ''}:${String(current.queueId)}`
+      ? `${current.currentTicket}:${String(current.threadNumber)}:${current.counterName ?? ''}:${current.queueId}`
       : '';
     if (!key || key === previousCall.current) return;
     previousCall.current = key;
@@ -153,7 +153,8 @@ export function DisplayPage() {
           <h1>{scopeTitle}</h1>
         </div>
         <time>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           type="button"
           className="display-audio"
           aria-pressed={audio}
@@ -187,7 +188,7 @@ export function DisplayPage() {
               {visibleActiveCalls.map((call) => (
                 <article
                   className={`display-active-ticket${attention && call.currentTicket === current?.currentTicket ? ' is-calling' : ''}`}
-                  key={`${call.currentTicket ?? ''}-${String(call.queueId)}-${String(call.threadNumber)}`}
+                  key={`${call.currentTicket ?? ''}-${call.queueId}-${String(call.threadNumber)}`}
                 >
                   <div className="display-ticket-number">
                     <small>{__t('common.ticket')}</small>
@@ -201,7 +202,7 @@ export function DisplayPage() {
                     <span>
                       {call.queueName ??
                         __t('display.queueName', {
-                          value0: String(call.queueId),
+                          value0: call.queueId,
                         })}
                     </span>
                   </div>
@@ -230,14 +231,14 @@ export function DisplayPage() {
           {nextTickets.length ? (
             <ol key={`next-${String(currentNextPage)}`}>
               {visibleNextTickets.map((item, index) => (
-                <li key={`${item.ticket}-${String(item.queueId)}-${String(index)}`}>
+                <li key={`${item.ticket}-${item.queueId}-${String(index)}`}>
                   <span>{String(index + 1).padStart(2, '0')}</span>
                   <div>
                     <strong>{item.ticket}</strong>
                     <small>
                       {item.queueName ??
                         __t('display.queueName', {
-                          value0: String(item.queueId),
+                          value0: item.queueId,
                         })}
                     </small>
                   </div>

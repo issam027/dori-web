@@ -10,10 +10,10 @@ export const findSites = (signal?: AbortSignal, isActive?: boolean) =>
 
 export const findAllSites = (signal?: AbortSignal) => findSites(signal);
 
-export const findSite = (siteId: number, signal?: AbortSignal) =>
+export const findSite = (siteId: string, signal?: AbortSignal) =>
   sitesControllerFindSite(siteId, undefined, signal);
 
-export const deactivateSite = (siteId: number) => sitesControllerDeleteSite(siteId);
+export const deactivateSite = (siteId: string) => sitesControllerDeleteSite(siteId);
 
-export const reactivateSite = (siteId: number) =>
+export const reactivateSite = (siteId: string) =>
   sitesControllerUpdateSite(siteId, { isActive: true });

@@ -63,7 +63,7 @@ export function QueueServiceSettings({
       enabled: item.isActive,
     })),
   });
-  const refresh = async (queueId: number, tierId: number) => {
+  const refresh = async (queueId: string, tierId: string) => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeys.tiers.byQueue(queueId) }),
       queryClient.invalidateQueries({ queryKey: queryKeys.tiers.rules(queueId, tierId) }),
@@ -140,7 +140,7 @@ function TierConfigurationCard({
   association?: QueueTierResponseDto;
   rules: NotificationRuleResponseDto[];
   order: number;
-  refresh: (queueId: number, tierId: number) => Promise<void>;
+  refresh: (queueId: string, tierId: string) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const welcomeSmsRule = ruleFor(rules, 'welcomeSms');
@@ -219,7 +219,8 @@ function TierConfigurationCard({
     <article
       className={`station tier-config-card ${association?.isActive ? 'selected is-selected' : ''}`}
     >
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         type="button"
         className="tier-choice tier-choice-toggle"
         aria-pressed={Boolean(association?.isActive)}
@@ -251,7 +252,9 @@ function TierConfigurationCard({
             t('onboarding.enableService')
           )}
         </span>
-        <span className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}>
+        <span
+          className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}
+        >
           <strong>{tier.tierName}</strong>
           <small>{tier.description || tier.tierCode}</small>
         </span>
@@ -291,7 +294,7 @@ function TierConfigurationCard({
           <label className="tier-default-option">
             <input
               type="radio"
-              name={`default-tier-${String(queue.queueId)}`}
+              name={`default-tier-${queue.queueId}`}
               checked={isDefault}
               onChange={() => {
                 setDefault(true);
@@ -379,7 +382,8 @@ function TierConfigurationCard({
               <span>{t('onboarding.trackingLink')}</span>
             </label>
           </fieldset>
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={pending}

@@ -163,8 +163,8 @@ export function ProfilePage() {
                   {user.scope.isGlobal
                     ? __t('profile.profile.global')
                     : __t('profile.scope.sitesAndQueues', {
-                        value0: String(user.scope.siteIds.length),
-                        value1: String(user.scope.queueIds.length),
+                        value0: user.scope.siteIds.length,
+                        value1: user.scope.queueIds.length,
                       })}
                 </dd>
               </div>
@@ -377,7 +377,7 @@ export function ProfilePage() {
               user.scope.isGlobal
                 ? __t('profile.profile.global')
                 : __t('profile.scope.sites', {
-                    value0: String(user.scope.siteIds.length),
+                    value0: user.scope.siteIds.length,
                   })
             }
             icon={<Globe2 />}

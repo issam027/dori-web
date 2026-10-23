@@ -17,13 +17,13 @@ describe('onboarding recovery', () => {
     };
     const draft = {
       ...structuredClone(initialOnboardingDraft),
-      confirmedSiteId: 18,
-      confirmedQueueIds: { ACC: 41 },
+      confirmedSiteId: '00000000-0000-4000-8000-000000000018',
+      confirmedQueueIds: { ACC: '00000000-0000-4000-8000-000000000041' },
       queues: [{ queueCode: 'ACC' }, { queueCode: 'LAB' }],
     };
     saveOnboardingDraft(draft, storage);
     const restored = loadOnboardingDraft(storage);
-    expect(restored.confirmedSiteId).toBe(18);
+    expect(restored.confirmedSiteId).toBe('00000000-0000-4000-8000-000000000018');
     const [confirmed, pending] = restored.queues;
     expect(confirmed && queueNeedsCreation(restored, confirmed)).toBe(false);
     expect(pending && queueNeedsCreation(restored, pending)).toBe(true);
@@ -35,13 +35,13 @@ describe('onboarding recovery', () => {
     const legacy = JSON.stringify({
       step: 2,
       site: { siteName: 'Site repris' },
-      confirmedSiteId: 9,
+      confirmedSiteId: '00000000-0000-4000-8000-000000000009',
     });
     const restored = loadOnboardingDraft({
       getItem: (key) => (key === 'dori:onboarding:v1' ? legacy : null),
     });
     expect(restored.draftVersion).toBe(3);
-    expect(restored.confirmedSiteId).toBe(9);
+    expect(restored.confirmedSiteId).toBe('00000000-0000-4000-8000-000000000009');
     expect(restored.site.siteName).toBe('Site repris');
     expect(restored.site.timezone).toBe('Africa/Tunis');
     expect(restored.confirmedQueueIds).toEqual({});
@@ -53,7 +53,7 @@ describe('onboarding recovery', () => {
           ? JSON.stringify({
               draftVersion: 2,
               step: 4,
-              confirmedQueueIds: { ACC: 41 },
+              confirmedQueueIds: { ACC: '00000000-0000-4000-8000-000000000041' },
               selectedTierIds: { '41': [2] },
             })
           : null,

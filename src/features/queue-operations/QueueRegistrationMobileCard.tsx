@@ -44,7 +44,7 @@ export function QueueRegistrationMobileCard({
             >
               {registration.tierName ??
                 t('queue-operations.quickRegistration.serviceFallback', {
-                  id: String(registration.tierId),
+                  id: registration.tierId,
                 })}
             </span>
           ),

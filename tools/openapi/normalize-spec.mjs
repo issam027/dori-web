@@ -17,11 +17,11 @@ const propertyTypeOverrides = {
   'RescheduleRegistrationResponseDto.appointmentStatus': 'string',
   'RescheduleRegistrationResponseDto.scheduledTime': 'string',
   'QueuePreviewItemDto.scheduledTime': 'string',
-  'ThreadSessionItemDto.currentRegistrationId': 'number',
+  'ThreadSessionItemDto.currentRegistrationId': 'string',
   'QueueSessionResponseDto.threadNumber': 'number',
   'QueueSessionResponseDto.disconnectedAt': 'string',
-  'QueueSessionResponseDto.takenOverFromSessionId': 'number',
-  'QueueSessionResponseDto.reassignedRegistrationId': 'number',
+  'QueueSessionResponseDto.takenOverFromSessionId': 'string',
+  'QueueSessionResponseDto.reassignedRegistrationId': 'string',
   'CallNextRegistrationResponseDto.scheduledTime': 'string',
   'UpdateRegistrationStatusResponseDto.servedAt': 'string',
 };
@@ -29,6 +29,32 @@ const propertyTypeOverrides = {
 export default function normalizeSpec(document) {
   const normalized = structuredClone(document);
   const schemas = normalized.components?.schemas ?? {};
+
+  // The current Swagger export duplicates some UUID path parameters with an
+  // empty name. The correctly named parameter is already present; discard only
+  // those invalid duplicates and assert every path placeholder remains covered.
+  for (const [path, pathItem] of Object.entries(normalized.paths ?? {})) {
+    for (const method of ['get', 'post', 'put', 'patch', 'delete']) {
+      const operation = pathItem?.[method];
+      if (!operation?.parameters) continue;
+
+      operation.parameters = operation.parameters.filter(
+        (parameter) => !(parameter?.in === 'path' && parameter.name === ''),
+      );
+
+      const placeholders = [...path.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]);
+      const namedPathParameters = operation.parameters
+        .filter((parameter) => parameter?.in === 'path')
+        .map((parameter) => parameter.name);
+      for (const placeholder of placeholders) {
+        if (!namedPathParameters.includes(placeholder)) {
+          throw new Error(
+            `OpenAPI path parameter is missing after normalization: ${method.toUpperCase()} ${path} (${placeholder})`,
+          );
+        }
+      }
+    }
+  }
 
   for (const [qualifiedName, type] of Object.entries(propertyTypeOverrides)) {
     const separator = qualifiedName.indexOf('.');
@@ -41,7 +67,60 @@ export default function normalizeSpec(document) {
     }
 
     property.type = type;
+
+    if (type === 'string' && propertyName.endsWith('Id')) {
+      property.format = 'uuid';
+    }
   }
+
+  // Temporary contract repair: all domain identifiers are UUIDs. Keep these
+  // assertions until the upstream Swagger document emits the correct types.
+  const uuidArrayProperties = [
+    'UserScopeDto.siteIds',
+    'UserScopeDto.queueIds',
+    'MonitoringLiveOperatorDto.queueIds',
+    'MonitoringAppliedFiltersDto.queueIds',
+    'MonitoringAppliedFiltersDto.userIds',
+    'MonitoringAppliedFiltersDto.tierIds',
+  ];
+
+  for (const qualifiedName of uuidArrayProperties) {
+    const separator = qualifiedName.indexOf('.');
+    const schemaName = qualifiedName.slice(0, separator);
+    const propertyName = qualifiedName.slice(separator + 1);
+    const property = schemas[schemaName]?.properties?.[propertyName];
+
+    if (!property?.items) {
+      throw new Error(`OpenAPI UUID array normalization target is missing: ${qualifiedName}`);
+    }
+
+    property.items.type = 'string';
+    property.items.format = 'uuid';
+  }
+
+  const deleteItemId = schemas.DeleteItemResponseDto?.properties?.id;
+  if (!deleteItemId) {
+    throw new Error('OpenAPI UUID normalization target is missing: DeleteItemResponseDto.id');
+  }
+  deleteItemId.type = 'string';
+  deleteItemId.format = 'uuid';
+
+  const exampleUuid = '00000000-0000-4000-8000-000000000001';
+  const normalizeUuidExamples = (value) => {
+    if (!value || typeof value !== 'object') return;
+
+    if (value.type === 'string' && value.format === 'uuid' && 'example' in value) {
+      value.example = exampleUuid;
+    }
+    if (value.type === 'array' && value.items?.format === 'uuid' && Array.isArray(value.example)) {
+      value.example = value.example.map(
+        (_, index) => `${exampleUuid.slice(0, -1)}${((index % 9) + 1).toString()}`,
+      );
+    }
+
+    for (const child of Object.values(value)) normalizeUuidExamples(child);
+  };
+  normalizeUuidExamples(normalized);
 
   const dailyResetOrigin = schemas.QueueConfigOriginsResponseDto?.properties?.dailyResetTime;
   if (!dailyResetOrigin) {

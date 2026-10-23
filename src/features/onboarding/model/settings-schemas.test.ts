@@ -9,8 +9,8 @@ describe('settings form schemas', () => {
   it('rejects an incomplete tier association', () => {
     expect(
       tierAssociationSchema.safeParse({
-        queueId: 0,
-        tierId: 0,
+        queueId: '00000000-0000-4000-8000-000000000000',
+        tierId: '00000000-0000-4000-8000-000000000000',
         price: -1,
         currency: 'EU',
         order: 1,
@@ -22,8 +22,8 @@ describe('settings form schemas', () => {
   it('validates a complete notification rule', () => {
     expect(
       notificationRuleSchema.safeParse({
-        queueId: 1,
-        tierId: 2,
+        queueId: '00000000-0000-4000-8000-000000000001',
+        tierId: '00000000-0000-4000-8000-000000000002',
         type: 'threshold',
         channel: 'sms',
         threshold: 'position',

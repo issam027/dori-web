@@ -52,7 +52,7 @@ export function KioskWizard() {
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const site = useSite(activeSiteId);
   const [{ flow, walkinStep }, dispatch] = useReducer(kioskWizardReducer, initialKioskWizardState);
-  const [queueId, setQueueId] = useState<number>();
+  const [queueId, setQueueId] = useState<string>();
   const [tier, setTier] = useState<QueueTierResponseDto>();
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -428,7 +428,7 @@ export function KioskWizard() {
                         <strong>
                           {item.tier?.tierName ??
                             __t('kiosk.tier.name', {
-                              value0: String(item.tierId),
+                              value0: item.tierId,
                             })}
                         </strong>
                         <span>
@@ -523,7 +523,7 @@ export function KioskWizard() {
                       <td>
                         {tier?.tier?.tierName ??
                           __t('kiosk.tier.name', {
-                            value0: String(tier?.tierId ?? ''),
+                            value0: tier?.tierId ?? '',
                           })}
                       </td>
                     </tr>

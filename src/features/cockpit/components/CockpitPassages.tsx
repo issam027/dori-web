@@ -22,14 +22,14 @@ export function CockpitPassages({
   onStatusChange: (status: 'served' | 'no_show') => void;
 }) {
   const { t } = useTranslation();
-  const [printingId, setPrintingId] = useState<number | null>(null);
+  const [printingId, setPrintingId] = useState<string | null>(null);
   const printingPassage = passages.find((passage) => passage.registrationId === printingId);
 
   useEffect(() => {
     if (!printingPassage) return;
     return printDocument({
       datasetKey: 'printPassage',
-      datasetValue: String(printingPassage.registrationId),
+      datasetValue: printingPassage.registrationId,
       delayMs: 50,
       onAfterPrint: () => {
         setPrintingId(null);
@@ -85,7 +85,7 @@ export function CockpitPassages({
         {passages.map((passage) => (
           <article
             className="passage-summary-card"
-            key={`${String(passage.registrationId)}-${passage.closedAt}`}
+            key={`${passage.registrationId}-${passage.closedAt}`}
           >
             <header>
               <div>

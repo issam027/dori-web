@@ -63,10 +63,10 @@ export function usePublicTracking(token: string) {
 }
 
 export function useDisplaySnapshot(options: {
-  siteId: number | null;
-  allowedQueueIds: readonly number[];
+  siteId: string | null;
+  allowedQueueIds: readonly string[];
   isGlobal: boolean;
-  selectedQueueId?: number;
+  selectedQueueId?: string;
 }) {
   const queues = useQuery({
     queryKey: queryKeys.publicExperience.displayQueues(options.siteId),
@@ -109,8 +109,8 @@ export function useDisplaySnapshot(options: {
 }
 
 export function useKioskCatalog(
-  siteId: number | null,
-  queueId: number | undefined,
+  siteId: string | null,
+  queueId: string | undefined,
   enabled: boolean,
 ) {
   const queues = useQuery({
@@ -135,7 +135,7 @@ export function useKioskCatalog(
     enabled: Boolean(queueId),
     queryFn: ({ signal }) =>
       serviceTiersControllerGetQueueTiers(
-        queueId ?? 0,
+        queueId ?? '',
         { page: 1, pageSize: 100, sort: 'displayOrder:asc' },
         undefined,
         signal,

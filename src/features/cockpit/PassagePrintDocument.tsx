@@ -39,7 +39,7 @@ export function PassagePrintDocument({
   const fallbackNameParts = passage.personName.trim().split(/\s+/);
   const firstName = passage.firstName ?? fallbackNameParts.shift() ?? '';
   const lastName = passage.lastName ?? fallbackNameParts.join(' ');
-  const reference = `DORIFY-PASSAGE-${String(passage.registrationId)}`;
+  const reference = `DORIFY-PASSAGE-${passage.registrationId}`;
   const unknown = t('passageReceipt.notRecorded');
 
   return createPortal(

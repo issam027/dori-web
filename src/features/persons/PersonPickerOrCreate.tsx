@@ -18,7 +18,7 @@ export function PersonPickerOrCreate({
   value,
   onChange,
 }: {
-  siteId: number;
+  siteId: string;
   value: PersonChoice | null;
   onChange: (choice: PersonChoice | null) => void;
 }) {
@@ -48,7 +48,8 @@ export function PersonPickerOrCreate({
   return (
     <div className="person-picker form-stack">
       <div className="segmented">
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           type="button"
           aria-pressed={mode === 'existing'}
           onClick={() => {
@@ -58,7 +59,8 @@ export function PersonPickerOrCreate({
         >
           {__t('persons.personPickerOrCreate.personneConnue')}
         </Button>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           type="button"
           aria-pressed={mode === 'new'}
           onClick={() => {

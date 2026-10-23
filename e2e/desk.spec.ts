@@ -13,28 +13,34 @@ import {
 } from './support/scenario-fixtures';
 
 const site = buildSite();
-const primaryQueue = buildQueue({ queueId: 10, queueName: 'Accueil prioritaire' });
-const queues = [primaryQueue, buildQueue({ queueId: 11, queueName: 'Accueil secondaire' })];
+const primaryQueue = buildQueue({
+  queueId: '00000000-0000-4000-8000-000000000010',
+  queueName: 'Accueil prioritaire',
+});
+const queues = [
+  primaryQueue,
+  buildQueue({ queueId: '00000000-0000-4000-8000-000000000011', queueName: 'Accueil secondaire' }),
+];
 
-const session = (queueId = 10) => ({
-  sessionId: queueId * 10,
+const session = (queueId = '00000000-0000-4000-8000-000000000010') => ({
+  sessionId: '00000000-0000-4000-8000-000000000100',
   queueId,
   threadNumber: 1,
-  userId: 1,
+  userId: '00000000-0000-4000-8000-000000000001',
   username: 'operator.e2e',
   mode: 'active',
   connectedAt: '2026-10-09T09:00:00Z',
 });
 
-const call = (registrationId = 500, ticketNumber = 'E001') => ({
+const call = (registrationId = '00000000-0000-4000-8000-000000000500', ticketNumber = 'E001') => ({
   registrationId,
   ticketNumber,
   entryType: 'walkin',
   scheduledTime: null,
   calledEarly: false,
-  tier: { tierId: 1, tierName: 'Standard E2E' },
+  tier: { tierId: '00000000-0000-4000-8000-000000000001', tierName: 'Standard E2E' },
   status: 'in_service',
-  sessionId: 100,
+  sessionId: '00000000-0000-4000-8000-000000000100',
   threadNumber: 1,
   priorityScore: 10,
   calledAt: '2026-10-09T09:15:00Z',
@@ -55,11 +61,11 @@ async function installDesk(
   });
 }
 
-function activeSessionHandler(activeQueueIds: Set<number>): ApiScenarioHandler {
+function activeSessionHandler(activeQueueIds: Set<string>): ApiScenarioHandler {
   return async ({ method, path, route }) => {
-    const match = path.match(/^\/api\/v1\/queues\/(\d+)\/sessions(?:\/(\d+))?$/);
+    const match = path.match(/^\/api\/v1\/queues\/([^/]+)\/sessions(?:\/([^/]+))?$/);
     if (!match) return false;
-    const queueId = Number(match[1]);
+    const queueId = match[1] ?? '';
     if (method === 'GET') {
       await route.fulfill({
         json: apiEnvelope(paginated(activeQueueIds.has(queueId) ? [session(queueId)] : [])),
@@ -73,7 +79,7 @@ function activeSessionHandler(activeQueueIds: Set<number>): ApiScenarioHandler {
     }
     if (method === 'DELETE') {
       activeQueueIds.delete(queueId);
-      await route.fulfill({ json: apiEnvelope({ sessionId: Number(match[2]), closed: true }) });
+      await route.fulfill({ json: apiEnvelope({ sessionId: match[2] ?? '', closed: true }) });
       return true;
     }
     return false;
@@ -83,7 +89,7 @@ function activeSessionHandler(activeQueueIds: Set<number>): ApiScenarioHandler {
 test('opening and closing a desk refreshes the card and prioritizes the active queue', async ({
   page,
 }) => {
-  const activeQueueIds = new Set<number>();
+  const activeQueueIds = new Set<string>();
   await installDesk(page, [activeSessionHandler(activeQueueIds)]);
   await page.goto('/desk');
   const primary = page.locator('.queue-desk-card').filter({ hasText: 'Accueil prioritaire' });
@@ -108,11 +114,11 @@ test('the cockpit restores the server-side current call when local state is miss
   page,
 }) => {
   const operational: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/queues/10/threads') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/threads') {
       await route.fulfill({
         json: apiEnvelope(
           paginated([
@@ -121,7 +127,7 @@ test('the cockpit restores the server-side current call when local state is miss
               status: 'occupied',
               session: {
                 ...session(),
-                currentRegistrationId: 500,
+                currentRegistrationId: '00000000-0000-4000-8000-000000000500',
                 lastSeenAt: '2026-10-09T09:15:00Z',
                 inactiveMinutes: 0,
               },
@@ -131,7 +137,7 @@ test('the cockpit restores the server-side current call when local state is miss
       });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/registrations/500') {
+    if (method === 'GET' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500') {
       await route.fulfill({
         json: apiEnvelope(
           buildRegistration({
@@ -140,9 +146,9 @@ test('the cockpit restores the server-side current call when local state is miss
             updatedAt: '2026-10-09T09:15:00Z',
             businessDate: '2026-10-09',
             registrationTrackingToken: 'desk-restore-e2e',
-            tierId: 1,
-            servedBySessionId: 100,
-            servedByUserId: 1,
+            tierId: '00000000-0000-4000-8000-000000000001',
+            servedBySessionId: '00000000-0000-4000-8000-000000000100',
+            servedByUserId: '00000000-0000-4000-8000-000000000001',
             firstName: 'Lina',
             lastName: 'Martin',
           }),
@@ -150,7 +156,7 @@ test('the cockpit restores the server-side current call when local state is miss
       });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100') {
       await route.fulfill({
         json: apiEnvelope(buildPerson({ firstName: 'Lina', lastName: 'Martin' })),
       });
@@ -162,8 +168,8 @@ test('the cockpit restores the server-side current call when local state is miss
           paginated([
             buildRegistration({
               status: 'in_progress',
-              servedBySessionId: 100,
-              servedByUserId: 1,
+              servedBySessionId: '00000000-0000-4000-8000-000000000100',
+              servedByUserId: '00000000-0000-4000-8000-000000000001',
               firstName: 'Lina',
               lastName: 'Martin',
             }),
@@ -195,22 +201,22 @@ test('calling and serving a person shows details, disables mutation and builds a
       updatedAt: '2026-10-09T09:15:00Z',
       businessDate: '2026-10-09',
       registrationTrackingToken: 'desk-e2e',
-      tierId: 1,
-      servedBySessionId: 100,
-      servedByUserId: 1,
+      tierId: '00000000-0000-4000-8000-000000000001',
+      servedBySessionId: '00000000-0000-4000-8000-000000000100',
+      servedByUserId: '00000000-0000-4000-8000-000000000001',
       firstName: undefined,
       lastName: 'Martin',
       activeNoteCount: 3,
     });
   const operational: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/queues/10/status') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/status') {
       await route.fulfill({
         json: apiEnvelope({
-          queueId: 10,
+          queueId: '00000000-0000-4000-8000-000000000010',
           waitingCount: 1,
           activeThreads: 1,
           estimatedWaitMinutes: 5,
@@ -219,12 +225,12 @@ test('calling and serving a person shows details, disables mutation and builds a
       });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/queues/10/next') {
+    if (method === 'POST' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/next') {
       called = true;
       await route.fulfill({ json: apiEnvelope(call()) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/registrations/500') {
+    if (method === 'GET' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500') {
       await route.fulfill({ json: apiEnvelope(activeRegistration()) });
       return true;
     }
@@ -238,21 +244,26 @@ test('calling and serving a person shows details, disables mutation and builds a
       await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100') {
       await route.fulfill({
         json: apiEnvelope(buildPerson({ firstName: null, lastName: 'Martin' })),
       });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100/notes') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100/notes') {
       await route.fulfill({ json: apiEnvelope({ ...paginated([{}]), total: 3 }) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/500/served') {
+    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/served') {
       servedCalls += 1;
       await new Promise((resolve) => setTimeout(resolve, 150));
       hasBeenServed = true;
-      await route.fulfill({ json: apiEnvelope({ registrationId: 500, status: 'served' }) });
+      await route.fulfill({
+        json: apiEnvelope({
+          registrationId: '00000000-0000-4000-8000-000000000500',
+          status: 'served',
+        }),
+      });
       return true;
     }
     return false;
@@ -311,21 +322,21 @@ test('marking a called person absent also creates a discreet passage summary', a
       updatedAt: '2026-10-09T09:15:00Z',
       businessDate: '2026-10-09',
       registrationTrackingToken: 'desk-absent-e2e',
-      tierId: 1,
-      servedBySessionId: 100,
-      servedByUserId: 1,
+      tierId: '00000000-0000-4000-8000-000000000001',
+      servedBySessionId: '00000000-0000-4000-8000-000000000100',
+      servedByUserId: '00000000-0000-4000-8000-000000000001',
     });
   const absent: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/queues/10/next') {
+    if (method === 'POST' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/next') {
       called = true;
       await route.fulfill({ json: apiEnvelope(call()) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/registrations/500') {
+    if (method === 'GET' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500') {
       await route.fulfill({ json: apiEnvelope(absentRegistration()) });
       return true;
     }
@@ -339,14 +350,19 @@ test('marking a called person absent also creates a discreet passage summary', a
       await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100') {
       await route.fulfill({ json: apiEnvelope(buildPerson()) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/500/no-show') {
+    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/no-show') {
       noShowCalls += 1;
       markedAbsent = true;
-      await route.fulfill({ json: apiEnvelope({ registrationId: 500, status: 'no_show' }) });
+      await route.fulfill({
+        json: apiEnvelope({
+          registrationId: '00000000-0000-4000-8000-000000000500',
+          status: 'no_show',
+        }),
+      });
       return true;
     }
     return false;
@@ -362,11 +378,11 @@ test('marking a called person absent also creates a discreet passage summary', a
 
 test('zero waiting is handled as a normal business outcome', async ({ page }) => {
   const empty: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/queues/10/next') {
+    if (method === 'POST' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/next') {
       await route.fulfill({
         json: {
           code: 'QUEUE_EMPTY',
@@ -398,17 +414,17 @@ test('two operators competing for the same next ticket produce one call and one 
   const second = await context.newPage();
   let attempts = 0;
   const competing: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/sessions') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/queues/10/next') {
+    if (method === 'POST' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/next') {
       attempts += 1;
       if (attempts === 1) await route.fulfill({ json: apiEnvelope(call()) });
       else await route.fulfill(apiFailure(409, 'REGISTRATION_ALREADY_CALLED'));
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/registrations/500') {
+    if (method === 'GET' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500') {
       await route.fulfill({
         json: apiEnvelope(
           buildRegistration({
@@ -417,13 +433,13 @@ test('two operators competing for the same next ticket produce one call and one 
             updatedAt: '2026-10-09T09:15:00Z',
             businessDate: '2026-10-09',
             registrationTrackingToken: 'concurrency-e2e',
-            tierId: 1,
+            tierId: '00000000-0000-4000-8000-000000000001',
           }),
         ),
       });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100') {
       await route.fulfill({ json: apiEnvelope(buildPerson()) });
       return true;
     }

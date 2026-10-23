@@ -25,7 +25,7 @@ export function ReportsPage() {
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [queueId, setQueueId] = useState<number>();
+  const [queueId, setQueueId] = useState<string>();
   const [granularity, setGranularity] = useState<'day' | 'week' | 'month'>('day');
   const site = useSite(siteId);
   const today = dateInTimeZone(site.data?.data.timezone ?? fallbackTimeZone);
@@ -130,7 +130,7 @@ export function ReportsPage() {
             <select
               value={queueId ?? ''}
               onChange={(event) => {
-                setQueueId(event.target.value ? Number(event.target.value) : undefined);
+                setQueueId(event.target.value || undefined);
               }}
             >
               <option value="">{__t('common.all')}</option>
@@ -151,36 +151,40 @@ export function ReportsPage() {
         ) : null}
         {!reports.isLoading ? (
           <>
-        {[
-          { label: __t('common.registered'), value: totals?.volume.registered, icon: UserPlus },
-          { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
-          {
-            label: __t('reports.averageWaitAbbreviation'),
-            value:
-              totals?.timing.averageWaitMinutes == null
-                ? '—'
-                : `${number(totals.timing.averageWaitMinutes)} ${__t('common.min')}`,
-            icon: Timer,
-          },
-          {
-            label: __t('reports.averageServiceAbbreviation'),
-            value:
-              totals?.timing.averageServiceMinutes == null
-                ? '—'
-                : `${number(totals.timing.averageServiceMinutes)} ${__t('common.min')}`,
-            icon: Gauge,
-          },
-          {
-            label: __t('common.noShow'),
-            value:
-              totals?.rates.noShowRate == null
-                ? '—'
-                : formatReportPercent(totals.rates.noShowRate, i18n.language),
-            icon: UserX,
-          },
-        ].map(({ label, value, icon: Icon }) => (
-          <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
-        ))}
+            {[
+              { label: __t('common.registered'), value: totals?.volume.registered, icon: UserPlus },
+              {
+                label: __t('common.servedPlural'),
+                value: totals?.volume.served,
+                icon: CircleCheck,
+              },
+              {
+                label: __t('reports.averageWaitAbbreviation'),
+                value:
+                  totals?.timing.averageWaitMinutes == null
+                    ? '—'
+                    : `${number(totals.timing.averageWaitMinutes)} ${__t('common.min')}`,
+                icon: Timer,
+              },
+              {
+                label: __t('reports.averageServiceAbbreviation'),
+                value:
+                  totals?.timing.averageServiceMinutes == null
+                    ? '—'
+                    : `${number(totals.timing.averageServiceMinutes)} ${__t('common.min')}`,
+                icon: Gauge,
+              },
+              {
+                label: __t('common.noShow'),
+                value:
+                  totals?.rates.noShowRate == null
+                    ? '—'
+                    : formatReportPercent(totals.rates.noShowRate, i18n.language),
+                icon: UserX,
+              },
+            ].map(({ label, value, icon: Icon }) => (
+              <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
+            ))}
           </>
         ) : null}
       </div>

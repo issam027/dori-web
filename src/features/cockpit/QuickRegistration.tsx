@@ -35,14 +35,14 @@ export function QuickRegistration({
   siteId,
   queues,
 }: {
-  siteId: number;
+  siteId: string;
   queues: readonly QueueResponseDto[];
 }) {
   const { t: __t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [choice, setChoice] = useState<PersonChoice | null>(null);
-  const [queueId, setQueueId] = useState(queues[0]?.queueId ?? 0);
-  const [tierId, setTierId] = useState(0);
+  const [queueId, setQueueId] = useState(queues[0]?.queueId ?? '');
+  const [tierId, setTierId] = useState('');
   const [entryType, setEntryType] = useState<'walkin' | 'appointment'>('walkin');
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
@@ -62,7 +62,7 @@ export function QuickRegistration({
         undefined,
         signal,
       ),
-    enabled: queueId > 0,
+    enabled: Boolean(queueId),
   });
   const activeTiers = tiers.data?.data.items.filter((item) => item.isActive) ?? [];
   const site = useQuery({
@@ -72,7 +72,7 @@ export function QuickRegistration({
   const availability = useQuery({
     queryKey: queryKeys.availability(queueId, appointmentDate),
     queryFn: () => getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
-    enabled: entryType === 'appointment' && queueId > 0 && Boolean(appointmentDate),
+    enabled: entryType === 'appointment' && Boolean(queueId) && Boolean(appointmentDate),
   });
   const serviceTimeZone = availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
   const availableSlots = availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
@@ -149,8 +149,8 @@ export function QuickRegistration({
   const reset = () => {
     setStep(1);
     setChoice(null);
-    setQueueId(queues[0]?.queueId ?? 0);
-    setTierId(0);
+    setQueueId(queues[0]?.queueId ?? '');
+    setTierId('');
     setEntryType('walkin');
     setAppointmentDate('');
     setAppointmentTime('');
@@ -322,8 +322,8 @@ export function QuickRegistration({
                   <select
                     value={queueId}
                     onChange={(e) => {
-                      setQueueId(Number(e.target.value));
-                      setTierId(0);
+                      setQueueId(e.target.value);
+                      setTierId('');
                       setAppointmentTime('');
                     }}
                   >
@@ -339,7 +339,7 @@ export function QuickRegistration({
                   <select
                     value={tierId}
                     onChange={(e) => {
-                      setTierId(Number(e.target.value));
+                      setTierId(e.target.value);
                     }}
                   >
                     <option value={0}>{__t('common.choose')}</option>
@@ -347,7 +347,7 @@ export function QuickRegistration({
                       <option key={tier.tierId} value={tier.tierId}>
                         {tier.tier?.tierName ??
                           __t('queue-operations.quickRegistration.serviceFallback', {
-                            id: String(tier.tierId),
+                            id: tier.tierId,
                           })}{' '}
                         ·{' '}
                         {new Intl.NumberFormat(i18n.language, {

@@ -10,7 +10,7 @@ import {
 } from './report-utils';
 
 const group: ReportGroupViewModel = {
-  dimension: { queueId: 10 },
+  dimension: { queueId: '00000000-0000-4000-8000-000000000010' },
   buckets: [],
   volume: {
     registered: 12,
@@ -34,9 +34,13 @@ const group: ReportGroupViewModel = {
 
 describe('report calculations', () => {
   it('maps grouped API series to queue rows', () => {
-    const queue = { queueId: 10, queueCode: 'A', queueName: 'Accueil' } as QueueResponseDto;
+    const queue = {
+      queueId: '00000000-0000-4000-8000-000000000010',
+      queueCode: 'A',
+      queueName: 'Accueil',
+    } as QueueResponseDto;
     expect(groupsToQueueRows([group], [queue])[0]).toMatchObject({
-      queueId: 10,
+      queueId: '00000000-0000-4000-8000-000000000010',
       queueName: 'Accueil',
     });
   });
@@ -44,7 +48,7 @@ describe('report calculations', () => {
   it('keeps nullable metrics and resolves string queue identifiers from API dimensions', () => {
     const nullableGroup: ReportGroupViewModel = {
       ...group,
-      dimension: { queueId: '10', queueName: 'Nom API' },
+      dimension: { queueId: '00000000-0000-4000-8000-000000000010', queueName: 'Nom API' },
       timing: {
         averageWaitMinutes: null,
         medianWaitMinutes: null,
@@ -55,10 +59,18 @@ describe('report calculations', () => {
       },
       rates: { noShowRate: null, cancellationRate: null, expirationRate: null },
     };
-    const queue = { queueId: 10, queueCode: 'A', queueName: 'Accueil' } as QueueResponseDto;
+    const queue = {
+      queueId: '00000000-0000-4000-8000-000000000010',
+      queueCode: 'A',
+      queueName: 'Accueil',
+    } as QueueResponseDto;
     const [row] = groupsToQueueRows([nullableGroup], [queue]);
 
-    expect(row).toMatchObject({ queueId: 10, queueCode: 'A', queueName: 'Accueil' });
+    expect(row).toMatchObject({
+      queueId: '00000000-0000-4000-8000-000000000010',
+      queueCode: 'A',
+      queueName: 'Accueil',
+    });
     expect(row?.timing.averageWaitMinutes).toBeNull();
     expect(row?.rates.noShowRate).toBeNull();
   });
@@ -104,7 +116,12 @@ describe('report calculations', () => {
   });
 
   it('exports grouped rows as CSV', () => {
-    const row = { ...group, queueId: 10, queueCode: 'A', queueName: 'Accueil' };
+    const row = {
+      ...group,
+      queueId: '00000000-0000-4000-8000-000000000010',
+      queueCode: 'A',
+      queueName: 'Accueil',
+    };
     expect(reportsToCsv([row])).toContain('"Accueil"');
   });
 

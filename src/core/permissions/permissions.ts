@@ -20,7 +20,7 @@ export function hasAnyPermission(
 
 export function isWithinScope(
   scope: UserScopeDto | undefined,
-  resource: { siteId?: number; queueId?: number },
+  resource: { siteId?: string; queueId?: string },
 ): boolean {
   if (!scope) return false;
   if (scope.isGlobal) return true;

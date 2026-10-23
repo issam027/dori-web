@@ -59,7 +59,7 @@ function periodRange(period: Period, now: number) {
   };
 }
 
-function uniqueOperatorsByUser<T extends { userId: number }>(operators: readonly T[]): T[] {
+function uniqueOperatorsByUser<T extends { userId: string }>(operators: readonly T[]): T[] {
   return Array.from(new Map(operators.map((operator) => [operator.userId, operator])).values());
 }
 
@@ -70,14 +70,14 @@ export function ControlRoomPage() {
     useSessionStore((state) => state.user),
     'queue_reset',
   );
-  const [selectedQueueIds, setSelectedQueueIds] = useState<number[]>([]);
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [selectedQueueIds, setSelectedQueueIds] = useState<string[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [pressure, setPressure] = useState<PressureFilter>('all');
   const [period, setPeriod] = useState<Period>('8h');
   const [refreshInterval, setRefreshInterval] = useState<RefreshInterval>(false);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [rangeAnchor, setRangeAnchor] = useState(() => Date.now());
-  const [resetTarget, setResetTarget] = useState<{ queueId: number; queueName: string }>();
+  const [resetTarget, setResetTarget] = useState<{ queueId: string; queueName: string }>();
   const range = useMemo(() => periodRange(period, rangeAnchor), [period, rangeAnchor]);
   useEffect(() => {
     if (!refreshInterval) return;
@@ -132,7 +132,7 @@ export function ControlRoomPage() {
         operators.some((operator) => selectedUserIds.includes(operator.userId))) &&
       (pressure === 'all' || (pressure === 'healthy' ? tone === 'success' : tone === pressure)),
   );
-  const toggle = (values: number[], value: number, setter: (next: number[]) => void) => {
+  const toggle = (values: string[], value: string, setter: (next: string[]) => void) => {
     setter(values.includes(value) ? values.filter((id) => id !== value) : [...values, value]);
   };
   const updatedAt = snapshot?.generatedAt

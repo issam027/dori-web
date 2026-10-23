@@ -63,8 +63,8 @@ export function AppointmentActionDialog({
   timeZone: string;
   onCreateFollowUp?: (context: {
     person: PersonResponseDto;
-    queueId: number;
-    tierId: number;
+    queueId: string;
+    tierId: string;
   }) => void;
 }) {
   const { t, i18n } = useTranslation();

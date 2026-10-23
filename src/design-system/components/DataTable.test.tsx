@@ -8,7 +8,7 @@ describe('DataTable', () => {
         loading
         caption="Utilisateurs"
         rows={[]}
-        getRowKey={(row: { id: number }) => row.id}
+        getRowKey={(row: { id: string }) => row.id}
         columns={[{ key: 'name', header: 'Nom', render: () => 'Nom' }]}
       />,
     );
@@ -21,7 +21,7 @@ describe('DataTable', () => {
     render(
       <DataTable
         caption="Utilisateurs"
-        rows={[{ id: 1, name: 'Ada' }]}
+        rows={[{ id: '00000000-0000-4000-8000-000000000001', name: 'Ada' }]}
         getRowKey={(row) => row.id}
         columns={[{ key: 'name', header: 'Nom', render: (row) => row.name }]}
       />,
@@ -57,7 +57,7 @@ describe('DataTable', () => {
     render(
       <DataTable
         caption="Personnes"
-        rows={[{ id: 7, name: 'Ada Lovelace' }]}
+        rows={[{ id: '00000000-0000-4000-8000-000000000007', name: 'Ada Lovelace' }]}
         getRowKey={(row) => row.id}
         columns={[{ key: 'name', header: 'Nom', render: (row) => row.name }]}
         renderMobileRow={(row) => (

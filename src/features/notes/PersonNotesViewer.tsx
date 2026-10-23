@@ -31,7 +31,7 @@ export function PersonNotesViewer({
   initialMode = 'view',
   personName,
 }: {
-  personId: number;
+  personId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialMode?: 'view' | 'add';
@@ -45,12 +45,12 @@ export function PersonNotesViewer({
   const [index, setIndex] = useState(0);
   const [adding, setAdding] = useState(initialMode === 'add');
   const [content, setContent] = useState('');
-  const [editingNoteId, setEditingNoteId] = useState<number>();
+  const [editingNoteId, setEditingNoteId] = useState<string>();
   const notes = usePersonNotes(personId, { enabled: open });
   const addNote = useAddPersonNote(personId);
   const updateNote = useUpdatePersonNote(personId);
   const deleteNote = useDeletePersonNote(personId);
-  const displayName = personName?.trim() || `#${String(personId)}`;
+  const displayName = personName?.trim() || `#${personId}`;
   const items = notes.data?.data.items ?? [];
   const current = items[index];
   const add = async () => {
@@ -196,7 +196,7 @@ export function PersonNotesViewer({
             <small className="note-meta">
               {current.authorUsername ??
                 __t('persons.notes.userReference', {
-                  value0: String(current.createdByUserId),
+                  value0: current.createdByUserId,
                 })}{' '}
               · {formatDateTime(current.createdAt, i18n.language)}
             </small>

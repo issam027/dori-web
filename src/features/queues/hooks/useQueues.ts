@@ -3,7 +3,7 @@ import { queryKeys } from '@/api/client/query-keys';
 import { findQueues, findQueueStatus } from '../api/queues-api';
 
 export function useQueues(options: {
-  siteId: number | null;
+  siteId: string | null;
   isActive?: boolean;
   usage?: string;
   enabled?: boolean;
@@ -27,7 +27,7 @@ export function useQueues(options: {
   });
 }
 
-export function useQueueStatuses(queueIds: readonly number[]) {
+export function useQueueStatuses(queueIds: readonly string[]) {
   return useQueries({
     queries: queueIds.map((queueId) => ({
       queryKey: queryKeys.queueStatus.detail(queueId),

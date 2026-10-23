@@ -23,7 +23,11 @@ function renderModal(client = new QueryClient({ defaultOptions: { queries: { ret
   render(
     <QueryClientProvider client={client}>
       <QueueOperatorsModal
-        queue={{ queueId: 10, queueName: 'Accueil', siteId: 1 }}
+        queue={{
+          queueId: '00000000-0000-4000-8000-000000000010',
+          queueName: 'Accueil',
+          siteId: '00000000-0000-4000-8000-000000000001',
+        }}
         onOpenChange={() => {
           // The close callback is irrelevant to these characterizations.
         }}
@@ -50,7 +54,7 @@ it('issues one candidate request after a typing burst reaches four characters', 
   });
   expect(findUsers.mock.calls[0]?.[0]).toMatchObject({
     search: 'abcd',
-    siteIds: '1',
+    siteIds: '00000000-0000-4000-8000-000000000001',
     pageSize: 5,
   });
 });
@@ -62,7 +66,14 @@ it('refreshes the centralized operator list after a successful assignment', asyn
       pageSize: 5,
       total: 1,
       totalPages: 1,
-      items: [{ userId: 8, username: 'alice', fullName: 'Alice Martin', isActive: true }],
+      items: [
+        {
+          userId: '00000000-0000-4000-8000-000000000008',
+          username: 'alice',
+          fullName: 'Alice Martin',
+          isActive: true,
+        },
+      ],
     },
   });
   assignOperator.mockResolvedValue({ data: { data: {} } });
@@ -75,7 +86,11 @@ it('refreshes the centralized operator list after a successful assignment', asyn
   await userEvent.click(screen.getByRole('button', { name: /confirmer/i }));
 
   await waitFor(() => {
-    expect(assignOperator).toHaveBeenCalledWith(10, { userId: 8 });
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['queue-operators', 10] });
+    expect(assignOperator).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000010', {
+      userId: '00000000-0000-4000-8000-000000000008',
+    });
+    expect(invalidate).toHaveBeenCalledWith({
+      queryKey: ['queue-operators', '00000000-0000-4000-8000-000000000010'],
+    });
   });
 });

@@ -22,10 +22,10 @@ export function useSites(
   });
 }
 
-export function useSite(siteId: number | null) {
+export function useSite(siteId: string | null) {
   return useQuery({
     queryKey: queryKeys.sites.detail(siteId),
-    queryFn: ({ signal }) => findSite(siteId ?? 0, signal),
+    queryFn: ({ signal }) => findSite(siteId ?? '', signal),
     enabled: siteId !== null,
   });
 }
@@ -34,7 +34,7 @@ export function useActiveSite() {
   const queryClient = useQueryClient();
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const activate = useCallback(
-    (siteId: number, scope: UserScopeDto) => changeActiveSite(queryClient, siteId, scope),
+    (siteId: string, scope: UserScopeDto) => changeActiveSite(queryClient, siteId, scope),
     [queryClient],
   );
   return {

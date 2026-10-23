@@ -5,9 +5,11 @@ import { findQueues, findRoles, findSites, findTiers } from '../api/onboarding-a
 import { sitesControllerGetDirectUsers } from '@/api/generated/sites/sites';
 
 export function useSettingsData(
-  siteId: number | null,
+  siteId: string | null,
   queueStatus: 'active' | 'inactive' | 'all' = 'active',
-  enabled: Partial<Record<'sites' | 'queues' | 'roles' | 'tiers' | 'directUsers' | 'allAccessibleQueues', boolean>> = {},
+  enabled: Partial<
+    Record<'sites' | 'queues' | 'roles' | 'tiers' | 'directUsers' | 'allAccessibleQueues', boolean>
+  > = {},
 ) {
   const queryClient = useQueryClient();
   const sites = useQuery({
@@ -21,11 +23,21 @@ export function useSettingsData(
   const queues = useQuery({
     queryKey: queryKeys.admin.queuesByStatus(queueSiteId, queueStatus),
     queryFn: async ({ signal }) => {
-      const load = (isActive: boolean) => findQueues({ page: 1, pageSize: 100, siteId: queueSiteId ?? undefined, isActive }, undefined, signal);
+      const load = (isActive: boolean) =>
+        findQueues(
+          { page: 1, pageSize: 100, siteId: queueSiteId ?? undefined, isActive },
+          undefined,
+          signal,
+        );
       if (queueStatus !== 'all') return load(queueStatus === 'active');
-      return findQueues({ page: 1, pageSize: 100, siteId: queueSiteId ?? undefined }, undefined, signal);
+      return findQueues(
+        { page: 1, pageSize: 100, siteId: queueSiteId ?? undefined },
+        undefined,
+        signal,
+      );
     },
-    enabled: (queueSiteId !== null || enabled.allAccessibleQueues === true) && (enabled.queues ?? true),
+    enabled:
+      (queueSiteId !== null || enabled.allAccessibleQueues === true) && (enabled.queues ?? true),
   });
   const roles = useQuery({
     queryKey: queryKeys.admin.roles,
@@ -41,7 +53,7 @@ export function useSettingsData(
     queryKey: queryKeys.admin.siteDirectUsers(siteId),
     queryFn: ({ signal }) =>
       sitesControllerGetDirectUsers(
-        siteId ?? 0,
+        siteId ?? '',
         { page: 1, pageSize: 100, sort: 'username:asc' },
         undefined,
         signal,

@@ -140,11 +140,11 @@ export function OnboardingWizard() {
         for (const queueId of Object.values(draft.confirmedQueueIds)) {
           if (done.has(queueId)) continue;
           const selected = fixed.filter((tier) =>
-            (draft.selectedTierIds[String(queueId)] ?? []).includes(tier.tierId),
+            (draft.selectedTierIds[queueId] ?? []).includes(tier.tierId),
           );
           if (selected.length === 0) throw new Error(__t('onboarding.errors.tierRequiredPerQueue'));
           for (const [index, tier] of selected.entries()) {
-            const configuration = draft.tierConfigurations[String(queueId)]?.[String(tier.tierId)];
+            const configuration = draft.tierConfigurations[queueId]?.[tier.tierId];
             await associateTier(queueId, {
               tierId: tier.tierId,
               price: configuration?.price ?? 0,
@@ -233,7 +233,8 @@ export function OnboardingWizard() {
             <span className="status-badge status-success">
               {__t('onboarding.onboarding.brouillonLocal')}
             </span>
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               className="button button-danger button-small"
               type="button"
               disabled={discarding}
@@ -250,7 +251,9 @@ export function OnboardingWizard() {
         <Card className="setup-navigation">
           <h2>{__t('onboarding.onboarding.parcoursDeConfiguration')}</h2>
           {stepKeys.map((key, index) => (
-            <Button variant="unstyled" type="submit"
+            <Button
+              variant="unstyled"
+              type="submit"
               key={key}
               className={`setup-nav-row ${draft.step === index + 1 ? 'active' : ''}`}
               disabled={index + 1 > draft.step}
@@ -302,7 +305,9 @@ export function OnboardingWizard() {
             </p>
           ) : null}
           <div className="setup-actions">
-            <Button variant="unstyled" type="submit"
+            <Button
+              variant="unstyled"
+              type="submit"
               className="button"
               disabled={draft.step === 1 || busy}
               onClick={() => {
@@ -312,7 +317,9 @@ export function OnboardingWizard() {
               {__t('onboarding.onboarding.precedent')}
             </Button>
             <div>
-              <Button variant="unstyled" type="submit"
+              <Button
+                variant="unstyled"
+                type="submit"
                 className="button"
                 onClick={() => {
                   saveOnboardingDraft(draft);
@@ -320,7 +327,9 @@ export function OnboardingWizard() {
               >
                 {__t('onboarding.onboarding.enregistrerLeBrouillon')}
               </Button>
-              <Button variant="unstyled" type="submit"
+              <Button
+                variant="unstyled"
+                type="submit"
                 className="button button-primary"
                 disabled={busy || !canAdvanceOnboarding(draft, fixed.length)}
                 onClick={() => void next()}
@@ -378,7 +387,8 @@ export function OnboardingWizard() {
         title={__t('onboarding.discardDraftTitle')}
         description={__t('onboarding.discardDraftDescription')}
         actions={
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-danger"
             type="button"
             disabled={discarding}
@@ -665,59 +675,62 @@ function QueuesStep({
         caption={__t('onboarding.onboarding.filesGuichets')}
         containerClassName="table-wrap admin-table-wrap onboarding-queue-table"
       >
-          <thead>
-            <tr>
-              <th scope="col">{__t('onboarding.onboarding.code')}</th>
-              <th scope="col">{__t('common.name')}</th>
-              <th scope="col">{__t('common.guichets')}</th>
-              <th scope="col">{__t('common.rdv')}</th>
-              <th scope="col">{__t('common.devise')}</th>
-              <th scope="col">{__t('common.api')}</th>
-              <th scope="col" className="table-action-column">{__t('onboarding.queueActions')}</th>
+        <thead>
+          <tr>
+            <th scope="col">{__t('onboarding.onboarding.code')}</th>
+            <th scope="col">{__t('common.name')}</th>
+            <th scope="col">{__t('common.guichets')}</th>
+            <th scope="col">{__t('common.rdv')}</th>
+            <th scope="col">{__t('common.devise')}</th>
+            <th scope="col">{__t('common.api')}</th>
+            <th scope="col" className="table-action-column">
+              {__t('onboarding.queueActions')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {draft.queues.map((q) => (
+            <tr key={q.queueCode}>
+              <td>
+                <b>{q.queueCode}</b>
+              </td>
+              <td>{q.queueName || '—'}</td>
+              <td>{q.threadCount ?? 1}</td>
+              <td>
+                {q.appointmentsEnabled === undefined
+                  ? __t('onboarding.onboarding.herite')
+                  : q.appointmentsEnabled
+                    ? __t('common.actives')
+                    : __t('common.desactives')}
+              </td>
+              <td>{q.currency || __t('common.heritee')}</td>
+              <td>
+                <span
+                  className={`status-badge ${draft.confirmedQueueIds[q.queueCode] ? 'status-success' : ''}`}
+                >
+                  {draft.confirmedQueueIds[q.queueCode]
+                    ? __t('onboarding.onboarding.confirmee')
+                    : __t('onboarding.onboarding.brouillon')}
+                </span>
+              </td>
+              <td className="table-action-column">
+                <Button
+                  variant="unstyled"
+                  type="button"
+                  className="button button-small"
+                  aria-label={__t('onboarding.editQueueLabel', {
+                    queue: q.queueName || q.queueCode,
+                  })}
+                  onClick={() => {
+                    edit(q.queueCode);
+                  }}
+                >
+                  {__t('onboarding.editQueue')}
+                </Button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {draft.queues.map((q) => (
-              <tr key={q.queueCode}>
-                <td>
-                  <b>{q.queueCode}</b>
-                </td>
-                <td>{q.queueName || '—'}</td>
-                <td>{q.threadCount ?? 1}</td>
-                <td>
-                  {q.appointmentsEnabled === undefined
-                    ? __t('onboarding.onboarding.herite')
-                    : q.appointmentsEnabled
-                      ? __t('common.actives')
-                      : __t('common.desactives')}
-                </td>
-                <td>{q.currency || __t('common.heritee')}</td>
-                <td>
-                  <span
-                    className={`status-badge ${draft.confirmedQueueIds[q.queueCode] ? 'status-success' : ''}`}
-                  >
-                    {draft.confirmedQueueIds[q.queueCode]
-                      ? __t('onboarding.onboarding.confirmee')
-                      : __t('onboarding.onboarding.brouillon')}
-                  </span>
-                </td>
-                <td className="table-action-column">
-                  <Button variant="unstyled"
-                    type="button"
-                    className="button button-small"
-                    aria-label={__t('onboarding.editQueueLabel', {
-                      queue: q.queueName || q.queueCode,
-                    })}
-                    onClick={() => {
-                      edit(q.queueCode);
-                    }}
-                  >
-                    {__t('onboarding.editQueue')}
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          ))}
+        </tbody>
       </DataTable>
     </section>
   );
@@ -728,7 +741,7 @@ function TiersStep({
   draft,
   save,
 }: {
-  fixed: { tierId: number; tierCode: string; tierName: string; description?: string }[];
+  fixed: { tierId: string; tierCode: string; tierName: string; description?: string }[];
   loading: boolean;
   draft: OnboardingDraft;
   save: (value: OnboardingDraft) => void;
@@ -750,9 +763,9 @@ function TiersStep({
     alertPosition: 3,
     includeTrackingLink: true,
   });
-  const toggle = (queueId: number, tierId: number) => {
-    const key = String(queueId);
-    const tierKey = String(tierId);
+  const toggle = (queueId: string, tierId: string) => {
+    const key = queueId;
+    const tierKey = tierId;
     const selected = draft.selectedTierIds[key] ?? [];
     const removing = selected.includes(tierId);
     const nextSelected = removing
@@ -770,11 +783,11 @@ function TiersStep({
       );
 
     const hasDefault = nextSelected.some(
-      (current) => currentConfigurations[String(current)]?.isDefault,
+      (current) => currentConfigurations[current]?.isDefault,
     );
     const nextConfigurations = Object.fromEntries(
       nextSelected.map((current, index) => {
-        const currentKey = String(current);
+        const currentKey = current;
         const configuration =
           currentConfigurations[currentKey] ?? defaultConfiguration(index + 1, index === 0);
         return [
@@ -794,12 +807,12 @@ function TiersStep({
     });
   };
   const configure = (
-    queueId: number,
-    tierId: number,
+    queueId: string,
+    tierId: string,
     patch: Partial<OnboardingDraft['tierConfigurations'][string][string]>,
   ) => {
-    const queueKey = String(queueId);
-    const tierKey = String(tierId);
+    const queueKey = queueId;
+    const tierKey = tierId;
     const selected = draft.selectedTierIds[queueKey] ?? [];
     const currentConfigurations = { ...(draft.tierConfigurations[queueKey] ?? {}) };
     const current =
@@ -807,7 +820,7 @@ function TiersStep({
       defaultConfiguration(selected.indexOf(tierId) + 1, selected[0] === tierId);
     if (patch.isDefault) {
       selected.forEach((selectedTierId) => {
-        const selectedKey = String(selectedTierId);
+        const selectedKey = selectedTierId;
         const configuration =
           currentConfigurations[selectedKey] ??
           defaultConfiguration(selected.indexOf(selectedTierId) + 1, false);
@@ -833,7 +846,7 @@ function TiersStep({
         </p>
       ) : null}
       {queues.map(([queueCode, queueId]) => {
-        const queueKey = String(queueId);
+        const queueKey = queueId;
         const selected = draft.selectedTierIds[queueKey] ?? [];
         return (
           <div className="tier-queue-section" key={queueId}>
@@ -854,7 +867,7 @@ function TiersStep({
               {fixed.map((tier) => {
                 const isSelected = selected.includes(tier.tierId);
                 const configuration =
-                  draft.tierConfigurations[queueKey]?.[String(tier.tierId)] ??
+                  draft.tierConfigurations[queueKey]?.[tier.tierId] ??
                   defaultConfiguration(
                     selected.indexOf(tier.tierId) + 1,
                     selected[0] === tier.tierId,
@@ -866,7 +879,8 @@ function TiersStep({
                     className={`station tier-config-card ${isSelected ? 'selected' : ''}`}
                     key={tier.tierId}
                   >
-                    <Button variant="unstyled"
+                    <Button
+                      variant="unstyled"
                       type="button"
                       className="tier-choice tier-choice-toggle"
                       aria-pressed={isSelected}
@@ -879,7 +893,9 @@ function TiersStep({
                           ? __t('onboarding.serviceEnabled')
                           : __t('onboarding.enableService')}
                       </span>
-                      <span className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}>
+                      <span
+                        className={`service-tier-label ${serviceTierVisualClass(tier.tierId, tier.tierCode || tier.tierName)}`}
+                      >
                         <strong>{tier.tierName}</strong>
                         <small>{tier.description || tier.tierCode}</small>
                       </span>
@@ -926,7 +942,7 @@ function TiersStep({
                         <label className="tier-default-option">
                           <input
                             type="radio"
-                            name={`default-tier-${String(queueId)}`}
+                            name={`default-tier-${queueId}`}
                             checked={configuration.isDefault}
                             onChange={() => {
                               configure(queueId, tier.tierId, { isDefault: true });
@@ -1095,7 +1111,9 @@ function ReviewStep({
         {draft.testValidated ? (
           <span className="status-badge status-success">{__t('common.valide')}</span>
         ) : (
-          <Button variant="unstyled" type="submit"
+          <Button
+            variant="unstyled"
+            type="submit"
             className="button"
             onClick={() => {
               save({ ...draft, testValidated: true });

@@ -7,7 +7,7 @@ import { PersonNotesViewer } from './PersonNotesViewer';
 it('loads notes without requesting the person detail', async () => {
   let personDetailRequests = 0;
   mockServer.use(
-    http.get('http://localhost:3000/api/v1/persons/42/notes', () =>
+    http.get('http://localhost:3000/api/v1/persons/00000000-0000-4000-8000-000000000042/notes', () =>
       HttpResponse.json({
         code: 'OK',
         translationKey: null,
@@ -15,7 +15,7 @@ it('loads notes without requesting the person detail', async () => {
         data: { page: 1, pageSize: 100, total: 0, totalPages: 0, items: [] },
       }),
     ),
-    http.get('http://localhost:3000/api/v1/persons/42', () => {
+    http.get('http://localhost:3000/api/v1/persons/00000000-0000-4000-8000-000000000042', () => {
       personDetailRequests += 1;
       return HttpResponse.json({ code: 'OK' });
     }),
@@ -25,7 +25,7 @@ it('loads notes without requesting the person detail', async () => {
   render(
     <QueryClientProvider client={client}>
       <PersonNotesViewer
-        personId={42}
+        personId={'00000000-0000-4000-8000-000000000042'}
         personName="Ada Lovelace"
         open
         onOpenChange={() => undefined}

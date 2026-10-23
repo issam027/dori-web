@@ -102,24 +102,47 @@ export const paginated = <T>(items: T[], page = 1, pageSize = 100) => ({
 export function buildUser(profile: TestProfile = 'root', overrides: Record<string, unknown> = {}) {
   const technical = profile === 'kiosk';
   return {
-    userId: technical ? 900 : 1,
+    userId: technical
+      ? '00000000-0000-4000-8000-000000000900'
+      : '00000000-0000-4000-8000-000000000001',
     username: `${profile}.e2e`,
     userType: technical ? 'kiosk' : 'human',
     roles: [profile],
     permissions: permissionsByProfile[profile],
     mustChangePassword: false,
     scope: technical
-      ? { isGlobal: false, siteIds: [1], queueIds: [10, 11] }
+      ? {
+          isGlobal: false,
+          siteIds: ['00000000-0000-4000-8000-000000000001'],
+          queueIds: [
+            '00000000-0000-4000-8000-000000000010',
+            '00000000-0000-4000-8000-000000000011',
+          ],
+        }
       : profile === 'root'
-        ? { isGlobal: true, siteIds: [1, 2], queueIds: [] }
-        : { isGlobal: false, siteIds: [1], queueIds: [10, 11] },
+        ? {
+            isGlobal: true,
+            siteIds: [
+              '00000000-0000-4000-8000-000000000001',
+              '00000000-0000-4000-8000-000000000002',
+            ],
+            queueIds: [],
+          }
+        : {
+            isGlobal: false,
+            siteIds: ['00000000-0000-4000-8000-000000000001'],
+            queueIds: [
+              '00000000-0000-4000-8000-000000000010',
+              '00000000-0000-4000-8000-000000000011',
+            ],
+          },
     ...overrides,
   };
 }
 
 export function buildSite(overrides: Record<string, unknown> = {}) {
   return {
-    siteId: 1,
+    siteId: '00000000-0000-4000-8000-000000000001',
     siteName: 'Site E2E Alpha',
     timezone: 'Europe/Paris',
     locale: 'fr',
@@ -130,10 +153,10 @@ export function buildSite(overrides: Record<string, unknown> = {}) {
 
 export function buildQueue(overrides: Record<string, unknown> = {}) {
   return {
-    queueId: 10,
+    queueId: '00000000-0000-4000-8000-000000000010',
     queueCode: 'E2E',
     queueName: 'Accueil E2E',
-    siteId: 1,
+    siteId: '00000000-0000-4000-8000-000000000001',
     isActive: true,
     appointmentsEnabled: true,
     workingDays: [1, 2, 3, 4, 5],
@@ -145,7 +168,7 @@ export function buildQueue(overrides: Record<string, unknown> = {}) {
 
 export function buildTier(overrides: Record<string, unknown> = {}) {
   return {
-    tierId: 1,
+    tierId: '00000000-0000-4000-8000-000000000001',
     tierCode: 'STD',
     tierName: 'Standard E2E',
     description: 'Service de test',
@@ -157,28 +180,28 @@ export function buildTier(overrides: Record<string, unknown> = {}) {
 
 export function buildPerson(overrides: Record<string, unknown> = {}) {
   return {
-    personId: 100,
+    personId: '00000000-0000-4000-8000-000000000100',
     firstName: 'Personne',
     lastName: 'Test',
     phoneNumber: '+999000000001',
     email: 'personne@test.example',
     birthDate: '1990-01-01',
     languagePreference: 'fr',
-    siteId: 1,
+    siteId: '00000000-0000-4000-8000-000000000001',
     ...overrides,
   };
 }
 
 export function buildRegistration(overrides: Record<string, unknown> = {}) {
   return {
-    registrationId: 500,
+    registrationId: '00000000-0000-4000-8000-000000000500',
     ticketNumber: 'E001',
-    queueId: 10,
-    tierId: 1,
+    queueId: '00000000-0000-4000-8000-000000000010',
+    tierId: '00000000-0000-4000-8000-000000000001',
     entryType: 'walkin',
     status: 'waiting',
     arrivalTime: '2026-10-09T08:00:00Z',
-    personId: 100,
+    personId: '00000000-0000-4000-8000-000000000100',
     businessDate: '2026-10-09',
     registrationTrackingToken: 'registration-e2e',
     createdAt: '2026-10-09T08:00:00Z',
@@ -197,7 +220,7 @@ export function buildRegistration(overrides: Record<string, unknown> = {}) {
 
 export function buildAppointment(overrides: Record<string, unknown> = {}) {
   return buildRegistration({
-    registrationId: 501,
+    registrationId: '00000000-0000-4000-8000-000000000501',
     ticketNumber: 'R001',
     entryType: 'appointment',
     scheduledTime: '2026-10-10T09:00:00Z',
@@ -208,7 +231,7 @@ export function buildAppointment(overrides: Record<string, unknown> = {}) {
 export function buildMonitoringLive(overrides: Record<string, unknown> = {}) {
   return {
     generatedAt: '2026-10-09T10:00:00Z',
-    siteId: 1,
+    siteId: '00000000-0000-4000-8000-000000000001',
     timezone: 'Europe/Paris',
     totals: {
       waiting: 0,
@@ -230,7 +253,7 @@ export function buildMonitoringSeries(overrides: Record<string, unknown> = {}) {
     generatedAt: '2026-10-09T10:00:00Z',
     timezone: 'Europe/Paris',
     appliedFilters: {
-      siteId: 1,
+      siteId: '00000000-0000-4000-8000-000000000001',
       queueIds: [],
       userIds: [],
       tierIds: [],
@@ -299,8 +322,14 @@ export async function installApiScenario(
   } = {},
 ) {
   const profile = options.profile ?? 'root';
-  const sites = options.sites ?? [buildSite(), buildSite({ siteId: 2, siteName: 'Site E2E Beta' })];
-  const queues = options.queues ?? [buildQueue(), buildQueue({ queueId: 11, queueCode: 'BIS' })];
+  const sites = options.sites ?? [
+    buildSite(),
+    buildSite({ siteId: '00000000-0000-4000-8000-000000000002', siteName: 'Site E2E Beta' }),
+  ];
+  const queues = options.queues ?? [
+    buildQueue(),
+    buildQueue({ queueId: '00000000-0000-4000-8000-000000000011', queueCode: 'BIS' }),
+  ];
   const tiers = options.tiers ?? [buildTier()];
   const handlers = options.handlers ?? [];
 
@@ -331,8 +360,8 @@ export async function installApiScenario(
       await route.fulfill({ json: apiEnvelope(paginated(sites)) });
       return;
     }
-    if (/^\/api\/v1\/sites\/\d+$/.test(request.path)) {
-      const siteId = Number(request.path.split('/').at(-1));
+    if (/^\/api\/v1\/sites\/[^/]+$/.test(request.path)) {
+      const siteId = request.path.split('/').at(-1) ?? '';
       await route.fulfill({
         json: apiEnvelope(sites.find((site) => site.siteId === siteId) ?? sites[0]),
       });
@@ -346,8 +375,8 @@ export async function installApiScenario(
       await route.fulfill({ json: apiEnvelope(paginated(tiers)) });
       return;
     }
-    if (/^\/api\/v1\/queues\/\d+\/tiers$/.test(request.path)) {
-      const queueId = Number(request.path.split('/')[4]);
+    if (/^\/api\/v1\/queues\/[^/]+\/tiers$/.test(request.path)) {
+      const queueId = request.path.split('/')[4] ?? '';
       await route.fulfill({
         json: apiEnvelope(
           paginated(
@@ -368,8 +397,8 @@ export async function installApiScenario(
       });
       return;
     }
-    if (/^\/api\/v1\/queues\/\d+\/status$/.test(request.path)) {
-      const queueId = Number(request.path.split('/')[4]);
+    if (/^\/api\/v1\/queues\/[^/]+\/status$/.test(request.path)) {
+      const queueId = request.path.split('/')[4] ?? '';
       await route.fulfill({
         json: apiEnvelope({
           queueId,
@@ -381,8 +410,8 @@ export async function installApiScenario(
       });
       return;
     }
-    if (/^\/api\/v1\/queues\/\d+\/display$/.test(request.path)) {
-      const queueId = Number(request.path.split('/')[4]);
+    if (/^\/api\/v1\/queues\/[^/]+\/display$/.test(request.path)) {
+      const queueId = request.path.split('/')[4] ?? '';
       const queue = queues.find((candidate) => candidate.queueId === queueId);
       await route.fulfill({
         json: apiEnvelope({
@@ -394,7 +423,7 @@ export async function installApiScenario(
       });
       return;
     }
-    if (/^\/api\/v1\/queues\/\d+\/(sessions|threads)$/.test(request.path)) {
+    if (/^\/api\/v1\/queues\/[^/]+\/(sessions|threads)$/.test(request.path)) {
       await route.fulfill({ json: apiEnvelope(paginated([])) });
       return;
     }
@@ -423,8 +452,8 @@ export async function installApiScenario(
       await route.fulfill({ json: apiEnvelope([]) });
       return;
     }
-    if (/^\/api\/v1\/reports\/queues\/\d+\/daily$/.test(request.path)) {
-      const queueId = Number(request.path.split('/')[5]);
+    if (/^\/api\/v1\/reports\/queues\/[^/]+\/daily$/.test(request.path)) {
+      const queueId = request.path.split('/')[5] ?? '';
       const queue = queues.find((candidate) => candidate.queueId === queueId);
       await route.fulfill({
         json: apiEnvelope({

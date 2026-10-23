@@ -14,12 +14,12 @@ import {
 export const findPersons = (params: PersonsControllerFindPersonsParams, signal?: AbortSignal) =>
   personsControllerFindPersons(params, undefined, signal);
 
-export const findPerson = (personId: number, signal?: AbortSignal) =>
+export const findPerson = (personId: string, signal?: AbortSignal) =>
   personsControllerFindOne(personId, undefined, signal);
 
 export const createPerson = (dto: CreatePersonDto) => personsControllerCreatePerson(dto);
 
-export const updatePerson = (personId: number, dto: UpdatePersonDto) =>
+export const updatePerson = (personId: string, dto: UpdatePersonDto) =>
   personsControllerUpdatePerson(personId, dto);
 
-export const deletePerson = (personId: number) => personsControllerDeletePerson(personId);
+export const deletePerson = (personId: string) => personsControllerDeletePerson(personId);

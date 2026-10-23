@@ -31,8 +31,8 @@ export function MyQueuesPage() {
   const { t: __t } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [page, setPage] = useState(1);
-  const [queueId, setQueueId] = useState<number | undefined>();
-  const [notesPersonId, setNotesPersonId] = useState<number | null>(null);
+  const [queueId, setQueueId] = useState<string | undefined>();
+  const [notesPersonId, setNotesPersonId] = useState<string | null>(null);
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [searchDraft, setSearchDraft] = useState('');
   const search = useDebouncedFilter(searchDraft);
@@ -45,7 +45,7 @@ export function MyQueuesPage() {
     'priorityReferenceTime:asc',
   );
   const [registrationDetails, setRegistrationDetails] = useState<{
-    id: number;
+    id: string;
     queueName: string;
   } | null>(null);
   const queues = useQueues({ siteId });
@@ -60,9 +60,9 @@ export function MyQueuesPage() {
     sort,
   });
   const items = registrations.data?.data.items ?? [];
-  const getQueueName = (queueId: number) =>
+  const getQueueName = (queueId: string) =>
     queues.data?.data.items.find((queue) => queue.queueId === queueId)?.queueName ??
-    'File #' + String(queueId);
+    'File #' + queueId;
   return (
     <div className="page-stack">
       <PageHeader
@@ -104,7 +104,7 @@ export function MyQueuesPage() {
                   <select
                     value={queueId ?? ''}
                     onChange={(event) => {
-                      setQueueId(event.target.value ? Number(event.target.value) : undefined);
+                      setQueueId(event.target.value || undefined);
                       setPage(1);
                     }}
                   >
@@ -244,7 +244,7 @@ export function MyQueuesPage() {
                 >
                   {item.tierName ??
                     __t('queue-operations.quickRegistration.serviceFallback', {
-                      id: String(item.tierId),
+                      id: item.tierId,
                     })}
                 </span>
               ),
@@ -301,7 +301,7 @@ export function MyQueuesPage() {
       ) : null}
       {notesPersonId !== null ? (
         <PersonNotesViewer
-          key={`${String(notesPersonId)}-${notesMode}`}
+          key={`${notesPersonId}-${notesMode}`}
           personId={notesPersonId}
           initialMode={notesMode}
           open

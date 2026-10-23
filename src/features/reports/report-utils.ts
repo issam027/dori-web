@@ -94,7 +94,7 @@ export function reportPeriodDates(startDate: string, endDate: string): string[] 
 }
 
 export type QueueReportRow = ReportGroupViewModel & {
-  queueId: number;
+  queueId: string;
   queueCode: string;
   queueName: string;
 };
@@ -105,11 +105,11 @@ export function groupsToQueueRows(
 ): QueueReportRow[] {
   return groups.map((group, index) => {
     const rawId = group.dimension.queueId ?? group.dimension.id;
-    const queueId = typeof rawId === 'number' ? rawId : Number(rawId);
-    const queue = queues.find((candidate) => candidate.queueId === queueId) ?? queues[index];
+    const queue = queues.find((candidate) => candidate.queueId === rawId) ?? queues[index];
+    const queueId = typeof rawId === 'string' ? rawId : queue?.queueId;
     return {
       ...group,
-      queueId: Number.isFinite(queueId) ? queueId : (queue?.queueId ?? index),
+      queueId: queueId ?? queue?.queueId ?? `unknown-${String(index)}`,
       queueCode:
         queue?.queueCode ??
         (typeof group.dimension.queueCode === 'string' ? group.dimension.queueCode : ''),
@@ -117,7 +117,7 @@ export function groupsToQueueRows(
         queue?.queueName ??
         (typeof group.dimension.queueName === 'string'
           ? group.dimension.queueName
-          : String(queueId)),
+          : queueId ?? ''),
     };
   });
 }

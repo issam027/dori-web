@@ -20,7 +20,7 @@ const appointmentQueue = buildQueue({
 });
 
 const availability = (date: string) => ({
-  queueId: 10,
+  queueId: '00000000-0000-4000-8000-000000000010',
   timezone: 'Europe/Paris',
   dateFrom: date,
   dateTo: date,
@@ -59,7 +59,7 @@ test('the appointment wizard loads availability and creates the selected civil t
   const availabilityDates: string[] = [];
   let registrationBody: Record<string, unknown> = {};
   const appointments: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/availability') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
       const date = url.searchParams.get('dateFrom') ?? '';
       availabilityDates.push(date);
       await route.fulfill({ json: apiEnvelope(availability(date)) });
@@ -74,7 +74,7 @@ test('the appointment wizard loads availability and creates the selected civil t
             businessDate: '2026-10-05',
             createdAt: '2026-10-09T10:00:00Z',
             updatedAt: '2026-10-09T10:00:00Z',
-            tierId: 1,
+            tierId: '00000000-0000-4000-8000-000000000001',
           }),
         ),
       });
@@ -95,8 +95,8 @@ test('the appointment wizard loads availability and creates the selected civil t
   await page.getByRole('button', { name: /créer le rendez-vous/i }).click();
   await expect(page.getByText(/rendez-vous créé/i)).toBeVisible();
   expect(registrationBody).toMatchObject({
-    queueId: 10,
-    tierId: 1,
+    queueId: '00000000-0000-4000-8000-000000000010',
+    tierId: '00000000-0000-4000-8000-000000000001',
     entryType: 'appointment',
     scheduledTime: '2026-10-05T07:00:00.000Z',
   });
@@ -105,7 +105,7 @@ test('the appointment wizard loads availability and creates the selected civil t
 test('a slot conflict keeps the wizard open and reloads availability', async ({ page }) => {
   let availabilityCalls = 0;
   const conflict: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/availability') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
       availabilityCalls += 1;
       await route.fulfill({
         json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
@@ -142,7 +142,7 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
     registrationTrackingToken: 'appointment-existing-e2e',
     createdAt: '2026-10-08T10:00:00Z',
     updatedAt: '2026-10-08T10:00:00Z',
-    tierId: 1,
+    tierId: '00000000-0000-4000-8000-000000000001',
     appointmentStatus: 'confirmed',
   });
   let rescheduleBody: Record<string, unknown> = {};
@@ -156,46 +156,51 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
         expectedListQuery =
           url.searchParams.get('page') === '1' &&
           url.searchParams.get('pageSize') === '100' &&
-          url.searchParams.get('queueId') === '10' &&
+          url.searchParams.get('queueId') === '00000000-0000-4000-8000-000000000010' &&
           url.searchParams.get('entryType') === 'appointment';
       }
       const items = url.searchParams.get('dateFrom') === '2026-10-05' ? [appointment] : [];
       await route.fulfill({ json: apiEnvelope(paginated(items)) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/registrations/501') {
+    if (method === 'GET' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501') {
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/persons/100') {
+    if (method === 'GET' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100') {
       await route.fulfill({ json: apiEnvelope(buildPerson()) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/queues/10/availability') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
       await route.fulfill({
         json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
       });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/501/reschedule') {
+    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/reschedule') {
       rescheduleBody = route.request().postDataJSON() as Record<string, unknown>;
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/501/check-in') {
+    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/check-in') {
       checkInCalls += 1;
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/persons/100/notes') {
+    if (method === 'POST' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100/notes') {
       const body = route.request().postDataJSON() as { content: string };
       noteBodies.push(body.content);
       await route.fulfill({ json: apiEnvelope({ noteId: noteBodies.length, ...body }) });
       return true;
     }
-    if (method === 'DELETE' && path === '/api/v1/registrations/501') {
+    if (method === 'DELETE' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501') {
       cancelCalls += 1;
-      await route.fulfill({ json: apiEnvelope({ registrationId: 501, deleted: true }) });
+      await route.fulfill({
+        json: apiEnvelope({
+          registrationId: '00000000-0000-4000-8000-000000000501',
+          deleted: true,
+        }),
+      });
       return true;
     }
     return false;
@@ -252,12 +257,12 @@ test('the queue calendar renders API-closed days compactly and prevents appointm
   page,
 }) => {
   const closedDay: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/10/availability') {
+    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
       const dateFrom = url.searchParams.get('dateFrom') ?? '';
       const dateTo = url.searchParams.get('dateTo') ?? dateFrom;
       await route.fulfill({
         json: apiEnvelope({
-          queueId: 10,
+          queueId: '00000000-0000-4000-8000-000000000010',
           timezone: 'Europe/Paris',
           dateFrom,
           dateTo,
