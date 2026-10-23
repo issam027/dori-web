@@ -225,6 +225,7 @@ export function NotificationsPage() {
       </Card>
       <Card className="settings-card notification-journal-card">
         <DataTable
+          loading={journal.isPending}
           caption={t('supervision.notifications.journalDesNotifications')}
           rows={items}
           getRowKey={(row) => row.notificationId}
@@ -321,6 +322,7 @@ export function NotificationsPage() {
       </Card>
       <ManualNotificationWizard open={wizard} onOpenChange={setWizard} />
       <Modal
+        loading={detail.isPending}
         open={Boolean(detailId)}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) setDetailId(undefined);

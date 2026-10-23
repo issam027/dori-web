@@ -261,6 +261,7 @@ export function TranslationsAdminPage() {
           </div>
         </div>
         <DataTable
+          loading={translations.isLoading}
           caption={t('admin.translations.catalogueDesTraductions')}
           containerClassName="table-wrap admin-table-wrap"
           mobileRows={items}

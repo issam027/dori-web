@@ -2,6 +2,21 @@ import { render, screen, within } from '@testing-library/react';
 import { DataTable } from './DataTable';
 
 describe('DataTable', () => {
+  it('shows the Dorify loader inside the table region while loading', () => {
+    render(
+      <DataTable
+        loading
+        caption="Utilisateurs"
+        rows={[]}
+        getRowKey={(row: { id: number }) => row.id}
+        columns={[{ key: 'name', header: 'Nom', render: () => 'Nom' }]}
+      />,
+    );
+
+    expect(screen.getByRole('status')).toBeVisible();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
   it('renders typed rows with scoped headers and a focusable scroll region', () => {
     render(
       <DataTable

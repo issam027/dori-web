@@ -7,7 +7,6 @@ import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
-import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -64,7 +63,7 @@ export function AuditPage() {
         description={t('audit.description')}
       />
       <Card className="admin-filter-card">
-        <details open>
+        <details>
           <summary><span><Search aria-hidden="true" /> {t('audit.filters.title')}</span><small>{t('audit.filters.help')}</small></summary>
           <div className="admin-filter-grid">
             <label>{t('audit.filters.search')}<input value={search} maxLength={100} placeholder={t('audit.filters.searchPlaceholder')} onChange={(event) => { setSearch(event.target.value); setPage(1); }} /></label>
@@ -78,13 +77,13 @@ export function AuditPage() {
           </div>
         </details>
       </Card>
-      <Card className="settings-card audit-table-card">
-        {journal.isPending ? <DorifyLoader /> : null}
+      <Card className="settings-card">
         {journal.isError ? <ErrorState onRetry={() => void journal.refetch()} /> : null}
         {journal.isSuccess && items.length === 0 ? <EmptyState title={t('audit.empty.title')} description={t('audit.empty.description')} /> : null}
-        {items.length > 0 ? (
+        {journal.isPending || items.length > 0 ? (
           <>
             <DataTable
+              loading={journal.isPending}
               caption={t('audit.table.caption')}
               rows={items}
               getRowKey={(row) => row.eventId}
@@ -95,15 +94,33 @@ export function AuditPage() {
                 { key: 'action', header: t('audit.fields.action'), render: (row) => row.action },
                 { key: 'target', header: t('audit.fields.target'), render: (row) => row.targetDisplayName ?? `${row.targetType} · ${row.targetId ?? '—'}` },
                 { key: 'outcome', header: t('audit.fields.outcome'), render: (row) => <StatusBadge tone={row.outcome === 'success' ? 'success' : 'danger'}>{t(`audit.outcomes.${row.outcome}`)}</StatusBadge> },
-                { key: 'actions', header: t('common.actions'), align: 'center', render: (row) => <Button size="icon" icon={<Eye />} label={t('audit.actions.view')} labelMode="icon-only" onClick={() => { setDetailId(row.eventId); }} /> },
+                {
+                  key: 'actions',
+                  header: t('common.actions'),
+                  render: (row) => (
+                    <div className="table-actions responsive-table-actions">
+                      <Button
+                        variant="unstyled"
+                        className="button button-small"
+                        type="button"
+                        title={t('audit.actions.view')}
+                        onClick={() => {
+                          setDetailId(row.eventId);
+                        }}
+                      >
+                        <Eye aria-hidden="true" />
+                        {t('audit.actions.view')}
+                      </Button>
+                    </div>
+                  ),
+                },
               ]}
             />
             <Pagination page={data?.page ?? page} totalPages={Math.max(1, data?.totalPages ?? 1)} onPageChange={setPage} />
           </>
         ) : null}
       </Card>
-      <Modal className="audit-detail-dialog" open={detailId !== undefined} onOpenChange={(open) => { if (!open) setDetailId(undefined); }} title={t('audit.detail.title')} description={detailId ? t('audit.detail.eventReference', { id: detailId }) : undefined}>
-        {detail.isPending ? <DorifyLoader /> : null}
+      <Modal loading={detail.isPending} className="audit-detail-dialog" open={detailId !== undefined} onOpenChange={(open) => { if (!open) setDetailId(undefined); }} title={t('audit.detail.title')} description={detailId ? t('audit.detail.eventReference', { id: detailId }) : undefined}>
         {detail.isError ? <ErrorState onRetry={() => void detail.refetch()} /> : null}
         {detail.data?.data ? <AuditEventDetail event={detail.data.data} /> : null}
       </Modal>

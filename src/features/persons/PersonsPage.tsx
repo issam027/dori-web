@@ -217,6 +217,7 @@ export function PersonsPage() {
           <EmptyState title={t('persons.admin.empty')} description={t('persons.admin.emptyHint')} />
         ) : (
           <DataTable
+            loading={persons.isLoading}
             caption={t('persons.admin.title')}
             containerClassName="table-wrap admin-table-wrap"
             mobileRows={items}
@@ -364,6 +365,7 @@ export function PersonsPage() {
         <PersonNotesViewer
           key={notesPerson.personId}
           personId={notesPerson.personId}
+          personName={[notesPerson.firstName, notesPerson.lastName].filter(Boolean).join(' ')}
           initialMode={notesMode}
           open
           onOpenChange={(open) => {

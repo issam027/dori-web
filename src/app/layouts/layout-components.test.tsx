@@ -52,6 +52,17 @@ describe('application layout', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
+  it('shows the Dorify loader in a loading modal', () => {
+    render(
+      <Modal open loading onOpenChange={vi.fn()} title="Chargement">
+        Contenu différé
+      </Modal>,
+    );
+
+    expect(screen.getByRole('status')).toBeVisible();
+    expect(screen.queryByText('Contenu différé')).not.toBeInTheDocument();
+  });
+
   it('can omit the default cancel action for a completed modal state', () => {
     render(
       <Modal

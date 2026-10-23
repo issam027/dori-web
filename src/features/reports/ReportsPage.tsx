@@ -15,6 +15,7 @@ import { ReportVisualizations } from './ReportVisualizations';
 import { ReportAnalyticsSections } from './ReportAnalyticsSections';
 import { formatReportNumber, formatReportPercent } from '@/core/i18n/number-format';
 import { Button } from '@/design-system/components/Button';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 const fallbackTimeZone = 'UTC';
 
@@ -143,6 +144,13 @@ export function ReportsPage() {
         </div>
       </Card>
       <div className="metric-grid">
+        {reports.isLoading ? (
+          <Card>
+            <DorifyLoader compact />
+          </Card>
+        ) : null}
+        {!reports.isLoading ? (
+          <>
         {[
           { label: __t('common.registered'), value: totals?.volume.registered, icon: UserPlus },
           { label: __t('common.servedPlural'), value: totals?.volume.served, icon: CircleCheck },
@@ -173,6 +181,8 @@ export function ReportsPage() {
         ].map(({ label, value, icon: Icon }) => (
           <MetricCard key={label} label={label} value={value ?? '—'} icon={<Icon />} />
         ))}
+          </>
+        ) : null}
       </div>
       {reports.data ? (
         <ReportVisualizations
@@ -235,6 +245,7 @@ export function ReportsPage() {
         <Card>
           <h2>{__t('supervision.reports.performanceParFile')}</h2>
           <DataTable
+            loading={reports.isLoading}
             caption={__t('reports.periodReportByQueue')}
             rows={queueItems}
             getRowKey={(row) => row.queueId}

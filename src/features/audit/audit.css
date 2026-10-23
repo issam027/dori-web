@@ -56,42 +56,6 @@
   overflow-wrap: break-word;
 }
 
-.audit-table-card .table-scroll {
-  overflow-x: hidden;
-}
-
-.audit-table-card table {
-  table-layout: fixed;
-}
-
-.audit-table-card th,
-.audit-table-card td {
-  min-width: 0;
-  padding-inline: var(--space-3);
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-.audit-table-card th:nth-child(1) {
-  width: 9.5rem;
-}
-
-.audit-table-card th:nth-child(2) {
-  width: 10rem;
-}
-
-.audit-table-card th:nth-child(5) {
-  width: 7rem;
-}
-
-.audit-table-card th:nth-child(6) {
-  width: 4.5rem;
-}
-
-.audit-table-card td:nth-child(6) .button {
-  margin-inline: auto;
-}
-
 @media (min-width: 720px) {
   .audit-detail-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import { Check, CircleAlert, X } from 'lucide-react';
 import { Button, ButtonLabelModeProvider } from './Button';
+import { DorifyLoader } from './DorifyLoader';
 
 interface ModalProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface ModalProps {
   actions?: ReactNode;
   hideDismissAction?: boolean;
   className?: string;
+  loading?: boolean;
 }
 
 export function Modal({
@@ -24,6 +26,7 @@ export function Modal({
   actions,
   hideDismissAction = false,
   className,
+  loading = false,
 }: ModalProps) {
   const { t } = useTranslation();
   return (
@@ -37,7 +40,7 @@ export function Modal({
               {description ? <Dialog.Description>{description}</Dialog.Description> : null}
             </div>
           </header>
-          <div className="dialog-body">{children}</div>
+          <div className="dialog-body">{loading ? <DorifyLoader compact /> : children}</div>
           <ButtonLabelModeProvider value="always">
             <footer className="dialog-actions">
               {!hideDismissAction ? (

@@ -181,6 +181,7 @@ export function MyQueuesPage() {
       ) : null}
       {queues.data?.data.items.length ? (
         <DataTable
+          loading={registrations.isPending}
           caption={__t('queue-operations.myQueues.inscriptionsDansMesFiles')}
           containerClassName="table-scroll queue-registrations-table"
           rows={items}

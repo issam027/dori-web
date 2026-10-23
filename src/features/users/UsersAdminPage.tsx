@@ -249,6 +249,7 @@ export function UsersAdminPage() {
           </div>
         </div>
         <DataTable
+          loading={users.isLoading}
           caption={t('admin.users.comptesUtilisateurs')}
           containerClassName="table-wrap admin-table-wrap"
           mobileRows={items}
@@ -457,6 +458,7 @@ export function UsersAdminPage() {
         onCreated={() => void refresh()}
       />
       <Modal
+        loading={userDetail.isLoading}
         open={Boolean(viewingId)}
         onOpenChange={(open) => {
           if (!open) setViewingId(undefined);
@@ -466,9 +468,7 @@ export function UsersAdminPage() {
       >
         {userDetail.data ? (
           <UserDetail user={userDetail.data.data} locale={i18n.language} t={t} />
-        ) : (
-          <p className="muted">{t('common.loading')}</p>
-        )}
+        ) : null}
       </Modal>
       <Modal
         open={Boolean(deleting)}

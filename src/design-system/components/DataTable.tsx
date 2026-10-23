@@ -1,4 +1,9 @@
 import { Fragment, type Key, type ReactNode } from 'react';
+import { DorifyLoader } from './DorifyLoader';
+
+interface DataTableLoadingProps {
+  loading?: boolean;
+}
 
 export interface DataColumn<TRow> {
   key: string;
@@ -24,9 +29,17 @@ interface DataTableCompositionProps<TRow> {
   renderMobileRow?: (row: TRow) => ReactNode;
 }
 
-type DataTableProps<TRow> = DataTableRowsProps<TRow> | DataTableCompositionProps<TRow>;
+type DataTableProps<TRow> = (DataTableRowsProps<TRow> | DataTableCompositionProps<TRow>) &
+  DataTableLoadingProps;
 
 export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
+  if (props.loading) {
+    return (
+      <div className="data-table-loading">
+        <DorifyLoader compact />
+      </div>
+    );
+  }
   const table =
     'rows' in props ? (
       <table>

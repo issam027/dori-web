@@ -13,8 +13,6 @@ import {
 import { Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { usePerson } from '@/features/persons/hooks/usePersons';
-import { normalizePersonText } from '@/features/persons/person-display';
 import {
   useAddPersonNote,
   useDeletePersonNote,
@@ -31,11 +29,13 @@ export function PersonNotesViewer({
   open,
   onOpenChange,
   initialMode = 'view',
+  personName,
 }: {
   personId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialMode?: 'view' | 'add';
+  personName?: string;
 }) {
   const { t: __t, i18n } = useTranslation();
   const canManage = hasPermission(
@@ -47,18 +47,10 @@ export function PersonNotesViewer({
   const [content, setContent] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<number>();
   const notes = usePersonNotes(personId, { enabled: open });
-  const person = usePerson(personId, open);
   const addNote = useAddPersonNote(personId);
   const updateNote = useUpdatePersonNote(personId);
   const deleteNote = useDeletePersonNote(personId);
-  const personName = person.data
-    ? [
-        normalizePersonText(person.data.data.firstName),
-        normalizePersonText(person.data.data.lastName),
-      ]
-        .filter(Boolean)
-        .join(' ') || __t('persons.admin.unknownPerson')
-    : __t('persons.admin.unknownPerson');
+  const displayName = personName?.trim() || `#${String(personId)}`;
   const items = notes.data?.data.items ?? [];
   const current = items[index];
   const add = async () => {
@@ -71,7 +63,7 @@ export function PersonNotesViewer({
       notify({
         tone: 'success',
         title: __t('notifications.note.created'),
-        message: __t('notifications.note.createdMessage', { name: personName }),
+        message: __t('notifications.note.createdMessage', { name: displayName }),
       });
     } catch (error) {
       notifyError(error);
@@ -100,6 +92,7 @@ export function PersonNotesViewer({
   };
   return (
     <Modal
+      loading={notes.isPending}
       open={open}
       onOpenChange={(next) => {
         if (!next && (editingNoteId || adding)) {
@@ -110,7 +103,7 @@ export function PersonNotesViewer({
         }
         onOpenChange(next);
       }}
-      title={__t('persons.notes.title', { name: personName })}
+      title={__t('persons.notes.title', { name: displayName })}
       description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
       actions={
         <>
