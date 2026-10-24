@@ -12,11 +12,13 @@ import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
 import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
 import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
-import { useWaitingRegistrations } from './hooks/useQueueOperations';
+import {
+  useWaitingRegistrations,
+  type RegistrationStatus,
+} from './hooks/useQueueOperations';
 import { RegistrationDetailsModal } from './RegistrationDetailsModal';
 import type {
   RegistrationsControllerFindRegistrationsSort,
-  RegistrationsControllerFindRegistrationsStatus,
 } from '@/api/generated/models';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { Button } from '@/design-system/components/Button';
@@ -38,9 +40,7 @@ export function MyQueuesPage() {
   const search = useDebouncedFilter(searchDraft);
   const today = localIsoDate();
   const [selectedDate, setSelectedDate] = useState(today);
-  const [status, setStatus] = useState<'' | RegistrationsControllerFindRegistrationsStatus>(
-    'waiting',
-  );
+  const [status, setStatus] = useState<'' | RegistrationStatus>('waiting');
   const [sort, setSort] = useState<RegistrationsControllerFindRegistrationsSort>(
     'priorityReferenceTime:asc',
   );
@@ -136,7 +136,7 @@ export function MyQueuesPage() {
                     value={status}
                     onChange={(event) => {
                       setStatus(
-                        event.target.value as '' | RegistrationsControllerFindRegistrationsStatus,
+                        event.target.value as '' | RegistrationStatus,
                       );
                       setPage(1);
                     }}

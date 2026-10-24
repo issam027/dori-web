@@ -428,3 +428,15 @@ La migration n'est terminée que si :
 <!-- CHECKPOINT id="ckpt_mvm0sa6u_jheqi8" time="2026-10-24T06:30:37.974Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
 
 <!-- CHECKPOINT id="ckpt_mvm1556x_83bh7a" time="2026-10-24T06:40:38.025Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmhybxc_yc53ds" time="2026-10-24T14:31:13.632Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmib6vy_w95l9n" time="2026-10-24T14:41:13.630Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmio1uz_n5tjul" time="2026-10-24T14:51:13.643Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmk2b9z_fsmjho" time="2026-10-24T15:30:18.647Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmrbaqs_9b7e5l" time="2026-10-24T18:53:15.172Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvmro2w4_9xszwa" time="2026-10-24T19:03:11.524Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
