@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { loadTranslationBundle, setLanguage } from '@/core/i18n/i18n';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
+import { updateFavicon } from '@/core/theme/favicon';
 
 export function PreferenceSynchronizer() {
   const location = useLocation();
@@ -29,6 +30,7 @@ export function PreferenceSynchronizer() {
       `color-mix(in srgb, ${color} 16%, var(--color-surface))`,
     );
     root.style.setProperty('--color-primary-contrast', dark ? '#07151f' : '#ffffff');
+    updateFavicon(color, dark ? '#07151f' : '#ffffff');
   }, [accentColor, theme]);
 
   return null;
