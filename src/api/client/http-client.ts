@@ -48,7 +48,7 @@ function isPublicOperation(url?: string): boolean {
   return Boolean(url?.includes('/api/v1/public/'));
 }
 
-async function refreshAccessToken(): Promise<string> {
+export async function refreshAccessToken(): Promise<string> {
   if (!refreshPromise) {
     refreshPromise = refreshClient
       .post<RefreshResponse>('/api/v1/auth/refresh', {})

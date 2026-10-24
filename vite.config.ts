@@ -36,7 +36,6 @@ export function securityHeaders(env: Record<string, string>): Plugin {
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    "frame-ancestors 'none'",
     "form-action 'self'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",

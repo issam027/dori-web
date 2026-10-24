@@ -12,6 +12,7 @@ import {
   getRememberedUsername,
   hydrateSession,
   login,
+  restoreSession,
 } from './session-actions';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
@@ -54,6 +55,44 @@ describe('hydrateSession', () => {
       user: { userId: '00000000-0000-4000-8000-000000000007', permissions: ['queue_view'] },
     });
     expect(useScopeStore.getState().activeSiteId).toBe('00000000-0000-4000-8000-000000000012');
+  });
+
+  it('restores an access token before loading /auth/me after a page reload', async () => {
+    const calls: string[] = [];
+    mockServer.use(
+      http.post('http://localhost:3000/api/v1/auth/refresh', () => {
+        calls.push('refresh');
+        return HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: { accessToken: 'restored-token' },
+        });
+      }),
+      http.get('http://localhost:3000/api/v1/auth/me', ({ request }) => {
+        calls.push('me');
+        expect(request.headers.get('authorization')).toBe('Bearer restored-token');
+        return HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: {
+            userId: '00000000-0000-4000-8000-000000000007',
+            username: 'sarah',
+            userType: 'human',
+            roles: ['operator'],
+            permissions: ['queue_view'],
+            mustChangePassword: false,
+            scope: { isGlobal: true, siteIds: [], queueIds: [] },
+          },
+        });
+      }),
+    );
+
+    await restoreSession();
+
+    expect(calls).toEqual(['refresh', 'me']);
+    expect(getAccessToken()).toBe('restored-token');
   });
 
   it('logs in, keeps only the remembered username locally and hydrates /auth/me', async () => {

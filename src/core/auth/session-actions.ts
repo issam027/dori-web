@@ -9,10 +9,11 @@ import { sitesControllerFindSite } from '@/api/generated/sites/sites';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
-import { setAccessToken } from './access-token';
+import { getAccessToken, setAccessToken } from './access-token';
 import { useOperationStore } from '@/features/queue-operations/operation-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { clearOwnedStorage, storageKeys } from '@/core/storage/storage-keys';
+import { refreshAccessToken } from '@/api/client/http-client';
 
 export function getRememberedUsername(): string {
   return localStorage.getItem(storageKeys.local.rememberedUsername) ?? '';
@@ -45,6 +46,18 @@ export async function hydrateSession(): Promise<void> {
     } else {
       useScopeStore.getState().clear();
     }
+  } catch (error: unknown) {
+    useSessionStore.getState().clear();
+    useScopeStore.getState().clear();
+    throw error;
+  }
+}
+
+export async function restoreSession(): Promise<void> {
+  useSessionStore.getState().beginHydration();
+  try {
+    if (!getAccessToken()) await refreshAccessToken();
+    await hydrateSession();
   } catch (error: unknown) {
     useSessionStore.getState().clear();
     useScopeStore.getState().clear();

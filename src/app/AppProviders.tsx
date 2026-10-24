@@ -6,7 +6,7 @@ import { i18n } from '@/core/i18n/i18n';
 import { AppErrorBoundary } from './AppErrorBoundary';
 import { PreferenceSynchronizer } from './PreferenceSynchronizer';
 import { createQueryClient } from './query-client';
-import { hydrateSession } from '@/core/auth/session-actions';
+import { restoreSession } from '@/core/auth/session-actions';
 import { NotificationCenter } from '@/design-system/components/NotificationCenter';
 import { onAuthenticationExpired } from '@/api/client/http-client';
 import { expireSession } from '@/core/auth/session-actions';
@@ -19,7 +19,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     if (hydrationStarted.current) return;
     hydrationStarted.current = true;
     if (window.location.pathname === '/track') return;
-    void hydrateSession().catch(() => {
+    void restoreSession().catch(() => {
       // An absent/expired refresh cookie is the normal anonymous startup path.
     });
   }, []);
