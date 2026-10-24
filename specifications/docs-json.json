@@ -63,6 +63,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
+                            "maxLength": 100,
                             "example": "site.create",
                             "type": "string"
                         },
@@ -73,6 +74,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
+                            "maxLength": 50,
                             "example": "site",
                             "type": "string"
                         },
@@ -83,6 +85,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
+                            "maxLength": 128,
                             "example": "42",
                             "type": "string",
                             "format": "uuid"
@@ -107,6 +110,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
+                            "maxLength": 128,
                             "example": "corr-01JXYZ",
                             "type": "string"
                         },
@@ -8545,6 +8549,15 @@
                         "description": "Filtrer par statut",
                         "schema": {
                             "example": "waiting",
+                            "enum": [
+                                "booked",
+                                "waiting",
+                                "in_progress",
+                                "served",
+                                "no_show",
+                                "cancelled",
+                                "expired"
+                            ],
                             "type": "string"
                         }
                     },
@@ -14896,6 +14909,8 @@
         "/api/internal/cron/daily-reset": {
             "get": {
                 "operationId": "CronController_dailyResetCron",
+                "summary": "Réinitialiser les files pour la nouvelle journée",
+                "description": "Clôture les inscriptions encore actives de la journée précédente et prépare les files pour la date métier courante.",
                 "parameters": [
                     {
                         "name": "authorization",
@@ -14909,14 +14924,98 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Réinitialisation quotidienne exécutée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides (validation échouée)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — token manquant ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de requêtes — limite de débit atteinte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne sans exposition de détails techniques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "tags": [
+                    "ScheduledTasks"
+                ],
+                "security": [
+                    {
+                        "cron-secret": []
+                    }
+                ]
             }
         },
         "/api/internal/cron/appointment-expiry": {
             "get": {
                 "operationId": "CronController_appointmentExpiryCron",
+                "summary": "Traiter les rendez-vous expirés",
+                "description": "Identifie les rendez-vous dont l'heure de passage est dépassée et applique les règles d'expiration configurées.",
                 "parameters": [
                     {
                         "name": "authorization",
@@ -14930,14 +15029,98 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Traitement des rendez-vous expirés exécuté",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides (validation échouée)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — token manquant ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de requêtes — limite de débit atteinte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne sans exposition de détails techniques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "tags": [
+                    "ScheduledTasks"
+                ],
+                "security": [
+                    {
+                        "cron-secret": []
+                    }
+                ]
             }
         },
         "/api/internal/cron/notifications": {
             "get": {
                 "operationId": "CronController_notificationCron",
+                "summary": "Envoyer les notifications en attente",
+                "description": "Traite la file des notifications en attente et déclenche leur envoi selon leur canal.",
                 "parameters": [
                     {
                         "name": "authorization",
@@ -14951,14 +15134,98 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Traitement des notifications exécuté",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides (validation échouée)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — token manquant ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de requêtes — limite de débit atteinte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne sans exposition de détails techniques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "tags": [
+                    "ScheduledTasks"
+                ],
+                "security": [
+                    {
+                        "cron-secret": []
+                    }
+                ]
             }
         },
         "/api/internal/cron/queue-estimation": {
             "get": {
                 "operationId": "CronController_queueEstimationCron",
+                "summary": "Actualiser les estimations d'attente",
+                "description": "Recalcule les estimations de temps d'attente des files actives à partir de leur état courant.",
                 "parameters": [
                     {
                         "name": "authorization",
@@ -14972,9 +15239,91 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Actualisation des estimations d'attente exécutée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides (validation échouée)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — token manquant ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de requêtes — limite de débit atteinte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne sans exposition de détails techniques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "tags": [
+                    "ScheduledTasks"
+                ],
+                "security": [
+                    {
+                        "cron-secret": []
+                    }
+                ]
             }
         },
         "/api/v1/monitoring/health": {
@@ -15462,6 +15811,10 @@
         {
             "name": "Monitoring",
             "description": "Santé technique, métriques et indicateurs d’activité"
+        },
+        {
+            "name": "ScheduledTasks",
+            "description": "Déclenchement interne des traitements automatisés par Vercel Cron"
         }
     ],
     "servers": [
@@ -15470,6 +15823,9 @@
         },
         {
             "url": "https://dori-api.vercel.app"
+        },
+        {
+            "url": "https://dori-api-dev.vercel.app"
         }
     ],
     "components": {
@@ -15491,6 +15847,12 @@
                 "in": "header",
                 "name": "X-Registration-Token",
                 "description": "Jeton public de suivi de position"
+            },
+            "cron-secret": {
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "type": "http",
+                "description": "Secret partagé CRON_SECRET envoyé automatiquement par Vercel Cron"
             }
         },
         "schemas": {
@@ -15548,7 +15910,7 @@
                         "format": "uuid"
                     },
                     "actorDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Sophie Martin (smartin)",
                         "description": "Valeur du champ « actor display name »."
@@ -15571,7 +15933,7 @@
                         "format": "uuid"
                     },
                     "targetDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Accueil principal",
                         "description": "Valeur du champ « target display name »."
@@ -15584,7 +15946,7 @@
                         "format": "uuid"
                     },
                     "secondaryTargetDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Opérateur Jean (jdupont)",
                         "description": "Valeur du champ « secondary target display name »."
@@ -15597,7 +15959,7 @@
                         "format": "uuid"
                     },
                     "siteScopeDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Agence Centre",
                         "description": "Valeur du champ « site scope display name »."
@@ -15626,7 +15988,7 @@
                         "description": "Valeur du champ « request path »."
                     },
                     "failureType": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "DoriException",
                         "description": "Valeur du champ « failure type »."
@@ -15701,7 +16063,7 @@
                         "format": "uuid"
                     },
                     "actorDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Sophie Martin (smartin)",
                         "description": "Valeur du champ « actor display name »."
@@ -15724,7 +16086,7 @@
                         "format": "uuid"
                     },
                     "targetDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Accueil principal",
                         "description": "Valeur du champ « target display name »."
@@ -15737,7 +16099,7 @@
                         "format": "uuid"
                     },
                     "secondaryTargetDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Opérateur Jean (jdupont)",
                         "description": "Valeur du champ « secondary target display name »."
@@ -15750,7 +16112,7 @@
                         "format": "uuid"
                     },
                     "siteScopeDisplayName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Agence Centre",
                         "description": "Valeur du champ « site scope display name »."
@@ -15779,7 +16141,7 @@
                         "description": "Valeur du champ « request path »."
                     },
                     "failureType": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "DoriException",
                         "description": "Valeur du champ « failure type »."
@@ -15790,13 +16152,13 @@
                         "description": "Valeur du champ « occurred at »."
                     },
                     "actorUsername": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "smartin",
                         "description": "Valeur du champ « actor username »."
                     },
                     "actorFullName": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Sophie Martin",
                         "description": "Valeur du champ « actor full name »."
@@ -15811,34 +16173,34 @@
                         "description": "Valeur du champ « actor user type »."
                     },
                     "actorIsActive": {
-                        "type": "object",
+                        "type": "boolean",
                         "nullable": true,
                         "description": "Valeur du champ « actor is active »."
                     },
                     "targetIsActive": {
-                        "type": "object",
+                        "type": "boolean",
                         "nullable": true,
                         "description": "Valeur du champ « target is active »."
                     },
                     "secondaryTargetIsActive": {
-                        "type": "object",
+                        "type": "boolean",
                         "nullable": true,
                         "description": "Valeur du champ « secondary target is active »."
                     },
                     "siteScopeLocation": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "12 avenue Centrale",
                         "description": "Valeur du champ « site scope location »."
                     },
                     "siteScopeTimezone": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "example": "Europe/Paris",
                         "description": "Valeur du champ « site scope timezone »."
                     },
                     "siteScopeIsActive": {
-                        "type": "object",
+                        "type": "boolean",
                         "nullable": true,
                         "description": "Valeur du champ « site scope is active »."
                     },
@@ -16139,9 +16501,9 @@
                         "description": "Valeur du champ « language preference »."
                     },
                     "lastLogin": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « last login »."
                     },
                     "scope": {
@@ -16173,10 +16535,10 @@
                     },
                     "newPassword": {
                         "type": "string",
-                        "description": "Nouveau mot de passe (entre 10 et 20 caractères)",
-                        "example": "••••••••••••",
                         "minLength": 10,
-                        "maxLength": 20
+                        "maxLength": 20,
+                        "description": "Nouveau mot de passe (entre 10 et 20 caractères)",
+                        "example": "••••••••••••"
                     }
                 },
                 "required": [
@@ -16414,16 +16776,19 @@
                 "properties": {
                     "siteName": {
                         "type": "string",
+                        "maxLength": 100,
                         "example": "Hôpital Aziza Othmana",
                         "description": "Nom du site"
                     },
                     "siteLocation": {
                         "type": "string",
+                        "maxLength": 255,
                         "example": "Tunis, Tunisie",
                         "description": "Adresse ou localisation"
                     },
                     "siteLogoUrl": {
                         "type": "string",
+                        "maxLength": 500,
                         "example": "https://cdn.dori.tn/logos/hao.png",
                         "description": "URL du logo"
                     },
@@ -16438,6 +16803,7 @@
                     },
                     "timezone": {
                         "type": "string",
+                        "maxLength": 64,
                         "example": "Africa/Tunis",
                         "description": "Fuseau horaire IANA"
                     },
@@ -16453,36 +16819,43 @@
                     },
                     "defaultAppointmentSlotDuration": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 15,
                         "description": "Durée d'un créneau (minutes)"
                     },
                     "defaultSlotCapacity": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Capacité par créneau"
                     },
                     "defaultWorkingHoursStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "08:00",
                         "description": "Heure d'ouverture (HH:mm)"
                     },
                     "defaultWorkingHoursEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "17:00",
                         "description": "Heure de fermeture (HH:mm)"
                     },
                     "defaultBreakStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "12:00",
                         "description": "Début de pause méridienne (HH:mm)"
                     },
                     "defaultBreakEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "14:00",
                         "description": "Fin de pause méridienne (HH:mm)"
                     },
                     "defaultLateToleranceMinutes": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
                     },
@@ -16497,7 +16870,9 @@
                         "description": "Jours ouvrés par défaut du site (1=Lundi ... 7=Dimanche)",
                         "type": "array",
                         "items": {
-                            "type": "number"
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
                         }
                     },
                     "defaultBaseWeightWalkin": {
@@ -16536,12 +16911,14 @@
                     },
                     "defaultDailyResetTime": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "03:00",
                         "description": "Heure de reset journalier (HH:mm)",
                         "format": "date-time"
                     },
                     "defaultLocale": {
                         "type": "string",
+                        "maxLength": 10,
                         "example": "fr",
                         "description": "Locale par défaut (ISO 639-1)"
                     }
@@ -16555,16 +16932,19 @@
                 "properties": {
                     "siteName": {
                         "type": "string",
+                        "maxLength": 100,
                         "example": "Hôpital Aziza Othmana",
                         "description": "Nom du site"
                     },
                     "siteLocation": {
                         "type": "string",
+                        "maxLength": 255,
                         "example": "Tunis, Tunisie",
                         "description": "Adresse ou localisation"
                     },
                     "siteLogoUrl": {
                         "type": "string",
+                        "maxLength": 500,
                         "example": "https://cdn.dori.tn/logos/hao.png",
                         "description": "URL du logo"
                     },
@@ -16579,6 +16959,7 @@
                     },
                     "timezone": {
                         "type": "string",
+                        "maxLength": 64,
                         "example": "Africa/Tunis",
                         "description": "Fuseau horaire IANA"
                     },
@@ -16594,36 +16975,43 @@
                     },
                     "defaultAppointmentSlotDuration": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 15,
                         "description": "Durée d'un créneau (minutes)"
                     },
                     "defaultSlotCapacity": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Capacité par créneau"
                     },
                     "defaultWorkingHoursStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "08:00",
                         "description": "Heure d'ouverture (HH:mm)"
                     },
                     "defaultWorkingHoursEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "17:00",
                         "description": "Heure de fermeture (HH:mm)"
                     },
                     "defaultBreakStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "12:00",
                         "description": "Début de pause méridienne (HH:mm)"
                     },
                     "defaultBreakEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "14:00",
                         "description": "Fin de pause méridienne (HH:mm)"
                     },
                     "defaultLateToleranceMinutes": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
                     },
@@ -16638,7 +17026,9 @@
                         "description": "Jours ouvrés par défaut du site (1=Lundi ... 7=Dimanche)",
                         "type": "array",
                         "items": {
-                            "type": "number"
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
                         }
                     },
                     "defaultBaseWeightWalkin": {
@@ -16677,12 +17067,14 @@
                     },
                     "defaultDailyResetTime": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "03:00",
                         "description": "Heure de reset journalier (HH:mm)",
                         "format": "date-time"
                     },
                     "defaultLocale": {
                         "type": "string",
+                        "maxLength": 10,
                         "example": "fr",
                         "description": "Locale par défaut (ISO 639-1)"
                     },
@@ -17271,28 +17663,32 @@
                 "properties": {
                     "queueCode": {
                         "type": "string",
+                        "maxLength": 10,
                         "example": "MED",
                         "description": "Code unique de la queue (max 10 caractères)"
                     },
                     "queueName": {
                         "type": "string",
+                        "maxLength": 50,
                         "example": "Médecine Générale",
                         "description": "Nom affiché de la queue"
                     },
                     "averageWaitTime": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 10,
                         "description": "Temps d'attente moyen estimé (minutes)"
                     },
                     "threadCount": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Nombre de guichets (threads) actifs"
                     },
                     "currency": {
-                        "type": "object",
-                        "example": "EUR",
+                        "type": "string",
                         "nullable": true,
+                        "example": "EUR",
                         "description": "Surcharge de la devise ISO 4217 du site ; null ou absence = héritage du site"
                     },
                     "appointmentsEnabled": {
@@ -17302,40 +17698,48 @@
                     },
                     "appointmentSlotDuration": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 15,
                         "description": "Durée d'un créneau (minutes)"
                     },
                     "slotCapacity": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Valeur du champ « slot capacity »."
                     },
                     "workingHoursStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "08:00",
                         "description": "Valeur du champ « working hours start »."
                     },
                     "workingHoursEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "17:00",
                         "description": "Valeur du champ « working hours end »."
                     },
                     "breakStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "12:00",
                         "description": "Valeur du champ « break start »."
                     },
                     "breakEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "14:00",
                         "description": "Valeur du champ « break end »."
                     },
                     "lateToleranceMinutes": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
                     },
                     "workingDays": {
+                        "nullable": true,
                         "example": [
                             1,
                             2,
@@ -17343,11 +17747,12 @@
                             4,
                             5
                         ],
-                        "nullable": true,
                         "description": "Surcharge des jours ouvrés de la file (1=Lundi ... 7=Dimanche) ; null ou absence = héritage du site",
                         "type": "array",
                         "items": {
-                            "type": "number"
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
                         }
                     },
                     "baseWeightWalkin": {
@@ -17386,14 +17791,16 @@
                     },
                     "dailyResetTime": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "03:00",
                         "description": "Valeur du champ « daily reset time ».",
                         "format": "date-time"
                     },
                     "locale": {
-                        "type": "object",
-                        "example": "fr-FR",
+                        "type": "string",
                         "nullable": true,
+                        "maxLength": 10,
+                        "example": "fr-FR",
                         "description": "Surcharge de la locale du site ; null ou absence = héritage du site"
                     }
                 },
@@ -17406,28 +17813,32 @@
                 "properties": {
                     "queueCode": {
                         "type": "string",
+                        "maxLength": 10,
                         "example": "MED",
                         "description": "Code unique de la queue (max 10 caractères)"
                     },
                     "queueName": {
                         "type": "string",
+                        "maxLength": 50,
                         "example": "Médecine Générale",
                         "description": "Nom affiché de la queue"
                     },
                     "averageWaitTime": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 10,
                         "description": "Temps d'attente moyen estimé (minutes)"
                     },
                     "threadCount": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Nombre de guichets (threads) actifs"
                     },
                     "currency": {
-                        "type": "object",
-                        "example": "EUR",
+                        "type": "string",
                         "nullable": true,
+                        "example": "EUR",
                         "description": "Surcharge de la devise ISO 4217 du site ; null ou absence = héritage du site"
                     },
                     "appointmentsEnabled": {
@@ -17437,40 +17848,48 @@
                     },
                     "appointmentSlotDuration": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 15,
                         "description": "Durée d'un créneau (minutes)"
                     },
                     "slotCapacity": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Valeur du champ « slot capacity »."
                     },
                     "workingHoursStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "08:00",
                         "description": "Valeur du champ « working hours start »."
                     },
                     "workingHoursEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "17:00",
                         "description": "Valeur du champ « working hours end »."
                     },
                     "breakStart": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "12:00",
                         "description": "Valeur du champ « break start »."
                     },
                     "breakEnd": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "14:00",
                         "description": "Valeur du champ « break end »."
                     },
                     "lateToleranceMinutes": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 60,
                         "description": "Tolérance retard RDV (minutes)"
                     },
                     "workingDays": {
+                        "nullable": true,
                         "example": [
                             1,
                             2,
@@ -17478,11 +17897,12 @@
                             4,
                             5
                         ],
-                        "nullable": true,
                         "description": "Surcharge des jours ouvrés de la file (1=Lundi ... 7=Dimanche) ; null ou absence = héritage du site",
                         "type": "array",
                         "items": {
-                            "type": "number"
+                            "type": "number",
+                            "maximum": 7,
+                            "minimum": 1
                         }
                     },
                     "baseWeightWalkin": {
@@ -17521,14 +17941,16 @@
                     },
                     "dailyResetTime": {
                         "type": "string",
+                        "pattern": "/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/",
                         "example": "03:00",
                         "description": "Valeur du champ « daily reset time ».",
                         "format": "date-time"
                     },
                     "locale": {
-                        "type": "object",
-                        "example": "fr-FR",
+                        "type": "string",
                         "nullable": true,
+                        "maxLength": 10,
+                        "example": "fr-FR",
                         "description": "Surcharge de la locale du site ; null ou absence = héritage du site"
                     },
                     "isActive": {
@@ -17616,9 +18038,9 @@
                         "description": "Nombre de guichets actuellement actifs"
                     },
                     "estimatedWaitMinutes": {
-                        "type": "object",
-                        "example": 30,
+                        "type": "number",
                         "nullable": true,
+                        "example": 30,
                         "description": "Temps d'attente estimé en minutes"
                     },
                     "nextAppointments": {
@@ -17646,9 +18068,9 @@
                         "description": "Numéro du guichet"
                     },
                     "currentTicket": {
-                        "type": "object",
-                        "example": "A-007",
+                        "type": "string",
                         "nullable": true,
+                        "example": "A-007",
                         "description": "Numéro de ticket en cours de traitement"
                     },
                     "calledAt": {
@@ -17947,16 +18369,19 @@
                 "properties": {
                     "tierCode": {
                         "type": "string",
+                        "maxLength": 20,
                         "example": "gold",
                         "description": "Code unique du forfait"
                     },
                     "tierName": {
                         "type": "string",
+                        "maxLength": 50,
                         "example": "Or",
                         "description": "Nom affiché du forfait"
                     },
                     "description": {
                         "type": "string",
+                        "maxLength": 500,
                         "example": "Notification de bienvenue + seuil + lien de suivi",
                         "description": "Valeur du champ « description »."
                     }
@@ -18018,7 +18443,6 @@
                     }
                 },
                 "required": [
-                    "tierId",
                     "deleted"
                 ]
             },
@@ -18050,9 +18474,9 @@
                         "description": "Valeur du champ « currency »."
                     },
                     "currencyOverride": {
-                        "type": "object",
-                        "example": null,
+                        "type": "string",
                         "nullable": true,
+                        "example": null,
                         "minLength": 3,
                         "maxLength": 3,
                         "description": "Surcharge persistée sur cette association"
@@ -18151,18 +18575,19 @@
                     },
                     "price": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 5,
-                        "description": "Tarif (≥ 0)",
-                        "minimum": 0
+                        "description": "Tarif (≥ 0)"
                     },
                     "currency": {
-                        "type": "object",
-                        "example": "EUR",
+                        "type": "string",
                         "nullable": true,
+                        "example": "EUR",
                         "description": "Surcharge ISO 4217 de cette association ; null ou absence = devise effective de la file"
                     },
                     "displayOrder": {
                         "type": "number",
+                        "minimum": 0,
                         "example": 1,
                         "description": "Ordre d'affichage"
                     },
@@ -18182,14 +18607,14 @@
                 "properties": {
                     "price": {
                         "type": "number",
-                        "example": 7.5,
                         "minimum": 0,
+                        "example": 7.5,
                         "description": "Valeur du champ « price »."
                     },
                     "currency": {
-                        "type": "object",
-                        "example": "EUR",
+                        "type": "string",
                         "nullable": true,
+                        "example": "EUR",
                         "description": "Surcharge ISO 4217 ; null rétablit l’héritage depuis la file puis le site"
                     },
                     "displayOrder": {
@@ -18247,10 +18672,10 @@
                         "description": "Valeur du champ « threshold type »."
                     },
                     "thresholdValue": {
-                        "type": "object",
+                        "type": "number",
+                        "nullable": true,
                         "example": 3,
                         "minimum": 1,
-                        "nullable": true,
                         "description": "Valeur du champ « threshold value »."
                     },
                     "channel": {
@@ -18351,8 +18776,8 @@
                     },
                     "thresholdValue": {
                         "type": "number",
-                        "example": 3,
                         "minimum": 1,
+                        "example": 3,
                         "description": "Position ou nombre de minutes selon thresholdType"
                     },
                     "includeTrackingLink": {
@@ -18395,10 +18820,10 @@
                         "description": "Valeur du champ « threshold type »."
                     },
                     "thresholdValue": {
-                        "type": "object",
-                        "example": 5,
-                        "minimum": 1,
+                        "type": "number",
                         "nullable": true,
+                        "minimum": 1,
+                        "example": 5,
                         "description": "Valeur du champ « threshold value »."
                     },
                     "includeTrackingLink": {
@@ -18546,9 +18971,9 @@
                     },
                     "phoneNumber": {
                         "type": "string",
+                        "pattern": "^\\+[1-9][0-9]{6,14}$",
                         "example": "+21698765432",
-                        "description": "Numéro de téléphone au format E.164",
-                        "pattern": "^\\+[1-9][0-9]{6,14}$"
+                        "description": "Numéro de téléphone au format E.164"
                     },
                     "birthDate": {
                         "type": "string",
@@ -18595,9 +19020,9 @@
                     },
                     "phoneNumber": {
                         "type": "string",
+                        "pattern": "^\\+[1-9][0-9]{6,14}$",
                         "example": "+21698765432",
-                        "description": "Numéro de téléphone au format E.164",
-                        "pattern": "^\\+[1-9][0-9]{6,14}$"
+                        "description": "Numéro de téléphone au format E.164"
                     },
                     "birthDate": {
                         "type": "string",
@@ -18666,9 +19091,9 @@
                         "description": "Note active"
                     },
                     "deletedAt": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Date de désactivation de la ressource, ou null si elle est active."
                     }
                 },
@@ -18988,9 +19413,9 @@
                         "description": "Indique si la ressource est active."
                     },
                     "deletedAt": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Date de désactivation de la ressource, ou null si elle est active."
                     },
                     "firstName": {
@@ -19015,15 +19440,15 @@
                     },
                     "servedBySessionId": {
                         "type": "string",
-                        "example": 45,
                         "nullable": true,
+                        "example": 45,
                         "description": "ID de la session opérateur ayant pris en charge l'inscription",
                         "format": "uuid"
                     },
                     "servedByUserId": {
                         "type": "string",
-                        "example": 12,
                         "nullable": true,
+                        "example": 12,
                         "description": "ID de l'utilisateur ayant pris en charge l'inscription, conservé directement sur l'inscription",
                         "format": "uuid"
                     },
@@ -19116,14 +19541,14 @@
                         "description": "Valeur du champ « entry type »."
                     },
                     "appointmentStatus": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "description": "Valeur du champ « appointment status »."
                     },
                     "scheduledTime": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « scheduled time »."
                     },
                     "status": {
@@ -19150,7 +19575,7 @@
                         "description": "Date et heure d’expiration du jeton public de suivi"
                     },
                     "estimatedWaitMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "minimum": 0,
                         "description": "Valeur du champ « estimated wait minutes »."
@@ -19201,9 +19626,9 @@
                     },
                     "phoneNumber": {
                         "type": "string",
+                        "pattern": "^\\+[1-9][0-9]{6,14}$",
                         "example": "+21698765432",
-                        "description": "Numéro de téléphone au format E.164",
-                        "pattern": "^\\+[1-9][0-9]{6,14}$"
+                        "description": "Numéro de téléphone au format E.164"
                     },
                     "birthDate": {
                         "type": "string",
@@ -19317,14 +19742,14 @@
                         "description": "Valeur du champ « status »."
                     },
                     "appointmentStatus": {
-                        "type": "object",
+                        "type": "string",
                         "nullable": true,
                         "description": "Valeur du champ « appointment status »."
                     },
                     "scheduledTime": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « scheduled time »."
                     },
                     "priorityReferenceTime": {
@@ -19387,9 +19812,9 @@
                         "description": "Position courante dans la file"
                     },
                     "estimatedWaitMinutes": {
-                        "type": "object",
-                        "example": 25,
+                        "type": "number",
                         "nullable": true,
+                        "example": 25,
                         "description": "Temps d'attente estimé en minutes"
                     },
                     "estimationMethod": {
@@ -19443,8 +19868,8 @@
                     },
                     "calledAt": {
                         "type": "string",
-                        "format": "date-time",
                         "nullable": true,
+                        "format": "date-time",
                         "example": "2026-10-15T09:42:18.000Z",
                         "description": "Date et heure de l'appel du client"
                     },
@@ -19518,9 +19943,9 @@
                         "description": "Valeur du champ « entry type »."
                     },
                     "scheduledTime": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « scheduled time »."
                     },
                     "priorityScore": {
@@ -19691,9 +20116,9 @@
                         "format": "uuid"
                     },
                     "threadNumber": {
-                        "type": "object",
-                        "minimum": 1,
+                        "type": "number",
                         "nullable": true,
+                        "minimum": 1,
                         "description": "Valeur du champ « thread number »."
                     },
                     "counterName": {
@@ -19795,12 +20220,14 @@
                 "properties": {
                     "counterName": {
                         "type": "string",
-                        "example": "Guichet 04",
+                        "minLength": 1,
                         "maxLength": 100,
+                        "example": "Guichet 04",
                         "description": "Nom complet et libre du point de service, par exemple Bureau A, Guichet 04 ou Cabinet 2"
                     },
                     "threadNumber": {
                         "type": "number",
+                        "minimum": 1,
                         "example": 1,
                         "description": "Numéro du guichet (thread) à ouvrir (requis si mode=active)"
                     },
@@ -19859,9 +20286,9 @@
                         "description": "Valeur du champ « entry type »."
                     },
                     "scheduledTime": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « scheduled time »."
                     },
                     "calledEarly": {
@@ -19932,9 +20359,9 @@
                         "description": "Valeur du champ « status »."
                     },
                     "servedAt": {
-                        "type": "object",
-                        "format": "date-time",
+                        "type": "string",
                         "nullable": true,
+                        "format": "date-time",
                         "description": "Valeur du champ « served at »."
                     },
                     "closedAt": {
@@ -20620,25 +21047,28 @@
                 "properties": {
                     "username": {
                         "type": "string",
+                        "maxLength": 50,
                         "example": "operator_tunis",
                         "description": "Nom d'utilisateur unique"
                     },
                     "fullName": {
                         "type": "string",
+                        "maxLength": 150,
                         "example": "Jean Dupont",
                         "description": "Nom complet de l'utilisateur"
                     },
                     "email": {
                         "type": "string",
+                        "maxLength": 255,
                         "example": "operator@hopital.tn",
                         "description": "Adresse e-mail"
                     },
                     "password": {
                         "type": "string",
-                        "example": "••••••••••••",
-                        "description": "Mot de passe (entre 10 et 20 caractères)",
                         "minLength": 10,
-                        "maxLength": 20
+                        "maxLength": 20,
+                        "example": "••••••••••••",
+                        "description": "Mot de passe (entre 10 et 20 caractères)"
                     },
                     "userType": {
                         "type": "string",
@@ -20915,16 +21345,19 @@
                 "properties": {
                     "fullName": {
                         "type": "string",
+                        "maxLength": 150,
                         "example": "Jean Dupont",
                         "description": "Valeur du champ « full name »."
                     },
                     "email": {
                         "type": "string",
+                        "maxLength": 255,
                         "example": "nouvel.email@hopital.tn",
                         "description": "Valeur du champ « email »."
                     },
                     "languagePreference": {
                         "type": "string",
+                        "maxLength": 10,
                         "example": "ar",
                         "description": "Valeur du champ « language preference »."
                     },
@@ -21012,10 +21445,10 @@
                 "properties": {
                     "newPassword": {
                         "type": "string",
-                        "example": "••••••••••••",
-                        "description": "Nouveau mot de passe (entre 10 et 20 caractères)",
                         "minLength": 10,
-                        "maxLength": 20
+                        "maxLength": 20,
+                        "example": "••••••••••••",
+                        "description": "Nouveau mot de passe (entre 10 et 20 caractères)"
                     }
                 },
                 "required": [
@@ -21231,6 +21664,19 @@
                     "permissionNames"
                 ]
             },
+            "CronExecutionResponseDto": {
+                "type": "object",
+                "properties": {
+                    "accepted": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Indique que la tâche planifiée a été exécutée avec succès."
+                    }
+                },
+                "required": [
+                    "accepted"
+                ]
+            },
             "MonitoringHealthResponseDto": {
                 "type": "object",
                 "properties": {
@@ -21265,8 +21711,11 @@
                     },
                     "derived": {
                         "type": "object",
-                        "example": {
-                            "averageHttpRequestDurationMs": 12.5
+                        "properties": {
+                            "averageHttpRequestDurationMs": {
+                                "required": true,
+                                "type": "number"
+                            }
                         },
                         "description": "Valeur du champ « derived »."
                     },
@@ -21350,7 +21799,7 @@
                         "description": "Valeur du champ « active operators »."
                     },
                     "longestWaitMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « longest wait minutes »."
                     }
@@ -21393,12 +21842,12 @@
                         "description": "Valeur du champ « active operators »."
                     },
                     "estimatedWaitMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « estimated wait minutes »."
                     },
                     "longestWaitMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « longest wait minutes »."
                     }
@@ -21656,15 +22105,15 @@
                         "description": "Valeur du champ « cancelled »."
                     },
                     "averageWaitMinutes": {
-                        "type": "object",
-                        "example": 12.4,
+                        "type": "number",
                         "nullable": true,
+                        "example": 12.4,
                         "description": "Valeur du champ « average wait minutes »."
                     },
                     "averageServiceMinutes": {
-                        "type": "object",
-                        "example": 7.8,
+                        "type": "number",
                         "nullable": true,
+                        "example": 7.8,
                         "description": "Valeur du champ « average service minutes »."
                     }
                 },
@@ -21701,15 +22150,15 @@
                         "description": "Valeur du champ « cancelled »."
                     },
                     "averageWaitMinutes": {
-                        "type": "object",
-                        "example": 12.4,
+                        "type": "number",
                         "nullable": true,
+                        "example": 12.4,
                         "description": "Valeur du champ « average wait minutes »."
                     },
                     "averageServiceMinutes": {
-                        "type": "object",
-                        "example": 7.8,
+                        "type": "number",
                         "nullable": true,
+                        "example": 7.8,
                         "description": "Valeur du champ « average service minutes »."
                     },
                     "periodStart": {
@@ -21752,15 +22201,15 @@
                         "description": "Valeur du champ « cancelled »."
                     },
                     "averageWaitMinutes": {
-                        "type": "object",
-                        "example": 12.4,
+                        "type": "number",
                         "nullable": true,
+                        "example": 12.4,
                         "description": "Valeur du champ « average wait minutes »."
                     },
                     "averageServiceMinutes": {
-                        "type": "object",
-                        "example": 7.8,
+                        "type": "number",
                         "nullable": true,
+                        "example": 7.8,
                         "description": "Valeur du champ « average service minutes »."
                     },
                     "queueId": {
@@ -21809,7 +22258,7 @@
                         "description": "Valeur du champ « no show »."
                     },
                     "averageServiceMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « average service minutes »."
                     }
@@ -21852,7 +22301,7 @@
                         "description": "Valeur du champ « no show »."
                     },
                     "averageWaitMinutes": {
-                        "type": "object",
+                        "type": "number",
                         "nullable": true,
                         "description": "Valeur du champ « average wait minutes »."
                     }

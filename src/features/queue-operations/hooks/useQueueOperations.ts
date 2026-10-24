@@ -2,6 +2,7 @@ import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   OpenQueueSessionDto,
   RegistrationsControllerFindRegistrationsSort,
+  RegistrationsControllerFindRegistrationsStatus,
 } from '@/api/generated/models';
 import {
   queueEngineControllerCloseSession,
@@ -20,15 +21,6 @@ import { queryKeys } from '@/api/client/query-keys';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
 import { callNextAndCommit } from '../operation-actions';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
-
-export type RegistrationStatus =
-  | 'booked'
-  | 'waiting'
-  | 'in_progress'
-  | 'served'
-  | 'no_show'
-  | 'cancelled'
-  | 'expired';
 
 export function useRegistration(registrationId: string | null | undefined, enabled = true) {
   return useQuery({
@@ -71,7 +63,7 @@ export function useWaitingRegistrations(options: {
   dateTo?: string;
   page: number;
   search?: string;
-  status?: RegistrationStatus;
+  status?: RegistrationsControllerFindRegistrationsStatus;
   sort?: RegistrationsControllerFindRegistrationsSort;
 }) {
   return useQuery({
