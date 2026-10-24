@@ -12,6 +12,7 @@ export function Topbar({
   sites,
   activeSiteId,
   pageHeaderVisible,
+  pageTitle,
   onLogout,
   onOpenCommands,
   onRefresh,
@@ -21,6 +22,7 @@ export function Topbar({
   sites: readonly { id: string; name: string }[];
   activeSiteId: string | null;
   pageHeaderVisible: boolean;
+  pageTitle?: string;
   onLogout: () => void;
   onOpenCommands: () => void;
   onRefresh: () => void;
@@ -87,7 +89,7 @@ export function Topbar({
         </div>
         <div className="topbar-title-route" aria-hidden={pageHeaderVisible}>
           <span className="eyebrow">{activeSiteName}</span>
-          <h1>{t(routeLabel)}</h1>
+          <h1>{pageTitle || t(routeLabel)}</h1>
         </div>
       </div>
       <div className="topbar-actions">

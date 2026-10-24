@@ -95,6 +95,10 @@ test('the page title follows the selected queue and only shows the selector when
   await expect(
     page.getByRole('main').getByRole('heading', { name: 'Rendez-vous — Rendez-vous spécialisés' }),
   ).toBeVisible();
+  await page.locator('.calendar-day').last().scrollIntoViewIfNeeded();
+  await expect(page.locator('.topbar-title-route h1')).toHaveText(
+    'Rendez-vous — Rendez-vous spécialisés',
+  );
 });
 
 test('the appointment wizard loads availability and creates the selected civil time', async ({

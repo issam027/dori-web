@@ -422,3 +422,9 @@ La migration n'est terminée que si :
 <!-- CHECKPOINT id="ckpt_mvlil9az_co31nn" time="2026-10-23T22:01:17.147Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
 
 <!-- CHECKPOINT id="ckpt_mvliy4a2_pk8h4w" time="2026-10-23T22:11:17.162Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvm0ff8a_7j5d02" time="2026-10-24T06:20:37.978Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvm0sa6u_jheqi8" time="2026-10-24T06:30:37.974Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->
+
+<!-- CHECKPOINT id="ckpt_mvm1556x_83bh7a" time="2026-10-24T06:40:38.025Z" note="auto" fixes=0 questions=0 highlights=0 sections="5. Infrastructure front commune" -->

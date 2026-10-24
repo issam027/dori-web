@@ -38,6 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mobileViewport, setMobileViewport] = useState(() => mediaMatches('(max-width: 620px)'));
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const [pageHeaderVisible, setPageHeaderVisible] = useState(false);
+  const [pageTitle, setPageTitle] = useState<string>();
   const appContentRef = useRef<HTMLElement>(null);
   const activeSiteQuery = useSite(activeSiteId);
   const sites = useMemo(() => {
@@ -88,16 +89,19 @@ export function AppShell({ children }: { children: ReactNode }) {
     );
     const observePageHeader = () => {
       const pageHeader = content.querySelector('.page-header');
-      if (pageHeader === observedHeader) return;
-      visibilityObserver.disconnect();
-      observedHeader = pageHeader;
-      setPageHeaderVisible(Boolean(pageHeader));
-      if (pageHeader) visibilityObserver.observe(pageHeader);
+      const nextTitle = pageHeader?.querySelector('h1')?.textContent.trim();
+      setPageTitle(nextTitle || undefined);
+      if (pageHeader !== observedHeader) {
+        visibilityObserver.disconnect();
+        observedHeader = pageHeader;
+        setPageHeaderVisible(Boolean(pageHeader));
+        if (pageHeader) visibilityObserver.observe(pageHeader);
+      }
     };
     const contentObserver = new MutationObserver(observePageHeader);
 
     observePageHeader();
-    contentObserver.observe(content, { childList: true, subtree: true });
+    contentObserver.observe(content, { childList: true, subtree: true, characterData: true });
     return () => {
       contentObserver.disconnect();
       visibilityObserver.disconnect();
@@ -124,7 +128,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         }}
       />
       {mobileNavigationOpen ? (
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="sidebar-backdrop"
           type="button"
           aria-label={__t('common.fermerLeMenu')}
@@ -138,6 +143,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           sites={sites}
           activeSiteId={activeSiteId}
           pageHeaderVisible={pageHeaderVisible}
+          pageTitle={pageTitle}
           onLogout={() => {
             void clearSession(queryClient);
           }}
