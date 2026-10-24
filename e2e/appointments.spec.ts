@@ -49,9 +49,53 @@ async function selectNewPerson(page: Page) {
 
 async function openEmptySlot(page: Page) {
   await page.goto('/appointments');
+  await expect(
+    page.getByRole('main').getByRole('heading', {
+      name: `Rendez-vous — ${appointmentQueue.queueName}`,
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole('combobox', { name: /file/i })).toHaveCount(0);
   await page.locator('.calendar-slot-empty').filter({ hasText: '09:00' }).first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
 }
+
+test('the page title follows the selected queue and only shows the selector when useful', async ({
+  page,
+}) => {
+  const secondQueue = buildQueue({
+    queueId: '00000000-0000-4000-8000-000000000011',
+    queueName: 'Rendez-vous spécialisés',
+    appointmentsEnabled: true,
+  });
+  await installApiScenario(page, {
+    profile: 'operator',
+    sites: [site],
+    queues: [appointmentQueue, secondQueue],
+    handlers: [
+      async ({ path, url, route }) => {
+        if (!/^\/api\/v1\/queues\/[^/]+\/availability$/.test(path)) return false;
+        await route.fulfill({
+          json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
+        });
+        return true;
+      },
+    ],
+  });
+
+  await page.goto('/appointments');
+  const selector = page.getByRole('combobox', { name: /file/i });
+  await expect(selector).toBeVisible();
+  await expect(
+    page
+      .getByRole('main')
+      .getByRole('heading', { name: `Rendez-vous — ${appointmentQueue.queueName}` }),
+  ).toBeVisible();
+
+  await selector.selectOption(secondQueue.queueId);
+  await expect(
+    page.getByRole('main').getByRole('heading', { name: 'Rendez-vous — Rendez-vous spécialisés' }),
+  ).toBeVisible();
+});
 
 test('the appointment wizard loads availability and creates the selected civil time', async ({
   page,
@@ -59,7 +103,10 @@ test('the appointment wizard loads availability and creates the selected civil t
   const availabilityDates: string[] = [];
   let registrationBody: Record<string, unknown> = {};
   const appointments: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability'
+    ) {
       const date = url.searchParams.get('dateFrom') ?? '';
       availabilityDates.push(date);
       await route.fulfill({ json: apiEnvelope(availability(date)) });
@@ -105,7 +152,10 @@ test('the appointment wizard loads availability and creates the selected civil t
 test('a slot conflict keeps the wizard open and reloads availability', async ({ page }) => {
   let availabilityCalls = 0;
   const conflict: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability'
+    ) {
       availabilityCalls += 1;
       await route.fulfill({
         json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
@@ -171,29 +221,44 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
       await route.fulfill({ json: apiEnvelope(buildPerson()) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability'
+    ) {
       await route.fulfill({
         json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
       });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/reschedule') {
+    if (
+      method === 'POST' &&
+      path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/reschedule'
+    ) {
       rescheduleBody = route.request().postDataJSON() as Record<string, unknown>;
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/check-in') {
+    if (
+      method === 'POST' &&
+      path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501/check-in'
+    ) {
       checkInCalls += 1;
       await route.fulfill({ json: apiEnvelope(appointment) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/persons/00000000-0000-4000-8000-000000000100/notes') {
+    if (
+      method === 'POST' &&
+      path === '/api/v1/persons/00000000-0000-4000-8000-000000000100/notes'
+    ) {
       const body = route.request().postDataJSON() as { content: string };
       noteBodies.push(body.content);
       await route.fulfill({ json: apiEnvelope({ noteId: noteBodies.length, ...body }) });
       return true;
     }
-    if (method === 'DELETE' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501') {
+    if (
+      method === 'DELETE' &&
+      path === '/api/v1/registrations/00000000-0000-4000-8000-000000000501'
+    ) {
       cancelCalls += 1;
       await route.fulfill({
         json: apiEnvelope({
@@ -257,7 +322,10 @@ test('the queue calendar renders API-closed days compactly and prevents appointm
   page,
 }) => {
   const closedDay: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability'
+    ) {
       const dateFrom = url.searchParams.get('dateFrom') ?? '';
       const dateTo = url.searchParams.get('dateTo') ?? dateFrom;
       await route.fulfill({

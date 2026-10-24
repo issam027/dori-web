@@ -41,6 +41,9 @@ export function AppointmentsPage() {
     queues.data?.data.items.filter((queue) => queue.appointmentsEnabled) ?? [];
   const selectedQueue =
     availableQueues.find((queue) => queue.queueId === queueId) ?? availableQueues[0];
+  const pageTitle = selectedQueue
+    ? `${__t('appointments.title')} — ${selectedQueue.queueName}`
+    : __t('appointments.title');
   const timeZone = site.data?.data.timezone ?? 'UTC';
   const displayedMonth = `${String(anchor.getUTCFullYear())}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}`;
   const displayedMonthLabel = new Intl.DateTimeFormat(i18n.language, {
@@ -131,7 +134,7 @@ export function AppointmentsPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow={__t('nav.appointments')}
-        title={__t('appointments.title')}
+        title={pageTitle}
         description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
         actions={
           <div className="segmented">
@@ -183,19 +186,21 @@ export function AppointmentsPage() {
       {availableQueues.length > 0 ? (
         <>
           <div className="calendar-toolbar">
-            <select
-              aria-label={__t('queues.singular')}
-              value={selectedQueue?.queueId ?? ''}
-              onChange={(e) => {
-                setQueueId(e.target.value);
-              }}
-            >
-              {availableQueues.map((queue) => (
-                <option key={queue.queueId} value={queue.queueId}>
-                  {queue.queueName}
-                </option>
-              ))}
-            </select>
+            {availableQueues.length > 1 ? (
+              <select
+                aria-label={__t('queues.singular')}
+                value={selectedQueue?.queueId ?? ''}
+                onChange={(e) => {
+                  setQueueId(e.target.value);
+                }}
+              >
+                {availableQueues.map((queue) => (
+                  <option key={queue.queueId} value={queue.queueId}>
+                    {queue.queueName}
+                  </option>
+                ))}
+              </select>
+            ) : null}
             <Button
               variant="unstyled"
               className="button"
