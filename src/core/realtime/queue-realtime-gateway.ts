@@ -48,7 +48,7 @@ const channelContracts = {
 class FatalRealtimeError extends Error {}
 
 export function queueRealtimeUrl(queueId: string, channel: QueueRealtimeChannel): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+  const baseUrl = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
   return `${baseUrl}/api/v1/realtime/queues/${encodeURIComponent(queueId)}/${channel}`;
 }
 
