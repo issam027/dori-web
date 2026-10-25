@@ -19873,6 +19873,12 @@
                         "example": "2026-10-15T09:42:18.000Z",
                         "description": "Date et heure de l'appel du client"
                     },
+                    "queueId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "00000000-0000-4000-8000-000000000001",
+                        "description": "Identifiant UUID de la file, retourné uniquement tant que l'inscription est en attente ou en cours de traitement"
+                    },
                     "queueName": {
                         "type": "string",
                         "example": "Consultation Cardiologie",
