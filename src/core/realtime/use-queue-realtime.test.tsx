@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { useQueueDisplayRealtime, useQueueTrackingRealtime } from './use-queue-realtime';
 
 const gatewayMocks = vi.hoisted(() => ({
-  construct: vi.fn(),
+  construct: vi.fn<(options: unknown) => void>(),
   connect: vi.fn(),
   disconnect: vi.fn(),
 }));
@@ -38,9 +38,12 @@ describe('queue realtime hooks', () => {
       { initialProps: { queueIds: ['queue-1'] } },
     );
 
-    expect(gatewayMocks.construct).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: 'tracking', getCredential: expect.any(Function) }),
-    );
+    const trackingOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
+      channel: string;
+      getCredential: () => string;
+    };
+    expect(trackingOptions.channel).toBe('tracking');
+    expect(trackingOptions.getCredential()).toBe('registration-token');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1']);
 
     rerender({ queueIds: [] });
@@ -48,7 +51,7 @@ describe('queue realtime hooks', () => {
     expect(gatewayMocks.disconnect).toHaveBeenCalledOnce();
   });
 
-  it('subscribes one display socket to every displayed queue', () => {
+  it('subscribes one display stream to every displayed queue', () => {
     renderHook(() => {
       useQueueDisplayRealtime({
         queueIds: ['queue-2', 'queue-1'],
@@ -58,9 +61,12 @@ describe('queue realtime hooks', () => {
       });
     });
 
-    expect(gatewayMocks.construct).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: 'display', getCredential: expect.any(Function) }),
-    );
+    const displayOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
+      channel: string;
+      getCredential: () => string;
+    };
+    expect(displayOptions.channel).toBe('display');
+    expect(displayOptions.getCredential()).toBe('display-jwt');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1', 'queue-2']);
   });
 });

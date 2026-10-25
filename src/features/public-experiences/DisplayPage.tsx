@@ -46,8 +46,8 @@ export function DisplayPage() {
           : displayedQueueIds,
       );
     },
-    onReconnect: () => {
-      refreshQueues(displayedQueueIds);
+    onReconnect: (queueId) => {
+      refreshQueues([queueId]);
     },
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));

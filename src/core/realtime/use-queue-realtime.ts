@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef } from 'react';
+import { useCallback, useEffect, useEffectEvent } from 'react';
 import {
   QueueRealtimeGateway,
   type QueueDisplayChangedEvent,
@@ -12,7 +12,7 @@ interface QueueRealtimeOptions<TChannel extends QueueRealtimeChannel> {
   credential: string | null | undefined;
   getCredential: () => string | null | undefined;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
-  onReconnect: () => void;
+  onReconnect: (queueId: string) => void;
 }
 
 function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
@@ -20,16 +20,15 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
   options: QueueRealtimeOptions<TChannel>,
 ): void {
   const queueKey = [...new Set(options.queueIds)].sort().join(',');
+  const { credential, getCredential } = options;
   const onEvent = useEffectEvent(options.onEvent);
   const onReconnect = useEffectEvent(options.onReconnect);
-  const credentialProvider = useRef(options.getCredential);
-  credentialProvider.current = options.getCredential;
 
   useEffect(() => {
-    if (!options.credential || !queueKey) return;
+    if (!credential || !queueKey) return;
     const gateway = new QueueRealtimeGateway({
       channel,
-      getCredential: () => credentialProvider.current()?.trim() ?? '',
+      getCredential: () => getCredential()?.trim() ?? '',
       onEvent,
       onReconnect,
     });
@@ -37,7 +36,7 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     return () => {
       gateway.disconnect();
     };
-  }, [channel, options.credential, queueKey]);
+  }, [channel, credential, getCredential, queueKey]);
 }
 
 export function useQueueDisplayRealtime(
@@ -59,9 +58,10 @@ export function useQueueTrackingRealtime(
     onEvent: (event: QueuePositionChangedEvent) => void;
   },
 ): void {
+  const getCredential = useCallback(() => options.registrationToken, [options.registrationToken]);
   useQueueRealtime('tracking', {
     ...options,
     credential: options.registrationToken,
-    getCredential: () => options.registrationToken,
+    getCredential,
   });
 }

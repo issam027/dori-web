@@ -1,4 +1,8 @@
-import { io, type ManagerOptions, type Socket, type SocketOptions } from 'socket.io-client';
+import {
+  fetchEventSource,
+  type EventSourceMessage,
+  type FetchEventSourceInit,
+} from '@microsoft/fetch-event-source';
 
 export type QueueRealtimeChannel = 'display' | 'tracking';
 
@@ -6,28 +10,27 @@ export interface QueueDisplayChangedEvent {
   queueId: string;
   reason:
     'registration_created' | 'registration_called' | 'registration_served' | 'registration_no_show';
+  timestamp: string;
 }
 
 export interface QueuePositionChangedEvent {
   queueId: string;
-  reason: 'registration_called';
+  timestamp: string;
 }
 
 export type QueueRealtimeEvent<TChannel extends QueueRealtimeChannel> = TChannel extends 'display'
   ? QueueDisplayChangedEvent
   : QueuePositionChangedEvent;
 
-type RealtimeSocket = Pick<Socket, 'connected' | 'connect' | 'disconnect' | 'emit' | 'on' | 'off'>;
+type EventStream = (input: RequestInfo, init: FetchEventSourceInit) => Promise<void>;
 
 interface QueueRealtimeGatewayOptions<TChannel extends QueueRealtimeChannel> {
   channel: TChannel;
   getCredential: () => string;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
-  onReconnect: () => void;
-  createSocket?: (
-    channel: QueueRealtimeChannel,
-    getCredential: () => string,
-  ) => RealtimeSocket;
+  onReconnect: (queueId: string) => void;
+  eventStream?: EventStream;
+  fetch?: typeof fetch;
 }
 
 const channelContracts = {
@@ -40,37 +43,14 @@ const channelContracts = {
       'registration_no_show',
     ]),
   },
-  tracking: {
-    event: 'queue_position_changed',
-    reasons: new Set(['registration_called']),
-  },
+  tracking: { event: 'queue_position_changed' },
 } as const;
 
-export function queueSocketOptions(
-  channel: QueueRealtimeChannel,
-  getCredential: () => string,
-): Partial<ManagerOptions & SocketOptions> {
-  return {
-    path: '/api/socket-io/socket.io',
-    auth: (callback) => {
-      const credential = getCredential();
-      callback(channel === 'display' ? { token: credential } : { registrationToken: credential });
-    },
-    autoConnect: false,
-    transports: ['websocket'],
-  };
-}
+class FatalRealtimeError extends Error {}
 
-function createSocket(
-  channel: QueueRealtimeChannel,
-  getCredential: () => string,
-): Socket {
-  const realtimeUrl = import.meta.env.VITE_REALTIME_URL || import.meta.env.VITE_API_BASE_URL;
-  return io(realtimeUrl || undefined, queueSocketOptions(channel, getCredential));
-}
-
-function queueRoom(queueId: string, channel: QueueRealtimeChannel): string {
-  return `queue:${queueId}:${channel}`;
+export function queueRealtimeUrl(queueId: string, channel: QueueRealtimeChannel): string {
+  const baseUrl = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+  return `${baseUrl}/api/v1/realtime/queues/${encodeURIComponent(queueId)}/${channel}`;
 }
 
 function isQueueEvent(
@@ -79,65 +59,97 @@ function isQueueEvent(
 ): value is QueueDisplayChangedEvent | QueuePositionChangedEvent {
   if (!value || typeof value !== 'object') return false;
   const event = value as Record<string, unknown>;
-  return (
-    typeof event.queueId === 'string' &&
-    typeof event.reason === 'string' &&
-    channelContracts[channel].reasons.has(event.reason)
-  );
+  if (
+    typeof event.queueId !== 'string' ||
+    typeof event.timestamp !== 'string' ||
+    Number.isNaN(Date.parse(event.timestamp))
+  )
+    return false;
+  return channel === 'tracking'
+    ? !('reason' in event)
+    : typeof event.reason === 'string' && channelContracts.display.reasons.has(event.reason);
+}
+
+function parseQueueEvent(
+  message: EventSourceMessage,
+  channel: QueueRealtimeChannel,
+  queueId: string,
+): QueueDisplayChangedEvent | QueuePositionChangedEvent | undefined {
+  if (message.event !== channelContracts[channel].event) return undefined;
+  try {
+    const event: unknown = JSON.parse(message.data);
+    return isQueueEvent(event, channel) && event.queueId === queueId ? event : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
-  private readonly socket: RealtimeSocket;
-  private readonly eventName: string;
-  private queueIds: string[] = [];
-  private hasConnected = false;
+  private readonly controllers = new Map<string, AbortController>();
   private started = false;
 
-  constructor(private readonly options: QueueRealtimeGatewayOptions<TChannel>) {
-    this.socket = (options.createSocket ?? createSocket)(options.channel, options.getCredential);
-    this.eventName = channelContracts[options.channel].event;
-  }
+  constructor(private readonly options: QueueRealtimeGatewayOptions<TChannel>) {}
 
   connect(queueIds: readonly string[]): void {
     if (this.started) return;
-    this.queueIds = [...new Set(queueIds)].sort();
-    if (!this.queueIds.length) return;
+    const uniqueQueueIds = [...new Set(queueIds)].sort();
+    if (!uniqueQueueIds.length) return;
     this.started = true;
-    this.socket.on('connect', this.handleConnect);
-    this.socket.on(this.eventName, this.handleQueueEvent);
-    this.socket.connect();
+    uniqueQueueIds.forEach((queueId) => {
+      this.open(queueId);
+    });
   }
 
   disconnect(): void {
-    if (!this.started) return;
-    if (this.socket.connected) {
-      this.queueIds.forEach((queueId) => {
-        this.socket.emit('unsubscribe', {
-          room: queueRoom(queueId, this.options.channel),
-        });
-      });
-    }
-    this.socket.off('connect', this.handleConnect);
-    this.socket.off(this.eventName, this.handleQueueEvent);
-    this.socket.disconnect();
-    this.queueIds = [];
-    this.hasConnected = false;
+    this.controllers.forEach((controller) => {
+      controller.abort();
+    });
+    this.controllers.clear();
     this.started = false;
   }
 
-  private readonly handleConnect = () => {
-    this.queueIds.forEach((queueId) => {
-      this.socket.emit('subscribe', {
-        room: queueRoom(queueId, this.options.channel),
-      });
-    });
-    if (this.hasConnected) this.options.onReconnect();
-    this.hasConnected = true;
-  };
+  private open(queueId: string): void {
+    const controller = new AbortController();
+    const eventStream = this.options.eventStream ?? fetchEventSource;
+    const requestFetch = this.options.fetch ?? globalThis.fetch;
+    let hasOpened = false;
+    this.controllers.set(queueId, controller);
 
-  private readonly handleQueueEvent = (event: unknown) => {
-    if (!isQueueEvent(event, this.options.channel) || !this.queueIds.includes(event.queueId))
-      return;
-    this.options.onEvent(event as QueueRealtimeEvent<TChannel>);
-  };
+    void eventStream(queueRealtimeUrl(queueId, this.options.channel), {
+      signal: controller.signal,
+      openWhenHidden: true,
+      headers: { Accept: 'text/event-stream' },
+      fetch: (input, init) => {
+        const headers = new Headers(init?.headers);
+        const credential = this.options.getCredential();
+        if (this.options.channel === 'display')
+          headers.set('Authorization', `Bearer ${credential}`);
+        else headers.set('X-Registration-Token', credential);
+        return requestFetch(input, { ...init, headers });
+      },
+      onopen: (response) => {
+        const contentType = response.headers.get('content-type') ?? '';
+        if (response.ok && contentType.includes('text/event-stream')) {
+          if (hasOpened) this.options.onReconnect(queueId);
+          hasOpened = true;
+          return Promise.resolve();
+        }
+        if (response.status >= 400 && response.status < 500 && response.status !== 429)
+          throw new FatalRealtimeError(
+            `SSE request rejected with status ${String(response.status)}`,
+          );
+        throw new Error(`SSE request failed with status ${String(response.status)}`);
+      },
+      onmessage: (message) => {
+        const event = parseQueueEvent(message, this.options.channel, queueId);
+        if (event) this.options.onEvent(event as QueueRealtimeEvent<TChannel>);
+      },
+      onclose: () => {
+        throw new Error('SSE connection closed');
+      },
+      onerror: (error) => {
+        if (error instanceof FatalRealtimeError) throw error;
+      },
+    }).catch(() => undefined);
+  }
 }

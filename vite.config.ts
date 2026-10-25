@@ -40,7 +40,7 @@ export function securityHeaders(env: Record<string, string>): Plugin {
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
-    `connect-src 'self' ${apiOrigin} ws: wss:`,
+    `connect-src 'self' ${apiOrigin}`,
     "script-src 'self'",
   ].join('; ');
   return {

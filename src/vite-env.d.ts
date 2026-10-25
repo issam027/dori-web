@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string;
-  readonly VITE_REALTIME_URL?: string;
   readonly VITE_APP_ENV: 'development' | 'test' | 'production';
   readonly VITE_KIOSK_IDLE_MS?: string;
   readonly VITE_USER_RESET_PASSWORD?: string;
