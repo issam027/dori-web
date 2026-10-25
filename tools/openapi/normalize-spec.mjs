@@ -3,6 +3,59 @@ const propertyTypeOverrides = {
   'ThreadSessionItemDto.connectedAt': 'string',
   'QueueSessionResponseDto.connectedAt': 'string',
   'QueueSessionResponseDto.disconnectedAt': 'string',
+  'AuditEventResponseDto.actorDisplayName': 'string',
+  'AuditEventResponseDto.targetDisplayName': 'string',
+  'AuditEventResponseDto.secondaryTargetDisplayName': 'string',
+  'AuditEventResponseDto.siteScopeDisplayName': 'string',
+  'AuditEventResponseDto.failureType': 'string',
+  'AuditEventDetailResponseDto.actorDisplayName': 'string',
+  'AuditEventDetailResponseDto.targetDisplayName': 'string',
+  'AuditEventDetailResponseDto.secondaryTargetDisplayName': 'string',
+  'AuditEventDetailResponseDto.siteScopeDisplayName': 'string',
+  'AuditEventDetailResponseDto.failureType': 'string',
+  'AuditEventDetailResponseDto.actorUsername': 'string',
+  'AuditEventDetailResponseDto.actorFullName': 'string',
+  'AuditEventDetailResponseDto.actorIsActive': 'boolean',
+  'AuditEventDetailResponseDto.targetIsActive': 'boolean',
+  'AuditEventDetailResponseDto.secondaryTargetIsActive': 'boolean',
+  'AuditEventDetailResponseDto.siteScopeLocation': 'string',
+  'AuditEventDetailResponseDto.siteScopeTimezone': 'string',
+  'AuditEventDetailResponseDto.siteScopeIsActive': 'boolean',
+  'CurrentUserResponseDto.lastLogin': 'string',
+  'CreateQueueDto.currency': 'string',
+  'CreateQueueDto.locale': 'string',
+  'UpdateQueueDto.currency': 'string',
+  'UpdateQueueDto.locale': 'string',
+  'QueueStatusResponseDto.estimatedWaitMinutes': 'number',
+  'CallingTicketResponseDto.currentTicket': 'string',
+  'QueueTierResponseDto.currencyOverride': 'string',
+  'AssociateQueueTierDto.currency': 'string',
+  'UpdateQueueTierDto.currency': 'string',
+  'NotificationRuleResponseDto.thresholdValue': 'number',
+  'UpdateNotificationRuleDto.thresholdValue': 'number',
+  'PersonNoteResponseDto.deletedAt': 'string',
+  'RegistrationResponseDto.deletedAt': 'string',
+  'CreateRegistrationResponseDto.appointmentStatus': 'string',
+  'CreateRegistrationResponseDto.scheduledTime': 'string',
+  'CreateRegistrationResponseDto.estimatedWaitMinutes': 'number',
+  'RescheduleRegistrationResponseDto.appointmentStatus': 'string',
+  'RescheduleRegistrationResponseDto.scheduledTime': 'string',
+  'RegistrationPositionResponseDto.estimatedWaitMinutes': 'number',
+  'QueuePreviewItemDto.scheduledTime': 'string',
+  'QueueSessionResponseDto.threadNumber': 'number',
+  'CallNextRegistrationResponseDto.scheduledTime': 'string',
+  'UpdateRegistrationStatusResponseDto.servedAt': 'string',
+  'MonitoringLiveTotalsDto.longestWaitMinutes': 'number',
+  'MonitoringLiveQueueDto.estimatedWaitMinutes': 'number',
+  'MonitoringLiveQueueDto.longestWaitMinutes': 'number',
+  'MonitoringSeriesMetricsDto.averageWaitMinutes': 'number',
+  'MonitoringSeriesMetricsDto.averageServiceMinutes': 'number',
+  'MonitoringSeriesBucketDto.averageWaitMinutes': 'number',
+  'MonitoringSeriesBucketDto.averageServiceMinutes': 'number',
+  'MonitoringQueueBreakdownDto.averageWaitMinutes': 'number',
+  'MonitoringQueueBreakdownDto.averageServiceMinutes': 'number',
+  'MonitoringUserBreakdownDto.averageServiceMinutes': 'number',
+  'MonitoringTierBreakdownDto.averageWaitMinutes': 'number',
 };
 
 export default function normalizeSpec(document) {
@@ -32,6 +85,24 @@ export default function normalizeSpec(document) {
           );
         }
       }
+    }
+  }
+
+  const registrationStatuses = [
+    'booked',
+    'waiting',
+    'in_progress',
+    'served',
+    'no_show',
+    'cancelled',
+    'expired',
+  ];
+  for (const pathItem of Object.values(normalized.paths ?? {})) {
+    for (const method of ['get', 'post', 'put', 'patch', 'delete']) {
+      const operation = pathItem?.[method];
+      if (operation?.operationId !== 'RegistrationsController_findRegistrations') continue;
+      const status = operation.parameters?.find((parameter) => parameter.name === 'status');
+      if (status?.schema) status.schema.enum = registrationStatuses;
     }
   }
 

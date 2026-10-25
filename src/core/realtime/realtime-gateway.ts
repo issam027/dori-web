@@ -1,5 +1,7 @@
 export type RealtimeListener<TSnapshot> = (snapshot: TSnapshot) => void;
 
+export const realtimeSafetyRefreshIntervalMs = 300_000;
+
 interface RealtimeGateway<TSnapshot> {
   connect: () => Promise<void>;
   disconnect: () => void;

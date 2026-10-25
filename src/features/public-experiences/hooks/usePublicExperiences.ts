@@ -24,7 +24,10 @@ import {
 } from '@/api/generated/tiers/tiers';
 import { queueEngineControllerGetActiveSessions } from '@/api/generated/queue-engine/queue-engine';
 import { queryKeys } from '@/api/client/query-keys';
-import { PollingRealtimeGateway } from '@/core/realtime/realtime-gateway';
+import {
+  PollingRealtimeGateway,
+  realtimeSafetyRefreshIntervalMs,
+} from '@/core/realtime/realtime-gateway';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 
 export function usePublicTracking(token: string) {
@@ -40,7 +43,7 @@ export function usePublicTracking(token: string) {
                   headers: { 'X-Registration-Token': token },
                 })
               ).data,
-            10_000,
+            realtimeSafetyRefreshIntervalMs,
             (cause) => {
               if (cause instanceof NormalizedApiError) {
                 const code = cause.code.toUpperCase();
@@ -89,7 +92,7 @@ export function useDisplaySnapshot(options: {
       queryKey: queryKeys.publicExperience.displaySnapshot(queue.queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         queuesControllerGetDisplay(queue.queueId, undefined, signal),
-      refetchInterval: 5_000,
+      refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
   });
   const sessions = useQueries({
@@ -102,7 +105,7 @@ export function useDisplaySnapshot(options: {
           undefined,
           signal,
         ),
-      refetchInterval: 5_000,
+      refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
   });
   return { queues, allowedQueues, displays, sessions };

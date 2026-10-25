@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSessionStore } from '@/core/auth/session-store';
+import { getAccessToken } from '@/core/auth/access-token';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
+import { useQueueRealtime } from '@/core/realtime/use-queue-realtime';
+import { queryKeys } from '@/api/client/query-keys';
 import { playChime, speakTicket } from './audio';
 import { useDisplaySnapshot } from './hooks/usePublicExperiences';
 import { Button } from '@/design-system/components/Button';
@@ -12,6 +16,7 @@ const upcomingTicketsPerPage = 8;
 
 export function DisplayPage() {
   const { t: __t } = useTranslation();
+  const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
@@ -21,6 +26,29 @@ export function DisplayPage() {
     allowedQueueIds: user?.scope.queueIds ?? [],
     isGlobal: user?.scope.isGlobal ?? false,
     selectedQueueId: queryQueue || undefined,
+  });
+  const displayedQueueIds = allowedQueues.map((queue) => queue.queueId);
+  const refreshQueues = (queueIds: readonly string[]) => {
+    queueIds.forEach((queueId) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.publicExperience.displaySnapshot(queueId),
+      });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.queueSessions.byQueue(queueId) });
+    });
+  };
+  useQueueRealtime({
+    queueIds: displayedQueueIds,
+    token: getAccessToken(),
+    onEvent: (event) => {
+      refreshQueues(
+        event.queueId && displayedQueueIds.includes(event.queueId)
+          ? [event.queueId]
+          : displayedQueueIds,
+      );
+    },
+    onReconnect: () => {
+      refreshQueues(displayedQueueIds);
+    },
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
   const counterNames = new Map(

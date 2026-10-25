@@ -1,8 +1,12 @@
-import { PollingRealtimeGateway } from './realtime-gateway';
+import { PollingRealtimeGateway, realtimeSafetyRefreshIntervalMs } from './realtime-gateway';
 
 describe('PollingRealtimeGateway', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
+
+  it('keeps the agreed five-minute safety refresh interval', () => {
+    expect(realtimeSafetyRefreshIntervalMs).toBe(5 * 60 * 1_000);
+  });
 
   it('loads a REST snapshot before polling and shares concurrent refreshes', async () => {
     let calls = 0;
