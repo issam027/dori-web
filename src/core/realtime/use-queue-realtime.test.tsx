@@ -30,7 +30,7 @@ describe('queue realtime hooks', () => {
       ({ queueIds }) => {
         useQueueTrackingRealtime({
           queueIds,
-          token: 'registration-token',
+          registrationToken: 'registration-token',
           onEvent: vi.fn(),
           onReconnect: vi.fn(),
         });
@@ -39,7 +39,7 @@ describe('queue realtime hooks', () => {
     );
 
     expect(gatewayMocks.construct).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: 'tracking', token: 'registration-token' }),
+      expect.objectContaining({ channel: 'tracking', getCredential: expect.any(Function) }),
     );
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1']);
 
@@ -52,14 +52,14 @@ describe('queue realtime hooks', () => {
     renderHook(() => {
       useQueueDisplayRealtime({
         queueIds: ['queue-2', 'queue-1'],
-        token: 'display-jwt',
+        getToken: () => 'display-jwt',
         onEvent: vi.fn(),
         onReconnect: vi.fn(),
       });
     });
 
     expect(gatewayMocks.construct).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: 'display', token: 'display-jwt' }),
+      expect.objectContaining({ channel: 'display', getCredential: expect.any(Function) }),
     );
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1', 'queue-2']);
   });

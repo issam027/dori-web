@@ -1,5 +1,5 @@
 import type { Socket } from 'socket.io-client';
-import { QueueRealtimeGateway } from './queue-realtime-gateway';
+import { QueueRealtimeGateway, queueSocketOptions } from './queue-realtime-gateway';
 
 function createSocketHarness() {
   const listeners = new Map<string, (...args: unknown[]) => void>();
@@ -31,12 +31,40 @@ function createSocketHarness() {
 }
 
 describe('QueueRealtimeGateway', () => {
+  it('uses the Vercel Socket.IO path and the current JWT for display connections', () => {
+    let token = 'jwt-initial';
+    const options = queueSocketOptions('display', () => token);
+    const authenticate = options.auth;
+    if (typeof authenticate !== 'function') throw new Error('Socket auth callback is required');
+    const callback = vi.fn();
+
+    authenticate(callback);
+    token = 'jwt-refreshed';
+    authenticate(callback);
+
+    expect(options.path).toBe('/api/socket-io/socket.io');
+    expect(options.transports).toEqual(['websocket']);
+    expect(callback).toHaveBeenNthCalledWith(1, { token: 'jwt-initial' });
+    expect(callback).toHaveBeenNthCalledWith(2, { token: 'jwt-refreshed' });
+  });
+
+  it('uses the registration token for tracking connections', () => {
+    const options = queueSocketOptions('tracking', () => 'tracking-token');
+    const authenticate = options.auth;
+    if (typeof authenticate !== 'function') throw new Error('Socket auth callback is required');
+    const callback = vi.fn();
+
+    authenticate(callback);
+
+    expect(callback).toHaveBeenCalledWith({ registrationToken: 'tracking-token' });
+  });
+
   it('subscribes a display to its queues and accepts display events only', () => {
     const harness = createSocketHarness();
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      token: 'jwt',
+      getCredential: () => 'jwt',
       onEvent,
       onReconnect: vi.fn(),
       createSocket: () => harness.socket,
@@ -70,7 +98,7 @@ describe('QueueRealtimeGateway', () => {
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'tracking',
-      token: 'registration-token',
+      getCredential: () => 'registration-token',
       onEvent,
       onReconnect: vi.fn(),
       createSocket: () => harness.socket,
@@ -94,7 +122,7 @@ describe('QueueRealtimeGateway', () => {
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      token: 'jwt',
+      getCredential: () => 'jwt',
       onEvent,
       onReconnect: vi.fn(),
       createSocket: () => harness.socket,
@@ -119,7 +147,7 @@ describe('QueueRealtimeGateway', () => {
     const onReconnect = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'tracking',
-      token: 'registration-token',
+      getCredential: () => 'registration-token',
       onEvent: vi.fn(),
       onReconnect,
       createSocket: () => harness.socket,
@@ -137,7 +165,7 @@ describe('QueueRealtimeGateway', () => {
     const harness = createSocketHarness();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      token: 'jwt',
+      getCredential: () => 'jwt',
       onEvent: vi.fn(),
       onReconnect: vi.fn(),
       createSocket: () => harness.socket,

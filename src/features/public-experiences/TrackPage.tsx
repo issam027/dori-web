@@ -52,7 +52,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
 
   useQueueTrackingRealtime({
     queueIds: position?.queueId ? [position.queueId] : [],
-    token,
+    registrationToken: token,
     onEvent: () => {
       void gateway?.refresh().catch(() => undefined);
     },

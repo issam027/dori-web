@@ -1,4 +1,4 @@
-import { io, type Socket } from 'socket.io-client';
+import { io, type ManagerOptions, type Socket, type SocketOptions } from 'socket.io-client';
 
 export type QueueRealtimeChannel = 'display' | 'tracking';
 
@@ -21,10 +21,13 @@ type RealtimeSocket = Pick<Socket, 'connected' | 'connect' | 'disconnect' | 'emi
 
 interface QueueRealtimeGatewayOptions<TChannel extends QueueRealtimeChannel> {
   channel: TChannel;
-  token: string;
+  getCredential: () => string;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: () => void;
-  createSocket?: (token: string) => RealtimeSocket;
+  createSocket?: (
+    channel: QueueRealtimeChannel,
+    getCredential: () => string,
+  ) => RealtimeSocket;
 }
 
 const channelContracts = {
@@ -43,13 +46,27 @@ const channelContracts = {
   },
 } as const;
 
-function createSocket(token: string): Socket {
-  const realtimeUrl = import.meta.env.VITE_REALTIME_URL || import.meta.env.VITE_API_BASE_URL;
-  return io(realtimeUrl || undefined, {
-    auth: { token },
+export function queueSocketOptions(
+  channel: QueueRealtimeChannel,
+  getCredential: () => string,
+): Partial<ManagerOptions & SocketOptions> {
+  return {
+    path: '/api/socket-io/socket.io',
+    auth: (callback) => {
+      const credential = getCredential();
+      callback(channel === 'display' ? { token: credential } : { registrationToken: credential });
+    },
     autoConnect: false,
     transports: ['websocket'],
-  });
+  };
+}
+
+function createSocket(
+  channel: QueueRealtimeChannel,
+  getCredential: () => string,
+): Socket {
+  const realtimeUrl = import.meta.env.VITE_REALTIME_URL || import.meta.env.VITE_API_BASE_URL;
+  return io(realtimeUrl || undefined, queueSocketOptions(channel, getCredential));
 }
 
 function queueRoom(queueId: string, channel: QueueRealtimeChannel): string {
@@ -77,7 +94,7 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
   private started = false;
 
   constructor(private readonly options: QueueRealtimeGatewayOptions<TChannel>) {
-    this.socket = (options.createSocket ?? createSocket)(options.token);
+    this.socket = (options.createSocket ?? createSocket)(options.channel, options.getCredential);
     this.eventName = channelContracts[options.channel].event;
   }
 

@@ -38,7 +38,7 @@ export function DisplayPage() {
   };
   useQueueDisplayRealtime({
     queueIds: displayedQueueIds,
-    token: getAccessToken(),
+    getToken: getAccessToken,
     onEvent: (event) => {
       refreshQueues(
         event.queueId && displayedQueueIds.includes(event.queueId)
