@@ -21,7 +21,7 @@ export function DisplayPage() {
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
   const queryQueue = new URLSearchParams(location.search).get('queueId');
-  const { queues, allowedQueues, displays, sessions } = useDisplaySnapshot({
+  const { queues, allowedQueues, displays } = useDisplaySnapshot({
     siteId: activeSiteId,
     allowedQueueIds: user?.scope.queueIds ?? [],
     isGlobal: user?.scope.isGlobal ?? false,
@@ -50,17 +50,6 @@ export function DisplayPage() {
     },
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
-  const counterNames = new Map(
-    sessions.flatMap((query, index) =>
-      (query.data?.data.items ?? []).map(
-        (session) =>
-          [
-            `${allowedQueues[index]?.queueId ?? 'unknown'}:${String(session.threadNumber)}`,
-            session.counterName?.trim() || undefined,
-          ] as const,
-      ),
-    ),
-  );
   const activeCalls = snapshots
     .flatMap((snapshot) =>
       snapshot.activeThreads
@@ -69,7 +58,6 @@ export function DisplayPage() {
           ...thread,
           queueId: snapshot.queueId,
           queueName: snapshot.queueName,
-          counterName: counterNames.get(`${snapshot.queueId}:${String(thread.threadNumber)}`),
         })),
     )
     .sort(
@@ -123,7 +111,7 @@ export function DisplayPage() {
   }, [activePageCount, nextPageCount]);
   useEffect(() => {
     const key = current?.currentTicket
-      ? `${current.currentTicket}:${String(current.threadNumber)}:${current.counterName ?? ''}:${current.queueId}`
+      ? `${current.currentTicket}:${String(current.threadNumber)}:${current.queueId}`
       : '';
     if (!key || key === previousCall.current) return;
     previousCall.current = key;
@@ -136,7 +124,7 @@ export function DisplayPage() {
       playChime();
       speakTicket(
         current?.currentTicket ?? '',
-        current?.counterName || `${__t('common.guichet')} ${String(current?.threadNumber ?? 0)}`,
+        `${__t('common.guichet')} ${String(current?.threadNumber ?? 0)}`,
         document.documentElement.lang || 'fr',
       );
     }
@@ -222,7 +210,7 @@ export function DisplayPage() {
                   <div className="display-destination">
                     <small>{__t('public-experiences.display.veuillezRejoindre')}</small>
                     <b>
-                      {call.counterName || `${__t('common.guichet')} ${String(call.threadNumber)}`}
+                      {__t('common.guichet')} {String(call.threadNumber)}
                     </b>
                     <span>
                       {call.queueName ??
