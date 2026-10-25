@@ -1,6 +1,7 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { findQueues, findQueueStatus } from '../api/queues-api';
+import { realtimeSafetyRefreshIntervalMs } from '@/core/realtime/realtime-gateway';
 
 export function useQueues(options: {
   siteId: string | null;
@@ -32,7 +33,7 @@ export function useQueueStatuses(queueIds: readonly string[]) {
     queries: queueIds.map((queueId) => ({
       queryKey: queryKeys.queueStatus.detail(queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) => findQueueStatus(queueId, signal),
-      refetchInterval: 15_000,
+      refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
   });
 }

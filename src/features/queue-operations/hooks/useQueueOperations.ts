@@ -21,6 +21,7 @@ import { queryKeys } from '@/api/client/query-keys';
 import { invalidateQueueOperations } from '@/api/client/query-invalidations';
 import { callNextAndCommit } from '../operation-actions';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
+import { realtimeSafetyRefreshIntervalMs } from '@/core/realtime/realtime-gateway';
 
 export function useRegistration(registrationId: string | null | undefined, enabled = true) {
   return useQuery({
@@ -104,7 +105,7 @@ export function useDeskSession(
     queryFn: ({ signal }) =>
       queueEngineControllerNextPreview(siteId ?? '', { limit: 5 }, undefined, signal),
     enabled: siteId !== null,
-    refetchInterval: 15_000,
+    refetchInterval: realtimeSafetyRefreshIntervalMs,
   });
   const sessions = useQueries({
     queries: queueIds.map((queueId) => ({

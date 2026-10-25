@@ -27,6 +27,9 @@ import {
 import { EligiblePreviewCard, QueueDeskCard } from './components/CockpitCards';
 import { CockpitPassages } from './components/CockpitPassages';
 import { Button } from '@/design-system/components/Button';
+import { getAccessToken } from '@/core/auth/access-token';
+import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
+import { refreshCockpitQueue } from './cockpit-realtime';
 
 export function CockpitPage() {
   const { t } = useTranslation();
@@ -56,6 +59,16 @@ export function CockpitPage() {
     allowed.map((queue) => queue.queueId),
   );
   const statuses = useQueueStatuses(allowed.map((queue) => queue.queueId));
+  useQueueDisplayRealtime({
+    queueIds: allowed.map((queue) => queue.queueId),
+    getToken: getAccessToken,
+    onEvent: (event) => {
+      void refreshCockpitQueue(queryClient, siteId, event.queueId, event.reason);
+    },
+    onReconnect: (queueId) => {
+      void refreshCockpitQueue(queryClient, siteId, queueId);
+    },
+  });
   const currentRegistrations = useOperatorRegistrations(user?.userId, 'in_progress', siteId, 20);
   const servedHistory = useOperatorRegistrations(user?.userId, 'served', siteId, 10);
   const noShowHistory = useOperatorRegistrations(user?.userId, 'no_show', siteId, 10);
