@@ -5,16 +5,16 @@ import { ensureLocaleLoaded, i18n, setLanguage } from './instance';
 import { fr } from './locales/fr';
 import { extractPlaceholders, placeholdersMatch, referenceFor } from './placeholders';
 
-export type TranslationCategory = TranslationsControllerGetBundleCategory;
+type TranslationCategory = TranslationsControllerGetBundleCategory;
 
-export interface RejectedEntry {
+interface RejectedEntry {
   key: string;
   reason: 'placeholder-mismatch' | 'not-a-string';
   expected?: string[];
   received?: string[];
 }
 
-export interface LoadBundleOptions {
+interface LoadBundleOptions {
   /** Re-apply the bundle even if its version is already loaded. */
   force?: boolean;
   /** Also make this locale the active language. Default false: loading ≠ switching. */
@@ -23,7 +23,7 @@ export interface LoadBundleOptions {
   onRejected?: (entries: RejectedEntry[]) => void;
 }
 
-export interface TranslationRejectionReport {
+interface TranslationRejectionReport {
   locale: string;
   category: TranslationCategory;
   version: number;
@@ -32,7 +32,7 @@ export interface TranslationRejectionReport {
 
 export type TranslationRejectionReporter = (report: TranslationRejectionReport) => void;
 
-export const translationRejectionEventName = 'dorify:i18n-rejected';
+const translationRejectionEventName = 'dorify:i18n-rejected';
 
 const browserRejectionReporter: TranslationRejectionReporter = (report) => {
   if (typeof window === 'undefined') return;
@@ -61,7 +61,7 @@ const bundleRequests = new Map<string, Promise<number>>();
  */
 const fixLegacyBrand = (value: string) => value.replace(/\bDORI\b/g, 'DORIFY');
 
-export function sanitizeRemoteEntries(entries: Record<string, unknown>): {
+function sanitizeRemoteEntries(entries: Record<string, unknown>): {
   accepted: Record<string, string>;
   rejected: RejectedEntry[];
 } {

@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { extname, join, relative } from 'node:path';
+import { extname, join, relative, sep } from 'node:path';
 
 const root = process.cwd();
 const sourceRoot = join(root, 'src');
@@ -25,6 +25,11 @@ function assertNoMatch(paths, pattern, message, ignore = () => false) {
 }
 
 const pageFiles = authoredFiles.filter((path) => /Page\.tsx$/.test(path));
+const foundationFiles = authoredFiles.filter((path) =>
+  ['core', 'shared', 'design-system'].some((layer) =>
+    path.startsWith(`${join(sourceRoot, layer)}${sep}`),
+  ),
+);
 // Temporary exceptions must be explicit and can only shrink. Keep this set
 // empty once migration is complete so a new direct controller import fails CI.
 const generatedControllerImportExceptions = new Set([]);
@@ -43,6 +48,11 @@ assertNoMatch(
   authoredFiles,
   /\b(?:interface|type)\s+\w*Dto\b/,
   'DTO recopié hors du client généré',
+);
+assertNoMatch(
+  foundationFiles,
+  /from\s+['"]@\/features\//,
+  'Dépendance inversée : une couche fondation importe une feature',
 );
 assertNoMatch(
   authoredFiles,

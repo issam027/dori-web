@@ -28,49 +28,19 @@ function CountryFlag({ locale }: { locale: (typeof locales)[number] }) {
   }
   if (locale === 'ar-TN') {
     return (
-      <svg
-        viewBox="0 0 30 20"
-        aria-hidden="true"
-        focusable="false"
-      >
+      <svg viewBox="0 0 30 20" aria-hidden="true" focusable="false">
         {/* Fond rouge tunisien */}
-        <rect
-          width="30"
-          height="20"
-          fill="#E70013"
-        />
+        <rect width="30" height="20" fill="#E70013" />
 
         {/* Disque blanc centré (base du drapeau tunisien) */}
-        <circle
-          cx="15"
-          cy="10"
-          r="6.5"
-          fill="#FFFFFF"
-        />
+        <circle cx="15" cy="10" r="6.5" fill="#FFFFFF" />
 
         {/* Smiley visage jaune jovial */}
-        <circle
-          cx="15"
-          cy="10"
-          r="5"
-          fill="#FFC800"
-          stroke="#E6A800"
-          strokeWidth="0.4"
-        />
+        <circle cx="15" cy="10" r="5" fill="#FFC800" stroke="#E6A800" strokeWidth="0.4" />
 
         {/* Yeux souriants */}
-        <circle
-          cx="13.2"
-          cy="8.7"
-          r="0.75"
-          fill="#1A1A1A"
-        />
-        <circle
-          cx="16.8"
-          cy="8.7"
-          r="0.75"
-          fill="#1A1A1A"
-        />
+        <circle cx="13.2" cy="8.7" r="0.75" fill="#1A1A1A" />
+        <circle cx="16.8" cy="8.7" r="0.75" fill="#1A1A1A" />
 
         {/* Grand sourire expressif */}
         <path
@@ -81,48 +51,22 @@ function CountryFlag({ locale }: { locale: (typeof locales)[number] }) {
           strokeLinecap="round"
         />
         {/* Dents blanches du sourire */}
-        <path
-          d="M 13 10.7 C 13.8 11.6 16.2 11.6 17 10.7 Z"
-          fill="#FFFFFF"
-        />
+        <path d="M 13 10.7 C 13.8 11.6 16.2 11.6 17 10.7 Z" fill="#FFFFFF" />
       </svg>
     );
   }
   return (
-    <svg
-      viewBox="0 0 30 20"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox="0 0 30 20" aria-hidden="true" focusable="false">
       {/* Fond rouge */}
-      <rect
-        width="30"
-        height="20"
-        fill="#E70013"
-      />
+      <rect width="30" height="20" fill="#E70013" />
 
       {/* Disque blanc exactement centré dans le drapeau */}
-      <circle
-        cx="15"
-        cy="10"
-        r="5"
-        fill="#FFFFFF"
-      />
+      <circle cx="15" cy="10" r="5" fill="#FFFFFF" />
 
       {/* Croissant rouge : deux cercles décalés */}
-      <circle
-        cx="15"
-        cy="10"
-        r="3.75"
-        fill="#E70013"
-      />
+      <circle cx="15" cy="10" r="3.75" fill="#E70013" />
 
-      <circle
-        cx="16"
-        cy="10"
-        r="3"
-        fill="#FFFFFF"
-      />
+      <circle cx="16" cy="10" r="3" fill="#FFFFFF" />
 
       {/*
         Étoile rouge à cinq branches.
@@ -173,7 +117,8 @@ export function LocaleSwitcher() {
 
   return (
     <div className="locale-switcher" ref={rootRef}>
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         className="locale-switcher-trigger"
         type="button"
         aria-label={`${t('locale.label')}: ${t(`locale.${activeLocale}`)}`}
@@ -189,7 +134,8 @@ export function LocaleSwitcher() {
       {open ? (
         <div className="locale-switcher-menu" role="listbox" aria-label={t('locale.label')}>
           {locales.map((code) => (
-            <Button variant="unstyled"
+            <Button
+              variant="unstyled"
               key={code}
               className="locale-switcher-option"
               type="button"

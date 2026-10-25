@@ -4,7 +4,12 @@ import { arTN, arTNDomains } from './locales/ar-TN';
 import { en, enDomains } from './locales/en';
 import { fr, frDomains } from './locales/fr';
 import { FORBIDDEN } from './glossary';
-import { hasPluralSuffix, placeholdersMatch, referenceFor, stripPluralSuffix } from './placeholders';
+import {
+  hasPluralSuffix,
+  placeholdersMatch,
+  referenceFor,
+  stripPluralSuffix,
+} from './placeholders';
 
 type Catalog = Record<string, string>;
 const catalogs: Record<'en' | 'ar' | 'ar-TN', Catalog> = { en, ar, 'ar-TN': arTN };
@@ -35,7 +40,9 @@ describe('catalog structure', () => {
   it.each(['en', 'ar'] as const)('%s defines every FR key and no unknown key', (locale) => {
     const catalog = catalogs[locale];
     expect(frKeys.filter((key) => !(key in catalog))).toEqual([]);
-    const unknown = Object.keys(catalog).filter((key) => !(key in frCatalog) && !hasPluralSuffix(key));
+    const unknown = Object.keys(catalog).filter(
+      (key) => !(key in frCatalog) && !hasPluralSuffix(key),
+    );
     expect(unknown).toEqual([]);
   });
 
@@ -46,7 +53,9 @@ describe('catalog structure', () => {
 
   it('has no empty value', () => {
     for (const [name, catalog] of Object.entries({ fr: frCatalog, ...catalogs })) {
-      const empty = Object.entries(catalog).filter(([, value]) => value.trim() === '').map(([key]) => key);
+      const empty = Object.entries(catalog)
+        .filter(([, value]) => value.trim() === '')
+        .map(([key]) => key);
       expect(empty, name).toEqual([]);
     }
   });
@@ -86,7 +95,9 @@ describe('interpolation parameters', () => {
 });
 
 describe('plurals', () => {
-  const pluralBases = [...new Set(frKeys.filter((key) => key.endsWith('_other')).map(stripPluralSuffix))];
+  const pluralBases = [
+    ...new Set(frKeys.filter((key) => key.endsWith('_other')).map(stripPluralSuffix)),
+  ];
 
   it('has plural bases to check', () => {
     expect(pluralBases.length).toBeGreaterThan(0);
@@ -95,7 +106,8 @@ describe('plurals', () => {
   it.each(pluralBases)('%s: EN has one/other, AR has the six CLDR categories', (base) => {
     expect(en[`${base}_one`], `${base}_one (en)`).toBeTruthy();
     expect(en[`${base}_other`], `${base}_other (en)`).toBeTruthy();
-    for (const category of AR_PLURAL) expect(ar[`${base}_${category}`], `${base}_${category} (ar)`).toBeTruthy();
+    for (const category of AR_PLURAL)
+      expect(ar[`${base}_${category}`], `${base}_${category} (ar)`).toBeTruthy();
   });
 
   it('no deprecated "_plural" suffix is left', () => {
@@ -106,14 +118,22 @@ describe('plurals', () => {
 });
 
 describe('untranslated text (ratchet)', () => {
-  it.each(['en', 'ar'] as const)('%s: only allow-listed keys may equal the French text', (locale) => {
-    const allowed = new Set<string>(ALLOW_IDENTICAL[locale]);
-    const catalog = catalogs[locale];
-    const untranslated = frKeys.filter((key) => catalog[key] === frCatalog[key] && !allowed.has(key));
-    expect(untranslated, 'translate these, or consciously add them to locales/allow-identical.ts').toEqual([]);
-    const stale = [...allowed].filter((key) => catalog[key] !== frCatalog[key]);
-    expect(stale, 'remove from allow-identical.ts').toEqual([]);
-  });
+  it.each(['en', 'ar'] as const)(
+    '%s: only allow-listed keys may equal the French text',
+    (locale) => {
+      const allowed = new Set<string>(ALLOW_IDENTICAL[locale]);
+      const catalog = catalogs[locale];
+      const untranslated = frKeys.filter(
+        (key) => catalog[key] === frCatalog[key] && !allowed.has(key),
+      );
+      expect(
+        untranslated,
+        'translate these, or consciously add them to locales/allow-identical.ts',
+      ).toEqual([]);
+      const stale = [...allowed].filter((key) => catalog[key] !== frCatalog[key]);
+      expect(stale, 'remove from allow-identical.ts').toEqual([]);
+    },
+  );
 
   it('every Arabic value contains Arabic letters unless allow-listed', () => {
     const allowed = new Set<string>(ALLOW_IDENTICAL.ar);
@@ -152,7 +172,11 @@ describe('Tunisian humour (ar-TN)', () => {
   const serious = Object.entries(arTN).filter(([key]) => SERIOUS.some((rule) => rule.test(key)));
 
   it('has no emoji', () => {
-    expect(Object.entries(arTN).filter(([, v]) => EMOJI.test(v)).map(([k]) => k)).toEqual([]);
+    expect(
+      Object.entries(arTN)
+        .filter(([, v]) => EMOJI.test(v))
+        .map(([k]) => k),
+    ).toEqual([]);
   });
 
   it('keeps labels, badges and column headers short (≤ 30 chars)', () => {

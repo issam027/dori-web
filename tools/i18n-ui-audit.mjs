@@ -227,7 +227,8 @@ const localesRoot = path.join(sourceRoot, 'core', 'i18n', 'locales');
 const localeKeys = new Map();
 for (const locale of ['fr', 'en', 'ar', 'ar-TN']) {
   const localeRoot = path.join(localesRoot, locale);
-  const domainFiles = fs.readdirSync(localeRoot)
+  const domainFiles = fs
+    .readdirSync(localeRoot)
     .filter((file) => file.endsWith('.ts') && file !== 'index.ts');
   const keys = domainFiles.flatMap((file) =>
     declaredTranslationKeys(fs.readFileSync(path.join(localeRoot, file), 'utf8')),

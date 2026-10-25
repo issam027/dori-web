@@ -1,8 +1,8 @@
 import type { CreateQueueDto, CreateSiteDto } from '@/api/generated/models';
 import { storageKeys } from '@/core/storage/storage-keys';
 
-export const ONBOARDING_DRAFT_VERSION = 3;
-export const ONBOARDING_DRAFT_KEY = storageKeys.local.onboardingDraft;
+const ONBOARDING_DRAFT_VERSION = 3;
+const ONBOARDING_DRAFT_KEY = storageKeys.local.onboardingDraft;
 const LEGACY_ONBOARDING_DRAFT_KEYS = storageKeys.local.legacyOnboardingDrafts;
 
 export interface OnboardingTierConfiguration {

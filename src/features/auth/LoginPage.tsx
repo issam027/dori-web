@@ -99,7 +99,8 @@ function LoginShowcase() {
         setPaused(false);
       }}
     >
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         className="login-showcase-pause"
         type="button"
         aria-label={t(paused ? 'login.showcase.play' : 'login.showcase.pause')}
@@ -138,7 +139,8 @@ function LoginShowcase() {
       </div>
       <div className="login-showcase-dots" role="group" aria-label={t('login.showcase.navigation')}>
         {loginShowcaseSlides.map((item, itemIndex) => (
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             key={item}
             type="button"
             aria-label={t('login.showcase.goto', { number: itemIndex + 1 })}
@@ -254,7 +256,12 @@ export function LoginPage() {
                 {apiError}
               </p>
             ) : null}
-            <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
+            <Button
+              variant="unstyled"
+              className="button button-primary"
+              disabled={isSubmitting}
+              type="submit"
+            >
               <LogIn aria-hidden="true" />
               {isSubmitting ? __t('auth.login.signingIn') : __t('auth.login.seConnecter')}
             </Button>
@@ -269,7 +276,8 @@ export function LoginPage() {
             </div>
             <div className="quick-login-grid">
               {demoProfiles.map(({ username, labelKey, detailKey, icon: ProfileIcon }) => (
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   key={username}
                   className="button quick-login-button"
                   type="button"

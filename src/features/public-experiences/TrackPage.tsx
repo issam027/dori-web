@@ -35,8 +35,13 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const [initialToken] = useState(() => consumeOrRestoreOpaqueToken(location.search, history));
   const [trackingId, setTrackingId] = useState(initialToken);
   const [token, setToken] = useState(initialToken);
-  const { gateway, position, setPosition, error: trackingError, setError } =
-    usePublicTracking(token);
+  const {
+    gateway,
+    position,
+    setPosition,
+    error: trackingError,
+    setError,
+  } = usePublicTracking(token);
   const [consent, setConsent] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const previousStatus = useRef('');
@@ -132,7 +137,9 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
           <div>
             <div>
               <strong>{__t('public-experiences.track.testerUnSuiviReel')}</strong>
-              <span>{__t('public-experiences.track.ceChampEstVisibleUniquementDansLApercuIn')}</span>
+              <span>
+                {__t('public-experiences.track.ceChampEstVisibleUniquementDansLApercuIn')}
+              </span>
             </div>
             <label htmlFor="tracking-id">{__t('public-experiences.track.trackingId')}</label>
           </div>
@@ -147,7 +154,12 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
                 setTrackingId(event.target.value);
               }}
             />
-            <Button variant="unstyled" type="submit" className="button button-primary" disabled={!trackingId.trim()}>
+            <Button
+              variant="unstyled"
+              type="submit"
+              className="button button-primary"
+              disabled={!trackingId.trim()}
+            >
               {__t('public-experiences.track.appliquer')}
             </Button>
           </div>
@@ -255,17 +267,22 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
 
             {!completed ? (
               <div className="tracking-actions">
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   type="button"
                   className="button tracking-refresh"
                   disabled={refreshing}
                   onClick={() => void refresh()}
                   aria-busy={refreshing}
                 >
-                  <RefreshCw className={refreshing ? 'is-spinning' : undefined} aria-hidden="true" />
+                  <RefreshCw
+                    className={refreshing ? 'is-spinning' : undefined}
+                    aria-hidden="true"
+                  />
                   {__t('tracking.refresh')}
                 </Button>
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   type="button"
                   className="button button-primary tracking-consent"
                   aria-pressed={consent}

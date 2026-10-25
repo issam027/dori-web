@@ -29,7 +29,8 @@ export function LegalPage() {
           <h1>{t('legal.title')}</h1>
           <p>{t('legal.updated')}</p>
         </div>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           type="button"
           className="button"
           onClick={() => {

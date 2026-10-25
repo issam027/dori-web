@@ -5,7 +5,7 @@ interface DataTableLoadingProps {
   loading?: boolean;
 }
 
-export interface DataColumn<TRow> {
+interface DataColumn<TRow> {
   key: string;
   header: ReactNode;
   render: (row: TRow) => ReactNode;

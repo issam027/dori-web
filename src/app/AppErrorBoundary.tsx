@@ -171,7 +171,8 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           <pre>{this.diagnostic()}</pre>
         </details>
         <div className="runtime-error-actions">
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-primary"
             type="button"
             onClick={() => {
@@ -180,7 +181,8 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           >
             <RotateCcw size={17} /> {i18n.t('common.retry')}
           </Button>
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button"
             type="button"
             onClick={() => {
@@ -189,7 +191,8 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
           >
             <RefreshCcw size={17} /> {i18n.t('errorBoundary.reload')}
           </Button>
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button"
             type="button"
             onClick={() => {

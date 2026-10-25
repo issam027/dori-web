@@ -114,11 +114,17 @@ test('the cockpit restores the server-side current call when local state is miss
   page,
 }) => {
   const operational: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions'
+    ) {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/threads') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/threads'
+    ) {
       await route.fulfill({
         json: apiEnvelope(
           paginated([
@@ -209,7 +215,10 @@ test('calling and serving a person shows details, disables mutation and builds a
       activeNoteCount: 3,
     });
   const operational: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions'
+    ) {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
@@ -254,7 +263,10 @@ test('calling and serving a person shows details, disables mutation and builds a
       await route.fulfill({ json: apiEnvelope({ ...paginated([{}]), total: 3 }) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/served') {
+    if (
+      method === 'POST' &&
+      path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/served'
+    ) {
       servedCalls += 1;
       await new Promise((resolve) => setTimeout(resolve, 150));
       hasBeenServed = true;
@@ -327,7 +339,10 @@ test('marking a called person absent also creates a discreet passage summary', a
       servedByUserId: '00000000-0000-4000-8000-000000000001',
     });
   const absent: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions'
+    ) {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
@@ -354,7 +369,10 @@ test('marking a called person absent also creates a discreet passage summary', a
       await route.fulfill({ json: apiEnvelope(buildPerson()) });
       return true;
     }
-    if (method === 'POST' && path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/no-show') {
+    if (
+      method === 'POST' &&
+      path === '/api/v1/registrations/00000000-0000-4000-8000-000000000500/no-show'
+    ) {
       noShowCalls += 1;
       markedAbsent = true;
       await route.fulfill({
@@ -378,7 +396,10 @@ test('marking a called person absent also creates a discreet passage summary', a
 
 test('zero waiting is handled as a normal business outcome', async ({ page }) => {
   const empty: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions'
+    ) {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }
@@ -414,7 +435,10 @@ test('two operators competing for the same next ticket produce one call and one 
   const second = await context.newPage();
   let attempts = 0;
   const competing: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions') {
+    if (
+      method === 'GET' &&
+      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/sessions'
+    ) {
       await route.fulfill({ json: apiEnvelope(paginated([session()])) });
       return true;
     }

@@ -2,7 +2,7 @@ import type { Page, Route } from '@playwright/test';
 
 export type TestProfile = 'root' | 'admin' | 'manager' | 'operator' | 'kiosk';
 
-export interface ApiScenarioRequest {
+interface ApiScenarioRequest {
   method: string;
   path: string;
   url: URL;
@@ -99,7 +99,7 @@ export const paginated = <T>(items: T[], page = 1, pageSize = 100) => ({
   items,
 });
 
-export function buildUser(profile: TestProfile = 'root', overrides: Record<string, unknown> = {}) {
+function buildUser(profile: TestProfile = 'root', overrides: Record<string, unknown> = {}) {
   const technical = profile === 'kiosk';
   return {
     userId: technical
@@ -166,7 +166,7 @@ export function buildQueue(overrides: Record<string, unknown> = {}) {
   };
 }
 
-export function buildTier(overrides: Record<string, unknown> = {}) {
+function buildTier(overrides: Record<string, unknown> = {}) {
   return {
     tierId: '00000000-0000-4000-8000-000000000001',
     tierCode: 'STD',
@@ -299,15 +299,6 @@ export function apiFailure(
       correlationId: `e2e-${String(status)}`,
     },
   };
-}
-
-export async function fulfillAfter(
-  route: Route,
-  response: Parameters<Route['fulfill']>[0],
-  delayMs = 0,
-) {
-  if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
-  await route.fulfill(response);
 }
 
 export async function installApiScenario(
@@ -509,21 +500,8 @@ export async function useFixedClock(page: Page, iso = '2026-10-09T10:00:00Z') {
   await page.clock.install({ time: new Date(iso) });
 }
 
-export async function setNetworkOffline(page: Page, offline = true) {
-  await page.context().setOffline(offline);
-}
-
 export async function activateSite(page: Page, siteName = 'Site E2E Alpha') {
   await page.goto('/portfolio');
   const card = page.locator('.site-card').filter({ hasText: siteName });
   await card.getByRole('button', { name: /travailler sur ce site/i }).click();
-}
-
-export async function openNavigationSection(page: Page, name: RegExp) {
-  const button = page.getByRole('button', { name });
-  if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
-}
-
-export async function chooseOptionByName(page: Page, label: RegExp, optionLabel: string) {
-  await page.getByLabel(label).selectOption({ label: optionLabel });
 }

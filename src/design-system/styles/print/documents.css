@@ -17,7 +17,7 @@ body[data-print-kiosk-ticket] > #root {
     min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: #fff !important;
+    background: var(--a) !important;
   }
 
   body[data-print-passage] * {
@@ -41,16 +41,19 @@ body[data-print-kiosk-ticket] > #root {
     flex-direction: column;
     padding: 3mm 4mm 2mm;
     overflow: hidden;
-    color: #111 !important;
-    background: #fff !important;
-    font: 9pt/1.35 Arial, Helvetica, sans-serif;
+    color: var(--ao) !important;
+    background: var(--a) !important;
+    font:
+      9pt/1.35 Arial,
+      Helvetica,
+      sans-serif;
   }
 
   html body[data-print-passage] > .passage-print-document.passage-print-document *,
   html body[data-print-passage] > .passage-print-document.passage-print-document *::before,
   html body[data-print-passage] > .passage-print-document.passage-print-document *::after {
     box-sizing: border-box;
-    color: #111 !important;
+    color: var(--ao) !important;
     background: transparent !important;
     box-shadow: none !important;
   }
@@ -61,7 +64,7 @@ body[data-print-kiosk-ticket] > #root {
     justify-content: space-between;
     gap: 10mm;
     padding: 0 0 3mm;
-    border-bottom: 0.3mm solid #111;
+    border-bottom: 0.3mm solid var(--ao);
   }
 
   html body[data-print-passage] .attestation-brand {
@@ -110,7 +113,7 @@ body[data-print-kiosk-ticket] > #root {
     gap: 1mm 4mm;
     padding: 2.5mm 0;
     border: 0;
-    border-block: 0.2mm solid #999;
+    border-block: 0.2mm solid var(--dq);
     border-radius: 0;
   }
 
@@ -146,7 +149,7 @@ body[data-print-kiosk-ticket] > #root {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 0;
-    border-block: 0.2mm solid #999;
+    border-block: 0.2mm solid var(--dq);
     break-inside: avoid;
   }
 
@@ -158,10 +161,13 @@ body[data-print-kiosk-ticket] > #root {
 
   html body[data-print-passage] .attestation-panel + .attestation-panel {
     padding-inline: 4mm 0;
-    border-inline-start: 0.2mm solid #bbb;
+    border-inline-start: 0.2mm solid var(--dv);
   }
 
-  html body[data-print-passage] :is(.attestation-panel, .attestation-timeline, .attestation-purpose) h2 {
+  html
+    body[data-print-passage]
+    :is(.attestation-panel, .attestation-timeline, .attestation-purpose)
+    h2 {
     margin: 0 0 2mm;
     font-size: 7pt;
     font-weight: 700;
@@ -207,7 +213,7 @@ body[data-print-kiosk-ticket] > #root {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
-    border-block: 0.2mm solid #999;
+    border-block: 0.2mm solid var(--dq);
   }
 
   html body[data-print-passage] .attestation-events > div {
@@ -219,7 +225,7 @@ body[data-print-kiosk-ticket] > #root {
   }
 
   html body[data-print-passage] .attestation-events > div + div {
-    border-inline-start: 0.2mm solid #bbb;
+    border-inline-start: 0.2mm solid var(--dv);
   }
 
   html body[data-print-passage] .attestation-events > div > span {
@@ -268,7 +274,7 @@ body[data-print-kiosk-ticket] > #root {
     margin: 11mm 0 0 auto;
     align-items: flex-end;
     justify-content: center;
-    border-bottom: 0.2mm solid #777;
+    border-bottom: 0.2mm solid var(--dk);
     break-inside: avoid;
   }
 
@@ -281,7 +287,7 @@ body[data-print-kiosk-ticket] > #root {
     display: block !important;
     margin-top: auto;
     padding-top: 3mm;
-    border-top: 0.2mm solid #999;
+    border-top: 0.2mm solid var(--dq);
   }
 
   html body[data-print-passage] .attestation-trace > div {
@@ -537,80 +543,4 @@ html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
     color: var(--p) !important;
     font-size: 8pt;
   }
-
-}
-
-@media print {
-  body[data-print-kiosk-ticket] > #root {
-    display: block !important;
-  }
-  body[data-print-kiosk-ticket] > #root * {
-    visibility: hidden !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result,
-  body[data-print-kiosk-ticket] .kiosk-result * {
-    visibility: visible !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result {
-    position: absolute;
-    inset: 0 auto auto 50%;
-    display: block;
-    width: min(80mm, 100%);
-    margin: 0;
-    border: 1px solid var(--u);
-    border-radius: 4mm;
-    padding: 7mm;
-    color: var(--f) !important;
-    background: var(--a) !important;
-    box-shadow: none;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    transform: translateX(-50%);
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header {
-    display: grid;
-    gap: 1mm;
-    padding-bottom: 4mm;
-    border-bottom: 1px dashed var(--c);
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
-    font-size: 20pt;
-    letter-spacing: 0.08em;
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
-    color: var(--p) !important;
-    font-size: 9pt;
-    text-transform: uppercase;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result-heading,
-  body[data-print-kiosk-ticket] .kiosk-result-guidance,
-  body[data-print-kiosk-ticket] .kiosk-result-actions {
-    display: none !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result {
-    display: grid;
-    justify-items: center;
-    gap: 3mm;
-    margin: 5mm 0;
-    border: 0;
-    padding: 0;
-    background: var(--a);
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
-    margin: 3mm 0 1mm;
-    color: var(--f) !important;
-    font-size: 38pt;
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
-    width: 38mm;
-    height: 38mm;
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
-    display: block;
-    padding-top: 4mm;
-    border-top: 1px dashed var(--c);
-    color: var(--p) !important;
-    font-size: 8pt;
-  }
-
 }

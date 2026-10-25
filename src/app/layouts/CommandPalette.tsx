@@ -28,9 +28,25 @@ const commands = [
     path: '/appointments',
     permissions: ['appointment_manage', 'appointment_checkin'],
   },
-  { id: 'person', featured: true, labelKey: 'nav.persons', path: '/persons', permissions: ['registration_view'] },
-  { id: 'control-room', labelKey: 'nav.controlRoom', path: '/control-room', permissions: ['report_view', 'queue_view'] },
-  { id: 'notifications', labelKey: 'nav.notifications', path: '/notifications', permissions: ['notification_view'] },
+  {
+    id: 'person',
+    featured: true,
+    labelKey: 'nav.persons',
+    path: '/persons',
+    permissions: ['registration_view'],
+  },
+  {
+    id: 'control-room',
+    labelKey: 'nav.controlRoom',
+    path: '/control-room',
+    permissions: ['report_view', 'queue_view'],
+  },
+  {
+    id: 'notifications',
+    labelKey: 'nav.notifications',
+    path: '/notifications',
+    permissions: ['notification_view'],
+  },
   { id: 'reports', labelKey: 'nav.reports', path: '/reports', permissions: ['report_view'] },
   { id: 'kiosk', labelKey: 'nav.kiosk', path: '/kiosk', permissions: [] },
   { id: 'display', labelKey: 'nav.display', path: '/display', permissions: [] },
@@ -43,14 +59,32 @@ const commands = [
     permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
   },
   {
-    id: 'users', labelKey: 'nav.usersAdmin', path: '/admin/users', permissions: ['user_manage_admin'],
+    id: 'users',
+    labelKey: 'nav.usersAdmin',
+    path: '/admin/users',
+    permissions: ['user_manage_admin'],
   },
-  { id: 'onboarding', labelKey: 'nav.onboarding', path: '/onboarding', permissions: ['site_create'] },
-  { id: 'translations', labelKey: 'nav.translations', path: '/admin/translations', permissions: ['translation_manage'] },
+  {
+    id: 'onboarding',
+    labelKey: 'nav.onboarding',
+    path: '/onboarding',
+    permissions: ['site_create'],
+  },
+  {
+    id: 'translations',
+    labelKey: 'nav.translations',
+    path: '/admin/translations',
+    permissions: ['translation_manage'],
+  },
   { id: 'health', labelKey: 'nav.health', path: '/health', permissions: ['system_manage'] },
   { id: 'audit', labelKey: 'nav.audit', path: '/audit', permissions: ['audit_view'] },
   { id: 'profile', labelKey: 'profile.title', path: '/profile', permissions: [] },
-  { id: 'password', labelKey: 'auth.changePassword.changerLeMotDePasse', path: '/change-password', permissions: [] },
+  {
+    id: 'password',
+    labelKey: 'auth.changePassword.changerLeMotDePasse',
+    path: '/change-password',
+    permissions: [],
+  },
   { id: 'legal', labelKey: 'nav.legal', path: '/legal', permissions: [] },
 ] as const;
 
@@ -65,20 +99,19 @@ export function CommandPalette({
   const navigate = useNavigate();
   const user = useSessionStore((state) => state.user);
   const [query, setQuery] = useState('');
-  const available = useMemo(
-    () => {
-      const normalizedQuery = query.trim().toLocaleLowerCase();
-      return commands
-        .filter((command) => hasAnyPermission(user, command.permissions))
-        .filter((command) => normalizedQuery.length > 0 || ('featured' in command && command.featured))
-        .filter((command) => {
-          const label = t(command.labelKey).toLocaleLowerCase();
-          const action = t('commands.goTo', { page: t(command.labelKey) }).toLocaleLowerCase();
-          return `${label} ${action}`.includes(normalizedQuery);
-        });
-    },
-    [query, t, user],
-  );
+  const available = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+    return commands
+      .filter((command) => hasAnyPermission(user, command.permissions))
+      .filter(
+        (command) => normalizedQuery.length > 0 || ('featured' in command && command.featured),
+      )
+      .filter((command) => {
+        const label = t(command.labelKey).toLocaleLowerCase();
+        const action = t('commands.goTo', { page: t(command.labelKey) }).toLocaleLowerCase();
+        return `${label} ${action}`.includes(normalizedQuery);
+      });
+  }, [query, t, user]);
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -111,7 +144,8 @@ export function CommandPalette({
           />
           <div className="command-list">
             {available.map((command) => (
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 key={command.id}
                 type="button"
                 onClick={() => {

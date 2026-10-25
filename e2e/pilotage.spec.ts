@@ -339,17 +339,6 @@ test('health is restricted to system_manage and renders no secret', async ({ pag
           json: {
             status: 'ok',
             timestamp: '2026-10-10T10:00:00Z',
-            uptime: 90061,
-            checks: {
-              database: 'up',
-              memoryUsage: {
-                rss: 104857600,
-                heapTotal: 52428800,
-                heapUsed: 31457280,
-                external: 1048576,
-                arrayBuffers: 524288,
-              },
-            },
             databaseUrl: 'postgres://secret-user:secret-password@private-host/db',
             jwtSecret: 'must-never-render',
           },
@@ -360,8 +349,8 @@ test('health is restricted to system_manage and renders no secret', async ({ pag
   });
   await page.goto('/health');
   await expect(page.getByRole('heading', { name: /santé de la plateforme/i })).toBeVisible();
-  await expect(page.getByText('PostgreSQL', { exact: true })).toBeVisible();
-  await expect(page.getByText(/100\.0 MiB/)).toBeVisible();
+  await expect(page.getByText('ok', { exact: true })).toBeVisible();
+  await expect(page.getByText(/10 oct\. 2026/)).toBeVisible();
   await expect(page.locator('body')).not.toContainText(
     /secret-password|must-never-render|private-host/i,
   );
@@ -398,11 +387,6 @@ test('health exposes a recoverable error state', async ({ page }) => {
             json: {
               status: 'ok',
               timestamp: '2026-10-10T10:00:00Z',
-              uptime: 60,
-              checks: {
-                database: 'up',
-                memoryUsage: { rss: 1, heapTotal: 1, heapUsed: 1, external: 1, arrayBuffers: 1 },
-              },
             },
           });
         }

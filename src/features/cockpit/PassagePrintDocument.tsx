@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import type { PassageSummary } from '@/features/queue-operations/operation-store';
+import type { PassageSummary } from '@/shared/queue-operations/operation-store';
 
 export interface PassageSiteDetails {
   siteName: string;

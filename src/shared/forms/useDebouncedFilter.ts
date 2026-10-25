@@ -10,11 +10,7 @@ const normalizeSearch = (value: string) => value.trim();
 
 export function useDebouncedFilter(
   value: string,
-  {
-    delay = 350,
-    minimumLength = 4,
-    normalize = normalizeSearch,
-  }: DebouncedFilterOptions = {},
+  { delay = 350, minimumLength = 4, normalize = normalizeSearch }: DebouncedFilterOptions = {},
 ): string {
   const normalizedValue = useMemo(() => normalize(value), [normalize, value]);
   const eligible = normalizedValue.length >= minimumLength;

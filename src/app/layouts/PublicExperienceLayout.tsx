@@ -14,7 +14,6 @@ export function PublicExperienceLayout({
   mode: 'public' | 'device' | 'kiosk' | 'display' | 'tracking';
   children: ReactNode;
 }) {
-  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ export function PublicExperienceLayout({
       <div className={`public-layout public-${mode}`}>
         <main className="experience-logout" role="status" aria-live="polite">
           <span className="spinner" aria-hidden="true" />
-          <strong>{__t('shell.layouts.publicExperienceLayout.deconnexionDeLAppareil')}</strong>
+          <strong>{t('shell.layouts.publicExperienceLayout.deconnexionDeLAppareil')}</strong>
         </main>
       </div>
     );
@@ -53,8 +52,8 @@ export function PublicExperienceLayout({
   return (
     <div className={`public-layout public-${mode}`}>
       <header className={`public-header${mode === 'display' ? ' public-header-display' : ''}`}>
-          <strong>{mode === 'kiosk' ? (kioskSite.data?.data.siteName ?? '') : t('app.name')}</strong>
-          <LocaleSwitcher />
+        <strong>{mode === 'kiosk' ? (kioskSite.data?.data.siteName ?? '') : t('app.name')}</strong>
+        <LocaleSwitcher />
       </header>
       <main>{children}</main>
       {mode !== 'display' && mode !== 'kiosk' ? (

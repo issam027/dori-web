@@ -3,7 +3,13 @@ import { mockServer } from '@/shared/testing/mock-server';
 import { ar } from './locales/ar';
 import { en } from './locales/en';
 import { fr } from './locales/fr';
-import { getLoadedBundleVersion, i18n, loadTranslationBundle, setLanguage, setTranslationRejectionReporter } from './i18n';
+import {
+  getLoadedBundleVersion,
+  i18n,
+  loadTranslationBundle,
+  setLanguage,
+  setTranslationRejectionReporter,
+} from './i18n';
 
 const fallbackCatalogs: Record<'fr' | 'en' | 'ar', Record<string, string>> = { fr, en, ar };
 
@@ -19,8 +25,12 @@ describe('translation bundles', () => {
     expect(missing).toEqual({ fr: [], en: [], ar: [] });
     const loginKeys = [...allKeys].filter((key) => key.startsWith('auth.login.'));
     expect(loginKeys.length).toBeGreaterThan(0);
-    expect(loginKeys.filter((key) => fallbackCatalogs.en[key] === fallbackCatalogs.fr[key])).toEqual([]);
-    expect(loginKeys.filter((key) => fallbackCatalogs.ar[key] === fallbackCatalogs.fr[key])).toEqual([]);
+    expect(
+      loginKeys.filter((key) => fallbackCatalogs.en[key] === fallbackCatalogs.fr[key]),
+    ).toEqual([]);
+    expect(
+      loginKeys.filter((key) => fallbackCatalogs.ar[key] === fallbackCatalogs.fr[key]),
+    ).toEqual([]);
   });
 
   it('provides complete localized copy for the kiosk journey', () => {
@@ -64,9 +74,13 @@ describe('translation bundles', () => {
       key.startsWith('public-experiences.kiosk.'),
     );
     for (const key of publicKioskKeys) {
-      expect(fallbackCatalogs.ar[key], `${key} must be localized in Arabic`).not.toBe(fallbackCatalogs.fr[key]);
+      expect(fallbackCatalogs.ar[key], `${key} must be localized in Arabic`).not.toBe(
+        fallbackCatalogs.fr[key],
+      );
       if (key !== 'public-experiences.kiosk.service') {
-        expect(fallbackCatalogs.en[key], `${key} must be localized in English`).not.toBe(fallbackCatalogs.fr[key]);
+        expect(fallbackCatalogs.en[key], `${key} must be localized in English`).not.toBe(
+          fallbackCatalogs.fr[key],
+        );
       }
     }
   });
@@ -136,9 +150,9 @@ describe('translation bundles', () => {
     );
 
     try {
-      await expect(
-        loadTranslationBundle('fr', 'ihm', { force: true, onRejected }),
-      ).resolves.toBe(988);
+      await expect(loadTranslationBundle('fr', 'ihm', { force: true, onRejected })).resolves.toBe(
+        988,
+      );
     } finally {
       restoreReporter();
     }

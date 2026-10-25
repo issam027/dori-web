@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Printer } from 'lucide-react';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { Card } from '@/design-system/components/Card';
-import type { PassageSummary } from '@/features/queue-operations/operation-store';
+import type { PassageSummary } from '@/shared/queue-operations/operation-store';
 import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
 import { Button } from '@/design-system/components/Button';
 import { printDocument } from '@/shared/printing/print-document';

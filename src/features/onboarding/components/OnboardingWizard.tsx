@@ -782,9 +782,7 @@ function TiersStep({
         selected.length === 0,
       );
 
-    const hasDefault = nextSelected.some(
-      (current) => currentConfigurations[current]?.isDefault,
-    );
+    const hasDefault = nextSelected.some((current) => currentConfigurations[current]?.isDefault);
     const nextConfigurations = Object.fromEntries(
       nextSelected.map((current, index) => {
         const currentKey = current;

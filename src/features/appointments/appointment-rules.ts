@@ -1,12 +1,21 @@
 import type { RegistrationResponseDto } from '@/api/generated/models';
 
 export type AppointmentVisualStatus =
-  'booked' | 'scheduled' | 'confirmed' | 'present' | 'in-progress' | 'served' | 'no-show' | 'expired' | 'cancelled';
+  | 'booked'
+  | 'scheduled'
+  | 'confirmed'
+  | 'present'
+  | 'in-progress'
+  | 'served'
+  | 'no-show'
+  | 'expired'
+  | 'cancelled';
 
 export function appointmentVisualStatus(
   registration: RegistrationResponseDto,
 ): AppointmentVisualStatus {
-  if (registration.status === 'cancelled' || registration.appointmentStatus === 'cancelled') return 'cancelled';
+  if (registration.status === 'cancelled' || registration.appointmentStatus === 'cancelled')
+    return 'cancelled';
   if (registration.status === 'served') return 'served';
   if (registration.status === 'no_show') return 'no-show';
   if (registration.status === 'in_progress') return 'in-progress';
@@ -58,7 +67,7 @@ export function canCheckIn(
   );
 }
 
-export function isoDate(date: Date): string {
+function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
@@ -126,9 +135,7 @@ export function slotTime(value: string, timeZone?: string): string {
   if (!value) return '';
   if (timeZone && (value.includes('T') || value.endsWith('Z'))) {
     const normalizedIso =
-      !value.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(value)
-        ? `${value}Z`
-        : value;
+      !value.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(value) ? `${value}Z` : value;
     const parts = appointmentLocalParts(normalizedIso, timeZone);
     if (parts.time && parts.time !== 'NaN:NaN') {
       return parts.time;
@@ -155,4 +162,3 @@ export function monthDates(anchor: Date): string[] {
     return isoDate(date);
   });
 }
-

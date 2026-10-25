@@ -87,7 +87,12 @@ export function ChangePasswordPage() {
               {apiError}
             </p>
           ) : null}
-          <Button variant="unstyled" className="button button-primary" disabled={isSubmitting} type="submit">
+          <Button
+            variant="unstyled"
+            className="button button-primary"
+            disabled={isSubmitting}
+            type="submit"
+          >
             <Save aria-hidden="true" />
             {__t('common.save')}
           </Button>

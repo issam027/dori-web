@@ -14,6 +14,10 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
+    if (pathname.endsWith('/auth/refresh')) {
+      await route.fulfill({ json: envelope({ accessToken: 'kiosk-access-token' }) });
+      return;
+    }
     if (pathname.endsWith('/auth/me')) {
       await route.fulfill({
         json: envelope({

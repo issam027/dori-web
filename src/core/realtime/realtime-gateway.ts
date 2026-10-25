@@ -1,6 +1,6 @@
 export type RealtimeListener<TSnapshot> = (snapshot: TSnapshot) => void;
 
-export interface RealtimeGateway<TSnapshot> {
+interface RealtimeGateway<TSnapshot> {
   connect: () => Promise<void>;
   disconnect: () => void;
   refresh: () => Promise<void>;

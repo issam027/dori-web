@@ -14,7 +14,8 @@ export function Pagination({
   const { t } = useTranslation();
   return (
     <nav className="pagination" aria-label={t('pagination.label')}>
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         type="button"
         className="button"
         disabled={page <= 1}
@@ -26,7 +27,8 @@ export function Pagination({
         {t('pagination.previous')}
       </Button>
       <span>{t('pagination.position', { page, totalPages })}</span>
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         type="button"
         className="button"
         disabled={page >= totalPages}

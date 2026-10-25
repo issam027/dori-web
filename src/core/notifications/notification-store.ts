@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type NotificationTone = 'success' | 'info' | 'warning' | 'error';
+type NotificationTone = 'success' | 'info' | 'warning' | 'error';
 
 export interface AppNotification {
   id: string;

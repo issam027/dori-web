@@ -14,7 +14,9 @@ export function PreferenceSynchronizer() {
   useEffect(() => {
     const publicExperiencePaths = new Set(['/kiosk', '/display', '/track']);
     const category = publicExperiencePaths.has(location.pathname) ? 'public_ihm' : 'ihm';
-    void setLanguage(locale).then(() => loadTranslationBundle(locale, category)).catch(() => undefined);
+    void setLanguage(locale)
+      .then(() => loadTranslationBundle(locale, category))
+      .catch(() => undefined);
   }, [locale, location.pathname]);
 
   useEffect(() => {

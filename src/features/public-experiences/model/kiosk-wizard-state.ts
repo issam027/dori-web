@@ -1,5 +1,5 @@
-export type KioskFlow = 'home' | 'walkin' | 'appointment' | 'result';
-export type KioskWalkinStep = 1 | 2 | 3 | 4;
+type KioskFlow = 'home' | 'walkin' | 'appointment' | 'result';
+type KioskWalkinStep = 1 | 2 | 3 | 4;
 
 export interface KioskWizardState {
   flow: KioskFlow;

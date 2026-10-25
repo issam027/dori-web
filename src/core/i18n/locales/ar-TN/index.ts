@@ -9,5 +9,27 @@ import { experiences } from './experiences';
 import { errors } from './errors';
 import { audit } from './audit';
 
-export const arTNDomains = { common, nav, auth, appointments, persons, operations, supervision, experiences, errors, audit };
-export const arTN: Record<string, string> = { ...common, ...nav, ...auth, ...appointments, ...persons, ...operations, ...supervision, ...experiences, ...errors, ...audit };
+export const arTNDomains = {
+  common,
+  nav,
+  auth,
+  appointments,
+  persons,
+  operations,
+  supervision,
+  experiences,
+  errors,
+  audit,
+};
+export const arTN: Record<string, string> = {
+  ...common,
+  ...nav,
+  ...auth,
+  ...appointments,
+  ...persons,
+  ...operations,
+  ...supervision,
+  ...experiences,
+  ...errors,
+  ...audit,
+};

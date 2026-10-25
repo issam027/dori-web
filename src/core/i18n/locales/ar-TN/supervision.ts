@@ -111,7 +111,8 @@ export const supervision: Record<string, string> = {
   'supervision.notifications.etape3Sur3': 'الخطوة 3 من 3',
   'supervision.notifications.indisponible': '— موش متاح',
   'supervision.notifications.inscription': 'التسجيل',
-  'supervision.notifications.journalDEnvoiDetailEtEmissionManuelle': 'جورنال الإرسال والبعثان باليد.',
+  'supervision.notifications.journalDEnvoiDetailEtEmissionManuelle':
+    'جورنال الإرسال والبعثان باليد.',
   'supervision.notifications.journalDesNotifications': 'جورنال الإشعارات',
   'supervision.notifications.lEnvoiNAPasPuEtreMisEnFile':
     'ما نجّمنّاش نحطوا الميساج في قائمة الإرسال.',
@@ -147,7 +148,8 @@ export const supervision: Record<string, string> = {
   'reports.median': 'الوسيط',
   'reports.p90': 'P90',
   'notifications.filters.title': 'صفّي الجورنال',
-  'notifications.filters.help': 'صفّي الإشعارات حسب القناة والحالة والفترة وقائمة الانتظار والتسجيل.',
+  'notifications.filters.help':
+    'صفّي الإشعارات حسب القناة والحالة والفترة وقائمة الانتظار والتسجيل.',
   'notifications.filters.registrationId': 'معرّف التسجيل',
   'notifications.filters.sort': 'رتّب النتائج',
   'notifications.filters.newest': 'الجدد لولانين',

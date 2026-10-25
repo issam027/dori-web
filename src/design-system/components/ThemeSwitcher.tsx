@@ -18,7 +18,8 @@ export function ThemeSwitcher() {
       <Sun size={19} />
     );
   return (
-    <Button variant="unstyled"
+    <Button
+      variant="unstyled"
       className="icon-button"
       type="button"
       onClick={cycleTheme}

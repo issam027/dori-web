@@ -397,8 +397,7 @@ export function QueueEditor({
                   onChange={(e) => {
                     field(
                       'dailyResetMode',
-                      (e.target.value || undefined) as
-                        'close_all' | 'carry_over_open' | undefined,
+                      (e.target.value || undefined) as 'close_all' | 'carry_over_open' | undefined,
                     );
                   }}
                 >

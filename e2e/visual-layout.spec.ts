@@ -503,8 +503,8 @@ test('phase 10 health and legal return preserve the exact origin', async ({ page
     "history.replaceState(history.state, '', '/health?probe=manual#memory'); window.dispatchEvent(new PopStateEvent('popstate'))",
   );
   await expect(page).toHaveURL(/\/health\?probe=manual#memory$/);
-  await expect(page.getByRole('cell', { name: 'ok', exact: true })).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'up', exact: true })).toBeVisible();
+  await expect(page.getByText('ok', { exact: true })).toBeVisible();
+  await expect(page.getByText(/\d{1,2} oct\. 2026/)).toBeVisible();
   await page.getByRole('button', { name: /actualiser/i }).click();
   await page.getByRole('link', { name: /mentions légales/i }).click();
   await expect(

@@ -58,7 +58,8 @@ function NotificationItem({ item }: { item: AppNotification }) {
           </small>
         ) : null}
       </div>
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         type="button"
         className="app-notification-dismiss"
         aria-label={__t('design.components.notificationCenter.fermerLaNotification')}

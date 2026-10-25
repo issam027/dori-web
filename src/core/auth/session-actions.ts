@@ -10,7 +10,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
 import { getAccessToken, setAccessToken } from './access-token';
-import { useOperationStore } from '@/features/queue-operations/operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { clearOwnedStorage, storageKeys } from '@/core/storage/storage-keys';
 import { refreshAccessToken } from '@/api/client/http-client';

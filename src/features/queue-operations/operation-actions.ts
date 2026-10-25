@@ -1,5 +1,5 @@
 import { queueEngineControllerCallNext } from '@/api/generated/queue-engine/queue-engine';
-import { useOperationStore } from './operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 
 export type CallNextOutcome = 'called' | 'empty';
 

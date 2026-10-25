@@ -60,8 +60,7 @@ export function RegistrationDetailsModal({
               <small>{t('common.ticket')}</small>
               <strong>{safeText(item.ticketNumber)}</strong>
               <span>
-                {queueName ??
-                  t('queues.registrationDetails.queueFallback', { id: item.queueId })}
+                {queueName ?? t('queues.registrationDetails.queueFallback', { id: item.queueId })}
               </span>
             </div>
             <div className="registration-detail-qr">
@@ -105,11 +104,7 @@ export function RegistrationDetailsModal({
               <CalendarDays aria-hidden="true" /> {t('supervision.notifications.inscription')}
             </h3>
             <div className="registration-detail-grid">
-              <Detail
-                icon={<Hash />}
-                label={t('common.identifier')}
-                value={item.registrationId}
-              />
+              <Detail icon={<Hash />} label={t('common.identifier')} value={item.registrationId} />
               <Detail
                 icon={<CalendarDays />}
                 label={t('common.businessDate')}

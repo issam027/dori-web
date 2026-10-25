@@ -1,10 +1,10 @@
-export const SUPPORTED_LOCALES = ['fr', 'en', 'ar', 'ar-TN'] as const;
+const SUPPORTED_LOCALES = ['fr', 'en', 'ar', 'ar-TN'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: SupportedLocale = 'fr';
 
 /** `tn` is the ISO 639-1 code of Setswana. Tunisian Arabic is `aeb` / `ar-TN` (BCP 47). */
-export const LEGACY_LOCALE_ALIASES: Record<string, SupportedLocale> = {
+const LEGACY_LOCALE_ALIASES: Record<string, SupportedLocale> = {
   tn: 'ar-TN',
   'ar-tn': 'ar-TN',
   aeb: 'ar-TN',
@@ -14,11 +14,11 @@ export const LEGACY_LOCALE_ALIASES: Record<string, SupportedLocale> = {
  * Locale code expected by the translation service. ASSUMPTION: the backend still uses `tn`.
  * If the backend has been (or gets) migrated to `ar-TN`, delete this entry.
  */
-export const BACKEND_LOCALE_CODES: Partial<Record<SupportedLocale, string>> = {
+const BACKEND_LOCALE_CODES: Partial<Record<SupportedLocale, string>> = {
   'ar-TN': 'tn',
 };
 
-export const RTL_LOCALES: ReadonlySet<SupportedLocale> = new Set<SupportedLocale>(['ar']);
+const RTL_LOCALES: ReadonlySet<SupportedLocale> = new Set<SupportedLocale>(['ar']);
 
 /** Resolution order for a missing key. Never "translate" by silently copying French into EN/AR. */
 export const FALLBACK_CHAIN: Record<string, string[]> = {
@@ -43,7 +43,7 @@ export function toBackendLocale(locale: SupportedLocale): string {
   return BACKEND_LOCALE_CODES[locale] ?? locale;
 }
 
-export function isRtl(locale: string): boolean {
+function isRtl(locale: string): boolean {
   return RTL_LOCALES.has(normalizeLocale(locale));
 }
 

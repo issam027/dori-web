@@ -1,6 +1,6 @@
 import type { MonitoringSeriesMetricsDto, QueueResponseDto } from '@/api/generated/models';
 
-export interface ReportVolumeViewModel {
+interface ReportVolumeViewModel {
   registered: number;
   served: number;
   walkin: number;
@@ -9,7 +9,7 @@ export interface ReportVolumeViewModel {
   cancelled: number;
   expired: number;
 }
-export interface ReportTimingViewModel {
+interface ReportTimingViewModel {
   averageWaitMinutes: number | null;
   medianWaitMinutes: number | null;
   p90WaitMinutes: number | null;
@@ -17,7 +17,7 @@ export interface ReportTimingViewModel {
   medianServiceMinutes: number | null;
   p90ServiceMinutes: number | null;
 }
-export interface ReportRatesViewModel {
+interface ReportRatesViewModel {
   noShowRate: number | null;
   cancellationRate: number | null;
   expirationRate: number | null;
@@ -117,7 +117,7 @@ export function groupsToQueueRows(
         queue?.queueName ??
         (typeof group.dimension.queueName === 'string'
           ? group.dimension.queueName
-          : queueId ?? ''),
+          : (queueId ?? '')),
     };
   });
 }

@@ -14,6 +14,13 @@ Seuls les dossiers utiles à la feature sont créés :
 
 Une page compose les hooks et composants. Elle ne connaît ni URL, ni Axios, ni enveloppe API, ni contrôleur Orval. Les fichiers simples peuvent rester à la racine de la feature tant qu'une extraction ne clarifie pas une responsabilité.
 
+## Dépendances entre couches
+
+- `core/`, `shared/` et `design-system/` constituent les fondations et ne dépendent jamais de `features/`.
+- Une feature peut dépendre des fondations, mais pas des détails internes d'une autre feature.
+- Un état ou service utilisé par plusieurs features est placé dans `shared/` ; un mécanisme transversal d'infrastructure reste dans `core/`.
+- Ces frontières sont contrôlées automatiquement par `npm run audit:phase11`.
+
 ## Clés React Query
 
 Les clés partagées sont déclarées dans `src/api/client/query-keys.ts`, jamais sous forme de tableaux littéraux dans les pages.

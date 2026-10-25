@@ -29,7 +29,6 @@ export function Topbar({
   refreshing: boolean;
   onOpenNavigation: () => void;
 }) {
-  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
@@ -37,7 +36,7 @@ export function Topbar({
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const initials = user ? getUserInitials(user) : 'D';
   const activeSiteName =
-    sites.find((site) => site.id === activeSiteId)?.name ?? __t('common.noActiveSite');
+    sites.find((site) => site.id === activeSiteId)?.name ?? t('common.noActiveSite');
   const routeLabel = location.pathname.startsWith('/settings/')
     ? 'nav.settings'
     : ((
@@ -79,7 +78,7 @@ export function Topbar({
         variant="unstyled"
         className="topbar-icon-button mobile-menu-trigger"
         onClick={onOpenNavigation}
-        aria-label={__t('shell.layouts.topbar.ouvrirLeMenu')}
+        aria-label={t('shell.layouts.topbar.ouvrirLeMenu')}
       >
         <Menu aria-hidden="true" />
       </Button>
@@ -104,7 +103,7 @@ export function Topbar({
           <RefreshCw aria-hidden="true" className={refreshing ? 'is-spinning' : undefined} />
         </Button>
         <Button variant="unstyled" className="command-trigger" onClick={onOpenCommands}>
-          {t('commands.open')} <kbd>{__t('shell.layouts.topbar.k')}</kbd>
+          {t('commands.open')} <kbd>{t('shell.layouts.topbar.k')}</kbd>
         </Button>
         <ThemeSwitcher />
         <div className="topbar-desktop-account">

@@ -125,7 +125,8 @@ export const supervision: DomainTranslations<typeof import('../fr/supervision').
   'reports.servedFlow': 'حركة الحرفاء المخدومين',
   'reports.servedRatio': '{{served}} من جملة {{registered}} تمت خدمتهم',
   'notifications.filters.title': 'تصفية السجل',
-  'notifications.filters.help': 'تصفية الإشعارات حسب القناة والحالة والفترة وقائمة الانتظار والتسجيل.',
+  'notifications.filters.help':
+    'تصفية الإشعارات حسب القناة والحالة والفترة وقائمة الانتظار والتسجيل.',
   'notifications.filters.registrationId': 'معرِّف التسجيل',
   'notifications.filters.sort': 'ترتيب النتائج',
   'notifications.filters.newest': 'الأحدث أولاً',

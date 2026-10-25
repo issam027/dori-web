@@ -56,4 +56,3 @@ describe('appointment timezone rules', () => {
     expect(isSlotAvailable({ isAvailable: false })).toBe(false);
   });
 });
-

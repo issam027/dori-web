@@ -1,8 +1,5 @@
 import type { AuditControllerSearchParams } from '@/api/generated/models';
-import {
-  auditControllerFindById,
-  auditControllerSearch,
-} from '@/api/generated/audit/audit';
+import { auditControllerFindById, auditControllerSearch } from '@/api/generated/audit/audit';
 
 export function searchAuditEvents(params: AuditControllerSearchParams, signal?: AbortSignal) {
   return auditControllerSearch(params, undefined, signal);

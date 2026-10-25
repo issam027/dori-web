@@ -15,5 +15,37 @@ import { legal } from './legal';
 import { audit } from './audit';
 import type { Translations } from '../../types';
 
-export const enDomains = { common, nav, auth, profile, errors, appointments, persons, operations, portfolio, onboarding, admin, supervision, experiences, legal, audit };
-export const en: Translations = { ...common, ...nav, ...auth, ...profile, ...errors, ...appointments, ...persons, ...operations, ...portfolio, ...onboarding, ...admin, ...supervision, ...experiences, ...legal, ...audit };
+export const enDomains = {
+  common,
+  nav,
+  auth,
+  profile,
+  errors,
+  appointments,
+  persons,
+  operations,
+  portfolio,
+  onboarding,
+  admin,
+  supervision,
+  experiences,
+  legal,
+  audit,
+};
+export const en: Translations = {
+  ...common,
+  ...nav,
+  ...auth,
+  ...profile,
+  ...errors,
+  ...appointments,
+  ...persons,
+  ...operations,
+  ...portfolio,
+  ...onboarding,
+  ...admin,
+  ...supervision,
+  ...experiences,
+  ...legal,
+  ...audit,
+};

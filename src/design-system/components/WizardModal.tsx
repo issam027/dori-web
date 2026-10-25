@@ -51,7 +51,8 @@ export function WizardModal({
           ) : (
             <span />
           )}
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             className="button button-primary"
             type="button"
             disabled={!canContinue}

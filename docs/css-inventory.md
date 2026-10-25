@@ -18,25 +18,25 @@ la phase E2 ; il ne constitue pas une autorisation de déplacer une règle sans 
 
 ## Familles et destinations
 
-| Famille actuelle | Sélecteurs représentatifs | Destination E2 |
-| --- | --- | --- |
-| Tokens et thèmes | `:root`, `[data-theme]`, variables `--color-*`, `--space-*`, `--shadow-*` | `tokens/index.css` |
-| Base et typographie | `*`, `html`, `body`, titres, liens, `.sr-only` | `tokens/base.css` |
-| Boutons et formulaires | `.button`, `.icon-button`, champs natifs, `.form-field`, `.international-phone-input`, `.phone-country-*` | `components/controls.css` |
-| Cartes et données | `.card`, `.metric-card`, `.data-table`, `.status-badge`, `.detail-list`, états vides | `components/content.css` |
-| Overlays | `.modal-*`, `.wizard-*`, `.command-*`, `.notification-center`, menus contextuels | `components/overlays.css` |
-| Shell privé | `.app-shell`, `.sidebar`, `.topbar`, `.app-content`, navigation mobile | `layouts/shell.css` |
-| Authentification | `.login-*`, `.auth-*`, carrousel de présentation | `features/auth.css` |
-| Portefeuille/configuration | `.portfolio-*`, `.settings-*`, `.onboarding-*`, éditeur de file | `features/administration.css` |
-| Cockpit/files | `.desk-*`, `.queue-*`, `.passage-summary-*`, `.receipt-80mm` | `features/operations.css` |
-| Rendez-vous | `.calendar-*`, `.appointment-*`, créneaux et popups | `features/appointments.css` |
-| Pilotage | `.supervision-*`, `.reports-*`, `.health-*`, `.notification-*` | `features/pilotage.css` |
-| Pages publiques communes | `.public-layout`, `.public-header`, `.experience-preview-*`, `.device-mode-*` | `experiences/public-shell.css` |
-| Borne | `.public-kiosk`, `.kiosk-*`, `.tracking-qr-*` pour le ticket | `experiences/kiosk.css` |
-| Écran salle | `.public-display`, `.display-*` | `experiences/display.css` |
-| Tracking | `.public-tracking`, `.tracking-*` | `experiences/tracking.css` |
-| Impression | blocs `@media print`, attributs `data-print-*`, documents portalisés | `print/kiosk.css`, `print/passage.css`, `print/receipt.css` |
-| Animation/accessibilité | `@keyframes`, `prefers-reduced-motion`, focus visible | module propriétaire ; garde-fou final dans `utilities.css` |
+| Famille actuelle           | Sélecteurs représentatifs                                                                                 | Destination E2                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Tokens et thèmes           | `:root`, `[data-theme]`, variables `--color-*`, `--space-*`, `--shadow-*`                                 | `tokens/index.css`                                          |
+| Base et typographie        | `*`, `html`, `body`, titres, liens, `.sr-only`                                                            | `tokens/base.css`                                           |
+| Boutons et formulaires     | `.button`, `.icon-button`, champs natifs, `.form-field`, `.international-phone-input`, `.phone-country-*` | `components/controls.css`                                   |
+| Cartes et données          | `.card`, `.metric-card`, `.data-table`, `.status-badge`, `.detail-list`, états vides                      | `components/content.css`                                    |
+| Overlays                   | `.modal-*`, `.wizard-*`, `.command-*`, `.notification-center`, menus contextuels                          | `components/overlays.css`                                   |
+| Shell privé                | `.app-shell`, `.sidebar`, `.topbar`, `.app-content`, navigation mobile                                    | `layouts/shell.css`                                         |
+| Authentification           | `.login-*`, `.auth-*`, carrousel de présentation                                                          | `features/auth.css`                                         |
+| Portefeuille/configuration | `.portfolio-*`, `.settings-*`, `.onboarding-*`, éditeur de file                                           | `features/administration.css`                               |
+| Cockpit/files              | `.desk-*`, `.queue-*`, `.passage-summary-*`, `.receipt-80mm`                                              | `features/operations.css`                                   |
+| Rendez-vous                | `.calendar-*`, `.appointment-*`, créneaux et popups                                                       | `features/appointments.css`                                 |
+| Pilotage                   | `.supervision-*`, `.reports-*`, `.health-*`, `.notification-*`                                            | `features/pilotage.css`                                     |
+| Pages publiques communes   | `.public-layout`, `.public-header`, `.experience-preview-*`, `.device-mode-*`                             | `experiences/public-shell.css`                              |
+| Borne                      | `.public-kiosk`, `.kiosk-*`, `.tracking-qr-*` pour le ticket                                              | `experiences/kiosk.css`                                     |
+| Écran salle                | `.public-display`, `.display-*`                                                                           | `experiences/display.css`                                   |
+| Tracking                   | `.public-tracking`, `.tracking-*`                                                                         | `experiences/tracking.css`                                  |
+| Impression                 | blocs `@media print`, attributs `data-print-*`, documents portalisés                                      | `print/kiosk.css`, `print/passage.css`, `print/receipt.css` |
+| Animation/accessibilité    | `@keyframes`, `prefers-reduced-motion`, focus visible                                                     | module propriétaire ; garde-fou final dans `utilities.css`  |
 
 ## Duplications et surcharges à résorber
 

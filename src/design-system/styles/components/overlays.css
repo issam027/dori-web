@@ -39,7 +39,10 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
 }
 .notification-wizard-dialog .picker-option:hover {
   border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-line));
@@ -174,7 +177,11 @@
   position: relative;
   align-items: flex-start;
   padding-top: 22px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 9%, var(--color-surface)), var(--color-surface));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 9%, var(--color-surface)),
+    var(--color-surface)
+  );
 }
 .dialog-header::before {
   position: absolute;
@@ -183,9 +190,18 @@
   content: '';
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
 }
-.dialog-header > div { display: grid; gap: 5px; }
-.dialog-header h2 { margin: 0; font-size: 1.2rem; }
-.dialog-header p { margin: 0; color: var(--color-text-muted); }
+.dialog-header > div {
+  display: grid;
+  gap: 5px;
+}
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.dialog-header p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
 .dialog-body {
   min-height: 0;
   overflow-y: auto;
@@ -204,8 +220,13 @@
   background: var(--color-surface);
   container-type: inline-size;
 }
-.confirmation-dialog { width: min(520px, calc(100vw - 32px)); }
-.confirmation-dialog .dialog-body { min-height: 0; padding-block: 6px; }
+.confirmation-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+.confirmation-dialog .dialog-body {
+  min-height: 0;
+  padding-block: 6px;
+}
 .wizard-progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

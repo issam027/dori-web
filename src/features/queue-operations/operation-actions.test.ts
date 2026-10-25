@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { mockServer } from '@/shared/testing/mock-server';
 import { callNextAndCommit } from './operation-actions';
-import { useOperationStore } from './operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 
 afterEach(() => {
   useOperationStore.getState().reset();

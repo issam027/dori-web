@@ -37,17 +37,17 @@ Elle n'est cependant pas encore au niveau « production durable » sans réserve
 
 ### Indicateurs constatés
 
-| Indicateur | Valeur observée | Lecture |
-|---|---:|---|
-| Fichiers de tests | 77 | 66 tests unitaires/composants et 11 spécifications E2E |
-| Fichiers générés API | 463 | contrat backend fortement structurant |
-| Adaptateurs API de feature | 11 | migration architecturale seulement partielle |
-| Fichiers de production important directement `@/api/generated` | 69 | couplage fort entre UI, DTO et client Orval |
-| Plus gros composant | `OnboardingWizard.tsx`, 1 110 lignes | risque élevé de régression et test difficile |
-| Plus grosse feuille applicative | `application.css`, 4 316 lignes | propriété et maintenance des styles floues |
-| Dossiers source vides | 2 | `shared/currency`, `shared/pagination` |
-| Seuils de couverture | aucun | une baisse de couverture ne bloque pas la CI |
-| Outil d'observabilité externe | aucun trouvé | erreurs réelles et performance non mesurées |
+| Indicateur                                                     |                      Valeur observée | Lecture                                                |
+| -------------------------------------------------------------- | -----------------------------------: | ------------------------------------------------------ |
+| Fichiers de tests                                              |                                   77 | 66 tests unitaires/composants et 11 spécifications E2E |
+| Fichiers générés API                                           |                                  463 | contrat backend fortement structurant                  |
+| Adaptateurs API de feature                                     |                                   11 | migration architecturale seulement partielle           |
+| Fichiers de production important directement `@/api/generated` |                                   69 | couplage fort entre UI, DTO et client Orval            |
+| Plus gros composant                                            | `OnboardingWizard.tsx`, 1 110 lignes | risque élevé de régression et test difficile           |
+| Plus grosse feuille applicative                                |      `application.css`, 4 316 lignes | propriété et maintenance des styles floues             |
+| Dossiers source vides                                          |                                    2 | `shared/currency`, `shared/pagination`                 |
+| Seuils de couverture                                           |                                aucun | une baisse de couverture ne bloque pas la CI           |
+| Outil d'observabilité externe                                  |                         aucun trouvé | erreurs réelles et performance non mesurées            |
 
 ### Priorités proposées
 
@@ -194,18 +194,18 @@ Le `PollingRealtimeGateway` évite deux rafraîchissements simultanés pour une 
 
 ### Fichiers à risque
 
-| Fichier | Taille observée | Action recommandée |
-|---|---:|---|
-| `OnboardingWizard.tsx` | 1 110 lignes | extraire machine de workflow, contrôleur de transaction et étapes |
-| `KioskWizard.tsx` | 782 lignes | isoler état, confidentialité, impression et étapes |
-| `UsersAdminPage.tsx` | 680 lignes | extraire requêtes, filtres, tableau/cartes et dialogues |
-| `ReportVisualizations.tsx` | 657 lignes | séparer modèle de graphiques et visualisations |
-| `AppointmentActionDialog.tsx` | 578 lignes | isoler règles par action et formulaires |
-| `ControlRoomPage.tsx` | 545 lignes | séparer orchestration live et sections |
-| `TranslationsAdminPage.tsx` | 529 lignes | isoler formulaire, comparaison et mutations |
-| `AppointmentsPage.tsx` | 503 lignes | extraire agenda, filtres et commandes |
-| `application.css` | 4 316 lignes | répartir la propriété des styles par feature |
-| `admin.css` | 1 118 lignes | découper par écran/composant |
+| Fichier                       | Taille observée | Action recommandée                                                |
+| ----------------------------- | --------------: | ----------------------------------------------------------------- |
+| `OnboardingWizard.tsx`        |    1 110 lignes | extraire machine de workflow, contrôleur de transaction et étapes |
+| `KioskWizard.tsx`             |      782 lignes | isoler état, confidentialité, impression et étapes                |
+| `UsersAdminPage.tsx`          |      680 lignes | extraire requêtes, filtres, tableau/cartes et dialogues           |
+| `ReportVisualizations.tsx`    |      657 lignes | séparer modèle de graphiques et visualisations                    |
+| `AppointmentActionDialog.tsx` |      578 lignes | isoler règles par action et formulaires                           |
+| `ControlRoomPage.tsx`         |      545 lignes | séparer orchestration live et sections                            |
+| `TranslationsAdminPage.tsx`   |      529 lignes | isoler formulaire, comparaison et mutations                       |
+| `AppointmentsPage.tsx`        |      503 lignes | extraire agenda, filtres et commandes                             |
+| `application.css`             |    4 316 lignes | répartir la propriété des styles par feature                      |
+| `admin.css`                   |    1 118 lignes | découper par écran/composant                                      |
 
 Le découpage ne doit pas être mécanique. Une extraction est utile si elle isole une responsabilité testable, un état ou une frontière réseau.
 
@@ -602,3 +602,29 @@ npm run verify
 ```
 
 Ne cocher les checkpoints de validation qu'avec une sortie CI ou un procès-verbal de recette associé, pas sur la seule base d'une lecture du code.
+
+<!-- CHECKPOINT id="ckpt_mvmzslzx_h3mtta" time="2026-10-24T22:50:39.837Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn05gz1_jk3iaq" time="2026-10-24T23:00:39.853Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn19r6t_hzkkbh" time="2026-10-24T23:31:59.333Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn1mm5n_6k98g6" time="2026-10-24T23:41:59.339Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn1zh4e_cf31vq" time="2026-10-24T23:51:59.343Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn2cc3a_7nqxsc" time="2026-10-25T00:01:59.350Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvn79x61_ov6u7j" time="2026-10-25T02:20:04.777Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvncnjhm_5rbcrb" time="2026-10-25T04:50:38.314Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvnd0egm_u855ap" time="2026-10-25T05:00:38.326Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvndd9fx_f0telw" time="2026-10-25T05:10:38.349Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvnhv238_rytx0v" time="2026-10-25T07:16:27.092Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvnklitb_zcuodr" time="2026-10-25T08:33:01.055Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->
+
+<!-- CHECKPOINT id="ckpt_mvnkydse_cvasds" time="2026-10-25T08:43:01.070Z" note="auto" fixes=0 questions=0 highlights=0 sections="" -->

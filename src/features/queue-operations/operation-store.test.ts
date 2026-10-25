@@ -1,5 +1,5 @@
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
-import { canCallNext, useOperationStore } from './operation-store';
+import { canCallNext, useOperationStore } from '@/shared/queue-operations/operation-store';
 
 function call(registrationId: string): CallNextRegistrationResponseDto {
   return {

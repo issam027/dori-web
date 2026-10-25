@@ -125,7 +125,8 @@ export function InternationalPhoneInput({
   return (
     <div className="international-phone-input" ref={rootRef}>
       <div className="phone-country-control">
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           type="button"
           className="phone-country-trigger"
           aria-label={`${countryLabel}: ${country.dialCode}`}
@@ -143,7 +144,8 @@ export function InternationalPhoneInput({
         {menuOpen ? (
           <div className="phone-country-menu" role="listbox" aria-label={countryLabel}>
             {countries.map((item) => (
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 type="button"
                 role="option"
                 aria-label={item.dialCode}

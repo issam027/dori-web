@@ -21,7 +21,6 @@ function mediaMatches(query: string): boolean {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
@@ -132,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           variant="unstyled"
           className="sidebar-backdrop"
           type="button"
-          aria-label={__t('common.fermerLeMenu')}
+          aria-label={t('common.fermerLeMenu')}
           onClick={() => {
             setMobileNavigationOpen(false);
           }}
@@ -166,13 +165,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
               <div className="site-required-card">
                 <EmptyState
-                  title={__t('shell.layouts.appShell.choisissezUnSiteActif')}
-                  description={__t(
+                  title={t('shell.layouts.appShell.choisissezUnSiteActif')}
+                  description={t(
                     'shell.layouts.appShell.selectionnezLeSiteSurLequelVousSouhaitezT',
                   )}
                   action={
                     <Link className="button button-primary" to="/portfolio">
-                      {__t('shell.layouts.appShell.ouvrirLePortefeuilleDeSites')}
+                      {t('shell.layouts.appShell.ouvrirLePortefeuilleDeSites')}
                     </Link>
                   }
                 />

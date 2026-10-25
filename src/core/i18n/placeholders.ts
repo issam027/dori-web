@@ -2,9 +2,13 @@ const PLURAL_SUFFIX = /_(zero|one|two|few|many|other|plural)$/;
 
 /** Unique, sorted interpolation names: "{{ count, number }}" → ["count"]. */
 export function extractPlaceholders(value: string): string[] {
-  return [...new Set([...value.matchAll(/{{\s*([^},\s]+)[^}]*}}/g)].flatMap((match) =>
-    match[1] ? [match[1]] : [],
-  ))].sort();
+  return [
+    ...new Set(
+      [...value.matchAll(/{{\s*([^},\s]+)[^}]*}}/g)].flatMap((match) =>
+        match[1] ? [match[1]] : [],
+      ),
+    ),
+  ].sort();
 }
 
 export const hasPluralSuffix = (key: string): boolean => PLURAL_SUFFIX.test(key);

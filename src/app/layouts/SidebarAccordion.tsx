@@ -162,7 +162,6 @@ export function SidebarAccordion({
   onToggleCollapsed?: () => void;
   onCloseMobile?: () => void;
 }) {
-  const { t: __t } = useTranslation();
   const { t } = useTranslation();
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
@@ -171,10 +170,7 @@ export function SidebarAccordion({
       sections
         .map((section) => ({
           ...section,
-          items: section.items.filter(
-            (item) =>
-              hasAnyPermission(user, item.permissions),
-          ),
+          items: section.items.filter((item) => hasAnyPermission(user, item.permissions)),
         }))
         .filter((section) => section.items.length > 0),
     [user],
@@ -196,13 +192,14 @@ export function SidebarAccordion({
       className={`sidebar${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
     >
       <div className="sidebar-brand">
-        <span className="brand-mark">{__t('common.d')}</span>
-        <strong className="sidebar-label">{__t('app.name')}</strong>
-        <Button variant="unstyled"
+        <span className="brand-mark">{t('common.d')}</span>
+        <strong className="sidebar-label">{t('app.name')}</strong>
+        <Button
+          variant="unstyled"
           className="sidebar-mobile-close"
           type="button"
           onClick={onCloseMobile}
-          aria-label={__t('common.fermerLeMenu')}
+          aria-label={t('common.fermerLeMenu')}
         >
           <X aria-hidden="true" />
         </Button>
@@ -212,7 +209,8 @@ export function SidebarAccordion({
           const open = collapsed || openedSection === section.id;
           return (
             <section className="nav-section" key={section.id}>
-              <Button variant="unstyled"
+              <Button
+                variant="unstyled"
                 type="button"
                 className="nav-section-toggle"
                 aria-expanded={open}
@@ -255,14 +253,15 @@ export function SidebarAccordion({
         <ShieldCheck aria-hidden="true" />
         <span className="sidebar-label">{t('nav.legal')}</span>
       </NavLink>
-      <Button variant="unstyled"
+      <Button
+        variant="unstyled"
         className="sidebar-collapse"
         type="button"
         onClick={onToggleCollapsed}
         aria-label={collapsed ? t('nav.expandMenu') : t('nav.collapseMenu')}
       >
         {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
-        <span className="sidebar-label">{__t('shell.layouts.sidebarAccordion.reduire')}</span>
+        <span className="sidebar-label">{t('shell.layouts.sidebarAccordion.reduire')}</span>
       </Button>
     </aside>
   );

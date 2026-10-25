@@ -16,7 +16,7 @@ import {
 } from './session-actions';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
-import { useOperationStore } from '@/features/queue-operations/operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 
 describe('hydrateSession', () => {
   afterEach(() => {

@@ -1,10 +1,4 @@
-import {
-  Children,
-  cloneElement,
-  isValidElement,
-  useId,
-  type ReactNode,
-} from 'react';
+import { Children, cloneElement, isValidElement, useId, type ReactNode } from 'react';
 
 type DescribedControlProps = {
   id?: string;
@@ -48,7 +42,7 @@ export function FormField({
   const describedBy =
     [control?.props['aria-describedby'], messageId].filter(Boolean).join(' ') || undefined;
   const enhancedControl = control
-      ? cloneElement(control, {
+    ? cloneElement(control, {
         id: controlId,
         required: required || control.props.required || undefined,
         'aria-describedby': describedBy,

@@ -49,7 +49,8 @@ export function DeviceModePage() {
       </div>
       <div className="device-mode-footer">
         <p className="device-mode-hint">{__t('deviceMode.fullscreenTip')}</p>
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button"
           type="button"
           disabled={disconnecting}

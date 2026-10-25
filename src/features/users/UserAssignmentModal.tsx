@@ -108,7 +108,8 @@ export function UserAssignmentModal({
       title={t('settings.assignUser')}
       description={t('settings.assignUserDescription', { resource: target?.label ?? '' })}
       actions={
-        <Button variant="unstyled"
+        <Button
+          variant="unstyled"
           className="button button-primary"
           type="button"
           disabled={!selectedUser || !roleId || saving}
@@ -146,7 +147,8 @@ export function UserAssignmentModal({
           ) : results.length ? (
             <div className="assignment-user-results">
               {results.map((user) => (
-                <Button variant="unstyled"
+                <Button
+                  variant="unstyled"
                   type="button"
                   className={selectedUser?.userId === user.userId ? 'selected' : ''}
                   aria-pressed={selectedUser?.userId === user.userId}
@@ -160,7 +162,10 @@ export function UserAssignmentModal({
                   <span className="profile-avatar">{getUserInitials(user)}</span>
                   <span>
                     <strong>{getUserDisplayName(user)}</strong>
-                    <small>{user.fullName ? `@${user.username} · ` : ''}{user.email ?? t('settings.noEmail')}</small>
+                    <small>
+                      {user.fullName ? `@${user.username} · ` : ''}
+                      {user.email ?? t('settings.noEmail')}
+                    </small>
                   </span>
                   <span className={`status-badge ${user.isActive ? 'status-success' : ''}`}>
                     {user.isActive ? t('settings.active') : t('settings.inactive')}

@@ -6,8 +6,7 @@ import { findAuditEvent, searchAuditEvents } from '../api/audit-api';
 export function useAuditEvents(filters: AuditControllerSearchParams & { page: number }) {
   return useQuery({
     queryKey: queryKeys.audit.list(filters),
-    queryFn: ({ signal }) =>
-      searchAuditEvents({ ...filters, pageSize: 25 }, signal),
+    queryFn: ({ signal }) => searchAuditEvents({ ...filters, pageSize: 25 }, signal),
   });
 }
 

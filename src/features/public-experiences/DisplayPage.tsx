@@ -42,9 +42,7 @@ export function DisplayPage() {
           ...thread,
           queueId: snapshot.queueId,
           queueName: snapshot.queueName,
-          counterName: counterNames.get(
-            `${snapshot.queueId}:${String(thread.threadNumber)}`,
-          ),
+          counterName: counterNames.get(`${snapshot.queueId}:${String(thread.threadNumber)}`),
         })),
     )
     .sort(

@@ -1,4 +1,4 @@
-export function consumeOpaqueToken(search: string, history: Pick<History, 'replaceState'>) {
+function consumeOpaqueToken(search: string, history: Pick<History, 'replaceState'>) {
   const params = new URLSearchParams(search);
   const token = params.get('token')?.trim() ?? '';
   if (params.has('token')) {

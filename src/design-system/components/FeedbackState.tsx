@@ -33,7 +33,12 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
       </div>
       <h2>{t('states.error')}</h2>
       {onRetry ? (
-        <Button variant="unstyled" className="button button-primary" type="button" onClick={onRetry}>
+        <Button
+          variant="unstyled"
+          className="button button-primary"
+          type="button"
+          onClick={onRetry}
+        >
           <RotateCcw aria-hidden="true" />
           {t('common.retry')}
         </Button>

@@ -8,7 +8,9 @@ import {
 
 const singleSite = [buildSite()];
 
-test('login uses the real form flow and redirects to the first authorized route', async ({ page }) => {
+test('login uses the real form flow and redirects to the first authorized route', async ({
+  page,
+}) => {
   let loggedIn = false;
   const anonymousUntilLogin: ApiScenarioHandler = async ({ method, path, route }) => {
     if (method === 'POST' && path.endsWith('/auth/login')) {
@@ -32,10 +34,14 @@ test('login uses the real form flow and redirects to the first authorized route'
   await page.getByLabel(/mot de passe/i).fill('Root@123456');
   await page.getByRole('button', { name: /se connecter/i }).click();
   await expect(page).toHaveURL(/\/portfolio$/);
-  await expect(page.getByRole('main').getByRole('heading', { name: /portefeuille/i })).toBeVisible();
+  await expect(
+    page.getByRole('main').getByRole('heading', { name: /portefeuille/i }),
+  ).toBeVisible();
 });
 
-test('refreshing a private route restores session and active single-site context', async ({ page }) => {
+test('refreshing a private route restores session and active single-site context', async ({
+  page,
+}) => {
   let meCalls = 0;
   const countMe: ApiScenarioHandler = ({ path }) => {
     if (path.endsWith('/auth/me')) meCalls += 1;
@@ -86,7 +92,9 @@ test('logout clears the private shell and returns to login', async ({ page }) =>
   await expect(page.getByRole('heading', { name: /bienvenue/i })).toBeVisible();
 });
 
-test('a user required to change password is redirected before business routes', async ({ page }) => {
+test('a user required to change password is redirected before business routes', async ({
+  page,
+}) => {
   await installApiScenario(page, {
     profile: 'operator',
     sites: singleSite,

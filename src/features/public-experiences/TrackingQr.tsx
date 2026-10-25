@@ -12,8 +12,12 @@ export function TrackingQr({ value, onReady }: { value?: string | null; onReady?
   useEffect(() => {
     let active = true;
     if (!qrValue) {
-      queueMicrotask(() => { if (active) onReady?.(); });
-      return () => { active = false; };
+      queueMicrotask(() => {
+        if (active) onReady?.();
+      });
+      return () => {
+        active = false;
+      };
     }
     void QRCode.toDataURL(qrValue, {
       margin: 1,

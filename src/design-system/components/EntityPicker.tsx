@@ -28,7 +28,8 @@ export function EntityPicker<TEntity>({
         const key = getKey(entity);
         const selected = key === selectedKey;
         return (
-          <Button variant="unstyled"
+          <Button
+            variant="unstyled"
             key={key}
             type="button"
             role="option"

@@ -11,9 +11,9 @@ import {
   type ReactNode,
 } from 'react';
 
-export type ButtonVariant = 'default' | 'primary' | 'danger' | 'unstyled';
-export type ButtonSize = 'default' | 'small' | 'icon';
-export type ButtonLabelMode = 'responsive' | 'always' | 'icon-only';
+type ButtonVariant = 'default' | 'primary' | 'danger' | 'unstyled';
+type ButtonSize = 'default' | 'small' | 'icon';
+type ButtonLabelMode = 'responsive' | 'always' | 'icon-only';
 
 const ButtonLabelModeContext = createContext<ButtonLabelMode>('responsive');
 

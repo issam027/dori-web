@@ -14,7 +14,7 @@ import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
 import { QuickRegistration } from './QuickRegistration';
-import { useOperationStore } from '@/features/queue-operations/operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 import {
   useCallNext,
   useCloseDeskSession,

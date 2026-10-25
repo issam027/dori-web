@@ -59,7 +59,8 @@ export const persons: DomainTranslations<typeof import('../fr/persons').persons>
   'persons.notes.updated': 'تم تحيين الملاحظة بنجاح',
   'persons.notes.deleted': 'تم حذف الملاحظة',
   'persons.admin.deleteTitle': 'حذف هذا الحريف؟',
-  'persons.admin.deleteDescription': 'ستتم معالجة حذف ملف الحريف والملاحظات المرتبطة به عبر المنظومة.',
+  'persons.admin.deleteDescription':
+    'ستتم معالجة حذف ملف الحريف والملاحظات المرتبطة به عبر المنظومة.',
   'persons.admin.deleted': 'تم حذف الحريف',
   'persons.admin.reactivate': 'إعادة التفعيل',
   'persons.admin.reactivated': 'تمت إعادة تفعيل الحريف بنجاح',
