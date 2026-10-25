@@ -47,6 +47,7 @@ import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { UserMobileCard } from './UserMobileCard';
+import { userPasswordResetDto } from './user-password-reset';
 
 const PAGE_SIZE = 10;
 export function UsersAdminPage() {
@@ -279,7 +280,7 @@ export function UsersAdminPage() {
                   .catch(notifyError);
               }}
               onResetPassword={() => {
-                void setUserPassword(user.userId, { newPassword: 'Root@123456' })
+                void setUserPassword(user.userId, userPasswordResetDto())
                   .then(() =>
                     notify({
                       tone: 'success',
@@ -407,9 +408,7 @@ export function UsersAdminPage() {
                             type="button"
                             title={t('onboarding.settings.reinitialiserMdp')}
                             onClick={() =>
-                              void setUserPassword(user.userId, {
-                                newPassword: 'Root@123456',
-                              })
+                              void setUserPassword(user.userId, userPasswordResetDto())
                                 .then(() =>
                                   notify({
                                     tone: 'success',
