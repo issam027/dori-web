@@ -33,7 +33,6 @@ export function DisplayPage() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.publicExperience.displaySnapshot(queueId),
       });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.queueSessions.byQueue(queueId) });
     });
   };
   useQueueDisplayRealtime({

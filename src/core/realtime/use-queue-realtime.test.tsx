@@ -40,10 +40,10 @@ describe('queue realtime hooks', () => {
 
     const trackingOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
       channel: string;
-      getCredential: () => string;
+      credential: string;
     };
     expect(trackingOptions.channel).toBe('tracking');
-    expect(trackingOptions.getCredential()).toBe('registration-token');
+    expect(trackingOptions.credential).toBe('registration-token');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1']);
 
     rerender({ queueIds: [] });
@@ -52,21 +52,30 @@ describe('queue realtime hooks', () => {
   });
 
   it('subscribes one display stream to every displayed queue', () => {
-    renderHook(() => {
-      useQueueDisplayRealtime({
-        queueIds: ['queue-2', 'queue-1'],
-        getToken: () => 'display-jwt',
-        onEvent: vi.fn(),
-        onReconnect: vi.fn(),
-      });
-    });
+    const getToken = () => 'display-jwt';
+    const { rerender } = renderHook(
+      ({ queueIds }) => {
+        useQueueDisplayRealtime({
+          queueIds,
+          getToken,
+          onEvent: vi.fn(),
+          onReconnect: vi.fn(),
+        });
+      },
+      { initialProps: { queueIds: ['queue-2', 'queue-1'] } },
+    );
 
     const displayOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
       channel: string;
-      getCredential: () => string;
+      credential: string;
     };
     expect(displayOptions.channel).toBe('display');
-    expect(displayOptions.getCredential()).toBe('display-jwt');
+    expect(displayOptions.credential).toBe('display-jwt');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1', 'queue-2']);
+
+    rerender({ queueIds: ['queue-1', 'queue-2'] });
+
+    expect(gatewayMocks.construct).toHaveBeenCalledOnce();
+    expect(gatewayMocks.disconnect).not.toHaveBeenCalled();
   });
 });

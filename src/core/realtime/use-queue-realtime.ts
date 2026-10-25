@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useEffectEvent } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import {
   QueueRealtimeGateway,
   type QueueDisplayChangedEvent,
@@ -10,7 +10,6 @@ import {
 interface QueueRealtimeOptions<TChannel extends QueueRealtimeChannel> {
   queueIds: readonly string[];
   credential: string | null | undefined;
-  getCredential: () => string | null | undefined;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: (queueId: string) => void;
 }
@@ -20,7 +19,7 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
   options: QueueRealtimeOptions<TChannel>,
 ): void {
   const queueKey = [...new Set(options.queueIds)].sort().join(',');
-  const { credential, getCredential } = options;
+  const credential = options.credential?.trim();
   const onEvent = useEffectEvent(options.onEvent);
   const onReconnect = useEffectEvent(options.onReconnect);
 
@@ -28,7 +27,7 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     if (!credential || !queueKey) return;
     const gateway = new QueueRealtimeGateway({
       channel,
-      getCredential: () => getCredential()?.trim() ?? '',
+      credential,
       onEvent,
       onReconnect,
     });
@@ -36,11 +35,11 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     return () => {
       gateway.disconnect();
     };
-  }, [channel, credential, getCredential, queueKey]);
+  }, [channel, credential, queueKey]);
 }
 
 export function useQueueDisplayRealtime(
-  options: Omit<QueueRealtimeOptions<'display'>, 'credential' | 'getCredential' | 'onEvent'> & {
+  options: Omit<QueueRealtimeOptions<'display'>, 'credential' | 'onEvent'> & {
     getToken: () => string | null;
     onEvent: (event: QueueDisplayChangedEvent) => void;
   },
@@ -48,20 +47,17 @@ export function useQueueDisplayRealtime(
   useQueueRealtime('display', {
     ...options,
     credential: options.getToken(),
-    getCredential: options.getToken,
   });
 }
 
 export function useQueueTrackingRealtime(
-  options: Omit<QueueRealtimeOptions<'tracking'>, 'credential' | 'getCredential' | 'onEvent'> & {
+  options: Omit<QueueRealtimeOptions<'tracking'>, 'credential' | 'onEvent'> & {
     registrationToken: string | null | undefined;
     onEvent: (event: QueuePositionChangedEvent) => void;
   },
 ): void {
-  const getCredential = useCallback(() => options.registrationToken, [options.registrationToken]);
   useQueueRealtime('tracking', {
     ...options,
     credential: options.registrationToken,
-    getCredential,
   });
 }

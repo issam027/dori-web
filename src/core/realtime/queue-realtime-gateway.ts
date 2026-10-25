@@ -26,11 +26,10 @@ type EventStream = (input: RequestInfo, init: FetchEventSourceInit) => Promise<v
 
 interface QueueRealtimeGatewayOptions<TChannel extends QueueRealtimeChannel> {
   channel: TChannel;
-  getCredential: () => string;
+  credential: string;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: (queueId: string) => void;
   eventStream?: EventStream;
-  fetch?: typeof fetch;
 }
 
 const channelContracts = {
@@ -111,22 +110,22 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
   private open(queueId: string): void {
     const controller = new AbortController();
     const eventStream = this.options.eventStream ?? fetchEventSource;
-    const requestFetch = this.options.fetch ?? globalThis.fetch;
     let hasOpened = false;
     this.controllers.set(queueId, controller);
 
     void eventStream(queueRealtimeUrl(queueId, this.options.channel), {
       signal: controller.signal,
       openWhenHidden: true,
-      headers: { Accept: 'text/event-stream' },
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        const credential = this.options.getCredential();
-        if (this.options.channel === 'display')
-          headers.set('Authorization', `Bearer ${credential}`);
-        else headers.set('X-Registration-Token', credential);
-        return requestFetch(input, { ...init, headers });
-      },
+      headers:
+        this.options.channel === 'display'
+          ? {
+              Authorization: `Bearer ${this.options.credential}`,
+              Accept: 'text/event-stream',
+            }
+          : {
+              'X-Registration-Token': this.options.credential,
+              Accept: 'text/event-stream',
+            },
       onopen: (response) => {
         const contentType = response.headers.get('content-type') ?? '';
         if (response.ok && contentType.includes('text/event-stream')) {

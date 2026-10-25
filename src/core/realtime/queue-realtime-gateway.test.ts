@@ -20,19 +20,14 @@ const openedResponse = new Response(null, {
 });
 
 describe('QueueRealtimeGateway', () => {
-  it('opens one authenticated display stream per unique queue', async () => {
+  it('opens one authenticated display stream per unique queue', () => {
     const harness = createEventStreamHarness();
-    const requestFetch = vi
-      .fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>()
-      .mockResolvedValue(openedResponse);
-    let token = 'jwt-initial';
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      getCredential: () => token,
+      credential: 'jwt-token',
       onEvent: vi.fn(),
       onReconnect: vi.fn(),
       eventStream: harness.eventStream,
-      fetch: requestFetch,
     });
 
     gateway.connect(['queue-2', 'queue-1', 'queue-1']);
@@ -42,36 +37,24 @@ describe('QueueRealtimeGateway', () => {
       queueRealtimeUrl('queue-2', 'display'),
     ]);
     const request = harness.requests[0]?.options;
-    await request?.fetch?.('stream', { headers: request.headers });
-    token = 'jwt-refreshed';
-    await request?.fetch?.('stream', { headers: request.headers });
-    expect(new Headers(requestFetch.mock.calls[0]?.[1]?.headers).get('Authorization')).toBe(
-      'Bearer jwt-initial',
-    );
-    expect(new Headers(requestFetch.mock.calls[1]?.[1]?.headers).get('Authorization')).toBe(
-      'Bearer jwt-refreshed',
-    );
+    expect(new Headers(request?.headers).get('Authorization')).toBe('Bearer jwt-token');
+    expect(new Headers(request?.headers).get('Accept')).toBe('text/event-stream');
     expect(request?.openWhenHidden).toBe(true);
   });
 
   it('uses the registration token and accepts only valid tracking events', () => {
     const harness = createEventStreamHarness();
-    const requestFetch = vi
-      .fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>()
-      .mockResolvedValue(openedResponse);
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'tracking',
-      getCredential: () => 'tracking-token',
+      credential: 'tracking-token',
       onEvent,
       onReconnect: vi.fn(),
       eventStream: harness.eventStream,
-      fetch: requestFetch,
     });
 
     gateway.connect(['queue-1']);
     const request = harness.requests[0]?.options;
-    void request?.fetch?.('stream', { headers: request.headers });
     request?.onmessage?.({
       event: 'queue_position_changed',
       data: JSON.stringify({ queueId: 'queue-1', timestamp: '2026-10-25T14:00:00.000Z' }),
@@ -85,9 +68,7 @@ describe('QueueRealtimeGateway', () => {
       retry: undefined,
     });
 
-    expect(new Headers(requestFetch.mock.calls[0]?.[1]?.headers).get('X-Registration-Token')).toBe(
-      'tracking-token',
-    );
+    expect(new Headers(request?.headers).get('X-Registration-Token')).toBe('tracking-token');
     expect(onEvent).toHaveBeenCalledOnce();
     expect(onEvent).toHaveBeenCalledWith({
       queueId: 'queue-1',
@@ -100,7 +81,7 @@ describe('QueueRealtimeGateway', () => {
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      getCredential: () => 'jwt',
+      credential: 'jwt',
       onEvent,
       onReconnect: vi.fn(),
       eventStream: harness.eventStream,
@@ -139,7 +120,7 @@ describe('QueueRealtimeGateway', () => {
     const onReconnect = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      getCredential: () => 'jwt',
+      credential: 'jwt',
       onEvent: vi.fn(),
       onReconnect,
       eventStream: harness.eventStream,
@@ -158,7 +139,7 @@ describe('QueueRealtimeGateway', () => {
     const harness = createEventStreamHarness();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
-      getCredential: () => 'jwt',
+      credential: 'jwt',
       onEvent: vi.fn(),
       onReconnect: vi.fn(),
       eventStream: harness.eventStream,
