@@ -1,7 +1,8 @@
 import { renderHook } from '@testing-library/react';
-import { useQueueRealtime } from './use-queue-realtime';
+import { useQueueDisplayRealtime, useQueueTrackingRealtime } from './use-queue-realtime';
 
 const gatewayMocks = vi.hoisted(() => ({
+  construct: vi.fn(),
   connect: vi.fn(),
   disconnect: vi.fn(),
 }));
@@ -10,19 +11,24 @@ vi.mock('./queue-realtime-gateway', () => ({
   QueueRealtimeGateway: class {
     connect = gatewayMocks.connect;
     disconnect = gatewayMocks.disconnect;
+
+    constructor(options: unknown) {
+      gatewayMocks.construct(options);
+    }
   },
 }));
 
-describe('useQueueRealtime', () => {
+describe('queue realtime hooks', () => {
   beforeEach(() => {
+    gatewayMocks.construct.mockClear();
     gatewayMocks.connect.mockClear();
     gatewayMocks.disconnect.mockClear();
   });
 
-  it('disconnects when an active mobile registration no longer exposes a queue', () => {
+  it('disconnects tracking when an active registration no longer exposes a queue', () => {
     const { rerender } = renderHook(
       ({ queueIds }) => {
-        useQueueRealtime({
+        useQueueTrackingRealtime({
           queueIds,
           token: 'registration-token',
           onEvent: vi.fn(),
@@ -32,6 +38,9 @@ describe('useQueueRealtime', () => {
       { initialProps: { queueIds: ['queue-1'] } },
     );
 
+    expect(gatewayMocks.construct).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'tracking', token: 'registration-token' }),
+    );
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1']);
 
     rerender({ queueIds: [] });
@@ -39,9 +48,9 @@ describe('useQueueRealtime', () => {
     expect(gatewayMocks.disconnect).toHaveBeenCalledOnce();
   });
 
-  it('subscribes one socket to every queue displayed by the room screen', () => {
+  it('subscribes one display socket to every displayed queue', () => {
     renderHook(() => {
-      useQueueRealtime({
+      useQueueDisplayRealtime({
         queueIds: ['queue-2', 'queue-1'],
         token: 'display-jwt',
         onEvent: vi.fn(),
@@ -49,6 +58,9 @@ describe('useQueueRealtime', () => {
       });
     });
 
+    expect(gatewayMocks.construct).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'display', token: 'display-jwt' }),
+    );
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1', 'queue-2']);
   });
 });

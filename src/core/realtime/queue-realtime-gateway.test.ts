@@ -31,10 +31,11 @@ function createSocketHarness() {
 }
 
 describe('QueueRealtimeGateway', () => {
-  it('subscribes once to each queue and forwards queue events', () => {
+  it('subscribes a display to its queues and accepts display events only', () => {
     const harness = createSocketHarness();
     const onEvent = vi.fn();
     const gateway = new QueueRealtimeGateway({
+      channel: 'display',
       token: 'jwt',
       onEvent,
       onReconnect: vi.fn(),
@@ -44,7 +45,11 @@ describe('QueueRealtimeGateway', () => {
     gateway.connect(['queue-2', 'queue-1', 'queue-1']);
     harness.setConnected(true);
     harness.trigger('connect');
-    harness.trigger('registration_called', { queueId: 'queue-1', ticketNumber: 'A042' });
+    harness.trigger('registration_called', { queueId: 'queue-1' });
+    harness.trigger('queue_display_changed', {
+      queueId: 'queue-1',
+      reason: 'registration_called',
+    });
 
     expect(harness.emit).toHaveBeenCalledWith('subscribe', {
       room: 'queue:queue-1:display',
@@ -53,14 +58,68 @@ describe('QueueRealtimeGateway', () => {
       room: 'queue:queue-2:display',
     });
     expect(harness.emit).toHaveBeenCalledTimes(2);
-    expect(onEvent).toHaveBeenCalledWith({ queueId: 'queue-1', ticketNumber: 'A042' });
+    expect(onEvent).toHaveBeenCalledOnce();
+    expect(onEvent).toHaveBeenCalledWith({
+      queueId: 'queue-1',
+      reason: 'registration_called',
+    });
+  });
+
+  it('subscribes tracking to its dedicated room and event', () => {
+    const harness = createSocketHarness();
+    const onEvent = vi.fn();
+    const gateway = new QueueRealtimeGateway({
+      channel: 'tracking',
+      token: 'registration-token',
+      onEvent,
+      onReconnect: vi.fn(),
+      createSocket: () => harness.socket,
+    });
+
+    gateway.connect(['queue-1']);
+    harness.trigger('connect');
+    harness.trigger('queue_position_changed', {
+      queueId: 'queue-1',
+      reason: 'registration_called',
+    });
+
+    expect(harness.emit).toHaveBeenCalledWith('subscribe', {
+      room: 'queue:queue-1:tracking',
+    });
+    expect(onEvent).toHaveBeenCalledOnce();
+  });
+
+  it('ignores malformed events and events from unsubscribed queues', () => {
+    const harness = createSocketHarness();
+    const onEvent = vi.fn();
+    const gateway = new QueueRealtimeGateway({
+      channel: 'display',
+      token: 'jwt',
+      onEvent,
+      onReconnect: vi.fn(),
+      createSocket: () => harness.socket,
+    });
+
+    gateway.connect(['queue-1']);
+    harness.trigger('queue_display_changed', undefined);
+    harness.trigger('queue_display_changed', {
+      queueId: 'queue-1',
+      reason: 'unknown_reason',
+    });
+    harness.trigger('queue_display_changed', {
+      queueId: 'queue-2',
+      reason: 'registration_created',
+    });
+
+    expect(onEvent).not.toHaveBeenCalled();
   });
 
   it('resubscribes and requests a REST refresh after reconnecting', () => {
     const harness = createSocketHarness();
     const onReconnect = vi.fn();
     const gateway = new QueueRealtimeGateway({
-      token: 'jwt',
+      channel: 'tracking',
+      token: 'registration-token',
       onEvent: vi.fn(),
       onReconnect,
       createSocket: () => harness.socket,
@@ -71,12 +130,13 @@ describe('QueueRealtimeGateway', () => {
     harness.trigger('connect');
 
     expect(harness.emit).toHaveBeenCalledTimes(2);
-    expect(onReconnect).toHaveBeenCalledTimes(1);
+    expect(onReconnect).toHaveBeenCalledOnce();
   });
 
-  it('leaves every room and removes listeners when disconnected', () => {
+  it('leaves every room and removes the channel listeners', () => {
     const harness = createSocketHarness();
     const gateway = new QueueRealtimeGateway({
+      channel: 'display',
       token: 'jwt',
       onEvent: vi.fn(),
       onReconnect: vi.fn(),
@@ -95,7 +155,7 @@ describe('QueueRealtimeGateway', () => {
       room: 'queue:queue-2:display',
     });
     expect(harness.off).toHaveBeenCalledWith('connect', expect.any(Function));
-    expect(harness.off).toHaveBeenCalledWith('registration_called', expect.any(Function));
+    expect(harness.off).toHaveBeenCalledWith('queue_display_changed', expect.any(Function));
     expect(harness.disconnect).toHaveBeenCalledOnce();
   });
 });

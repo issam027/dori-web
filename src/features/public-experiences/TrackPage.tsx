@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Clock3, RefreshCw, TriangleAlert, XCircle } from 'lucide-react';
 import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
-import { useQueueRealtime } from '@/core/realtime/use-queue-realtime';
+import { useQueueTrackingRealtime } from '@/core/realtime/use-queue-realtime';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
 import { usePublicTracking } from './hooks/usePublicExperiences';
@@ -50,7 +50,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const called = phase === 'called';
   const completed = phase === 'completed';
 
-  useQueueRealtime({
+  useQueueTrackingRealtime({
     queueIds: position?.queueId ? [position.queueId] : [],
     token,
     onEvent: () => {

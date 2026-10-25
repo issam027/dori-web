@@ -5,7 +5,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { getAccessToken } from '@/core/auth/access-token';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
-import { useQueueRealtime } from '@/core/realtime/use-queue-realtime';
+import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
 import { queryKeys } from '@/api/client/query-keys';
 import { playChime, speakTicket } from './audio';
 import { useDisplaySnapshot } from './hooks/usePublicExperiences';
@@ -36,7 +36,7 @@ export function DisplayPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.queueSessions.byQueue(queueId) });
     });
   };
-  useQueueRealtime({
+  useQueueDisplayRealtime({
     queueIds: displayedQueueIds,
     token: getAccessToken(),
     onEvent: (event) => {
