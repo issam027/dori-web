@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
 import type { CreateRegistrationDto, CreateRegistrationResponseDto } from '@/api/generated/models';
@@ -11,7 +10,6 @@ import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice, findPersons } from '@/features/persons/public';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { refreshCockpitQueue } from './cockpit-realtime';
 import { appointmentUtcIso, isSlotAvailable, slotTime } from '@/features/appointments/public';
 import {
   KioskTicketPrintDocument,
@@ -31,7 +29,6 @@ export function QuickRegistration({
   queues: readonly QueueResponseDto[];
 }) {
   const { t: __t, i18n } = useTranslation();
-  const queryClient = useQueryClient();
   const [choice, setChoice] = useState<PersonChoice | null>(null);
   const [queueId, setQueueId] = useState(queues[0]?.queueId ?? '');
   const [tierId, setTierId] = useState('');
@@ -95,7 +92,6 @@ export function QuickRegistration({
       setResult(response.data);
       setPrintReady(false);
       setStep(3);
-      await refreshCockpitQueue(queryClient, siteId, dto.queueId);
       notify({
         tone: 'success',
         title:
