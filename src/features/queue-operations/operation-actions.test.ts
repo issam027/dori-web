@@ -68,6 +68,24 @@ it('treats an empty queue as a normal outcome and keeps local state unchanged', 
   ).toBeUndefined();
 });
 
+it('treats the new HTTP 200 empty object response as an empty queue', async () => {
+  mockServer.use(
+    http.post('http://localhost:3000/api/v1/queues/00000000-0000-4000-8000-000000000004/next', () =>
+      HttpResponse.json({
+        code: 'OK',
+        translationKey: null,
+        translationParams: {},
+        data: {},
+      }),
+    ),
+  );
+
+  await expect(callNextAndCommit('00000000-0000-4000-8000-000000000004')).resolves.toBe('empty');
+  expect(
+    useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000004'],
+  ).toBeUndefined();
+});
+
 it('keeps local state unchanged on a 409 conflict', async () => {
   mockServer.use(
     http.post('http://localhost:3000/api/v1/queues/00000000-0000-4000-8000-000000000004/next', () =>
