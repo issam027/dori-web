@@ -8,6 +8,7 @@ import type {
   RegistrationResponseDto,
 } from '@/api/generated/models';
 import {
+  queuesControllerFindAll,
   queuesControllerGetDisplay,
   queuesControllerGetStatus,
 } from '@/api/generated/queues/queues';

@@ -157,7 +157,7 @@ export function DisplayPage() {
 
   const scopeTitle =
     displayedQueueIds.length === 1
-      ? snapshots[0]?.queueName ?? __t('public-experiences.track.votreFile')
+      ? (snapshots[0]?.queueName ?? __t('public-experiences.track.votreFile'))
       : __t('public-experiences.display.filesAffichees', {
           count: displayedQueueIds.length,
         });
@@ -222,12 +222,7 @@ export function DisplayPage() {
                     <b>
                       {__t('common.guichet')} {String(call.threadNumber)}
                     </b>
-                    <span>
-                      {call.queueName ??
-                        __t('display.queueName', {
-                          value0: call.queueId,
-                        })}
-                    </span>
+                    <span>{call.queueName}</span>
                   </div>
                 </article>
               ))}
@@ -258,12 +253,7 @@ export function DisplayPage() {
                   <span>{String(index + 1).padStart(2, '0')}</span>
                   <div>
                     <strong>{item.ticket}</strong>
-                    <small>
-                      {item.queueName ??
-                        __t('display.queueName', {
-                          value0: item.queueId,
-                        })}
-                    </small>
+                    <small>{item.queueName}</small>
                   </div>
                 </li>
               ))}
