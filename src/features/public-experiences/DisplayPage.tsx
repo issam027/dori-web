@@ -23,13 +23,11 @@ export function DisplayPage() {
   const activeSiteId = useScopeStore((state) => state.activeSiteId);
   const brandName = useBrandStore((state) => state.name);
   const queryQueue = new URLSearchParams(location.search).get('queueId');
-  const { queues, allowedQueues, displays } = useDisplaySnapshot({
-    siteId: activeSiteId,
-    allowedQueueIds: user?.scope.queueIds ?? [],
-    isGlobal: user?.scope.isGlobal ?? false,
+  const { displayedQueueIds, displays } = useDisplaySnapshot({
+    queueIds: user?.scope.queueIds ?? [],
     selectedQueueId: queryQueue || undefined,
+    enabled: Boolean(activeSiteId),
   });
-  const displayedQueueIds = allowedQueues.map((queue) => queue.queueId);
   const refreshQueues = (queueIds: readonly string[]) => {
     queueIds.forEach((queueId) => {
       void queryClient.invalidateQueries({
@@ -142,7 +140,7 @@ export function DisplayPage() {
     };
   }, [__t, audio, current]);
 
-  if (!queues.isPending && activeSiteId && allowedQueues.length === 0)
+  if (activeSiteId && displayedQueueIds.length === 0)
     return (
       <section className="display-screen display-empty-state">
         <h1>{__t('common.aucuneFileConfiguree')}</h1>
@@ -158,10 +156,10 @@ export function DisplayPage() {
     );
 
   const scopeTitle =
-    allowedQueues.length === 1
-      ? allowedQueues[0]?.queueName
+    displayedQueueIds.length === 1
+      ? snapshots[0]?.queueName ?? __t('public-experiences.track.votreFile')
       : __t('public-experiences.display.filesAffichees', {
-          count: allowedQueues.length,
+          count: displayedQueueIds.length,
         });
   const displayBrandName =
     !brandName || brandName.trim().toUpperCase() === 'DORIFY' ? __t('app.name') : brandName;

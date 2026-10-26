@@ -3504,20 +3504,10 @@
                     ]
                 },
                 "summary": "Flux d'affichage pour écran (Display)",
-                "description": "Retourne les tickets en cours d'appel et le journal récent des appels pour les écrans de salle d'attente.",
+                "description": "Retourne l'identifiant et le nom de la file, les tickets actuellement appelés et les prochains tickets à afficher dans la salle d'attente.",
                 "parameters": [
                     {
                         "name": "queueId",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        },
-                        "description": "Identifiant de la file."
-                    },
-                    {
-                        "name": "",
                         "required": true,
                         "in": "path",
                         "description": "ID de la file",
@@ -15523,110 +15513,6 @@
                 ]
             }
         },
-        "/api/internal/cron/realtime-outbox": {
-            "get": {
-                "operationId": "CronController_realtimeOutboxCron",
-                "summary": "Publier les événements temps réel en attente",
-                "parameters": [
-                    {
-                        "name": "authorization",
-                        "required": true,
-                        "in": "header",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Valeur du paramètre « authorization »."
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Outbox temps réel traitée",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "example": "OK",
-                                            "description": "Code applicatif du résultat"
-                                        },
-                                        "translationKey": {
-                                            "type": "string",
-                                            "nullable": true,
-                                            "example": null,
-                                            "description": "Clé de traduction du message (null si aucun message)"
-                                        },
-                                        "translationParams": {
-                                            "type": "object",
-                                            "additionalProperties": true,
-                                            "example": {},
-                                            "description": "Paramètres de traduction"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "translationKey",
-                                        "translationParams",
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Données invalides (validation échouée)",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié — token manquant ou expiré",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "429": {
-                        "description": "Trop de requêtes — limite de débit atteinte",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne sans exposition de détails techniques",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponseDto"
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "ScheduledTasks"
-                ],
-                "security": [
-                    {
-                        "cron-secret": []
-                    }
-                ]
-            }
-        },
         "/api/v1/monitoring/health": {
             "get": {
                 "operationId": "MonitoringController_health",
@@ -18356,6 +18242,7 @@
                 },
                 "required": [
                     "queueId",
+                    "queueName",
                     "activeThreads",
                     "nextTickets"
                 ]

@@ -8,7 +8,6 @@ import type {
   RegistrationResponseDto,
 } from '@/api/generated/models';
 import {
-  queuesControllerFindAll,
   queuesControllerGetDisplay,
   queuesControllerGetStatus,
 } from '@/api/generated/queues/queues';
@@ -64,37 +63,31 @@ export function usePublicTracking(token: string) {
   return { gateway, position, setPosition, error, setError };
 }
 
+export function resolveDisplayQueueIds(
+  queueIds: readonly string[],
+  selectedQueueId?: string,
+): string[] {
+  const scopedQueueIds = [...new Set(queueIds)];
+  if (!selectedQueueId) return scopedQueueIds;
+  return scopedQueueIds.includes(selectedQueueId) ? [selectedQueueId] : [];
+}
+
 export function useDisplaySnapshot(options: {
-  siteId: string | null;
-  allowedQueueIds: readonly string[];
-  isGlobal: boolean;
+  queueIds: readonly string[];
   selectedQueueId?: string;
+  enabled: boolean;
 }) {
-  const queues = useQuery({
-    queryKey: queryKeys.publicExperience.displayQueues(options.siteId),
-    enabled: Boolean(options.siteId),
-    queryFn: ({ signal }) =>
-      queuesControllerFindAll(
-        { siteId: options.siteId ?? undefined, isActive: true, page: 1, pageSize: 100 },
-        undefined,
-        signal,
-      ),
-  });
-  const allowedQueues =
-    queues.data?.data.items.filter(
-      (queue) =>
-        (options.isGlobal || options.allowedQueueIds.includes(queue.queueId)) &&
-        (!options.selectedQueueId || queue.queueId === options.selectedQueueId),
-    ) ?? [];
+  const displayedQueueIds = resolveDisplayQueueIds(options.queueIds, options.selectedQueueId);
   const displays = useQueries({
-    queries: allowedQueues.map((queue) => ({
-      queryKey: queryKeys.publicExperience.displaySnapshot(queue.queueId),
+    queries: displayedQueueIds.map((queueId) => ({
+      queryKey: queryKeys.publicExperience.displaySnapshot(queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        queuesControllerGetDisplay(queue.queueId, undefined, signal),
+        queuesControllerGetDisplay(queueId, undefined, signal),
+      enabled: options.enabled,
       refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
   });
-  return { queues, allowedQueues, displays };
+  return { displayedQueueIds, displays };
 }
 
 export function useKioskCatalog(

@@ -164,7 +164,6 @@ export const queryKeys = {
     kioskTiers: (queueId: string | undefined) => ['kiosk', 'tiers', queueId] as const,
     kioskTierRules: (queueId: string, tierId: string) =>
       ['kiosk', 'tier-rules', queueId, tierId] as const,
-    displayQueues: (siteId: string | null) => ['display', 'queues', siteId] as const,
     displaySnapshot: (queueId: string) => ['display', 'snapshot', queueId] as const,
   },
 } as const;
