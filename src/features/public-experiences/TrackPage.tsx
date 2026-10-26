@@ -4,6 +4,8 @@ import { CheckCircle2, Clock3, RefreshCw, TriangleAlert, XCircle } from 'lucide-
 import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useQueueTrackingRealtime } from '@/core/realtime/use-queue-realtime';
+import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
+import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 import { playChime } from './audio';
 import { consumeOrRestoreOpaqueToken, trackingProgress } from './privacy';
 import { usePublicTracking } from './hooks/usePublicExperiences';
@@ -50,7 +52,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const called = phase === 'called';
   const completed = phase === 'completed';
 
-  useQueueTrackingRealtime({
+  const realtimeHealth = useQueueTrackingRealtime({
     queueIds: position?.queueId ? [position.queueId] : [],
     registrationToken: token,
     onEvent: () => {
@@ -59,6 +61,12 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     onReconnect: () => {
       void gateway?.refresh().catch(() => undefined);
     },
+  });
+
+  useDegradedRealtimeRefresh({
+    health: realtimeHealth,
+    enabled: Boolean(gateway) && !completed,
+    refresh: () => gateway?.refresh().catch(() => undefined),
   });
 
   useEffect(() => {
@@ -204,11 +212,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
             <header>
               <div className="tracking-brand-row">
                 <span className="tracking-brand">{__t('app.name')}</span>
-                {!completed ? (
-                  <span className="tracking-live">
-                    <i aria-hidden="true" /> {__t('common.enDirect')}
-                  </span>
-                ) : null}
+                {!completed ? <RealtimeConnectionIndicator health={realtimeHealth} /> : null}
               </div>
               <span>{__t('public-experiences.track.votreTicket')}</span>
               <strong>{position?.ticketNumber ?? '—'}</strong>

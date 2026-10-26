@@ -2711,6 +2711,40 @@
   background: var(--ci);
 }
 
+.realtime-connection-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.realtime-connection-indicator i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.realtime-connection-indicator.is-active {
+  color: var(--ci);
+}
+
+.realtime-connection-indicator.is-connecting {
+  color: var(--b);
+}
+
+.realtime-connection-indicator.is-degraded {
+  color: var(--ch);
+}
+
 .tracking-gauge {
   width: 195px;
   margin: 0.4rem auto;

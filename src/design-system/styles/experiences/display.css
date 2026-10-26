@@ -106,6 +106,15 @@
   font-size: clamp(2rem, 4vw, 5rem);
   font-variant-numeric: tabular-nums;
 }
+.display-realtime-status {
+  display: grid;
+  justify-items: end;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+.display-realtime-status time {
+  margin-inline-start: 0;
+}
 .display-audio {
   min-height: 48px;
   border: 1px solid var(--ey);

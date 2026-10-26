@@ -128,6 +128,9 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'tracking.counterPending': 'Counter being assigned',
   'tracking.refresh': 'Refresh',
   'tracking.refreshing': 'Refreshing…',
+  'realtime.connection.active': 'Live connection active',
+  'realtime.connection.connecting': 'Connecting to live updates…',
+  'realtime.connection.degraded': 'Degraded mode · refreshing every 30s',
   'tracking.waiting.far.text':
     'You can wait comfortably. We will let you know as your turn approaches.',
   'tracking.waiting.far.title': 'Your turn is still a little way off',

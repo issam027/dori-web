@@ -6,6 +6,8 @@ import { getAccessToken } from '@/core/auth/access-token';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
+import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
+import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 import { queryKeys } from '@/api/client/query-keys';
 import { playChime, speakTicket } from './audio';
 import { useDisplaySnapshot } from './hooks/usePublicExperiences';
@@ -35,7 +37,7 @@ export function DisplayPage() {
       });
     });
   };
-  useQueueDisplayRealtime({
+  const realtimeHealth = useQueueDisplayRealtime({
     queueIds: displayedQueueIds,
     getToken: getAccessToken,
     onEvent: (event) => {
@@ -47,6 +49,13 @@ export function DisplayPage() {
     },
     onReconnect: (queueId) => {
       refreshQueues([queueId]);
+    },
+  });
+  useDegradedRealtimeRefresh({
+    health: realtimeHealth,
+    enabled: displayedQueueIds.length > 0,
+    refresh: () => {
+      refreshQueues(displayedQueueIds);
     },
   });
   const snapshots = displays.flatMap((query) => (query.data ? [query.data.data] : []));
@@ -165,7 +174,10 @@ export function DisplayPage() {
           <span>{__t('public-experiences.display.accueilEtOrientationBsalw')}</span>
           <h1>{scopeTitle}</h1>
         </div>
-        <time>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+        <div className="display-realtime-status">
+          <RealtimeConnectionIndicator health={realtimeHealth} />
+          <time>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+        </div>
         <Button
           variant="unstyled"
           type="button"

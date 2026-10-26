@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useQueueDisplayRealtime, useQueueTrackingRealtime } from './use-queue-realtime';
 
 const gatewayMocks = vi.hoisted(() => ({
@@ -8,6 +8,7 @@ const gatewayMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('./queue-realtime-gateway', () => ({
+  realtimeHeartbeatTimeoutMs: 35_000,
   QueueRealtimeGateway: class {
     connect = gatewayMocks.connect;
     disconnect = gatewayMocks.disconnect;
@@ -23,6 +24,10 @@ describe('queue realtime hooks', () => {
     gatewayMocks.construct.mockClear();
     gatewayMocks.connect.mockClear();
     gatewayMocks.disconnect.mockClear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('disconnects tracking when an active registration no longer exposes a queue', () => {
@@ -77,5 +82,37 @@ describe('queue realtime hooks', () => {
 
     expect(gatewayMocks.construct).toHaveBeenCalledOnce();
     expect(gatewayMocks.disconnect).not.toHaveBeenCalled();
+  });
+
+  it('becomes active on heartbeat then degraded when heartbeats stop', () => {
+    vi.useFakeTimers();
+    const getToken = () => 'display-jwt';
+    const { result } = renderHook(() =>
+      useQueueDisplayRealtime({
+        queueIds: ['queue-1'],
+        getToken,
+        onEvent: vi.fn(),
+        onReconnect: vi.fn(),
+      }),
+    );
+    const displayOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
+      onHeartbeat: (queueId: string) => void;
+    };
+
+    expect(result.current).toBe('connecting');
+    act(() => {
+      displayOptions.onHeartbeat('queue-1');
+    });
+    expect(result.current).toBe('active');
+
+    act(() => {
+      vi.advanceTimersByTime(40_000);
+    });
+    expect(result.current).toBe('degraded');
+
+    act(() => {
+      displayOptions.onHeartbeat('queue-1');
+    });
+    expect(result.current).toBe('active');
   });
 });

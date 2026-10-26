@@ -6,11 +6,18 @@ import {
 
 export type QueueRealtimeChannel = 'display' | 'tracking';
 export type QueueRealtimeStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed' | 'closed';
+export type QueueRealtimeHealth = 'connecting' | 'active' | 'degraded';
+export const realtimeHeartbeatTimeoutMs = 35_000;
+export const realtimeDegradedRefreshIntervalMs = 30_000;
 
 export interface QueueDisplayChangedEvent {
   queueId: string;
   reason:
-    'registration_created' | 'registration_called' | 'registration_served' | 'registration_no_show';
+    | 'registration_created'
+    | 'appointment_checked_in'
+    | 'registration_called'
+    | 'registration_served'
+    | 'registration_no_show';
   timestamp: string;
 }
 
@@ -32,6 +39,7 @@ interface QueueRealtimeGatewayOptions<TChannel extends QueueRealtimeChannel> {
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: (queueId: string) => void;
   onStatusChange?: (queueId: string, status: QueueRealtimeStatus) => void;
+  onHeartbeat?: (queueId: string) => void;
   onError?: (queueId: string, error: unknown) => void;
   eventStream?: EventStream;
   fetch?: typeof fetch;
@@ -42,6 +50,7 @@ const channelContracts = {
     event: 'queue_display_changed',
     reasons: new Set([
       'registration_created',
+      'appointment_checked_in',
       'registration_called',
       'registration_served',
       'registration_no_show',
@@ -155,8 +164,21 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
         throw new Error(`SSE request failed with status ${String(response.status)}`);
       },
       onmessage: (message) => {
+        if (message.event === 'heartbeat') {
+          this.options.onHeartbeat?.(queueId);
+          return;
+        }
         const event = parseQueueEvent(message, this.options.channel, queueId);
-        if (event) this.options.onEvent(event as QueueRealtimeEvent<TChannel>);
+        if (event) {
+          this.options.onEvent(event as QueueRealtimeEvent<TChannel>);
+          return;
+        }
+        if (message.event === channelContracts[this.options.channel].event) {
+          this.options.onError?.(
+            queueId,
+            new Error(`Invalid ${message.event} payload received from the SSE stream`),
+          );
+        }
       },
       onclose: () => {
         throw new Error('SSE connection closed');

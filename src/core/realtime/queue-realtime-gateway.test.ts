@@ -101,11 +101,13 @@ describe('QueueRealtimeGateway', () => {
   it('filters malformed, unrelated and unsupported display events', () => {
     const harness = createEventStreamHarness();
     const onEvent = vi.fn();
+    const onError = vi.fn();
     const gateway = new QueueRealtimeGateway({
       channel: 'display',
       getCredential: () => 'jwt',
       onEvent,
       onReconnect: vi.fn(),
+      onError,
       eventStream: harness.eventStream,
     });
     gateway.connect(['queue-1']);
@@ -135,6 +137,58 @@ describe('QueueRealtimeGateway', () => {
     });
 
     expect(onEvent).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledTimes(2);
+  });
+
+  it('accepts appointment check-in display events emitted by the API', () => {
+    const harness = createEventStreamHarness();
+    const onEvent = vi.fn();
+    const gateway = new QueueRealtimeGateway({
+      channel: 'display',
+      getCredential: () => 'jwt',
+      onEvent,
+      onReconnect: vi.fn(),
+      eventStream: harness.eventStream,
+    });
+    gateway.connect(['queue-1']);
+
+    harness.requests[0]?.options.onmessage?.({
+      event: 'queue_display_changed',
+      data: JSON.stringify({
+        queueId: 'queue-1',
+        reason: 'appointment_checked_in',
+        timestamp: '2026-10-25T14:00:00.000Z',
+      }),
+      id: 'event-1',
+      retry: 3000,
+    });
+
+    expect(onEvent).toHaveBeenCalledOnce();
+  });
+
+  it('reports heartbeats without treating them as business events', () => {
+    const harness = createEventStreamHarness();
+    const onEvent = vi.fn();
+    const onHeartbeat = vi.fn();
+    const gateway = new QueueRealtimeGateway({
+      channel: 'display',
+      getCredential: () => 'jwt',
+      onEvent,
+      onReconnect: vi.fn(),
+      onHeartbeat,
+      eventStream: harness.eventStream,
+    });
+    gateway.connect(['queue-1']);
+
+    harness.requests[0]?.options.onmessage?.({
+      event: 'heartbeat',
+      data: JSON.stringify({ timestamp: '2026-10-25T14:00:00.000Z' }),
+      id: '',
+      retry: undefined,
+    });
+
+    expect(onHeartbeat).toHaveBeenCalledWith('queue-1');
+    expect(onEvent).not.toHaveBeenCalled();
   });
 
   it('refreshes the affected queue immediately after every reconnection', async () => {
