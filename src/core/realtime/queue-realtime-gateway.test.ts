@@ -52,6 +52,7 @@ describe('QueueRealtimeGateway', () => {
       'Bearer refreshed-jwt-token',
     );
     expect(new Headers(request?.headers).get('Accept')).toBe('text/event-stream');
+    expect(new Headers(request?.headers).get('last-event-id')).toBe('');
     expect(request?.openWhenHidden).toBe(true);
   });
 
@@ -89,6 +90,7 @@ describe('QueueRealtimeGateway', () => {
     expect(new Headers(requestFetch.mock.calls[0]?.[1]?.headers).get('X-Registration-Token')).toBe(
       'tracking-token',
     );
+    expect(new Headers(requestFetch.mock.calls[0]?.[1]?.headers).get('last-event-id')).toBe('');
     expect(onEvent).toHaveBeenCalledOnce();
     expect(onEvent).toHaveBeenCalledWith({
       queueId: 'queue-1',

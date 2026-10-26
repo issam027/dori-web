@@ -9980,6 +9980,15 @@
                             "format": "uuid",
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "last-event-id",
+                        "required": true,
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « last-event-id »."
                     }
                 ],
                 "responses": {
@@ -10081,6 +10090,15 @@
                             "type": "string",
                             "format": "uuid"
                         }
+                    },
+                    {
+                        "name": "last-event-id",
+                        "required": true,
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « last-event-id »."
                     }
                 ],
                 "responses": {
@@ -15419,6 +15437,110 @@
                 "responses": {
                     "200": {
                         "description": "Actualisation des estimations d'attente exécutée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "OK",
+                                            "description": "Code applicatif du résultat"
+                                        },
+                                        "translationKey": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "example": null,
+                                            "description": "Clé de traduction du message (null si aucun message)"
+                                        },
+                                        "translationParams": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "example": {},
+                                            "description": "Paramètres de traduction"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/CronExecutionResponseDto"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "translationKey",
+                                        "translationParams",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides (validation échouée)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — token manquant ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de requêtes — limite de débit atteinte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne sans exposition de détails techniques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseDto"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "ScheduledTasks"
+                ],
+                "security": [
+                    {
+                        "cron-secret": []
+                    }
+                ]
+            }
+        },
+        "/api/internal/cron/realtime-outbox": {
+            "get": {
+                "operationId": "CronController_realtimeOutboxCron",
+                "summary": "Publier les événements temps réel en attente",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "required": true,
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Valeur du paramètre « authorization »."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Outbox temps réel traitée",
                         "content": {
                             "application/json": {
                                 "schema": {

@@ -126,7 +126,7 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
     void eventStream(queueRealtimeUrl(queueId, this.options.channel), {
       signal: controller.signal,
       openWhenHidden: true,
-      headers: { Accept: 'text/event-stream' },
+      headers: { Accept: 'text/event-stream', 'last-event-id': '' },
       fetch: (input, init) => {
         const headers = new Headers(init?.headers);
         const credential = this.options.getCredential();
