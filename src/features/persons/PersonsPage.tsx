@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   CalendarDays,
   Eye,
@@ -31,7 +31,8 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
-import { createPerson, deletePerson, findPersons, updatePerson } from './api/persons-api';
+import { createPerson, deletePerson, updatePerson } from './api/persons-api';
+import { useAdminPersons } from './hooks/usePersons';
 import { PersonFormModal } from './PersonFormModal';
 import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
 import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
@@ -42,8 +43,6 @@ import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { PersonMobileCard } from './PersonMobileCard';
-
-const PAGE_SIZE = 10;
 
 export function PersonsPage() {
   const { t, i18n } = useTranslation();
@@ -66,24 +65,7 @@ export function PersonsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
-  const persons = useQuery({
-    queryKey: queryKeys.persons.adminSearch(siteId, search, page, PAGE_SIZE, { status, sort }),
-    queryFn: ({ signal }) => {
-      if (!siteId) throw new Error('An active site is required');
-      return findPersons(
-        {
-          siteId,
-          page,
-          pageSize: PAGE_SIZE,
-          sort,
-          isActive: status === 'all' ? undefined : status === 'active',
-          search: search || undefined,
-        },
-        signal,
-      );
-    },
-    enabled: Boolean(siteId),
-  });
+  const persons = useAdminPersons({ siteId, search, page, status, sort });
   const items = persons.data?.data.items ?? [];
   const totalPages = Math.max(1, persons.data?.data.totalPages ?? 1);
   const total = persons.data?.data.total ?? 0;

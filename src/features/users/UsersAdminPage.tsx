@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   KeyRound,
   Eye,
@@ -15,11 +15,7 @@ import {
   UserX,
   Trash2,
 } from 'lucide-react';
-import type {
-  UserResponseDto,
-  UserSummaryItemDto,
-  UsersControllerFindUsersParams,
-} from '@/api/generated/models';
+import type { UserResponseDto, UserSummaryItemDto } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -32,24 +28,22 @@ import { hasAnyPermission } from '@/core/permissions/permissions';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
-import { useSettingsData } from '@/features/onboarding/hooks/useSettingsData';
+import { useSettingsData } from '@/features/onboarding/public';
 import { queryKeys } from '@/api/client/query-keys';
 import {
   deleteUser,
-  findUserById,
-  findUsers,
   logoutUserSessions,
   setUserPassword,
   updateUser,
   updateUserStatus,
-} from '@/features/onboarding/api/onboarding-api';
+} from '@/features/onboarding/public';
+import { useAdminUserDetail, useAdminUsers } from './hooks/useAdminUsers';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { UserMobileCard } from './UserMobileCard';
 import { userPasswordResetDto } from './user-password-reset';
 
-const PAGE_SIZE = 10;
 export function UsersAdminPage() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
@@ -91,31 +85,8 @@ export function UsersAdminPage() {
       document.removeEventListener('pointerdown', close);
     };
   }, [openActionsUserId]);
-  const users = useQuery({
-    queryKey: queryKeys.admin.usersPage(page, effectiveFilters),
-    queryFn: ({ signal }) =>
-      findUsers(
-        {
-          page,
-          pageSize: PAGE_SIZE,
-          sort: effectiveFilters.sort as UsersControllerFindUsersParams['sort'],
-          siteIds:
-            current && !current.scope.isGlobal && current.scope.siteIds.length
-              ? current.scope.siteIds.join(',')
-              : undefined,
-          search: effectiveFilters.search || undefined,
-          userType: (effectiveFilters.userType ||
-            undefined) as UsersControllerFindUsersParams['userType'],
-        },
-        undefined,
-        signal,
-      ),
-  });
-  const userDetail = useQuery({
-    queryKey: queryKeys.admin.userDetail(viewingId),
-    queryFn: ({ signal }) => findUserById(viewingId ?? '', undefined, signal),
-    enabled: Boolean(viewingId),
-  });
+  const users = useAdminUsers(page, effectiveFilters, current);
+  const userDetail = useAdminUserDetail(viewingId);
   const items = users.data?.data.items ?? [];
   const totalPages = Math.max(1, users.data?.data.totalPages ?? 1);
   const rank = Math.max(

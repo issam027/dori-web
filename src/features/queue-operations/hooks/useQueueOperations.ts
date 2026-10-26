@@ -18,7 +18,11 @@ import {
   registrationsControllerFindRegistrations,
 } from '@/api/generated/registrations/registrations';
 import { queryKeys } from '@/api/client/query-keys';
-import { invalidateQueueOperations } from '@/api/client/query-invalidations';
+import {
+  invalidateQueueCall,
+  invalidateQueueSession,
+  invalidateRegistrationOutcome,
+} from '@/api/client/query-invalidations';
 import { callNextAndCommit } from '../operation-actions';
 import { useBusinessMutation } from '@/api/client/use-business-mutation';
 import { realtimeSafetyRefreshIntervalMs } from '@/core/realtime/realtime-gateway';
@@ -131,40 +135,58 @@ export function useDeskSession(
   return { previews, sessions, threads };
 }
 
-function useQueueCommand<TVariables>(mutationFn: (variables: TVariables) => Promise<unknown>) {
-  const queryClient = useQueryClient();
+function useQueueCommand<TVariables>(
+  mutationFn: (variables: TVariables) => Promise<unknown>,
+  invalidate: (variables: TVariables) => Promise<unknown>,
+) {
   return useBusinessMutation({
     mutationFn,
     expectedErrorStatuses: [404, 409, 422],
-    invalidate: () => invalidateQueueOperations(queryClient),
-    invalidateOnConflict: () => invalidateQueueOperations(queryClient),
+    invalidate: (_data, variables) => invalidate(variables),
+    invalidateOnConflict: (_error, variables) => invalidate(variables),
   });
 }
 
-export function useCallNext() {
-  return useQueueCommand((queueId: string) => callNextAndCommit(queueId));
+export function useCallNext(siteId?: string | null) {
+  const queryClient = useQueryClient();
+  return useQueueCommand(
+    (queueId: string) => callNextAndCommit(queueId),
+    (queueId) => invalidateQueueCall(queryClient, queueId, siteId),
+  );
 }
 
 export function useMarkServed() {
-  return useQueueCommand((registrationId: string) =>
-    queueEngineControllerMarkServed(registrationId),
+  const queryClient = useQueryClient();
+  return useQueueCommand(
+    (options: { registrationId: string; queueId: string; siteId?: string | null }) =>
+      queueEngineControllerMarkServed(options.registrationId),
+    (options) => invalidateRegistrationOutcome(queryClient, options),
   );
 }
 
 export function useMarkNoShow() {
-  return useQueueCommand((registrationId: string) =>
-    queueEngineControllerMarkNoShow(registrationId),
+  const queryClient = useQueryClient();
+  return useQueueCommand(
+    (options: { registrationId: string; queueId: string; siteId?: string | null }) =>
+      queueEngineControllerMarkNoShow(options.registrationId),
+    (options) => invalidateRegistrationOutcome(queryClient, options),
   );
 }
 
 export function useOpenDeskSession() {
-  return useQueueCommand(({ queueId, dto }: { queueId: string; dto: OpenQueueSessionDto }) =>
-    queueEngineControllerOpenSession(queueId, dto),
+  const queryClient = useQueryClient();
+  return useQueueCommand(
+    ({ queueId, dto }: { queueId: string; dto: OpenQueueSessionDto }) =>
+      queueEngineControllerOpenSession(queueId, dto),
+    ({ queueId }) => invalidateQueueSession(queryClient, queueId),
   );
 }
 
 export function useCloseDeskSession() {
-  return useQueueCommand(({ queueId, sessionId }: { queueId: string; sessionId: string }) =>
-    queueEngineControllerCloseSession(queueId, sessionId),
+  const queryClient = useQueryClient();
+  return useQueueCommand(
+    ({ queueId, sessionId }: { queueId: string; sessionId: string }) =>
+      queueEngineControllerCloseSession(queueId, sessionId),
+    ({ queueId }) => invalidateQueueSession(queryClient, queueId),
   );
 }

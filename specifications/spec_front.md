@@ -1,5 +1,7 @@
 # Spécification Fonctionnelle & Technique Détaillée du Front-End (SFD Front) — DORI SaaS
 
+> **Statut temps réel (2026-10-26)** : les sections Socket.IO/WebSocket sont historiques. Le contrat actif utilise exclusivement les endpoints SSE `/api/v1/realtime/queues/{queueId}/display` et `/api/v1/realtime/queues/{queueId}/tracking`, puis recharge les snapshots REST.
+
 > **Projet** : Plateforme Front-End DORI (Solution SaaS Internationale de Gestion des Files d'Attente & d'Accueil Patient)  
 > **Type de Solution** : SaaS Multi-Sites, Multi-Pays, Multi-Devises  
 > **API de Référence** : DORI-API v1.0.0 (NestJS 10 / PostgreSQL 15+ / WebSockets / TypeORM natif)  

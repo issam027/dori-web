@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { changePassword } from './api/password-api';
 import { hydrateSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
-import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
+import { findFirstAuthorizedPath } from '@/app/protected-routes';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { PageHeader } from '@/design-system/components/PageHeader';

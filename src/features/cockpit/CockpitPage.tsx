@@ -9,10 +9,9 @@ import { FormField } from '@/design-system/components/FormField';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { invalidateQueueOperations } from '@/api/client/query-invalidations';
-import { PersonNotesViewer } from '@/features/notes/PersonNotesViewer';
-import { useSite } from '@/features/portfolio/hooks/useSites';
-import { useQueues, useQueueStatuses } from '@/features/queues/hooks/useQueues';
+import { PersonNotesViewer } from '@/features/notes/public';
+import { useSite } from '@/features/portfolio/public';
+import { useQueues, useQueueStatuses } from '@/features/queues/public';
 import { QuickRegistration } from './QuickRegistration';
 import { useOperationStore } from '@/shared/queue-operations/operation-store';
 import {
@@ -23,7 +22,7 @@ import {
   useMarkServed,
   useOpenDeskSession,
   useOperatorRegistrations,
-} from '@/features/queue-operations/hooks/useQueueOperations';
+} from '@/features/queue-operations/public';
 import { EligiblePreviewCard, QueueDeskCard } from './components/CockpitCards';
 import { CockpitPassages } from './components/CockpitPassages';
 import { Button } from '@/design-system/components/Button';
@@ -73,7 +72,7 @@ export function CockpitPage() {
   const servedHistory = useOperatorRegistrations(user?.userId, 'served', siteId, 10);
   const noShowHistory = useOperatorRegistrations(user?.userId, 'no_show', siteId, 10);
   const registrationHistory = historyStatus === 'served' ? servedHistory : noShowHistory;
-  const callNext = useCallNext();
+  const callNext = useCallNext(siteId);
   const markServed = useMarkServed();
   const markNoShow = useMarkNoShow();
   const openSession = useOpenDeskSession();
@@ -114,7 +113,6 @@ export function CockpitPage() {
     }
   }, [activeCalls, currentRegistrations.data, sessions]);
 
-  const refresh = () => invalidateQueueOperations(queryClient);
   const execute = async (queueId: string, command: () => Promise<void>) => {
     setPendingQueueIds((current) => new Set(current).add(queueId));
     setError('');
@@ -127,7 +125,7 @@ export function CockpitPage() {
           ? t('states.conflict')
           : t('errors.actionImpossible'),
       );
-      await refresh();
+      await refreshCockpitQueue(queryClient, siteId, queueId, true);
     } finally {
       setPendingQueueIds((current) => {
         const next = new Set(current);
@@ -145,8 +143,9 @@ export function CockpitPage() {
     const call = activeCalls[queueId];
     if (!call) return;
     void execute(queueId, async () => {
-      if (outcome === 'served') await markServed.execute(call.registrationId);
-      else await markNoShow.execute(call.registrationId);
+      const operation = { registrationId: call.registrationId, queueId, siteId };
+      if (outcome === 'served') await markServed.execute(operation);
+      else await markNoShow.execute(operation);
       useOperationStore.getState().closeCall(queueId);
       useOperationStore.getState().addPassage({
         registrationId: call.registrationId,

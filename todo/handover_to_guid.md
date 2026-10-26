@@ -1,5 +1,7 @@
 # Handover — migration de tous les identifiants métier de `number` vers GUID
 
+> **Temps réel** : les références WebSocket sont historiques. Le contrat implémenté est SSE avec reconnexion et resynchronisation REST.
+
 ## 1. Objectif et règle de migration
 
 Ce document est le plan d'exécution de la migration du front Dori Web lorsque tous les identifiants métier exposés par l'API passent d'entiers à des GUID.

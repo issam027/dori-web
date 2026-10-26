@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { Check, Languages, Pencil, Plus, Save, Search, Trash2 } from 'lucide-react';
-import type {
-  CreateTranslationDto,
-  TranslationResponseDto,
-  TranslationsControllerFindTranslationsParams,
-} from '@/api/generated/models';
+import type { CreateTranslationDto, TranslationResponseDto } from '@/api/generated/models';
 import { CreateTranslationDtoCategory } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
@@ -17,17 +13,12 @@ import { notify } from '@/core/notifications/notification-store';
 import { loadTranslationBundle } from '@/core/i18n/i18n';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { queryKeys } from '@/api/client/query-keys';
-import {
-  createTranslation,
-  deleteTranslation,
-  findTranslations,
-  updateTranslation,
-} from './api/translations-api';
+import { createTranslation, deleteTranslation, updateTranslation } from './api/translations-api';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { TranslationMobileCard } from './TranslationMobileCard';
+import { useAdminTranslations } from './hooks/useAdminTranslations';
 
-const PAGE_SIZE = 10;
 const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
 type Form = {
   key: string;
@@ -62,23 +53,7 @@ export function TranslationsAdminPage() {
   const effectiveFilters = { ...filters, key: debouncedKey };
   const categoryLabel = (category: CreateTranslationDto['category']) =>
     t(`admin.translations.categories.${category}`);
-  const translations = useQuery({
-    queryKey: queryKeys.admin.translationsPage(page, effectiveFilters),
-    queryFn: ({ signal }) =>
-      findTranslations(
-        {
-          page,
-          pageSize: PAGE_SIZE,
-          sort: 'translationKey:asc',
-          key: effectiveFilters.key || undefined,
-          category: (effectiveFilters.category ||
-            undefined) as TranslationsControllerFindTranslationsParams['category'],
-          locale: effectiveFilters.locale || undefined,
-        },
-        undefined,
-        signal,
-      ),
-  });
+  const translations = useAdminTranslations(page, effectiveFilters);
   const items = translations.data?.data.items ?? [];
   const totalPages = Math.max(1, translations.data?.data.totalPages ?? 1);
   const showCreate = () => {

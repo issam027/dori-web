@@ -1,35 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
 import type { CreateRegistrationDto, CreateRegistrationResponseDto } from '@/api/generated/models';
-import {
-  findSite,
-  getAvailability,
-  getQueueTiers,
-  registerPerson,
-} from './api/quick-registration-api';
+import { registerPerson } from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { Modal } from '@/design-system/components/Modal';
-import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
+import { PersonPickerOrCreate, type PersonChoice, findPersons } from '@/features/persons/public';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
-import { queryKeys } from '@/api/client/query-keys';
 import { refreshCockpitQueue } from './cockpit-realtime';
+import { appointmentUtcIso, isSlotAvailable, slotTime } from '@/features/appointments/public';
 import {
-  appointmentUtcIso,
-  isSlotAvailable,
-  slotTime,
-} from '@/features/appointments/appointment-rules';
-import { TrackingQr } from '@/features/public-experiences/TrackingQr';
-import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
-import { findPersons } from '@/features/persons/api/persons-api';
+  KioskTicketPrintDocument,
+  TrackingQr,
+  trackingUrlFromToken,
+} from '@/features/public-experiences/public';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
-import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
 import { Button } from '@/design-system/components/Button';
 import { printDocument } from '@/shared/printing/print-document';
+import { useQuickRegistrationData } from './hooks/useQuickRegistrationData';
 
 export function QuickRegistration({
   siteId,
@@ -53,27 +45,13 @@ export function QuickRegistration({
   const submissionInFlight = useRef(false);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const tiers = useQuery({
-    queryKey: queryKeys.tiers.byQueue(queueId || undefined),
-    queryFn: ({ signal }) =>
-      getQueueTiers(
-        queueId,
-        { page: 1, pageSize: 100, sort: 'displayOrder:asc' },
-        undefined,
-        signal,
-      ),
-    enabled: Boolean(queueId),
-  });
+  const { tiers, site, availability } = useQuickRegistrationData(
+    siteId,
+    queueId,
+    appointmentDate,
+    entryType === 'appointment',
+  );
   const activeTiers = tiers.data?.data.items.filter((item) => item.isActive) ?? [];
-  const site = useQuery({
-    queryKey: queryKeys.sites.detail(siteId),
-    queryFn: () => findSite(siteId),
-  });
-  const availability = useQuery({
-    queryKey: queryKeys.availability(queueId, appointmentDate),
-    queryFn: () => getAvailability(queueId, { dateFrom: appointmentDate, dateTo: appointmentDate }),
-    enabled: entryType === 'appointment' && Boolean(queueId) && Boolean(appointmentDate),
-  });
   const serviceTimeZone = availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
   const availableSlots = availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
   const submit = async () => {

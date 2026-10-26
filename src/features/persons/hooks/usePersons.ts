@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { findPerson, findPersons } from '../api/persons-api';
+import type { PersonsControllerFindPersonsSort } from '@/api/generated/models';
 
 export function usePersonsSearch(options: {
   siteId: string | null;
@@ -25,6 +26,36 @@ export function usePersonsSearch(options: {
       return findPersons({ siteId: options.siteId, search, page: options.page, pageSize }, signal);
     },
     enabled: options.enabled !== false && options.siteId !== null && search.length >= 3,
+  });
+}
+
+export function useAdminPersons(options: {
+  siteId: string | null;
+  search: string;
+  page: number;
+  status: 'all' | 'active' | 'inactive';
+  sort: PersonsControllerFindPersonsSort;
+}) {
+  return useQuery({
+    queryKey: queryKeys.persons.adminSearch(options.siteId, options.search, options.page, 10, {
+      status: options.status,
+      sort: options.sort,
+    }),
+    queryFn: ({ signal }) => {
+      if (!options.siteId) throw new Error('An active site is required');
+      return findPersons(
+        {
+          siteId: options.siteId,
+          page: options.page,
+          pageSize: 10,
+          sort: options.sort,
+          isActive: options.status === 'all' ? undefined : options.status === 'active',
+          search: options.search || undefined,
+        },
+        signal,
+      );
+    },
+    enabled: Boolean(options.siteId),
   });
 }
 

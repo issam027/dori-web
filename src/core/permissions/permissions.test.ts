@@ -1,5 +1,5 @@
 import type { CurrentUserResponseDto } from '@/api/generated/models';
-import { findFirstAuthorizedPath } from './route-access';
+import { findFirstAuthorizedPath } from '@/app/protected-routes';
 import { hasAnyPermission, hasPermission, isWithinScope } from './permissions';
 
 const user: CurrentUserResponseDto = {

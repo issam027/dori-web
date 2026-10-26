@@ -52,8 +52,8 @@ export function useResetQueue(onSuccess?: () => void | Promise<void>) {
   return useBusinessMutation({
     mutationFn: (queueId: string) => resetQueue(queueId),
     expectedErrorStatuses: [404, 409, 422],
-    invalidate: () => invalidateControlRoom(queryClient),
-    invalidateOnConflict: () => invalidateControlRoom(queryClient),
+    invalidate: (_data, queueId) => invalidateControlRoom(queryClient, queueId),
+    invalidateOnConflict: (_error, queueId) => invalidateControlRoom(queryClient, queueId),
     onSuccess: () => onSuccess?.(),
   });
 }

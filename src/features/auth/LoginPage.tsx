@@ -22,7 +22,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { getRememberedUsername, login } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
-import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
+import { findFirstAuthorizedPath } from '@/app/protected-routes';
 import { FormField } from '@/design-system/components/FormField';
 import {
   loginShowcaseKey,

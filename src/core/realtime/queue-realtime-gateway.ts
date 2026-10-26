@@ -5,6 +5,7 @@ import {
 } from '@microsoft/fetch-event-source';
 
 export type QueueRealtimeChannel = 'display' | 'tracking';
+export type QueueRealtimeStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed' | 'closed';
 
 export interface QueueDisplayChangedEvent {
   queueId: string;
@@ -26,10 +27,14 @@ type EventStream = (input: RequestInfo, init: FetchEventSourceInit) => Promise<v
 
 interface QueueRealtimeGatewayOptions<TChannel extends QueueRealtimeChannel> {
   channel: TChannel;
-  credential: string;
+  getCredential: () => string;
+  refreshCredential?: () => Promise<void>;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: (queueId: string) => void;
+  onStatusChange?: (queueId: string, status: QueueRealtimeStatus) => void;
+  onError?: (queueId: string, error: unknown) => void;
   eventStream?: EventStream;
+  fetch?: typeof fetch;
 }
 
 const channelContracts = {
@@ -95,6 +100,7 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
     if (!uniqueQueueIds.length) return;
     this.started = true;
     uniqueQueueIds.forEach((queueId) => {
+      this.options.onStatusChange?.(queueId, 'connecting');
       this.open(queueId);
     });
   }
@@ -103,6 +109,9 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
     this.controllers.forEach((controller) => {
       controller.abort();
     });
+    this.controllers.forEach((_controller, queueId) => {
+      this.options.onStatusChange?.(queueId, 'closed');
+    });
     this.controllers.clear();
     this.started = false;
   }
@@ -110,28 +119,34 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
   private open(queueId: string): void {
     const controller = new AbortController();
     const eventStream = this.options.eventStream ?? fetchEventSource;
+    const requestFetch = this.options.fetch ?? globalThis.fetch;
     let hasOpened = false;
     this.controllers.set(queueId, controller);
 
     void eventStream(queueRealtimeUrl(queueId, this.options.channel), {
       signal: controller.signal,
       openWhenHidden: true,
-      headers:
-        this.options.channel === 'display'
-          ? {
-              Authorization: `Bearer ${this.options.credential}`,
-              Accept: 'text/event-stream',
-            }
-          : {
-              'X-Registration-Token': this.options.credential,
-              Accept: 'text/event-stream',
-            },
-      onopen: (response) => {
+      headers: { Accept: 'text/event-stream' },
+      fetch: (input, init) => {
+        const headers = new Headers(init?.headers);
+        const credential = this.options.getCredential();
+        if (this.options.channel === 'display')
+          headers.set('Authorization', `Bearer ${credential}`);
+        else headers.set('X-Registration-Token', credential);
+        return requestFetch(input, { ...init, headers });
+      },
+      onopen: async (response) => {
         const contentType = response.headers.get('content-type') ?? '';
         if (response.ok && contentType.includes('text/event-stream')) {
           if (hasOpened) this.options.onReconnect(queueId);
           hasOpened = true;
-          return Promise.resolve();
+          this.options.onStatusChange?.(queueId, 'connected');
+          return;
+        }
+        if (response.status === 401 && this.options.refreshCredential) {
+          this.options.onStatusChange?.(queueId, 'reconnecting');
+          await this.options.refreshCredential();
+          throw new Error('SSE credential refreshed');
         }
         if (response.status >= 400 && response.status < 500 && response.status !== 429)
           throw new FatalRealtimeError(
@@ -147,8 +162,17 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
         throw new Error('SSE connection closed');
       },
       onerror: (error) => {
-        if (error instanceof FatalRealtimeError) throw error;
+        this.options.onError?.(queueId, error);
+        if (error instanceof FatalRealtimeError) {
+          this.options.onStatusChange?.(queueId, 'failed');
+          throw error;
+        }
+        this.options.onStatusChange?.(queueId, 'reconnecting');
       },
-    }).catch(() => undefined);
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      this.options.onStatusChange?.(queueId, 'failed');
+      this.options.onError?.(queueId, error);
+    });
   }
 }

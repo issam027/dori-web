@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
-import { findFirstAuthorizedPath } from '@/core/permissions/route-access';
+import { findFirstAuthorizedPath } from '@/app/protected-routes';
 import { legalConfig } from './legal-config';
 import { Button } from '@/design-system/components/Button';
 

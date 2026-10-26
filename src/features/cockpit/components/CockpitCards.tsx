@@ -9,8 +9,8 @@ import type {
 } from '@/api/generated/models';
 import { Card } from '@/design-system/components/Card';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
-import { useRegistration } from '@/features/queue-operations/hooks/useQueueOperations';
-import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
+import { useRegistration } from '@/features/queue-operations/public';
+import { PersonNotesButton } from '@/features/notes/public';
 import { Button } from '@/design-system/components/Button';
 
 export function EligiblePreviewCard({ items }: { items: readonly QueuePreviewItemDto[] }) {

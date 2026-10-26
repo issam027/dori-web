@@ -1,5 +1,7 @@
 # Handover de réalisation — DORI Web
 
+> **Note 2026-10-26** : les consignes Socket.IO/WebSocket sont archivées. L'implémentation active repose sur SSE (`queue_display_changed`, `queue_position_changed`) et un fallback REST de cinq minutes.
+
 > Document de pilotage vivant — créé le 8 octobre 2026\
 > État courant : cadrage complété avec la SFD Front, implémentation non démarrée\
 > Convention : `[ ]` à faire, `[-]` en cours, `[x]` terminé, `[!]` bloqué ou dépendant d’une décision externe.

@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { invalidateQueueOperations } from './query-invalidations';
+import { invalidateQueueCall, invalidateQueueSession } from './query-invalidations';
 import { queryKeys } from './query-keys';
 
 describe('queryKeys', () => {
@@ -92,22 +92,35 @@ describe('queryKeys', () => {
     expect(queryKeys.monitoring.series(series)).toEqual(['monitoring', 'series', series]);
   });
 
-  it('invalidates every queue-operation resource through one policy', async () => {
+  it('invalidates only resources targeted by a queue operation', async () => {
     const queryClient = new QueryClient();
-    const roots = [
-      queryKeys.queues.all,
-      queryKeys.queueSessions.all,
-      queryKeys.threads.all,
-      queryKeys.queueStatus.all,
-      queryKeys.queuePreview.all,
-      queryKeys.registrations.all,
+    const targetedKeys = [
+      queryKeys.queueStatus.detail('queue-1'),
+      queryKeys.queuePreview.bySite('site-1'),
+      queryKeys.queueSessions.byQueue('queue-1'),
+      queryKeys.threads.byQueue('queue-1'),
+      queryKeys.registrations.list({ queueId: 'queue-1' }),
+      queryKeys.registrations.list({ siteId: 'site-1' }),
+      queryKeys.registrations.operator('user-1', 'CALLED', 'site-1', 100),
     ];
-    roots.forEach((key) => queryClient.setQueryData([...key, 'test'], 'cached'));
+    const unrelatedKeys = [
+      queryKeys.queues.detail('queue-1'),
+      queryKeys.queueStatus.detail('queue-2'),
+      queryKeys.queuePreview.bySite('site-2'),
+      queryKeys.queueSessions.byQueue('queue-2'),
+      queryKeys.threads.byQueue('queue-2'),
+      queryKeys.registrations.list({ queueId: 'queue-2' }),
+    ];
+    [...targetedKeys, ...unrelatedKeys].forEach((key) => queryClient.setQueryData(key, 'cached'));
 
-    await invalidateQueueOperations(queryClient);
+    await invalidateQueueCall(queryClient, 'queue-1', 'site-1');
+    await invalidateQueueSession(queryClient, 'queue-1');
 
-    roots.forEach((key) => {
-      expect(queryClient.getQueryState([...key, 'test'])?.isInvalidated).toBe(true);
+    targetedKeys.forEach((key) => {
+      expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true);
+    });
+    unrelatedKeys.forEach((key) => {
+      expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false);
     });
   });
 });

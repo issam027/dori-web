@@ -1,5 +1,7 @@
 # DORI — Spécification finale de l’IHM SaaS
 
+> **Mise à jour temps réel (2026-10-26)** : toute mention WebSocket est remplacée par le contrat SSE versionné de l'OpenAPI. Aucun client Socket.IO ne doit être ajouté.
+
 > Version de référence : 1.0 — 7 octobre 2026  
 > Référence visuelle validée : [`dori_saas_mockup.html`](./dori_saas_mockup.html)  
 > Contrat API : [`docs-json.json`](./docs-json.json), Dori API 1.0  

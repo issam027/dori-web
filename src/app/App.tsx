@@ -4,7 +4,11 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { ProtectedRoute } from '@/core/permissions/ProtectedRoute';
-import { findFirstAuthorizedPath, protectedRoutes } from '@/core/permissions/route-access';
+import {
+  findFirstAuthorizedPath,
+  protectedRoutes,
+  type ProtectedRouteDefinition,
+} from './protected-routes';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { AppProviders } from './AppProviders';
 import { AppShell } from './layouts/AppShell';
@@ -22,52 +26,8 @@ const ChangePasswordPage = lazyNamed(
   'ChangePasswordPage',
 );
 const ProfilePage = lazyNamed(() => import('@/features/profile/ProfilePage'), 'ProfilePage');
-const PortfolioPage = lazyNamed(
-  () => import('@/features/portfolio/PortfolioPage'),
-  'PortfolioPage',
-);
-const CockpitPage = lazyNamed(() => import('@/features/cockpit/CockpitPage'), 'CockpitPage');
-const MyQueuesPage = lazyNamed(
-  () => import('@/features/queue-operations/MyQueuesPage'),
-  'MyQueuesPage',
-);
-const PersonsPage = lazyNamed(() => import('@/features/persons/PersonsPage'), 'PersonsPage');
-const AppointmentsPage = lazyNamed(
-  () => import('@/features/appointments/AppointmentsPage'),
-  'AppointmentsPage',
-);
-const ControlRoomPage = lazyNamed(
-  () => import('@/features/supervision/ControlRoomPage'),
-  'ControlRoomPage',
-);
-const ReportsPage = lazyNamed(() => import('@/features/reports/ReportsPage'), 'ReportsPage');
-const NotificationsPage = lazyNamed(
-  () => import('@/features/notifications/NotificationsPage'),
-  'NotificationsPage',
-);
-const KioskPage = lazyNamed(() => import('@/features/public-experiences/KioskPage'), 'KioskPage');
-const DisplayPage = lazyNamed(
-  () => import('@/features/public-experiences/DisplayPage'),
-  'DisplayPage',
-);
-const DeviceModePage = lazyNamed(
-  () => import('@/features/public-experiences/DeviceModePage'),
-  'DeviceModePage',
-);
 const TrackPage = lazyNamed(() => import('@/features/public-experiences/TrackPage'), 'TrackPage');
-const HealthPage = lazyNamed(() => import('@/features/health/HealthPage'), 'HealthPage');
-const AuditPage = lazyNamed(() => import('@/features/audit/AuditPage'), 'AuditPage');
 const LegalPage = lazyNamed(() => import('@/features/legal/LegalPage'), 'LegalPage');
-const OnboardingPage = lazyNamed(
-  () => import('@/features/onboarding/OnboardingPage'),
-  'OnboardingPage',
-);
-const SettingsPage = lazyNamed(() => import('@/features/onboarding/SettingsPage'), 'SettingsPage');
-const UsersAdminPage = lazyNamed(() => import('@/features/users/UsersAdminPage'), 'UsersAdminPage');
-const TranslationsAdminPage = lazyNamed(
-  () => import('@/features/translations/TranslationsAdminPage'),
-  'TranslationsAdminPage',
-);
 
 function Page({ title }: { title: string }) {
   const { t } = useTranslation();
@@ -92,11 +52,6 @@ function Page({ title }: { title: string }) {
   );
 }
 
-function ProtectedPlaceholder({ name }: { name: string }) {
-  const { t } = useTranslation();
-  return <Page title={t('routes.placeholder', { name })} />;
-}
-
 function TranslatedPage({ titleKey }: { titleKey: string }) {
   const { t } = useTranslation();
   return <Page title={t(titleKey)} />;
@@ -107,18 +62,17 @@ function LandingRedirect() {
   return <Navigate replace to={user ? findFirstAuthorizedPath(user) : '/login'} />;
 }
 
-function ExperienceRoute({ mode }: { mode: 'kiosk' | 'display' | 'tracking' }) {
+function ExperienceRoute({
+  mode,
+  Component,
+}: {
+  mode: 'kiosk' | 'display' | 'tracking';
+  Component?: ComponentType;
+}) {
   const status = useSessionStore((state) => state.status);
   const user = useSessionStore((state) => state.user);
   const isHumanPreview = status === 'authenticated' && user?.userType === 'human';
-  const content =
-    mode === 'kiosk' ? (
-      <KioskPage />
-    ) : mode === 'display' ? (
-      <DisplayPage />
-    ) : (
-      <TrackPage preview={isHumanPreview} />
-    );
+  const content = Component ? <Component /> : <TrackPage preview={isHumanPreview} />;
 
   if (isHumanPreview) {
     return (
@@ -148,39 +102,10 @@ function LegalRoute() {
   );
 }
 
-type RouteView = {
-  component: ComponentType;
-  frame: 'shell' | 'public' | 'experience';
-  experienceMode?: 'kiosk' | 'display';
-  publicMode?: 'public' | 'device';
-};
-
-const protectedRouteViews: Record<string, RouteView> = {
-  '/device-mode': { component: DeviceModePage, frame: 'public', publicMode: 'device' },
-  '/portfolio': { component: PortfolioPage, frame: 'shell' },
-  '/desk': { component: CockpitPage, frame: 'shell' },
-  '/my-queues': { component: MyQueuesPage, frame: 'shell' },
-  '/persons': { component: PersonsPage, frame: 'shell' },
-  '/appointments': { component: AppointmentsPage, frame: 'shell' },
-  '/control-room': { component: ControlRoomPage, frame: 'shell' },
-  '/reports': { component: ReportsPage, frame: 'shell' },
-  '/notifications': { component: NotificationsPage, frame: 'shell' },
-  '/kiosk': { component: KioskPage, frame: 'experience', experienceMode: 'kiosk' },
-  '/display': { component: DisplayPage, frame: 'experience', experienceMode: 'display' },
-  '/onboarding': { component: OnboardingPage, frame: 'shell' },
-  '/settings/*': { component: SettingsPage, frame: 'shell' },
-  '/admin/users': { component: UsersAdminPage, frame: 'shell' },
-  '/admin/translations': { component: TranslationsAdminPage, frame: 'shell' },
-  '/health': { component: HealthPage, frame: 'shell' },
-  '/audit': { component: AuditPage, frame: 'shell' },
-};
-
-function ConfiguredProtectedPage({ path }: { path: string }) {
-  const view = protectedRouteViews[path];
-  if (!view) return <ProtectedPlaceholder name={path.replaceAll('/', '')} />;
+function ConfiguredProtectedPage({ view }: { view: ProtectedRouteDefinition }) {
   const Component = view.component;
   if (view.frame === 'experience' && view.experienceMode)
-    return <ExperienceRoute mode={view.experienceMode} />;
+    return <ExperienceRoute mode={view.experienceMode} Component={Component} />;
   if (view.frame === 'public')
     return (
       <PublicExperienceLayout mode={view.publicMode ?? 'public'}>
@@ -238,7 +163,7 @@ function AppRoutes() {
             />
           }
         >
-          <Route path={route.path} element={<ConfiguredProtectedPage path={route.path} />} />
+          <Route path={route.path} element={<ConfiguredProtectedPage view={route} />} />
         </Route>
       ))}
       <Route

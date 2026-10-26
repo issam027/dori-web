@@ -40,10 +40,10 @@ describe('queue realtime hooks', () => {
 
     const trackingOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
       channel: string;
-      credential: string;
+      getCredential: () => string;
     };
     expect(trackingOptions.channel).toBe('tracking');
-    expect(trackingOptions.credential).toBe('registration-token');
+    expect(trackingOptions.getCredential()).toBe('registration-token');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1']);
 
     rerender({ queueIds: [] });
@@ -67,10 +67,10 @@ describe('queue realtime hooks', () => {
 
     const displayOptions = gatewayMocks.construct.mock.calls[0]?.[0] as {
       channel: string;
-      credential: string;
+      getCredential: () => string;
     };
     expect(displayOptions.channel).toBe('display');
-    expect(displayOptions.credential).toBe('display-jwt');
+    expect(displayOptions.getCredential()).toBe('display-jwt');
     expect(gatewayMocks.connect).toHaveBeenCalledWith(['queue-1', 'queue-2']);
 
     rerender({ queueIds: ['queue-1', 'queue-2'] });
