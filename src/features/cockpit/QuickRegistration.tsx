@@ -17,7 +17,7 @@ import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/Pers
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { queryKeys } from '@/api/client/query-keys';
-import { invalidateQueueOperations } from '@/api/client/query-invalidations';
+import { refreshCockpitQueue } from './cockpit-realtime';
 import {
   appointmentUtcIso,
   isSlotAvailable,
@@ -117,7 +117,7 @@ export function QuickRegistration({
       setResult(response.data);
       setPrintReady(false);
       setStep(3);
-      await invalidateQueueOperations(queryClient);
+      await refreshCockpitQueue(queryClient, siteId, dto.queueId);
       notify({
         tone: 'success',
         title:

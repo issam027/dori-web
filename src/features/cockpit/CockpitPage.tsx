@@ -63,10 +63,10 @@ export function CockpitPage() {
     queueIds: allowed.map((queue) => queue.queueId),
     getToken: getAccessToken,
     onEvent: (event) => {
-      void refreshCockpitQueue(queryClient, siteId, event.queueId, event.reason);
+      void refreshCockpitQueue(queryClient, siteId, event.queueId);
     },
     onReconnect: (queueId) => {
-      void refreshCockpitQueue(queryClient, siteId, queueId);
+      void refreshCockpitQueue(queryClient, siteId, queueId, true);
     },
   });
   const currentRegistrations = useOperatorRegistrations(user?.userId, 'in_progress', siteId, 20);
@@ -166,14 +166,12 @@ export function CockpitPage() {
           outcome === 'served' ? t('notifications.visit.served') : t('notifications.visit.noShow'),
         message: t('notifications.visit.closedMessage', { ticket: call.ticketNumber }),
       });
-      await refresh();
     });
   };
   const releaseDesk = (queueId: string, sessionId: string, queueName: string) =>
     void execute(queueId, async () => {
       await closeSession.execute({ queueId, sessionId });
       notify({ tone: 'success', title: t('notifications.desk.released'), message: queueName });
-      await refresh();
     });
   const occupyDesk = (
     queueId: string,
@@ -211,7 +209,6 @@ export function CockpitPage() {
       });
       setDeskToOpen(undefined);
       setCounterName('');
-      await refresh();
     });
   };
   const callFromQueue = (queueId: string, queueName: string) =>
@@ -226,7 +223,6 @@ export function CockpitPage() {
             }
           : { tone: 'success', title: t('notifications.visit.called'), message: queueName },
       );
-      await refresh();
     });
   return (
     <div className="page-stack">
