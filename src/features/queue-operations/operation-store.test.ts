@@ -7,13 +7,13 @@ function call(registrationId: string): CallNextRegistrationResponseDto {
     ticketNumber: `A${registrationId}`,
     entryType: 'walkin',
     calledEarly: false,
-    tier: {},
+    tier: { tierId: 'tier-1', tierCode: 'STANDARD', tierName: 'Standard' },
     status: 'called',
     sessionId: '00000000-0000-4000-8000-000000000001',
     threadNumber: 1,
     priorityScore: 1,
     calledAt: '2026-10-08T08:00:00Z',
-    person: {},
+    person: { personId: 'person-1', hasNotes: false },
   };
 }
 

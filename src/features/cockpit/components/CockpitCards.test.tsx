@@ -8,13 +8,13 @@ const activeCall: CallNextRegistrationResponseDto = {
   ticketNumber: 'A001',
   entryType: 'walkin',
   calledEarly: false,
-  tier: {},
+  tier: { tierId: 'tier-1', tierCode: 'STANDARD', tierName: 'Standard' },
   status: 'called',
   sessionId: '00000000-0000-4000-8000-000000000004',
   threadNumber: 2,
   priorityScore: 0,
   calledAt: new Date().toISOString(),
-  person: {},
+  person: { personId: 'person-1', hasNotes: false },
 };
 
 describe('desk cockpit cards', () => {

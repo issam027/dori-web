@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
 import { useRef, useState } from 'react';
-import type { QueueResponseDto } from '@/api/generated/models';
 import type { CreateRegistrationDto, CreateRegistrationResponseDto } from '@/api/generated/models';
 import { registerPerson } from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
@@ -26,7 +25,7 @@ export function QuickRegistration({
   queues,
 }: {
   siteId: string;
-  queues: readonly QueueResponseDto[];
+  queues: readonly { queueId: string; queueName: string }[];
 }) {
   const { t: __t, i18n } = useTranslation();
   const [choice, setChoice] = useState<PersonChoice | null>(null);

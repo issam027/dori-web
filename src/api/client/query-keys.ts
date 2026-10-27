@@ -27,6 +27,10 @@ export const queryKeys = {
     all: ['queue-preview'] as const,
     bySite: (siteId: string | null) => ['queue-preview', 'site', siteId] as const,
   },
+  cockpit: {
+    all: ['cockpit'] as const,
+    bySite: (siteId: string | null) => ['cockpit', 'site', siteId] as const,
+  },
   queueSessions: {
     all: ['queue-sessions'] as const,
     byQueue: (queueId: string) => ['queue-sessions', 'queue', queueId] as const,

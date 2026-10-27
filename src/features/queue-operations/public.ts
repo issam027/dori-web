@@ -8,3 +8,4 @@ export {
   useOperatorRegistrations,
   useRegistration,
 } from './hooks/useQueueOperations';
+export { RegistrationDetailsModal } from './RegistrationDetailsModal';

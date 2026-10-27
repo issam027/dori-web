@@ -43,6 +43,12 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
     frame: 'shell',
   },
   {
+    path: '/desk/legacy',
+    permissions: ['registration_call', 'session_operate'],
+    component: lazyNamed(() => import('@/features/cockpit/OldCockpitPage'), 'OldCockpitPage'),
+    frame: 'shell',
+  },
+  {
     path: '/my-queues',
     permissions: ['registration_view', 'queue_view'],
     component: lazyNamed(() => import('@/features/queue-operations/MyQueuesPage'), 'MyQueuesPage'),
