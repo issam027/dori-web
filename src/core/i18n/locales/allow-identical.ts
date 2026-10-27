@@ -123,6 +123,10 @@ export const ALLOW_IDENTICAL = {
     'common.duration.minutes',
     'common.duration.minutes_one',
     'common.duration.minutes_other',
+    'cockpit.shortcutNext',
+    'cockpit.shortcutRecall',
+    'cockpit.shortcutServed',
+    'cockpit.shortcutAbsent',
   ],
   ar: [
     'app.name',
@@ -164,5 +168,9 @@ export const ALLOW_IDENTICAL = {
     'locale.en',
     'locale.ar',
     'locale.ar-TN',
+    'cockpit.shortcutNext',
+    'cockpit.shortcutRecall',
+    'cockpit.shortcutServed',
+    'cockpit.shortcutAbsent',
   ],
 } as const;

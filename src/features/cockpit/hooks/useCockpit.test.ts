@@ -54,6 +54,14 @@ function response(queueIds: string[], recentId: string): QueueEngineControllerGe
 describe('cockpit partial refresh merge', () => {
   it('replaces only the refreshed queue and keeps the others', () => {
     const current = response(['queue-1', 'queue-2'], 'old');
+    const firstPassage = current.data.recentPassages[0];
+    if (!firstPassage) throw new Error('Expected an existing passage');
+    current.data.recentPassages.push({
+      ...firstPassage,
+      registrationId: 'queue-2-passage',
+      queueId: 'queue-2',
+      queueName: 'Queue 2',
+    });
     const incoming = response(['queue-1'], 'new');
     const refreshedQueue = incoming.data.queues[0];
     if (!refreshedQueue) throw new Error('Expected a refreshed queue');
@@ -65,6 +73,12 @@ describe('cockpit partial refresh merge', () => {
     expect(merged.data.queues[0]?.waitingCount).toBe(2);
     expect(merged.data.queues[1]?.queueId).toBe('queue-2');
     expect(merged.data.recentPassages[0]?.registrationId).toBe('new');
+    expect(merged.data.recentPassages.map((passage) => passage.registrationId)).toContain(
+      'queue-2-passage',
+    );
+    expect(merged.data.recentPassages.map((passage) => passage.registrationId)).not.toContain(
+      'old',
+    );
   });
 
   it('uses the incoming response when no full cache exists', () => {

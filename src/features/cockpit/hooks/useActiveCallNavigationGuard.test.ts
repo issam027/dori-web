@@ -4,7 +4,9 @@ import { useActiveCallNavigationGuard } from './useActiveCallNavigationGuard';
 describe('useActiveCallNavigationGuard', () => {
   it('prevents closing the page while an active call exists', () => {
     const { rerender, unmount } = renderHook(
-      ({ enabled }: { enabled: boolean }) => useActiveCallNavigationGuard(enabled),
+      ({ enabled }: { enabled: boolean }) => {
+        useActiveCallNavigationGuard(enabled);
+      },
       { initialProps: { enabled: true } },
     );
     const activeEvent = new Event('beforeunload', { cancelable: true });

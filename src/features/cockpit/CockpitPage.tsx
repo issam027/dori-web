@@ -48,6 +48,7 @@ import { CockpitVersionSwitch } from './components/CockpitVersionSwitch';
 import {
   mergeCockpitQueue,
   refreshCockpitQueue,
+  shouldSkipCockpitRealtimeRefresh,
   useCockpit,
   useCockpitActions,
 } from './hooks/useCockpit';
@@ -84,9 +85,11 @@ export function CockpitPage() {
   const [replaceSessionId, setReplaceSessionId] = useState<string>();
   const [counterName, setCounterName] = useState('');
   const [notesPersonId, setNotesPersonId] = useState<string>();
+  const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [confirmation, setConfirmation] = useState<ConfirmationState>(null);
   const [historyOutcome, setHistoryOutcome] = useState<'all' | 'served' | 'no_show'>('all');
   const [historyQueueId, setHistoryQueueId] = useState('all');
+  const [historySearch, setHistorySearch] = useState('');
   const [queueSearch, setQueueSearch] = useState('');
   const [detailsRegistrationId, setDetailsRegistrationId] = useState<string | null>(null);
   const realtimeRefreshTimers = useRef(new Map<string, number>());
@@ -99,6 +102,7 @@ export function CockpitPage() {
     getToken: getAccessToken,
     onEvent: (event) => {
       if (!siteId) return;
+      if (shouldSkipCockpitRealtimeRefresh(siteId, event.queueId)) return;
       const previous = realtimeRefreshTimers.current.get(event.queueId);
       if (previous !== undefined) window.clearTimeout(previous);
       const timer = window.setTimeout(() => {
@@ -176,9 +180,12 @@ export function CockpitPage() {
       (cockpit.data?.data.recentPassages ?? []).filter(
         (passage) =>
           (historyOutcome === 'all' || passage.outcome === historyOutcome) &&
-          (historyQueueId === 'all' || passage.queueId === historyQueueId),
+          (historyQueueId === 'all' || passage.queueId === historyQueueId) &&
+          `${passage.ticketNumber} ${passage.personName} ${passage.queueName}`
+            .toLocaleLowerCase(i18n.language)
+            .includes(historySearch.trim().toLocaleLowerCase(i18n.language)),
       ),
-    [cockpit.data, historyOutcome, historyQueueId],
+    [cockpit.data, historyOutcome, historyQueueId, historySearch, i18n.language],
   );
   const recommendations = useMemo(() => {
     const items: Array<{ queue: CockpitQueueItemDto; type: 'open' | 'delay' }> = [];
@@ -205,6 +212,18 @@ export function CockpitPage() {
     },
     [preferences.soundsEnabled, siteId],
   );
+  const callBestNext = useCallback(
+    () =>
+      run(async () => {
+        const response = await actions.callNextForSite.execute(undefined);
+        const ticket = response.data.ticketNumber;
+        notify({
+          tone: ticket ? 'success' : 'info',
+          title: ticket ? t('cockpit.ticketCalled', { ticket }) : t('cockpit.noCandidate'),
+        });
+      }),
+    [actions.callNextForSite, run, t],
+  );
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -220,14 +239,18 @@ export function CockpitPage() {
         return;
       if (event.key.toLowerCase() === 'n' && totals.eligible > 0 && !pending) {
         event.preventDefault();
-        actions.callNextForSite.run(undefined);
+        void callBestNext();
       }
       const onlyActiveCall = activeQueues.length === 1 ? activeQueues[0]?.activeCall : null;
       if (!onlyActiveCall || pending) return;
       if (event.key.toLowerCase() === 'r') {
         event.preventDefault();
         void run(
-          () => actions.recall.execute(onlyActiveCall.registrationId),
+          () =>
+            actions.recall.execute({
+              registrationId: onlyActiveCall.registrationId,
+              queueId: activeQueues[0]?.queueId ?? '',
+            }),
           t('cockpit.ticketRecalled', { ticket: onlyActiveCall.ticketNumber }),
         );
       }
@@ -241,7 +264,11 @@ export function CockpitPage() {
           label: t('cockpit.served'),
           action: () => {
             void run(
-              () => actions.markServed.execute(onlyActiveCall.registrationId),
+              () =>
+                actions.markServed.execute({
+                  registrationId: onlyActiveCall.registrationId,
+                  queueId: activeQueues[0]?.queueId ?? '',
+                }),
               t('cockpit.markedServed'),
             );
           },
@@ -258,7 +285,11 @@ export function CockpitPage() {
           destructive: true,
           action: () => {
             void run(
-              () => actions.markNoShow.execute(onlyActiveCall.registrationId),
+              () =>
+                actions.markNoShow.execute({
+                  registrationId: onlyActiveCall.registrationId,
+                  queueId: activeQueues[0]?.queueId ?? '',
+                }),
               t('cockpit.markedNoShow'),
             );
           },
@@ -270,7 +301,7 @@ export function CockpitPage() {
       window.removeEventListener('keydown', listener);
     };
   }, [
-    actions.callNextForSite,
+    callBestNext,
     actions.markNoShow,
     actions.markServed,
     actions.recall,
@@ -321,21 +352,19 @@ export function CockpitPage() {
               pending={actions.callNextForSite.isPending}
               disabled={!totals.eligible || pending}
               onClick={() => {
-                void run(async () => {
-                  const response = await actions.callNextForSite.execute(undefined);
-                  const ticket = response.data.ticketNumber;
-                  notify({
-                    tone: ticket ? 'success' : 'info',
-                    title: ticket
-                      ? t('cockpit.ticketCalled', { ticket })
-                      : t('cockpit.noCandidate'),
-                  });
-                });
+                void callBestNext();
               }}
             />
           </div>
         }
       />
+
+      {health === 'degraded' ? (
+        <div className="cockpit-realtime-warning" role="alert">
+          <TriangleAlert aria-hidden="true" />
+          <span>{t('realtime.connection.degraded')}</span>
+        </div>
+      ) : null}
 
       {cockpit.isError ? <ErrorState onRetry={() => void cockpit.refetch()} /> : null}
       {cockpit.data ? (
@@ -438,9 +467,72 @@ export function CockpitPage() {
                           disabled={pending}
                           onClick={() => {
                             void run(
-                              () => actions.recall.execute(activeCall.registrationId),
+                              () =>
+                                actions.recall.execute({
+                                  registrationId: activeCall.registrationId,
+                                  queueId: queue.queueId,
+                                }),
                               t('cockpit.ticketRecalled', { ticket: activeCall.ticketNumber }),
                             );
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          icon={<CheckCircle2 />}
+                          label={t('cockpit.served')}
+                          disabled={pending}
+                          onClick={() => {
+                            setConfirmation({
+                              title: t('cockpit.confirmServedTitle'),
+                              description: t('cockpit.confirmOutcomeDescription', {
+                                ticket: activeCall.ticketNumber,
+                              }),
+                              label: t('cockpit.served'),
+                              action: () => {
+                                void run(
+                                  () =>
+                                    actions.markServed.execute({
+                                      registrationId: activeCall.registrationId,
+                                      queueId: queue.queueId,
+                                    }),
+                                  t('cockpit.markedServed'),
+                                );
+                              },
+                            });
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          icon={<UserX />}
+                          label={t('cockpit.noShow')}
+                          disabled={pending}
+                          onClick={() => {
+                            setConfirmation({
+                              title: t('cockpit.confirmNoShowTitle'),
+                              description: t('cockpit.confirmOutcomeDescription', {
+                                ticket: activeCall.ticketNumber,
+                              }),
+                              label: t('cockpit.noShow'),
+                              destructive: true,
+                              action: () => {
+                                void run(
+                                  () =>
+                                    actions.markNoShow.execute({
+                                      registrationId: activeCall.registrationId,
+                                      queueId: queue.queueId,
+                                    }),
+                                  t('cockpit.markedNoShow'),
+                                );
+                              },
+                            });
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          label={t('cockpit.addNote')}
+                          onClick={() => {
+                            setNotesMode('add');
+                            setNotesPersonId(activeCall.person.personId);
                           }}
                         />
                         <Button
@@ -465,36 +557,41 @@ export function CockpitPage() {
             <EmptyState title={t('cockpit.noQueues')} description={t('cockpit.noQueuesHint')} />
           ) : (
             <section className="cockpit-queue-section">
-              <div className="cockpit-section-heading">
+              <div className="cockpit-section-heading cockpit-queue-heading">
                 <div>
                   <p className="eyebrow">{t('cockpit.authorizedQueues')}</p>
                   <h2>{t('cockpit.manageQueues')}</h2>
                 </div>
-                <div className="cockpit-view-controls">
-                  <FormField label={t('cockpit.searchQueues')}>
-                    <div className="input-with-icon">
-                      <Search aria-hidden="true" />
-                      <input
-                        value={queueSearch}
-                        placeholder={t('cockpit.searchQueuesPlaceholder')}
-                        onChange={(event) => {
-                          setQueueSearch(event.target.value);
-                        }}
-                      />
-                    </div>
-                  </FormField>
-                  <FormField label={t('cockpit.sortQueues')}>
-                    <select
-                      value={preferences.sort}
+                <p className="cockpit-eligibility-summary">
+                  {t('cockpit.eligibleCount', { count: totals.eligible })}
+                </p>
+              </div>
+              <div className="cockpit-view-controls">
+                <FormField label={t('cockpit.searchQueues')}>
+                  <div className="input-with-icon">
+                    <Search aria-hidden="true" />
+                    <input
+                      value={queueSearch}
+                      placeholder={t('cockpit.searchQueuesPlaceholder')}
                       onChange={(event) => {
-                        preferences.setSort(event.target.value as CockpitSort);
+                        setQueueSearch(event.target.value);
                       }}
-                    >
-                      <option value="operational">{t('cockpit.sortOperational')}</option>
-                      <option value="waiting">{t('cockpit.sortWaiting')}</option>
-                      <option value="name">{t('cockpit.sortName')}</option>
-                    </select>
-                  </FormField>
+                    />
+                  </div>
+                </FormField>
+                <FormField label={t('cockpit.sortQueues')}>
+                  <select
+                    value={preferences.sort}
+                    onChange={(event) => {
+                      preferences.setSort(event.target.value as CockpitSort);
+                    }}
+                  >
+                    <option value="operational">{t('cockpit.sortOperational')}</option>
+                    <option value="waiting">{t('cockpit.sortWaiting')}</option>
+                    <option value="name">{t('cockpit.sortName')}</option>
+                  </select>
+                </FormField>
+                <div className="cockpit-view-actions">
                   <Button
                     icon={<LayoutGrid />}
                     label={
@@ -521,9 +618,13 @@ export function CockpitPage() {
                   />
                 </div>
               </div>
-              <p className="cockpit-eligibility-summary">
-                {t('cockpit.eligibleCount', { count: totals.eligible })}
-              </p>
+              <div className="cockpit-shortcuts" aria-label={t('cockpit.keyboardShortcuts')}>
+                <span>{t('cockpit.keyboardShortcuts')}</span>
+                <kbd>{t('cockpit.shortcutNext')}</kbd> {t('cockpit.callBestNext')}
+                <kbd>{t('cockpit.shortcutRecall')}</kbd> {t('cockpit.recall')}
+                <kbd>{t('cockpit.shortcutServed')}</kbd> {t('cockpit.served')}
+                <kbd>{t('cockpit.shortcutAbsent')}</kbd> {t('cockpit.noShow')}
+              </div>
               <div className={`cockpit-queue-grid is-${preferences.density}`}>
                 {displayedQueues.map((queue) => (
                   <QueueCard
@@ -578,7 +679,11 @@ export function CockpitPage() {
                       const activeCall = queue.activeCall;
                       if (!activeCall) return;
                       void run(
-                        () => actions.recall.execute(activeCall.registrationId),
+                        () =>
+                          actions.recall.execute({
+                            registrationId: activeCall.registrationId,
+                            queueId: queue.queueId,
+                          }),
                         t('cockpit.ticketRecalled', { ticket: activeCall.ticketNumber }),
                       );
                     }}
@@ -593,7 +698,11 @@ export function CockpitPage() {
                         label: t('cockpit.served'),
                         action: () => {
                           void run(
-                            () => actions.markServed.execute(activeCall.registrationId),
+                            () =>
+                              actions.markServed.execute({
+                                registrationId: activeCall.registrationId,
+                                queueId: queue.queueId,
+                              }),
                             t('cockpit.markedServed'),
                           );
                         },
@@ -611,13 +720,20 @@ export function CockpitPage() {
                         destructive: true,
                         action: () => {
                           void run(
-                            () => actions.markNoShow.execute(activeCall.registrationId),
+                            () =>
+                              actions.markNoShow.execute({
+                                registrationId: activeCall.registrationId,
+                                queueId: queue.queueId,
+                              }),
                             t('cockpit.markedNoShow'),
                           );
                         },
                       });
                     }}
-                    onNotes={setNotesPersonId}
+                    onNotes={(personId, mode = 'view') => {
+                      setNotesMode(mode);
+                      setNotesPersonId(personId);
+                    }}
                     onDetails={setDetailsRegistrationId}
                   />
                 ))}
@@ -634,6 +750,15 @@ export function CockpitPage() {
               <History aria-hidden="true" />
             </div>
             <div className="cockpit-history-filters">
+              <FormField label={t('cockpit.searchHistory')}>
+                <input
+                  value={historySearch}
+                  placeholder={t('cockpit.searchHistoryPlaceholder')}
+                  onChange={(event) => {
+                    setHistorySearch(event.target.value);
+                  }}
+                />
+              </FormField>
               <FormField label={t('cockpit.historyOutcome')}>
                 <select
                   value={historyOutcome}
@@ -744,6 +869,7 @@ export function CockpitPage() {
         <PersonNotesViewer
           personId={notesPersonId}
           open
+          initialMode={notesMode}
           onOpenChange={(open) => {
             if (!open) setNotesPersonId(undefined);
           }}
@@ -802,7 +928,7 @@ function QueueCard(props: {
   onRecall: () => void;
   onServed: () => void;
   onNoShow: () => void;
-  onNotes: (personId: string) => void;
+  onNotes: (personId: string, mode?: 'view' | 'add') => void;
   onDetails: (registrationId: string) => void;
 }) {
   const { t } = useTranslation();
@@ -941,14 +1067,20 @@ function QueueCard(props: {
                 onClick={props.onNoShow}
               />
             </div>
-            {activeCall.notesCount > 0 ? (
+            <div className="cockpit-note-actions">
               <Button
                 label={t('cockpit.viewNotes', { count: activeCall.notesCount })}
                 onClick={() => {
                   props.onNotes(activeCall.person.personId);
                 }}
               />
-            ) : null}
+              <Button
+                label={t('cockpit.addNote')}
+                onClick={() => {
+                  props.onNotes(activeCall.person.personId, 'add');
+                }}
+              />
+            </div>
             <Button
               label={t('cockpit.openCustomerFile')}
               onClick={() => {
