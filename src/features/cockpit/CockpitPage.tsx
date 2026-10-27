@@ -36,6 +36,7 @@ import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtim
 import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
+import { Card } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { FormField } from '@/design-system/components/FormField';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
@@ -563,61 +564,76 @@ export function CockpitPage() {
                   <h2>{t('cockpit.manageQueues')}</h2>
                 </div>
                 <p className="cockpit-eligibility-summary">
-                  {t('cockpit.eligibleCount', { count: totals.eligible })}
+                  {t('cockpit.visibleQueues', {
+                    count: displayedQueues.length,
+                    total: queues.length,
+                  })}
                 </p>
               </div>
-              <div className="cockpit-view-controls">
-                <FormField label={t('cockpit.searchQueues')}>
-                  <div className="input-with-icon">
-                    <Search aria-hidden="true" />
-                    <input
-                      value={queueSearch}
-                      placeholder={t('cockpit.searchQueuesPlaceholder')}
-                      onChange={(event) => {
-                        setQueueSearch(event.target.value);
-                      }}
-                    />
+              <Card className="admin-filter-card queue-customer-search cockpit-filter-card">
+                <details open>
+                  <summary>
+                    <span>
+                      <Search aria-hidden="true" /> {t('cockpit.searchQueues')}
+                    </span>
+                    <small>{t('cockpit.eligibleCount', { count: totals.eligible })}</small>
+                  </summary>
+                  <div className="queue-customer-filter-body">
+                    <div className="queue-customer-search-form cockpit-filter-grid">
+                      <label>
+                        {t('cockpit.searchQueues')}
+                        <input
+                          type="search"
+                          value={queueSearch}
+                          placeholder={t('cockpit.searchQueuesPlaceholder')}
+                          onChange={(event) => {
+                            setQueueSearch(event.target.value);
+                          }}
+                        />
+                      </label>
+                      <label>
+                        {t('cockpit.sortQueues')}
+                        <select
+                          value={preferences.sort}
+                          onChange={(event) => {
+                            preferences.setSort(event.target.value as CockpitSort);
+                          }}
+                        >
+                          <option value="operational">{t('cockpit.sortOperational')}</option>
+                          <option value="waiting">{t('cockpit.sortWaiting')}</option>
+                          <option value="name">{t('cockpit.sortName')}</option>
+                        </select>
+                      </label>
+                      <div className="cockpit-view-actions">
+                        <Button
+                          icon={<LayoutGrid />}
+                          label={
+                            preferences.density === 'compact'
+                              ? t('cockpit.comfortableView')
+                              : t('cockpit.compactView')
+                          }
+                          onClick={() => {
+                            preferences.setDensity(
+                              preferences.density === 'compact' ? 'comfortable' : 'compact',
+                            );
+                          }}
+                        />
+                        <Button
+                          icon={preferences.soundsEnabled ? <Volume2 /> : <VolumeX />}
+                          label={
+                            preferences.soundsEnabled
+                              ? t('cockpit.disableSounds')
+                              : t('cockpit.enableSounds')
+                          }
+                          onClick={() => {
+                            preferences.setSoundsEnabled(!preferences.soundsEnabled);
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </FormField>
-                <FormField label={t('cockpit.sortQueues')}>
-                  <select
-                    value={preferences.sort}
-                    onChange={(event) => {
-                      preferences.setSort(event.target.value as CockpitSort);
-                    }}
-                  >
-                    <option value="operational">{t('cockpit.sortOperational')}</option>
-                    <option value="waiting">{t('cockpit.sortWaiting')}</option>
-                    <option value="name">{t('cockpit.sortName')}</option>
-                  </select>
-                </FormField>
-                <div className="cockpit-view-actions">
-                  <Button
-                    icon={<LayoutGrid />}
-                    label={
-                      preferences.density === 'compact'
-                        ? t('cockpit.comfortableView')
-                        : t('cockpit.compactView')
-                    }
-                    onClick={() => {
-                      preferences.setDensity(
-                        preferences.density === 'compact' ? 'comfortable' : 'compact',
-                      );
-                    }}
-                  />
-                  <Button
-                    icon={preferences.soundsEnabled ? <Volume2 /> : <VolumeX />}
-                    label={
-                      preferences.soundsEnabled
-                        ? t('cockpit.disableSounds')
-                        : t('cockpit.enableSounds')
-                    }
-                    onClick={() => {
-                      preferences.setSoundsEnabled(!preferences.soundsEnabled);
-                    }}
-                  />
-                </div>
-              </div>
+                </details>
+              </Card>
               <div className="cockpit-shortcuts" aria-label={t('cockpit.keyboardShortcuts')}>
                 <span>{t('cockpit.keyboardShortcuts')}</span>
                 <kbd>{t('cockpit.shortcutNext')}</kbd> {t('cockpit.callBestNext')}
@@ -737,6 +753,13 @@ export function CockpitPage() {
                     onDetails={setDetailsRegistrationId}
                   />
                 ))}
+                {displayedQueues.length === 0 ? (
+                  <div className="cockpit-filter-empty">
+                    <Search aria-hidden="true" />
+                    <strong>{t('cockpit.noMatchingQueues')}</strong>
+                    <span>{t('cockpit.noMatchingQueuesHint')}</span>
+                  </div>
+                ) : null}
               </div>
             </section>
           )}
