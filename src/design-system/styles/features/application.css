@@ -2712,14 +2712,17 @@
 }
 
 .realtime-connection-indicator {
+  --realtime-indicator-color: var(--color-info);
+  --realtime-indicator-soft: var(--color-info-soft);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   width: fit-content;
   padding: 0.35rem 0.65rem;
-  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--realtime-indicator-color) 42%, var(--color-line));
   border-radius: 999px;
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: color-mix(in srgb, var(--realtime-indicator-color) 72%, var(--color-ink));
+  background: var(--realtime-indicator-soft);
   font-size: 0.75rem;
   font-weight: 700;
   white-space: nowrap;
@@ -2734,15 +2737,18 @@
 }
 
 .realtime-connection-indicator.is-active {
-  color: var(--ci);
+  --realtime-indicator-color: var(--color-success);
+  --realtime-indicator-soft: var(--color-success-soft);
 }
 
 .realtime-connection-indicator.is-connecting {
-  color: var(--b);
+  --realtime-indicator-color: var(--color-info);
+  --realtime-indicator-soft: var(--color-info-soft);
 }
 
 .realtime-connection-indicator.is-degraded {
-  color: var(--ch);
+  --realtime-indicator-color: var(--color-warning);
+  --realtime-indicator-soft: var(--color-warning-soft);
 }
 
 .tracking-gauge {

@@ -1524,10 +1524,13 @@
   max-width: none;
 }
 .cockpit-header-actions {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
-.cockpit-header-actions .realtime-connection-indicator,
+.cockpit-header-actions .realtime-connection-indicator {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.7rem;
+}
 .cockpit-last-sync {
   min-height: 2.25rem;
   padding: 0.45rem 0.7rem;
@@ -1535,6 +1538,15 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-surface) 88%, transparent);
   backdrop-filter: blur(8px);
+}
+@media (max-width: 72rem) and (min-width: 42.01rem) {
+  .cockpit-v2 > .page-header {
+    flex-direction: column;
+  }
+  .cockpit-v2 > .page-header .page-actions,
+  .cockpit-header-actions {
+    width: 100%;
+  }
 }
 .cockpit-active-overview {
   position: sticky;
