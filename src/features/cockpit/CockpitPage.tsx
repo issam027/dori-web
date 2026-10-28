@@ -41,6 +41,7 @@ import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState
 import { FormField } from '@/design-system/components/FormField';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
+import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/notes/public';
 import { useSite } from '@/features/portfolio/public';
 import { RegistrationDetailsModal } from '@/features/queue-operations/public';
@@ -359,13 +360,6 @@ export function CockpitPage() {
           </div>
         }
       />
-
-      {health === 'degraded' ? (
-        <div className="cockpit-realtime-warning" role="alert">
-          <TriangleAlert aria-hidden="true" />
-          <span>{t('realtime.connection.degraded')}</span>
-        </div>
-      ) : null}
 
       {cockpit.isError ? <ErrorState onRetry={() => void cockpit.refetch()} /> : null}
       {cockpit.data ? (
@@ -842,11 +836,9 @@ export function CockpitPage() {
                       </small>
                     </div>
                     <div>
-                      <span
-                        className={`status-badge ${passage.outcome === 'served' ? 'status-success' : 'status-warning'}`}
-                      >
+                      <StatusBadge tone={passage.outcome === 'served' ? 'success' : 'warning'}>
                         {passage.outcome === 'served' ? t('cockpit.served') : t('cockpit.noShow')}
-                      </span>
+                      </StatusBadge>
                       <time>{formatDateTime(asDate(passage.closedAt), i18n.language) ?? '—'}</time>
                       {siteId ? (
                         <CockpitPassagePrintButton
@@ -1005,9 +997,9 @@ function QueueCard(props: {
               : t('cockpit.noOpenSession')}
           </p>
         </div>
-        <span className={`status-badge ${mine ? 'status-success' : 'status-info'}`}>
+        <StatusBadge tone={mine ? 'success' : 'accent'}>
           {mine ? t('cockpit.sessionActive') : t('cockpit.available')}
-        </span>
+        </StatusBadge>
         <div className="cockpit-queue-card-controls">
           <Button
             size="icon"
