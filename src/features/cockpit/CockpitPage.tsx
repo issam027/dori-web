@@ -42,6 +42,7 @@ import { FormField } from '@/design-system/components/FormField';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { PersonNotesViewer } from '@/features/notes/public';
+import { useSite } from '@/features/portfolio/public';
 import { RegistrationDetailsModal } from '@/features/queue-operations/public';
 import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
@@ -81,6 +82,7 @@ export function CockpitPage() {
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const cockpit = useCockpit(siteId);
+  const site = useSite(siteId);
   const actions = useCockpitActions(siteId);
   const [sessionDialog, setSessionDialog] = useState<SessionDialogState>(null);
   const [selectedThread, setSelectedThread] = useState<number>();
@@ -839,7 +841,7 @@ export function CockpitPage() {
                       {siteId ? (
                         <CockpitPassagePrintButton
                           passage={passage}
-                          siteId={siteId}
+                          site={site.data?.data}
                           label={t('cockpit.printPassage')}
                         />
                       ) : null}

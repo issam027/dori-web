@@ -21,7 +21,7 @@ describe('useActiveCallNavigationGuard', () => {
   });
 
   it('blocks internal link navigation when the operator refuses confirmation', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     renderHook(() => {
       useActiveCallNavigationGuard(true, 'Leave?');
     });
@@ -30,7 +30,7 @@ describe('useActiveCallNavigationGuard', () => {
     document.body.append(link);
     const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
     link.dispatchEvent(event);
-    expect(window.confirm).toHaveBeenCalledWith('Leave?');
+    expect(confirm).toHaveBeenCalledWith('Leave?');
     expect(event.defaultPrevented).toBe(true);
     link.remove();
   });

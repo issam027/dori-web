@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Printer } from 'lucide-react';
-import type { CockpitRecentPassageItemDto } from '@/api/generated/models';
+import type { CockpitRecentPassageItemDto, SiteResponseDto } from '@/api/generated/models';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { Button } from '@/design-system/components/Button';
 import { printDocument } from '@/shared/printing/print-document';
 import type { PassageSummary } from '@/shared/queue-operations/operation-store';
 import { PassagePrintDocument, type PassageSiteDetails } from '../PassagePrintDocument';
-import { getPassageReceiptData } from '../api/passage-receipt-api';
+import { getPassageReceiptRegistration } from '../api/passage-receipt-api';
 
 interface PrintablePassage {
   passage: PassageSummary;
@@ -19,11 +19,11 @@ function dateValue(value: unknown): string {
 
 export function CockpitPassagePrintButton({
   passage,
-  siteId,
+  site,
   label,
 }: {
   passage: CockpitRecentPassageItemDto;
-  siteId: string;
+  site: SiteResponseDto | undefined;
   label: string;
 }) {
   const [printable, setPrintable] = useState<PrintablePassage | null>(null);
@@ -42,9 +42,10 @@ export function CockpitPassagePrintButton({
   }, [printable]);
 
   const preparePrint = async () => {
+    if (!site) return;
     setLoading(true);
     try {
-      const { registration, site } = await getPassageReceiptData(passage.registrationId, siteId);
+      const registration = await getPassageReceiptRegistration(passage.registrationId);
       setPrintable({
         passage: {
           registrationId: passage.registrationId,
@@ -78,7 +79,7 @@ export function CockpitPassagePrintButton({
         variant="unstyled"
         className="button button-ghost button-sm print-hidden"
         type="button"
-        disabled={loading}
+        disabled={loading || !site}
         aria-busy={loading}
         onClick={() => {
           void preparePrint();
