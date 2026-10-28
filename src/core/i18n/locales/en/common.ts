@@ -168,4 +168,6 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.workingDays': 'Working days',
   'common.workingDaysHelp': 'Select at least one opening day.',
   'common.workingDaysInherited': "The site's working days will be used.",
+  'common.noResults': 'No results to display',
+  'common.unknownQueue': 'Unknown queue',
 };

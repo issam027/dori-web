@@ -172,4 +172,6 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.workingDays': 'أيام العمل',
   'common.workingDaysHelp': 'يرجى تحديد يوم عمل واحد على الأقل.',
   'common.workingDaysInherited': 'سيتم اعتماد أيام عمل الموقع تلقائياً.',
+  'common.noResults': 'لا توجد نتائج لعرضها',
+  'common.unknownQueue': 'قائمة انتظار غير معروفة',
 };

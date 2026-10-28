@@ -12,6 +12,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { loadTranslationBundle } from '@/core/i18n/i18n';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { queryKeys } from '@/api/client/query-keys';
 import { createTranslation, deleteTranslation, updateTranslation } from './api/translations-api';
 import { Button } from '@/design-system/components/Button';
@@ -49,7 +50,7 @@ export function TranslationsAdminPage() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [createLocale, setCreateLocale] = useState<'fr' | 'en' | 'ar'>('fr');
-  const debouncedKey = useDebouncedFilter(filterDraft.key, { delay: 350, minimumLength: 4 });
+  const debouncedKey = useDebouncedFilter(filterDraft.key, { delay: 350 });
   const effectiveFilters = { ...filters, key: debouncedKey };
   const categoryLabel = (category: CreateTranslationDto['category']) =>
     t(`admin.translations.categories.${category}`);
@@ -169,7 +170,9 @@ export function TranslationsAdminPage() {
             <span>
               <Search /> {t('admin.translations.rechercherDansLesTraductions')}
             </span>
-            <small>{t('admin.translations.cleCategorieOuLangue')}</small>
+            <small>
+              {t('admin.translations.cleCategorieOuLangue', { count: SEARCH_MINIMUM_LENGTH })}
+            </small>
           </summary>
           <div className="admin-filter-grid">
             <label>
@@ -180,7 +183,7 @@ export function TranslationsAdminPage() {
                   const key = event.target.value;
                   setFilterDraft({ ...filterDraft, key });
                   setPage(1);
-                  if (key.trim().length <= 3) {
+                  if (key.trim().length < SEARCH_MINIMUM_LENGTH) {
                     setFilters((current) => ({ ...current, key: '' }));
                   }
                 }}
@@ -236,7 +239,11 @@ export function TranslationsAdminPage() {
           </div>
         </div>
         <DataTable
+          error={translations.isError}
+          onRetry={() => void translations.refetch()}
           loading={translations.isLoading}
+          empty={!translations.isLoading && items.length === 0}
+          emptyTitle={t('common.noResults')}
           caption={t('admin.translations.catalogueDesTraductions')}
           containerClassName="table-wrap admin-table-wrap"
           mobileRows={items}

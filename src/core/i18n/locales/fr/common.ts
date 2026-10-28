@@ -167,4 +167,6 @@ export const common = {
   'common.workingDays': 'Jours ouvrés',
   'common.workingDaysHelp': 'Sélectionnez au moins un jour d’ouverture.',
   'common.workingDaysInherited': 'Les jours du site seront utilisés.',
+  'common.noResults': 'Aucun résultat à afficher',
+  'common.unknownQueue': 'File non identifiée',
 } as const;

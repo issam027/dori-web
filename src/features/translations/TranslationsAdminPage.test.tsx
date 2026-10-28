@@ -21,7 +21,7 @@ function renderPage() {
   );
 }
 
-it('issues one translation request after a typing burst reaches four characters', async () => {
+it('issues one translation request after a typing burst reaches the shared threshold', async () => {
   findTranslations.mockResolvedValue({
     data: { data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] } },
   });
@@ -31,10 +31,10 @@ it('issues one translation request after a typing burst reaches four characters'
   });
   findTranslations.mockClear();
 
-  await userEvent.type(screen.getByRole('textbox', { name: /clé/i }), 'abcd');
+  await userEvent.type(screen.getByRole('textbox', { name: /clé/i }), 'ab');
 
   await waitFor(() => {
     expect(findTranslations).toHaveBeenCalledOnce();
   });
-  expect(findTranslations.mock.calls[0]?.[0]).toMatchObject({ key: 'abcd', pageSize: 10 });
+  expect(findTranslations.mock.calls[0]?.[0]).toMatchObject({ key: 'ab', pageSize: 10 });
 });

@@ -15,6 +15,7 @@ import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
 import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { queryKeys } from '@/api/client/query-keys';
 import { Button } from '@/design-system/components/Button';
 
@@ -31,7 +32,7 @@ export function QueueOperatorsModal({
   const queryClient = useQueryClient();
   const [view, setView] = useState<View>('assigned');
   const [search, setSearch] = useState('');
-  const debounced = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
+  const debounced = useDebouncedFilter(search, { delay: 300 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto>();
   const [pendingId, setPendingId] = useState<string>();
@@ -68,12 +69,13 @@ export function QueueOperatorsModal({
         undefined,
         signal,
       ),
-    enabled: Boolean(queue && view === 'add' && debounced.length >= 4),
+    enabled: Boolean(queue && view === 'add' && debounced.length >= SEARCH_MINIMUM_LENGTH),
   });
   const assigned = operators.data?.data.items ?? [];
   const assignedIds = new Set(assigned.map((operator) => operator.userId));
   const candidates = (users.data?.data.items ?? []).filter((user) => !assignedIds.has(user.userId));
-  const searchPending = search.trim().length >= 4 && debounced !== search.trim();
+  const searchPending =
+    search.trim().length >= SEARCH_MINIMUM_LENGTH && debounced !== search.trim();
   const refresh = () => queryClient.invalidateQueries({ queryKey: operatorsKey });
 
   const assign = async () => {
@@ -197,7 +199,9 @@ export function QueueOperatorsModal({
                 <input
                   type="search"
                   value={search}
-                  placeholder={t('settings.searchUserPlaceholder')}
+                  placeholder={t('settings.searchUserPlaceholder', {
+                    count: SEARCH_MINIMUM_LENGTH,
+                  })}
                   autoComplete="off"
                   onChange={(event) => {
                     setSearch(event.target.value);
@@ -207,8 +211,10 @@ export function QueueOperatorsModal({
                 />
               </span>
             </label>
-            {search.trim().length < 4 ? (
-              <p className="muted">{t('settings.searchUserMinimum')}</p>
+            {search.trim().length < SEARCH_MINIMUM_LENGTH ? (
+              <p className="muted">
+                {t('settings.searchUserMinimum', { count: SEARCH_MINIMUM_LENGTH })}
+              </p>
             ) : searchPending || users.isFetching ? (
               <p className="muted" role="status">
                 {t('common.loading')}

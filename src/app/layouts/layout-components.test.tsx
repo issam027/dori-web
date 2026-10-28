@@ -50,6 +50,8 @@ describe('application layout', () => {
       </Modal>,
     );
     expect(screen.getByRole('dialog', { name: 'Confirmation' })).toBeVisible();
+    const close = screen.getByRole('button', { name: /fermer|close|common.close/i });
+    expect(close).toHaveClass('dialog-header-close');
     const dismiss = screen.getByRole('button', { name: /annuler|cancel|common.cancel/i });
     expect(dismiss).toHaveClass('button');
     await userEvent.click(dismiss);

@@ -1,8 +1,14 @@
 import { Fragment, type Key, type ReactNode } from 'react';
 import { DorifyLoader } from './DorifyLoader';
+import { EmptyState, ErrorState } from './FeedbackState';
 
 interface DataTableLoadingProps {
   loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
+  empty?: boolean;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
 interface DataColumn<TRow> {
@@ -33,12 +39,16 @@ type DataTableProps<TRow> = (DataTableRowsProps<TRow> | DataTableCompositionProp
   DataTableLoadingProps;
 
 export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
+  if (props.error) return <ErrorState onRetry={props.onRetry} />;
   if (props.loading) {
     return (
       <div className="data-table-loading">
         <DorifyLoader compact />
       </div>
     );
+  }
+  if (props.empty && props.emptyTitle) {
+    return <EmptyState title={props.emptyTitle} description={props.emptyDescription} />;
   }
   const table =
     'rows' in props ? (

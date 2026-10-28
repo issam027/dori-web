@@ -23,20 +23,20 @@ vi.mock('./hooks/useQueueOperations', () => ({
 vi.mock('@/features/notes/PersonNotesViewer', () => ({ PersonNotesViewer: () => null }));
 vi.mock('./RegistrationDetailsModal', () => ({ RegistrationDetailsModal: () => null }));
 
-it('publishes one registration search after a typing burst reaches four characters', async () => {
+it('publishes one registration search after a typing burst reaches the shared threshold', async () => {
   useWaitingRegistrations.mockReturnValue({
     data: { data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] } },
   });
   render(<MyQueuesPage />);
   useWaitingRegistrations.mockClear();
 
-  await userEvent.type(screen.getByRole('searchbox'), 'abcd');
+  await userEvent.type(screen.getByRole('searchbox'), 'ab');
 
   await waitFor(() => {
     const searches = useWaitingRegistrations.mock.calls
       .map(([options]) => (options as { search?: string }).search)
       .filter(Boolean);
-    expect(searches).toEqual(['abcd']);
+    expect(searches).toEqual(['ab']);
   });
 });
 

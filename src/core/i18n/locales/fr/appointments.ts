@@ -40,6 +40,8 @@ export const appointments = {
   'appointments.calendar.moreCount': '+{{count}} autre',
   'appointments.calendar.collapse': 'Réduire',
   'appointments.calendar.closed': 'Fermé',
+  'appointments.calendar.today': 'Aujourd’hui',
+  'appointments.calendar.currentTime': 'Heure actuelle : {{time}}',
   'appointments.availability.loading': 'Chargement des disponibilités…',
   'appointments.availability.loaded': 'Créneaux retournés pour la date sélectionnée',
   'appointments.status.scheduled': 'Planifié',

@@ -27,7 +27,7 @@ function renderModal() {
   );
 }
 
-it('searches users only from four characters with five results per page', async () => {
+it('searches users from the shared threshold with five results per page', async () => {
   const requests: URL[] = [];
   mockServer.use(
     http.get('http://localhost:3000/api/v1/users', ({ request }) => {
@@ -39,13 +39,13 @@ it('searches users only from four characters with five results per page', async 
   );
   renderModal();
   const input = screen.getByRole('searchbox', { name: /nom d.utilisateur ou email/i });
-  await userEvent.type(input, 'abc');
+  await userEvent.type(input, 'a');
   expect(requests).toHaveLength(0);
-  await userEvent.type(input, 'd');
+  await userEvent.type(input, 'b');
   await waitFor(() => {
     expect(requests).toHaveLength(1);
   });
-  expect(requests[0]?.searchParams.get('search')).toBe('abcd');
+  expect(requests[0]?.searchParams.get('search')).toBe('ab');
   expect(requests[0]?.searchParams.get('pageSize')).toBe('5');
   expect(requests[0]?.searchParams.has('userType')).toBe(false);
 });

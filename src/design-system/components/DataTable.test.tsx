@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { DataTable } from './DataTable';
 
 describe('DataTable', () => {
@@ -74,5 +75,30 @@ describe('DataTable', () => {
     expect(table.closest('.responsive-data-table-desktop')).toBeInTheDocument();
     expect(mobileList).toHaveClass('responsive-data-table-mobile');
     expect(within(mobileList).getByRole('listitem')).toHaveTextContent('Ada Lovelace');
+  });
+
+  it('distinguishes error and empty states from loading', async () => {
+    const onRetry = vi.fn();
+    const props = {
+      caption: 'Utilisateurs',
+      rows: [] as { id: string }[],
+      getRowKey: (row: { id: string }) => row.id,
+      columns: [{ key: 'name', header: 'Nom', render: () => 'Nom' }],
+    };
+    const { rerender } = render(<DataTable {...props} error onRetry={onRetry} />);
+
+    await userEvent.click(screen.getByRole('button'));
+    expect(onRetry).toHaveBeenCalledOnce();
+
+    rerender(
+      <DataTable
+        {...props}
+        empty
+        emptyTitle="Aucun utilisateur"
+        emptyDescription="Modifiez vos filtres."
+      />,
+    );
+    expect(screen.getByText('Aucun utilisateur')).toBeVisible();
+    expect(screen.getByText('Modifiez vos filtres.')).toBeVisible();
   });
 });

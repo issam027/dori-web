@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { Eye, Search } from 'lucide-react';
+import { Eye, ListChecks, Search } from 'lucide-react';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { DataTable } from '@/design-system/components/DataTable';
 import { Card } from '@/design-system/components/Card';
@@ -62,7 +62,7 @@ export function MyQueuesPage() {
   const items = registrations.data?.data.items ?? [];
   const getQueueName = (queueId: string) =>
     queues.data?.data.items.find((queue) => queue.queueId === queueId)?.queueName ??
-    'File #' + queueId;
+    __t('common.unknownQueue');
   return (
     <div className="page-stack">
       <PageHeader
@@ -180,107 +180,127 @@ export function MyQueuesPage() {
         </Card>
       ) : null}
       {queues.data?.data.items.length ? (
-        <DataTable
-          loading={registrations.isPending}
-          caption={__t('queue-operations.myQueues.inscriptionsDansMesFiles')}
-          containerClassName="table-scroll queue-registrations-table"
-          rows={items}
-          getRowKey={(item) => item.registrationId}
-          renderMobileRow={(item) => {
-            const queueName = getQueueName(item.queueId);
-            const noteCount = item.activeNoteCount;
-            return (
-              <QueueRegistrationMobileCard
-                registration={item}
-                position={(page - 1) * 10 + items.indexOf(item) + 1}
-                queueName={queueName}
-                onView={() => {
-                  setRegistrationDetails({ id: item.registrationId, queueName });
-                }}
-                onNotes={() => {
-                  setNotesMode(noteCount ? 'view' : 'add');
-                  setNotesPersonId(item.personId);
-                }}
-              />
-            );
-          }}
-          columns={[
-            {
-              key: 'position',
-              header: __t('common.position'),
-              render: (item) => (page - 1) * 10 + items.indexOf(item) + 1,
-            },
-            {
-              key: 'queue',
-              header: __t('queues.myQueues.siteAndQueue'),
-              render: (item) => getQueueName(item.queueId),
-            },
-            {
-              key: 'ticket',
-              header: __t('common.ticket'),
-              render: (item) => <strong>{item.ticketNumber}</strong>,
-            },
-            {
-              key: 'person',
-              header: __t('common.person'),
-              render: (item) => {
-                return [item.firstName, item.lastName].filter(Boolean).join(' ') || '—';
+        <Card className="settings-card">
+          <div className="card-heading persons-directory-heading">
+            <span className="translation-heading-icon">
+              <ListChecks aria-hidden="true" />
+            </span>
+            <div>
+              <h2>{__t('queue-operations.myQueues.inscriptionsDansMesFiles')}</h2>
+              <p>
+                {__t('queue-operations.myQueues.resultCount', {
+                  count: registrations.data?.data.total ?? 0,
+                })}
+              </p>
+            </div>
+          </div>
+          <DataTable
+            error={registrations.isError}
+            onRetry={() => void registrations.refetch()}
+            loading={registrations.isPending}
+            empty={!registrations.isPending && items.length === 0}
+            emptyTitle={__t('common.noResults')}
+            emptyDescription={__t('queue-operations.myQueues.emptyHint')}
+            caption={__t('queue-operations.myQueues.inscriptionsDansMesFiles')}
+            containerClassName="table-scroll queue-registrations-table"
+            rows={items}
+            getRowKey={(item) => item.registrationId}
+            renderMobileRow={(item) => {
+              const queueName = getQueueName(item.queueId);
+              const noteCount = item.activeNoteCount;
+              return (
+                <QueueRegistrationMobileCard
+                  registration={item}
+                  position={(page - 1) * 10 + items.indexOf(item) + 1}
+                  queueName={queueName}
+                  onView={() => {
+                    setRegistrationDetails({ id: item.registrationId, queueName });
+                  }}
+                  onNotes={() => {
+                    setNotesMode(noteCount ? 'view' : 'add');
+                    setNotesPersonId(item.personId);
+                  }}
+                />
+              );
+            }}
+            columns={[
+              {
+                key: 'position',
+                header: __t('common.position'),
+                render: (item) => (page - 1) * 10 + items.indexOf(item) + 1,
               },
-            },
-            { key: 'type', header: __t('common.type'), render: (item) => item.entryType },
-            {
-              key: 'age',
-              header: __t('queues.myQueues.ageAndSla'),
-              render: (item) => {
-                return <StatusBadge tone="neutral">{item.status}</StatusBadge>;
+              {
+                key: 'queue',
+                header: __t('queues.myQueues.siteAndQueue'),
+                render: (item) => getQueueName(item.queueId),
               },
-            },
-            {
-              key: 'tier',
-              header: __t('common.tier'),
-              render: (item) => (
-                <span
-                  className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
-                >
-                  {item.tierName ??
-                    __t('queue-operations.quickRegistration.serviceFallback', {
-                      id: item.tierId,
-                    })}
-                </span>
-              ),
-            },
-            {
-              key: 'actions',
-              header: __t('common.actions'),
-              render: (item) => {
-                const noteCount = item.activeNoteCount;
-                const queueName = getQueueName(item.queueId);
-                return (
-                  <div className="table-actions responsive-table-actions">
-                    <Button
-                      variant="unstyled"
-                      className="button button-small"
-                      type="button"
-                      title={__t('queues.myQueues.consulter')}
-                      onClick={() => {
-                        setRegistrationDetails({ id: item.registrationId, queueName });
-                      }}
-                    >
-                      <Eye aria-hidden="true" /> {__t('queues.myQueues.consulter')}
-                    </Button>
-                    <PersonNotesButton
-                      noteCount={noteCount}
-                      onClick={() => {
-                        setNotesMode(noteCount ? 'view' : 'add');
-                        setNotesPersonId(item.personId);
-                      }}
-                    />
-                  </div>
-                );
+              {
+                key: 'ticket',
+                header: __t('common.ticket'),
+                render: (item) => <strong>{item.ticketNumber}</strong>,
               },
-            },
-          ]}
-        />
+              {
+                key: 'person',
+                header: __t('common.person'),
+                render: (item) => {
+                  return [item.firstName, item.lastName].filter(Boolean).join(' ') || '—';
+                },
+              },
+              { key: 'type', header: __t('common.type'), render: (item) => item.entryType },
+              {
+                key: 'age',
+                header: __t('queues.myQueues.ageAndSla'),
+                render: (item) => {
+                  return <StatusBadge tone="neutral">{item.status}</StatusBadge>;
+                },
+              },
+              {
+                key: 'tier',
+                header: __t('common.tier'),
+                render: (item) => (
+                  <span
+                    className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
+                  >
+                    {item.tierName ??
+                      __t('queue-operations.quickRegistration.serviceFallback', {
+                        id: item.tierId,
+                      })}
+                  </span>
+                ),
+              },
+              {
+                key: 'actions',
+                header: __t('common.actions'),
+                render: (item) => {
+                  const noteCount = item.activeNoteCount;
+                  const queueName = getQueueName(item.queueId);
+                  return (
+                    <div className="table-actions responsive-table-actions">
+                      <Button
+                        variant="unstyled"
+                        className="button button-small"
+                        type="button"
+                        title={__t('queues.myQueues.consulter')}
+                        onClick={() => {
+                          setRegistrationDetails({ id: item.registrationId, queueName });
+                        }}
+                      >
+                        <Eye aria-hidden="true" /> {__t('queues.myQueues.consulter')}
+                      </Button>
+                      <PersonNotesButton
+                        noteCount={noteCount}
+                        onClick={() => {
+                          setNotesMode(noteCount ? 'view' : 'add');
+                          setNotesPersonId(item.personId);
+                        }}
+                      />
+                    </div>
+                  );
+                },
+              },
+            ]}
+          />
+        </Card>
       ) : null}
       {queues.data?.data.items.length ? (
         <Pagination

@@ -16,6 +16,7 @@ import { queryKeys } from '@/api/client/query-keys';
 import { UserPlus } from 'lucide-react';
 import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { Button } from '@/design-system/components/Button';
 
 export interface AssignmentTarget {
@@ -37,7 +38,7 @@ export function UserAssignmentModal({
 }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebouncedFilter(search, { delay: 300, minimumLength: 4 });
+  const debouncedSearch = useDebouncedFilter(search, { delay: 300 });
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserSummaryItemDto | null>(null);
   const [roleId, setRoleId] = useState('');
@@ -66,11 +67,12 @@ export function UserAssignmentModal({
         pageSize: 5,
         sort: 'username:asc',
       }),
-    enabled: Boolean(target && debouncedSearch.length >= 4),
+    enabled: Boolean(target && debouncedSearch.length >= SEARCH_MINIMUM_LENGTH),
   });
   const results = users.data?.data.items ?? [];
   const totalPages = users.data?.data.totalPages ?? 0;
-  const searchPending = search.trim().length >= 4 && debouncedSearch !== search.trim();
+  const searchPending =
+    search.trim().length >= SEARCH_MINIMUM_LENGTH && debouncedSearch !== search.trim();
 
   const assign = async () => {
     if (!target || !selectedUser || !roleId) return;
@@ -128,7 +130,9 @@ export function UserAssignmentModal({
             <input
               type="search"
               value={search}
-              placeholder={t('settings.searchUserPlaceholder')}
+              placeholder={t('settings.searchUserPlaceholder', {
+                count: SEARCH_MINIMUM_LENGTH,
+              })}
               autoComplete="off"
               onChange={(event) => {
                 setSearch(event.target.value);
@@ -138,8 +142,10 @@ export function UserAssignmentModal({
               }}
             />
           </label>
-          {search.trim().length < 4 ? (
-            <p className="muted">{t('settings.searchUserMinimum')}</p>
+          {search.trim().length < SEARCH_MINIMUM_LENGTH ? (
+            <p className="muted">
+              {t('settings.searchUserMinimum', { count: SEARCH_MINIMUM_LENGTH })}
+            </p>
           ) : searchPending || users.isFetching ? (
             <p className="muted" role="status">
               {t('common.loading')}
@@ -173,7 +179,7 @@ export function UserAssignmentModal({
                 </Button>
               ))}
             </div>
-          ) : debouncedSearch.length >= 4 ? (
+          ) : debouncedSearch.length >= SEARCH_MINIMUM_LENGTH ? (
             <p className="muted">{t('settings.noUserFound')}</p>
           ) : null}
           {totalPages > 1 ? (

@@ -225,7 +225,11 @@ export function NotificationsPage() {
       </Card>
       <Card className="settings-card notification-journal-card">
         <DataTable
+          error={journal.isError}
+          onRetry={() => void journal.refetch()}
           loading={journal.isPending}
+          empty={!journal.isPending && items.length === 0}
+          emptyTitle={t('common.noResults')}
           caption={t('supervision.notifications.journalDesNotifications')}
           rows={items}
           getRowKey={(row) => row.notificationId}

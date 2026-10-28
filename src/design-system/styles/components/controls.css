@@ -467,9 +467,6 @@ textarea:disabled {
   border-color: color-mix(in srgb, var(--appointment-tier-color) 55%, var(--color-line));
   background: color-mix(in srgb, var(--appointment-tier-color) 9%, var(--color-surface));
 }
-.appointment-action-grid .button {
-  min-height: 48px;
-}
 .appointment-slot-grid .button {
   display: grid;
   gap: 0.1rem;
@@ -894,22 +891,6 @@ select:focus-visible {
 .topbar-icon-button .is-spinning {
   animation: experience-spin 0.8s linear infinite;
 }
-.desk-operational-card .button:first-of-type {
-  margin-top: auto;
-}
-.site-menu button {
-  min-height: 42px;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 8px;
-  color: var(--color-ink);
-  background: transparent;
-  text-align: start;
-}
-.site-menu button:hover,
-.site-menu button[aria-current='true'] {
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-}
 .site-required-card .button {
   display: inline-flex;
   align-items: center;
@@ -939,11 +920,6 @@ select:focus-visible {
     height: 38px;
     min-height: 38px;
   }
-}
-.passage-summary-card > footer .button {
-  min-height: 36px;
-  padding: 0.45rem 0.75rem;
-  background: transparent;
 }
 .tracking-lookup-actions input {
   min-width: 0;
@@ -1132,4 +1108,13 @@ input:is([type='checkbox'], [type='radio']):user-invalid {
     position: relative;
     overflow: visible;
   }
+}
+.disabled-action {
+  display: inline-grid;
+  gap: var(--space-1);
+}
+.disabled-action > small {
+  max-width: 18rem;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
 }

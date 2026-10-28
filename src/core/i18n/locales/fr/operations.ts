@@ -102,8 +102,11 @@ export const operations = {
   'queues.myQueues.consulter': 'Consulter',
   'queues.search.example': 'Ex. Nadia, Ben Ali ou A-042',
   'queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre':
-    'Nom, prénom ou ticket · recherche automatique à partir de 4 caractères',
+    'Nom, prénom ou ticket · recherche automatique à partir de 2 caractères',
   'queues.myQueues.rechercherUnClient': 'Rechercher un passage',
+  'queue-operations.myQueues.resultCount': '{{count}} passage(s)',
+  'queue-operations.myQueues.emptyHint':
+    'Modifiez votre recherche ou vos filtres pour retrouver un passage.',
   'queues.registrationDetails.chargementDeLInscription…': 'Chargement de l’inscription…',
   'queues.myQueues.siteAndQueue': 'Site / file',
   'queues.myQueues.ageAndSla': 'Ancienneté / SLA',
@@ -201,6 +204,8 @@ export const operations = {
   'cockpit.recentPassages': 'Derniers passages',
   'cockpit.printPassage': 'Imprimer le justificatif',
   'cockpit.noRecentPassages': 'Aucun passage terminé récemment.',
+  'cockpit.noRecentPassagesHint':
+    'Les passages servis ou marqués absents apparaîtront ici dès leur clôture.',
   'cockpit.counterNumber': 'Guichet {{number}}',
   'cockpit.served': 'Servi',
   'cockpit.noShow': 'Absent',
@@ -222,6 +227,7 @@ export const operations = {
   'cockpit.queueEmpty': 'Aucun client en attente.',
   'cockpit.closeSession': 'Fermer la session',
   'cockpit.openSession': 'Ouvrir une session',
+  'cockpit.sessionUnavailable': 'Aucun guichet n’est actuellement disponible pour cette file.',
   'cockpit.callFromQueue': 'Appeler sur cette file',
   'cockpit.confirmOpenSession': 'Confirmer l’ouverture',
   'cockpit.chooseCounter': 'Choisissez votre guichet',

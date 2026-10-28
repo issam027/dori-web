@@ -10,7 +10,7 @@ import {
   StickyNote,
   Trash2,
 } from 'lucide-react';
-import { Modal } from '@/design-system/components/Modal';
+import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import {
@@ -48,11 +48,12 @@ export function PersonNotesViewer({
   const [adding, setAdding] = useState(initialMode === 'add');
   const [content, setContent] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string>();
+  const [deletingNoteId, setDeletingNoteId] = useState<string>();
   const notes = usePersonNotes(personId, { enabled: open });
   const addNote = useAddPersonNote(personId);
   const updateNote = useUpdatePersonNote(personId);
   const deleteNote = useDeletePersonNote(personId);
-  const displayName = personName?.trim() || `#${personId}`;
+  const displayName = personName?.trim() || __t('persons.notes.unknownPerson');
   const items = notes.data?.data.items ?? [];
   const current = items[index];
   const add = async () => {
@@ -84,11 +85,11 @@ export function PersonNotesViewer({
       notifyError(error);
     }
   };
-  const remove = async () => {
-    if (!current) return;
+  const remove = async (noteId: string) => {
     try {
-      await deleteNote.execute(current.noteId);
+      await deleteNote.execute(noteId);
       setIndex(Math.max(0, index - 1));
+      setDeletingNoteId(undefined);
       onNotesChanged?.();
       notify({ tone: 'success', title: __t('persons.notes.deleted') });
     } catch (error) {
@@ -96,184 +97,201 @@ export function PersonNotesViewer({
     }
   };
   return (
-    <Modal
-      loading={notes.isPending}
-      open={open}
-      onOpenChange={(next) => {
-        if (!next && (editingNoteId || adding)) {
-          setEditingNoteId(undefined);
-          setAdding(false);
-          setContent('');
-          return;
+    <>
+      <Modal
+        loading={notes.isPending}
+        open={open}
+        onOpenChange={(next) => {
+          if (!next && (editingNoteId || adding)) {
+            setEditingNoteId(undefined);
+            setAdding(false);
+            setContent('');
+            return;
+          }
+          onOpenChange(next);
+        }}
+        title={__t('persons.notes.title', { name: displayName })}
+        description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
+        actions={
+          <>
+            {adding && items.length > 0 ? (
+              <Button
+                variant="unstyled"
+                className="button"
+                type="button"
+                icon={<ArrowLeft />}
+                label={__t('persons.personNotesViewer.retourAuxNotes')}
+                labelMode="responsive"
+                title={__t('persons.personNotesViewer.retourAuxNotes')}
+                onClick={() => {
+                  setAdding(false);
+                }}
+              />
+            ) : null}
+            {editingNoteId ? (
+              <Button
+                variant="unstyled"
+                className="button button-primary"
+                type="button"
+                disabled={!content.trim()}
+                onClick={() => void saveEdit()}
+              >
+                <Save aria-hidden="true" />
+                {__t('common.save')}
+              </Button>
+            ) : adding ? (
+              <Button
+                variant="unstyled"
+                className="button button-primary"
+                type="button"
+                disabled={!content.trim()}
+                onClick={() => void add()}
+              >
+                <Save aria-hidden="true" />
+                {__t('persons.personNotesViewer.enregistrerLaNote')}
+              </Button>
+            ) : (
+              <Button
+                variant="unstyled"
+                className="button button-primary"
+                type="button"
+                onClick={() => {
+                  setAdding(true);
+                }}
+              >
+                <Plus aria-hidden="true" />
+                {__t('common.add')}
+              </Button>
+            )}
+          </>
         }
-        onOpenChange(next);
-      }}
-      title={__t('persons.notes.title', { name: displayName })}
-      description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
-      actions={
-        <>
-          {adding && items.length > 0 ? (
-            <Button
-              variant="unstyled"
-              className="button"
-              type="button"
-              icon={<ArrowLeft />}
-              label={__t('persons.personNotesViewer.retourAuxNotes')}
-              labelMode="responsive"
-              title={__t('persons.personNotesViewer.retourAuxNotes')}
-              onClick={() => {
-                setAdding(false);
-              }}
-            />
-          ) : null}
-          {editingNoteId ? (
-            <Button
-              variant="unstyled"
-              className="button button-primary"
-              type="button"
-              disabled={!content.trim()}
-              onClick={() => void saveEdit()}
-            >
-              <Save aria-hidden="true" />
-              {__t('common.save')}
-            </Button>
-          ) : adding ? (
-            <Button
-              variant="unstyled"
-              className="button button-primary"
-              type="button"
-              disabled={!content.trim()}
-              onClick={() => void add()}
-            >
-              <Save aria-hidden="true" />
-              {__t('persons.personNotesViewer.enregistrerLaNote')}
-            </Button>
-          ) : (
-            <Button
-              variant="unstyled"
-              className="button button-primary"
-              type="button"
-              onClick={() => {
-                setAdding(true);
-              }}
-            >
-              <Plus aria-hidden="true" />
-              {__t('common.add')}
-            </Button>
-          )}
-        </>
-      }
-    >
-      {adding || editingNoteId ? (
-        <div className="note-editor-panel">
-          <div className="note-mode-heading">
-            <span className="note-icon" aria-hidden="true">
-              <StickyNote />
-            </span>
-            <div>
-              <h3>
-                {editingNoteId
-                  ? __t('persons.notes.editTitle')
-                  : __t('persons.personNotesViewer.nouvelleNote')}
-              </h3>
-              <p>{__t('persons.personNotesViewer.cetteInformationSeraVisibleLorsDesProchain')}</p>
+      >
+        {adding || editingNoteId ? (
+          <div className="note-editor-panel">
+            <div className="note-mode-heading">
+              <span className="note-icon" aria-hidden="true">
+                <StickyNote />
+              </span>
+              <div>
+                <h3>
+                  {editingNoteId
+                    ? __t('persons.notes.editTitle')
+                    : __t('persons.personNotesViewer.nouvelleNote')}
+                </h3>
+                <p>{__t('persons.personNotesViewer.cetteInformationSeraVisibleLorsDesProchain')}</p>
+              </div>
             </div>
+            <label>
+              {__t('persons.personNotesViewer.contenuDeLaNote')}
+              <textarea
+                aria-label={__t('persons.personNotesViewer.nouvelleNote')}
+                rows={6}
+                placeholder={__t('persons.personNotesViewer.exDocumentsAVerifierBesoinDAssistance')}
+                value={content}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                }}
+              />
+            </label>
           </div>
-          <label>
-            {__t('persons.personNotesViewer.contenuDeLaNote')}
-            <textarea
-              aria-label={__t('persons.personNotesViewer.nouvelleNote')}
-              rows={6}
-              placeholder={__t('persons.personNotesViewer.exDocumentsAVerifierBesoinDAssistance')}
-              value={content}
-              onChange={(e) => {
-                setContent(e.target.value);
-              }}
-            />
-          </label>
-        </div>
-      ) : current ? (
-        <article className="note-viewer-panel">
-          <div className="note-content-block">
-            <blockquote>{current.content}</blockquote>
-          </div>
-          <div className="note-meta-row">
-            <small className="note-meta">
-              {current.authorUsername ??
-                __t('persons.notes.userReference', {
-                  value0: current.createdByUserId,
-                })}{' '}
-              · {formatDateTime(current.createdAt, i18n.language)}
-            </small>
-            {canManage ? (
-              <div className="note-inline-actions">
+        ) : current ? (
+          <article className="note-viewer-panel">
+            <div className="note-content-block">
+              <blockquote>{current.content}</blockquote>
+            </div>
+            <div className="note-meta-row">
+              <small className="note-meta">
+                {current.authorUsername ??
+                  __t('persons.notes.userReference', {
+                    value0: current.createdByUserId,
+                  })}{' '}
+                · {formatDateTime(current.createdAt, i18n.language)}
+              </small>
+              {canManage ? (
+                <div className="note-inline-actions">
+                  <Button
+                    variant="unstyled"
+                    className="icon-button"
+                    type="button"
+                    title={__t('common.edit')}
+                    aria-label={__t('common.edit')}
+                    onClick={() => {
+                      setEditingNoteId(current.noteId);
+                      setContent(current.content);
+                    }}
+                  >
+                    <Pencil aria-hidden="true" />
+                  </Button>
+                  <Button
+                    variant="unstyled"
+                    className="icon-button icon-button-danger"
+                    type="button"
+                    title={__t('common.delete')}
+                    aria-label={__t('common.delete')}
+                    onClick={() => {
+                      setDeletingNoteId(current.noteId);
+                    }}
+                  >
+                    <Trash2 aria-hidden="true" />
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+            {items.length > 1 ? (
+              <div className="note-pagination">
                 <Button
                   variant="unstyled"
-                  className="icon-button"
+                  className="button"
                   type="button"
-                  title={__t('common.edit')}
-                  aria-label={__t('common.edit')}
+                  disabled={index >= items.length - 1}
                   onClick={() => {
-                    setEditingNoteId(current.noteId);
-                    setContent(current.content);
+                    setIndex(index + 1);
                   }}
                 >
-                  <Pencil aria-hidden="true" />
+                  <ChevronLeft aria-hidden="true" />
+                  {__t('persons.personNotesViewer.precedente')}
                 </Button>
+                <span>
+                  {index + 1} / {items.length}
+                </span>
                 <Button
                   variant="unstyled"
-                  className="icon-button icon-button-danger"
+                  className="button"
                   type="button"
-                  title={__t('common.delete')}
-                  aria-label={__t('common.delete')}
-                  onClick={() => void remove()}
+                  disabled={index === 0}
+                  onClick={() => {
+                    setIndex(index - 1);
+                  }}
                 >
-                  <Trash2 aria-hidden="true" />
+                  {__t('persons.personNotesViewer.suivante')}
+                  <ChevronRight aria-hidden="true" />
                 </Button>
               </div>
             ) : null}
+          </article>
+        ) : (
+          <div className="note-empty-state">
+            <span className="note-icon" aria-hidden="true">
+              <StickyNote />
+            </span>
+            <h3>{__t('persons.personNotesViewer.aucuneNote')}</h3>
+            <p>{__t('persons.personNotesViewer.ajoutezLaPremiereInformationUtilePourCette')}</p>
           </div>
-          {items.length > 1 ? (
-            <div className="note-pagination">
-              <Button
-                variant="unstyled"
-                className="button"
-                type="button"
-                disabled={index >= items.length - 1}
-                onClick={() => {
-                  setIndex(index + 1);
-                }}
-              >
-                <ChevronLeft aria-hidden="true" />
-                {__t('persons.personNotesViewer.precedente')}
-              </Button>
-              <span>
-                {index + 1} / {items.length}
-              </span>
-              <Button
-                variant="unstyled"
-                className="button"
-                type="button"
-                disabled={index === 0}
-                onClick={() => {
-                  setIndex(index - 1);
-                }}
-              >
-                {__t('persons.personNotesViewer.suivante')}
-                <ChevronRight aria-hidden="true" />
-              </Button>
-            </div>
-          ) : null}
-        </article>
-      ) : (
-        <div className="note-empty-state">
-          <span className="note-icon" aria-hidden="true">
-            <StickyNote />
-          </span>
-          <h3>{__t('persons.personNotesViewer.aucuneNote')}</h3>
-          <p>{__t('persons.personNotesViewer.ajoutezLaPremiereInformationUtilePourCette')}</p>
-        </div>
-      )}
-    </Modal>
+        )}
+      </Modal>
+      <ConfirmDialog
+        open={Boolean(deletingNoteId)}
+        onOpenChange={(next) => {
+          if (!next && !deleteNote.isPending) setDeletingNoteId(undefined);
+        }}
+        title={__t('persons.notes.deleteTitle')}
+        description={__t('persons.notes.deleteDescription')}
+        confirmLabel={__t('common.delete')}
+        destructive
+        onConfirm={() => {
+          if (deletingNoteId) void remove(deletingNoteId);
+        }}
+      />
+    </>
   );
 }

@@ -30,7 +30,8 @@ export const admin = {
   'admin.users.suspend': 'Suspendre',
   'admin.users.passwordResetSuccess': 'Mot de passe réinitialisé',
   'admin.translations.catalogueDesTraductions': 'Catalogue des traductions',
-  'admin.translations.cleCategorieOuLangue': 'Clé (4 caractères minimum), catégorie ou langue',
+  'admin.translations.cleCategorieOuLangue':
+    'Clé ({{count}} caractères minimum), catégorie ou langue',
   'admin.translations.contenusParLangue': 'Contenus par langue',
   'admin.translations.erreur': 'Erreur',
   'admin.translations.ihm': 'IHM',
@@ -56,7 +57,7 @@ export const admin = {
   'admin.users.modifierLUtilisateur': 'Modifier l’utilisateur',
   'admin.users.nomDUtilisateurOuEmail': 'Nom d’utilisateur ou email',
   'admin.users.nomEmailOuTypeDeCompte':
-    'Nom ou email à partir de 4 caractères · filtres automatiques',
+    'Nom ou email à partir de {{count}} caractères · filtres automatiques',
   'admin.users.recherche': 'Recherche',
   'admin.users.rechercherUnUtilisateur': 'Rechercher un utilisateur',
   'admin.users.toutesLesSessionsActivesSerontImmediatementRevoquees.':
@@ -132,8 +133,8 @@ export const admin = {
   'settings.assignmentStepUser': '1 · Rechercher un utilisateur',
   'settings.assignmentStepRole': '2 · Choisir son rôle',
   'settings.searchUser': 'Nom d’utilisateur ou email',
-  'settings.searchUserPlaceholder': 'Saisissez au moins 4 caractères',
-  'settings.searchUserMinimum': 'La recherche démarre à partir de 4 caractères.',
+  'settings.searchUserPlaceholder': 'Saisissez au moins {{count}} caractères',
+  'settings.searchUserMinimum': 'La recherche démarre à partir de {{count}} caractères.',
   'settings.noUserFound': 'Aucun utilisateur ne correspond à cette recherche.',
   'settings.noEmail': 'Sans adresse email',
   'settings.active': 'Actif',

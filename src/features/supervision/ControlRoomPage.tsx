@@ -79,16 +79,18 @@ export function ControlRoomPage() {
   const [rangeAnchor, setRangeAnchor] = useState(() => Date.now());
   const [resetTarget, setResetTarget] = useState<{ queueId: string; queueName: string }>();
   const range = useMemo(() => periodRange(period, rangeAnchor), [period, rangeAnchor]);
+  const live = useMonitoringLive(siteId, false);
+  const refetchLive = live.refetch;
   useEffect(() => {
     if (!refreshInterval) return;
     const interval = window.setInterval(() => {
       setRangeAnchor(Date.now());
+      void refetchLive();
     }, refreshInterval);
     return () => {
       window.clearInterval(interval);
     };
-  }, [refreshInterval]);
-  const live = useMonitoringLive(siteId, refreshInterval);
+  }, [refetchLive, refreshInterval]);
   const snapshot = live.data?.data;
   const items = snapshot?.queues ?? [];
   const uniqueOperators = uniqueOperatorsByUser(snapshot?.operators ?? []);

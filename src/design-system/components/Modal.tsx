@@ -39,6 +39,17 @@ export function Modal({
               <Dialog.Title>{title}</Dialog.Title>
               {description ? <Dialog.Description>{description}</Dialog.Description> : null}
             </div>
+            {!hideDismissAction ? (
+              <Dialog.Close asChild>
+                <Button
+                  className="dialog-header-close"
+                  size="icon"
+                  icon={<X />}
+                  label={t('common.close')}
+                  labelMode="icon-only"
+                />
+              </Dialog.Close>
+            ) : null}
           </header>
           <div className="dialog-body">{loading ? <DorifyLoader compact /> : children}</div>
           <ButtonLabelModeProvider value="always">

@@ -40,6 +40,8 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   'appointments.calendar.moreCount': '+{{count}} more',
   'appointments.calendar.collapse': 'Collapse',
   'appointments.calendar.closed': 'Closed',
+  'appointments.calendar.today': 'Today',
+  'appointments.calendar.currentTime': 'Current time: {{time}}',
   'appointments.availability.loading': 'Loading availability…',
   'appointments.availability.loaded': 'Availability loaded',
   'appointments.status.scheduled': 'Scheduled',

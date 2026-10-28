@@ -26,6 +26,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactElement;
   label?: ReactNode;
   labelMode?: ButtonLabelMode;
+  unavailableReason?: ReactNode;
 }
 
 function buttonClassName(
@@ -70,6 +71,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     label,
     labelMode: requestedLabelMode,
     children,
+    unavailableReason,
     ...props
   },
   ref,
@@ -81,13 +83,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     ? cloneElement(icon, { 'aria-hidden': true })
     : icon;
 
-  return (
+  const button = (
     <button
       {...props}
       ref={ref}
       type={type}
       className={buttonClassName(variant, size, className, labelMode, hasIcon)}
       disabled={disabled || pending}
+      title={props.title ?? (typeof unavailableReason === 'string' ? unavailableReason : undefined)}
       aria-busy={pending || undefined}
       aria-label={
         props['aria-label'] ??
@@ -97,5 +100,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {decorativeIcon}
       {label !== undefined ? <span className="button-label">{label}</span> : children}
     </button>
+  );
+  if (!disabled || !unavailableReason) return button;
+  return (
+    <span className="disabled-action">
+      {button}
+      <small>{unavailableReason}</small>
+    </span>
   );
 });

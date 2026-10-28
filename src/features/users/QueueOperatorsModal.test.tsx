@@ -37,7 +37,7 @@ function renderModal(client = new QueryClient({ defaultOptions: { queries: { ret
   return client;
 }
 
-it('issues one candidate request after a typing burst reaches four characters', async () => {
+it('issues one candidate request after a typing burst reaches the shared threshold', async () => {
   findUsers.mockResolvedValue({
     data: { page: 1, pageSize: 5, total: 0, totalPages: 0, items: [] },
   });
@@ -47,13 +47,13 @@ it('issues one candidate request after a typing burst reaches four characters', 
   const addAssignment = screen.getByRole('button', { name: /ajouter une affectation/i });
   expect(addAssignment).toHaveClass('button', 'button-primary');
   await userEvent.click(addAssignment);
-  await userEvent.type(screen.getByRole('searchbox'), 'abcd');
+  await userEvent.type(screen.getByRole('searchbox'), 'ab');
 
   await waitFor(() => {
     expect(findUsers).toHaveBeenCalledOnce();
   });
   expect(findUsers.mock.calls[0]?.[0]).toMatchObject({
-    search: 'abcd',
+    search: 'ab',
     siteIds: '00000000-0000-4000-8000-000000000001',
     pageSize: 5,
   });

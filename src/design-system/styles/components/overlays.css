@@ -269,7 +269,6 @@
 }
 .form-field input,
 .form-field select,
-.site-switcher select,
 .command-palette input {
   min-height: 44px;
   border: 1px solid var(--color-line);
@@ -328,4 +327,7 @@
     inset: 0.75rem 0.75rem auto;
     width: auto;
   }
+}
+.dialog-header-close {
+  flex: 0 0 auto;
 }

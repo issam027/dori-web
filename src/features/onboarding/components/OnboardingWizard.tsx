@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import {
   associateTier,
@@ -1067,9 +1068,9 @@ function TeamStep() {
         <span className="ticket-chip">5</span>
         <h3>{__t('onboarding.onboarding.assistantDeComptesPartage')}</h3>
         <p>{__t('onboarding.onboarding.creezLeRoleInitialPuisAffectezLesSitesEt')}</p>
-        <a className="button button-primary" href="/settings/users">
+        <Link className="button button-primary" to="/admin/users">
           {__t('onboarding.onboarding.ouvrirLesUtilisateurs')}
-        </a>
+        </Link>
       </div>
     </section>
   );

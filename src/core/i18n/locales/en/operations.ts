@@ -100,8 +100,10 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'queues.myQueues.consulter': 'View',
   'queues.search.example': 'E.g. Nadia, Ben Ali or A-042',
   'queues.myQueues.nomPrenomOuNumeroDeTicketDansVotrePerimetre':
-    'Name or ticket · automatic search from 4 characters',
+    'Name or ticket · automatic search from 2 characters',
   'queues.myQueues.rechercherUnClient': 'Search visits',
+  'queue-operations.myQueues.resultCount': '{{count}} visit(s)',
+  'queue-operations.myQueues.emptyHint': 'Change your search or filters to find a visit.',
   'queues.registrationDetails.chargementDeLInscription…': 'Loading registration…',
   'queues.myQueues.siteAndQueue': 'Site / queue',
   'queues.myQueues.ageAndSla': 'Waiting time / SLA',
@@ -197,6 +199,8 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.recentPassages': 'Latest visits',
   'cockpit.printPassage': 'Print receipt',
   'cockpit.noRecentPassages': 'No recently completed visit.',
+  'cockpit.noRecentPassagesHint':
+    'Served and no-show visits will appear here as soon as they are completed.',
   'cockpit.counterNumber': 'Counter {{number}}',
   'cockpit.served': 'Served',
   'cockpit.noShow': 'No show',
@@ -218,6 +222,7 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.queueEmpty': 'No customer is waiting.',
   'cockpit.closeSession': 'Close session',
   'cockpit.openSession': 'Open a session',
+  'cockpit.sessionUnavailable': 'No counter is currently available for this queue.',
   'cockpit.callFromQueue': 'Call from this queue',
   'cockpit.confirmOpenSession': 'Confirm opening',
   'cockpit.chooseCounter': 'Choose your counter',

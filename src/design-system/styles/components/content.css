@@ -616,133 +616,6 @@
   grid-column: 1 / -1;
 }
 
-.desk-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
-  align-items: stretch;
-  gap: var(--space-4);
-}
-.desk-operational-card {
-  display: flex;
-  min-width: 0;
-  min-height: 18rem;
-  flex-direction: column;
-  gap: 14px;
-  transition:
-    transform 180ms ease,
-    opacity 180ms ease,
-    box-shadow 180ms ease;
-}
-.desk-operational-card h2,
-.desk-operational-card h3,
-.desk-operational-card p {
-  margin-block: 0;
-}
-.queue-desk-card.has-open-desk {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-line));
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-}
-.queue-desk-card.has-active-call {
-  border-color: color-mix(in srgb, var(--color-primary) 62%, var(--color-line));
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
-    var(--color-surface) 58%
-  );
-  box-shadow: 0 14px 34px color-mix(in srgb, var(--color-primary) 18%, transparent);
-}
-.queue-desk-summary {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-.queue-desk-summary > div {
-  min-width: 0;
-}
-.queue-desk-summary h2,
-.queue-desk-summary p {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.queue-desk-summary p {
-  margin-top: 0.35rem;
-  color: var(--color-text-muted);
-  font-size: 0.82rem;
-}
-.queue-card-active-call {
-  display: grid;
-  min-width: 0;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 26%, var(--color-line));
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
-}
-.queue-card-person {
-  overflow: hidden;
-  max-width: 55%;
-  font-weight: 800;
-  text-align: end;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.queue-card-active-call .active-call-heading > * {
-  min-width: 0;
-}
-.queue-card-active-call .active-call-heading strong {
-  overflow-wrap: anywhere;
-}
-.queue-card-call-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.queue-card-call-actions .button {
-  flex: 1 1 auto;
-}
-.queue-desk-card.no-open-desk {
-  opacity: 0.68;
-  filter: saturate(0.65);
-}
-.queue-desk-card.no-open-desk:hover {
-  opacity: 0.9;
-  filter: none;
-}
-.desk-preview-card .preview-list {
-  display: grid;
-  align-items: stretch;
-}
-.desk-preview-card .preview-list > span {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--color-surface-muted);
-}
-.desk-active-card .active-call {
-  display: grid;
-  width: 100%;
-  align-items: stretch;
-}
-.active-call-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin: 0;
-}
-.active-call-metrics > div {
-  padding: 10px;
-  border-radius: 11px;
-  background: var(--color-surface-muted);
-}
-.active-call-metrics dt {
-  color: var(--color-text-muted);
-  font-size: 0.72rem;
-}
-.active-call-metrics dd {
-  margin: 3px 0 0;
-  font-weight: 800;
-}
 .site-required-card {
   min-height: min(68vh, 42rem);
   display: grid;
@@ -760,100 +633,6 @@
 }
 .site-required-card .feedback-state {
   max-width: 34rem;
-}
-.passage-summary-heading,
-.passage-summary-card > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.passage-summary-heading h2,
-.passage-summary-card h3 {
-  margin: 0.2rem 0 0;
-}
-.passage-summary-card {
-  width: 100%;
-  max-width: none;
-  min-width: 0;
-  padding: 0.85rem;
-  border: 1px dashed color-mix(in srgb, var(--color-muted) 48%, var(--color-line));
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--color-surface-muted) 58%, var(--color-surface));
-  box-shadow: none;
-}
-.passage-summary-card small {
-  color: var(--color-text-muted);
-  font-weight: 750;
-  overflow-wrap: anywhere;
-}
-.passage-summary-card > header > div {
-  min-width: 0;
-}
-.passage-summary-card > header .status-badge {
-  flex: 0 0 auto;
-}
-.passage-summary-card h3,
-.passage-summary-card dd {
-  overflow-wrap: anywhere;
-}
-.passage-summary-card dl {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin: 1rem 0 0;
-}
-.passage-summary-card dl > div {
-  padding: 0.65rem;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--color-surface) 62%, transparent);
-}
-.passage-summary-card dt {
-  color: var(--color-text-muted);
-  font-size: 0.72rem;
-}
-.passage-summary-card dd {
-  margin: 0.2rem 0 0;
-  font-weight: 800;
-}
-.passage-summary-card > footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.85rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed var(--color-line);
-}
-.passage-summary-card > footer > small {
-  font-size: 0.7rem;
-  font-weight: 500;
-}
-
-@media (max-width: 680px) {
-  .passage-summary-card {
-    padding: var(--space-3);
-  }
-  .passage-summary-card > header {
-    align-items: flex-start;
-  }
-  .passage-summary-card > footer {
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .passage-summary-card > footer .button {
-    width: 100%;
-    min-height: 44px;
-    justify-content: center;
-    white-space: normal;
-    text-align: center;
-  }
-}
-
-@media (max-width: 390px) {
-  .passage-summary-card dl {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 .tracking-status {
   margin: 0;
@@ -987,19 +766,6 @@
 .cockpit-recommendations article span {
   color: var(--color-text-muted);
   font-size: 0.75rem;
-}
-.cockpit-view-controls {
-  display: grid;
-  grid-template-columns: minmax(14rem, 1.4fr) minmax(12rem, 1fr) auto;
-  align-items: end;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-}
-.cockpit-view-controls .form-field {
-  min-width: 0;
 }
 .cockpit-view-actions,
 .cockpit-note-actions {
@@ -1462,11 +1228,6 @@
   }
   .cockpit-thread-options {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .cockpit-view-controls {
-    width: 100%;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: stretch;
   }
   .cockpit-view-actions {
     justify-content: stretch;

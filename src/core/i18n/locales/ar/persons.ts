@@ -58,6 +58,9 @@ export const persons: DomainTranslations<typeof import('../fr/persons').persons>
   'persons.notes.editTitle': 'تحيين الملاحظة',
   'persons.notes.updated': 'تم تحيين الملاحظة بنجاح',
   'persons.notes.deleted': 'تم حذف الملاحظة',
+  'persons.notes.deleteTitle': 'حذف هذه الملاحظة؟',
+  'persons.notes.deleteDescription': 'هذا الإجراء نهائي ولا يمكن استعادة الملاحظة.',
+  'persons.notes.unknownPerson': 'شخص غير معروف',
   'persons.admin.deleteTitle': 'حذف هذا الحريف؟',
   'persons.admin.deleteDescription':
     'ستتم معالجة حذف ملف الحريف والملاحظات المرتبطة به عبر المنظومة.',

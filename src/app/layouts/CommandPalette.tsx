@@ -5,79 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import { Button } from '@/design-system/components/Button';
+import { navigationRoutes, publicNavigationRoutes } from '@/app/protected-routes';
 
 const commands = [
-  {
-    id: 'desk',
-    featured: true,
-    labelKey: 'nav.desk',
-    path: '/desk',
-    permissions: ['registration_call', 'session_operate'],
-  },
-  {
-    id: 'queues',
-    featured: true,
-    labelKey: 'nav.myQueues',
-    path: '/my-queues',
-    permissions: ['registration_view', 'queue_view'],
-  },
-  {
-    id: 'appointment',
-    featured: true,
-    labelKey: 'nav.appointments',
-    path: '/appointments',
-    permissions: ['appointment_manage', 'appointment_checkin'],
-  },
-  {
-    id: 'person',
-    featured: true,
-    labelKey: 'nav.persons',
-    path: '/persons',
-    permissions: ['registration_view'],
-  },
-  {
-    id: 'control-room',
-    labelKey: 'nav.controlRoom',
-    path: '/control-room',
-    permissions: ['report_view', 'queue_view'],
-  },
-  {
-    id: 'notifications',
-    labelKey: 'nav.notifications',
-    path: '/notifications',
-    permissions: ['notification_view'],
-  },
-  { id: 'reports', labelKey: 'nav.reports', path: '/reports', permissions: ['report_view'] },
-  { id: 'kiosk', labelKey: 'nav.kiosk', path: '/kiosk', permissions: [] },
-  { id: 'display', labelKey: 'nav.display', path: '/display', permissions: [] },
-  { id: 'tracking', labelKey: 'nav.tracking', path: '/track', permissions: [] },
-  { id: 'portfolio', labelKey: 'nav.portfolio', path: '/portfolio', permissions: ['site_view'] },
-  {
-    id: 'settings',
-    labelKey: 'nav.settings',
-    path: '/settings',
-    permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
-  },
-  {
-    id: 'users',
-    labelKey: 'nav.usersAdmin',
-    path: '/admin/users',
-    permissions: ['user_manage_admin'],
-  },
-  {
-    id: 'onboarding',
-    labelKey: 'nav.onboarding',
-    path: '/onboarding',
-    permissions: ['site_create'],
-  },
-  {
-    id: 'translations',
-    labelKey: 'nav.translations',
-    path: '/admin/translations',
-    permissions: ['translation_manage'],
-  },
-  { id: 'health', labelKey: 'nav.health', path: '/health', permissions: ['system_manage'] },
-  { id: 'audit', labelKey: 'nav.audit', path: '/audit', permissions: ['audit_view'] },
+  ...navigationRoutes,
+  ...publicNavigationRoutes,
   { id: 'profile', labelKey: 'profile.title', path: '/profile', permissions: [] },
   {
     id: 'password',
@@ -86,7 +18,7 @@ const commands = [
     permissions: [],
   },
   { id: 'legal', labelKey: 'nav.legal', path: '/legal', permissions: [] },
-] as const;
+];
 
 export function CommandPalette({
   open,

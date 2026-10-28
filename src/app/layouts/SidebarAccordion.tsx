@@ -3,152 +3,26 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
-import {
-  Activity,
-  ScrollText,
-  Bell,
-  BriefcaseBusiness,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardList,
-  FileBarChart,
-  HeartPulse,
-  LayoutDashboard,
-  Languages,
-  Monitor,
-  Settings,
-  ShieldCheck,
-  Smartphone,
-  Store,
-  UserCog,
-  UsersRound,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShieldCheck, X } from 'lucide-react';
 import { Button } from '@/design-system/components/Button';
+import {
+  navigationRoutes,
+  publicNavigationRoutes,
+  type NavigationRouteDefinition,
+} from '@/app/protected-routes';
 
-interface NavItem {
-  path: string;
-  labelKey: string;
-  permissions: readonly string[];
-  icon: LucideIcon;
-}
 interface NavSection {
   id: string;
   labelKey: string;
-  items: readonly NavItem[];
+  items: readonly NavigationRouteDefinition[];
 }
 
-const sections: readonly NavSection[] = [
-  {
-    id: 'operations',
-    labelKey: 'nav.operations',
-    items: [
-      {
-        path: '/desk',
-        labelKey: 'nav.desk',
-        permissions: ['registration_call', 'session_operate'],
-        icon: LayoutDashboard,
-      },
-      {
-        path: '/my-queues',
-        labelKey: 'nav.myQueues',
-        permissions: ['registration_view', 'queue_view'],
-        icon: ClipboardList,
-      },
-      {
-        path: '/appointments',
-        labelKey: 'nav.appointments',
-        permissions: ['appointment_manage', 'appointment_checkin'],
-        icon: CalendarDays,
-      },
-      {
-        path: '/persons',
-        labelKey: 'nav.persons',
-        permissions: ['registration_view'],
-        icon: UsersRound,
-      },
-    ],
-  },
-  {
-    id: 'pilotage',
-    labelKey: 'nav.pilotage',
-    items: [
-      {
-        path: '/control-room',
-        labelKey: 'nav.controlRoom',
-        permissions: ['report_view', 'queue_view'],
-        icon: Activity,
-      },
-      {
-        path: '/notifications',
-        labelKey: 'nav.notifications',
-        permissions: ['notification_view'],
-        icon: Bell,
-      },
-      {
-        path: '/reports',
-        labelKey: 'nav.reports',
-        permissions: ['report_view'],
-        icon: FileBarChart,
-      },
-    ],
-  },
-  {
-    id: 'experiences',
-    labelKey: 'nav.experiences',
-    items: [
-      { path: '/kiosk', labelKey: 'nav.kiosk', permissions: [], icon: Store },
-      { path: '/display', labelKey: 'nav.display', permissions: [], icon: Monitor },
-      { path: '/track', labelKey: 'nav.tracking', permissions: [], icon: Smartphone },
-    ],
-  },
-  {
-    id: 'administration',
-    labelKey: 'nav.administration',
-    items: [
-      {
-        path: '/portfolio',
-        labelKey: 'nav.portfolio',
-        permissions: ['site_view'],
-        icon: BriefcaseBusiness,
-      },
-      {
-        path: '/settings',
-        labelKey: 'nav.settings',
-        permissions: ['site_edit', 'queue_edit', 'user_manage_admin', 'translation_manage'],
-        icon: Settings,
-      },
-      {
-        path: '/admin/users',
-        labelKey: 'nav.usersAdmin',
-        permissions: ['user_manage_admin'],
-        icon: UserCog,
-      },
-      {
-        path: '/onboarding',
-        labelKey: 'nav.onboarding',
-        permissions: ['site_create'],
-        icon: Store,
-      },
-    ],
-  },
-  {
-    id: 'system',
-    labelKey: 'nav.system',
-    items: [
-      {
-        path: '/admin/translations',
-        labelKey: 'nav.translations',
-        permissions: ['translation_manage'],
-        icon: Languages,
-      },
-      { path: '/health', labelKey: 'nav.health', permissions: ['system_manage'], icon: HeartPulse },
-      { path: '/audit', labelKey: 'nav.audit', permissions: ['audit_view'], icon: ScrollText },
-    ],
-  },
-];
+const sectionOrder = ['operations', 'pilotage', 'experiences', 'administration', 'system'] as const;
+const sections: readonly NavSection[] = sectionOrder.map((id) => ({
+  id,
+  labelKey: `nav.${id}`,
+  items: [...navigationRoutes, ...publicNavigationRoutes].filter((route) => route.section === id),
+}));
 
 export function SidebarAccordion({
   collapsed = false,

@@ -58,6 +58,9 @@ export const persons: DomainTranslations<typeof import('../fr/persons').persons>
   'persons.notes.editTitle': 'Edit note',
   'persons.notes.updated': 'Note updated',
   'persons.notes.deleted': 'Note deleted',
+  'persons.notes.deleteTitle': 'Delete this note?',
+  'persons.notes.deleteDescription': 'This action is permanent and the note cannot be restored.',
+  'persons.notes.unknownPerson': 'Unknown person',
   'persons.admin.deleteTitle': 'Delete this person?',
   'persons.admin.deleteDescription':
     'Deletion will be handled by the service and will include associated notes.',

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated/models';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { PageHeader } from '@/design-system/components/PageHeader';
@@ -18,6 +18,8 @@ import { useQueues } from '@/features/queues/hooks/useQueues';
 import { useSite } from '@/features/portfolio/hooks/useSites';
 import { useAppointment, useAppointments, useAvailabilityRange } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
+import { ErrorState } from '@/design-system/components/FeedbackState';
 
 export function AppointmentsPage() {
   const { t: __t, i18n } = useTranslation();
@@ -35,6 +37,7 @@ export function AppointmentsPage() {
   } | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(() => new Set());
+  const [now, setNow] = useState(() => new Date());
   const queues = useQueues({ siteId, isActive: true, usage: 'appointments' });
   const site = useSite(siteId);
   const availableQueues =
@@ -45,6 +48,9 @@ export function AppointmentsPage() {
     ? `${__t('appointments.title')} — ${selectedQueue.queueName}`
     : __t('appointments.title');
   const timeZone = site.data?.data.timezone ?? 'UTC';
+  const currentLocal = appointmentLocalParts(now.toISOString(), timeZone);
+  const [currentHour, currentMinute = '0'] = currentLocal.time.split(':');
+  const currentTimeProgress = `${String((Number(currentMinute) / 60) * 100)}%`;
   const displayedMonth = `${String(anchor.getUTCFullYear())}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}`;
   const displayedMonthLabel = new Intl.DateTimeFormat(i18n.language, {
     month: 'long',
@@ -57,6 +63,8 @@ export function AppointmentsPage() {
   );
   const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
   const availabilityQuery = useAvailabilityRange(selectedQueue?.queueId, dates);
+  const calendarLoading = appointmentsQuery.isPending || availabilityQuery.isPending;
+  const calendarError = appointmentsQuery.isError || availabilityQuery.isError;
   const appointments = useMemo(() => appointmentsQuery.data ?? [], [appointmentsQuery.data]);
   const selected = useAppointment(selectedId);
   const personName = (appointment: RegistrationResponseDto) =>
@@ -106,6 +114,15 @@ export function AppointmentsPage() {
       return next;
     });
   };
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(new Date());
+    }, 30_000);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const hours = selectedQueue
     ? Array.from(
@@ -163,6 +180,11 @@ export function AppointmentsPage() {
           </div>
         }
       />
+      {queues.isPending || site.isPending ? (
+        <div className="appointment-calendar-loading">
+          <DorifyLoader compact />
+        </div>
+      ) : null}
       {queues.isSuccess && availableQueues.length === 0 ? (
         <div className="card appointment-unavailable" role="status">
           <span className="ticket-chip" aria-hidden="true">
@@ -227,14 +249,35 @@ export function AppointmentsPage() {
               {__t('common.next')}
             </Button>
           </div>
-          {view === 'week' ? (
+          {calendarError ? (
+            <ErrorState
+              onRetry={() => {
+                void Promise.all([appointmentsQuery.refetch(), availabilityQuery.refetch()]);
+              }}
+            />
+          ) : calendarLoading ? (
+            <div className="appointment-calendar-loading">
+              <DorifyLoader compact />
+            </div>
+          ) : view === 'week' ? (
             <div className="week-calendar">
               {dates.map((date) => {
                 const dayIsOpen = isOpen(date);
+                const isToday = date === currentLocal.date;
                 return (
-                  <section key={date} className={`calendar-day${dayIsOpen ? '' : ' is-closed'}`}>
+                  <section
+                    key={date}
+                    className={`calendar-day${dayIsOpen ? '' : ' is-closed'}${isToday ? ' is-today' : ''}`}
+                  >
                     <h2>
-                      <span className="calendar-day-name">{weekday(date)}</span>
+                      <span className="calendar-day-name">
+                        {weekday(date)}
+                        {isToday ? (
+                          <span className="calendar-today-badge">
+                            {__t('appointments.calendar.today')}
+                          </span>
+                        ) : null}
+                      </span>
                       <span className="calendar-day-date">{date}</span>
                     </h2>
                     {!dayIsOpen ? (
@@ -261,6 +304,7 @@ export function AppointmentsPage() {
                           ? slotAppointments
                           : slotAppointments.slice(0, 2);
                         const hasMore = slotAppointments.length > 2;
+                        const isCurrentSlot = isToday && time.slice(0, 2) === currentHour;
 
                         return (
                           <div
@@ -284,6 +328,21 @@ export function AppointmentsPage() {
                               }
                             }}
                           >
+                            {isCurrentSlot ? (
+                              <div
+                                className="calendar-current-time"
+                                style={
+                                  {
+                                    '--current-time-progress': currentTimeProgress,
+                                  } as CSSProperties
+                                }
+                                aria-label={__t('appointments.calendar.currentTime', {
+                                  time: currentLocal.time,
+                                })}
+                              >
+                                <span>{currentLocal.time}</span>
+                              </div>
+                            ) : null}
                             <div className="calendar-slot-header">
                               <span className="calendar-slot-time">{time}</span>
                               {slotAppointments.length > 0 && (
@@ -379,11 +438,12 @@ export function AppointmentsPage() {
                   ? dayAppointments
                   : dayAppointments.slice(0, 3);
                 const hasMore = dayAppointments.length > 3;
+                const isToday = date === currentLocal.date;
 
                 return (
                   <section
                     key={date}
-                    className={`month-day${date.startsWith(displayedMonth) ? '' : ' is-outside-month'}${dayIsOpen ? '' : ' is-closed'}`}
+                    className={`month-day${date.startsWith(displayedMonth) ? '' : ' is-outside-month'}${dayIsOpen ? '' : ' is-closed'}${isToday ? ' is-today' : ''}`}
                     role={dayIsOpen ? 'button' : undefined}
                     tabIndex={dayIsOpen ? 0 : undefined}
                     onClick={() => {
@@ -413,6 +473,11 @@ export function AppointmentsPage() {
                       {dayAppointments.length > 0 && (
                         <span className="calendar-slot-count">{dayAppointments.length}</span>
                       )}
+                      {isToday ? (
+                        <span className="calendar-today-badge">
+                          {__t('appointments.calendar.today')}
+                        </span>
+                      ) : null}
                     </div>
                     {!dayIsOpen ? (
                       <span className="calendar-closed-label">

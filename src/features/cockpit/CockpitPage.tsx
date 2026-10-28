@@ -86,6 +86,18 @@ function personName(person: { firstName: string | null; lastName: string | null 
   return [person.firstName, person.lastName].filter(Boolean).join(' ');
 }
 
+function actionTargetsQueue(action: { isPending: boolean; variables?: unknown }, queueId: string) {
+  if (!action.isPending) return false;
+  const variables = action.variables;
+  if (typeof variables === 'string') return variables === queueId;
+  return Boolean(
+    variables &&
+    typeof variables === 'object' &&
+    'queueId' in variables &&
+    variables.queueId === queueId,
+  );
+}
+
 export function CockpitPage() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
@@ -669,7 +681,15 @@ export function CockpitPage() {
                   <QueueCard
                     key={queue.queueId}
                     queue={queue}
-                    pending={pending}
+                    pending={
+                      actions.callNextForSite.isPending ||
+                      actionTargetsQueue(actions.callNextForQueue, queue.queueId) ||
+                      actionTargetsQueue(actions.openSession, queue.queueId) ||
+                      actionTargetsQueue(actions.closeSession, queue.queueId) ||
+                      actionTargetsQueue(actions.recall, queue.queueId) ||
+                      actionTargetsQueue(actions.markServed, queue.queueId) ||
+                      actionTargetsQueue(actions.markNoShow, queue.queueId)
+                    }
                     locale={i18n.language}
                     serverNow={serverNow}
                     favorite={preferences.favoriteQueueIds.includes(queue.queueId)}
@@ -874,7 +894,10 @@ export function CockpitPage() {
                 ))}
               </div>
             ) : (
-              <p className="cockpit-muted">{t('cockpit.noRecentPassages')}</p>
+              <EmptyState
+                title={t('cockpit.noRecentPassages')}
+                description={t('cockpit.noRecentPassagesHint')}
+              />
             )}
           </section>
         </>
@@ -1194,6 +1217,9 @@ function QueueCard(props: {
                 icon={<MonitorUp />}
                 label={t('cockpit.openSession')}
                 disabled={props.pending || !queue.sessionOpening.allowed}
+                unavailableReason={
+                  !queue.sessionOpening.allowed ? t('cockpit.sessionUnavailable') : undefined
+                }
                 onClick={props.onOpenSession}
               />
             )}
@@ -1202,7 +1228,7 @@ function QueueCard(props: {
               icon={<PhoneCall />}
               label={t('cockpit.callFromQueue')}
               disabled={props.pending || !queue.centralizedNext.eligible}
-              title={nextUnavailableReason}
+              unavailableReason={nextUnavailableReason}
               onClick={props.onCallNext}
             />
           </footer>

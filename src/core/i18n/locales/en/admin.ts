@@ -31,7 +31,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'admin.users.suspend': 'Suspend',
   'admin.users.passwordResetSuccess': 'Password reset',
   'admin.translations.catalogueDesTraductions': 'Translation catalog',
-  'admin.translations.cleCategorieOuLangue': 'Key (4 characters minimum), category or language',
+  'admin.translations.cleCategorieOuLangue':
+    'Key ({{count}} characters minimum), category or language',
   'admin.translations.contenusParLangue': 'Content by language',
   'admin.translations.erreur': 'Error',
   'admin.translations.ihm': 'UI',
@@ -56,7 +57,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
     'Sensitive actions apply immediately to all affected sessions.',
   'admin.users.modifierLUtilisateur': 'Edit user',
   'admin.users.nomDUtilisateurOuEmail': 'Username or email',
-  'admin.users.nomEmailOuTypeDeCompte': 'Name or email from 4 characters · automatic filters',
+  'admin.users.nomEmailOuTypeDeCompte':
+    'Name or email from {{count}} characters · automatic filters',
   'admin.users.recherche': 'Search',
   'admin.users.rechercherUnUtilisateur': 'Search for a user',
   'admin.users.toutesLesSessionsActivesSerontImmediatementRevoquees.':
@@ -126,8 +128,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'settings.assignmentStepUser': '1 · Find a user',
   'settings.assignmentStepRole': '2 · Choose a role',
   'settings.searchUser': 'Username or email',
-  'settings.searchUserPlaceholder': 'Enter at least 4 characters',
-  'settings.searchUserMinimum': 'Search starts after 4 characters.',
+  'settings.searchUserPlaceholder': 'Enter at least {{count}} characters',
+  'settings.searchUserMinimum': 'Search starts after {{count}} characters.',
   'settings.noUserFound': 'No user matches this search.',
   'settings.noEmail': 'No email address',
   'settings.active': 'Active',

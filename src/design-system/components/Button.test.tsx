@@ -113,4 +113,18 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('topbar-icon-button');
     expect(screen.getByRole('button')).not.toHaveClass('button');
   });
+
+  it('explains why a disabled action is unavailable', () => {
+    render(
+      <Button disabled unavailableReason="Une session active est requise">
+        Appeler
+      </Button>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Appeler' })).toHaveAttribute(
+      'title',
+      'Une session active est requise',
+    );
+    expect(screen.getByText('Une session active est requise')).toBeVisible();
+  });
 });

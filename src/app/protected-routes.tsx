@@ -1,6 +1,25 @@
 import { lazy, type ComponentType } from 'react';
 import type { CurrentUserResponseDto } from '@/api/generated/models';
 import { hasAnyPermission } from '@/core/permissions/permissions';
+import {
+  Activity,
+  Bell,
+  BriefcaseBusiness,
+  CalendarDays,
+  ClipboardList,
+  FileBarChart,
+  HeartPulse,
+  Languages,
+  LayoutDashboard,
+  Monitor,
+  ScrollText,
+  Settings,
+  Smartphone,
+  Store,
+  UserCog,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react';
 
 const lazyNamed = <P extends object, K extends string>(
   loader: () => Promise<Record<K, ComponentType<P>>>,
@@ -16,6 +35,16 @@ export interface ProtectedRouteDefinition {
   allUserTypes?: boolean;
   experienceMode?: 'kiosk' | 'display';
   publicMode?: 'public' | 'device';
+}
+
+export interface NavigationRouteDefinition {
+  id: string;
+  path: string;
+  labelKey: string;
+  permissions: readonly string[];
+  section: 'operations' | 'pilotage' | 'experiences' | 'administration' | 'system';
+  icon: LucideIcon;
+  featured?: boolean;
 }
 
 export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
@@ -138,6 +167,134 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
     permissions: ['audit_view'],
     component: lazyNamed(() => import('@/features/audit/AuditPage'), 'AuditPage'),
     frame: 'shell',
+  },
+];
+
+const navigationMetadata: Readonly<
+  Record<
+    string,
+    Omit<NavigationRouteDefinition, 'path' | 'permissions'> & { navigationPath?: string }
+  >
+> = {
+  '/portfolio': {
+    id: 'portfolio',
+    labelKey: 'nav.portfolio',
+    section: 'administration',
+    icon: BriefcaseBusiness,
+  },
+  '/desk': {
+    id: 'desk',
+    labelKey: 'nav.desk',
+    section: 'operations',
+    icon: LayoutDashboard,
+    featured: true,
+  },
+  '/my-queues': {
+    id: 'queues',
+    labelKey: 'nav.myQueues',
+    section: 'operations',
+    icon: ClipboardList,
+    featured: true,
+  },
+  '/persons': {
+    id: 'person',
+    labelKey: 'nav.persons',
+    section: 'operations',
+    icon: UsersRound,
+    featured: true,
+  },
+  '/appointments': {
+    id: 'appointment',
+    labelKey: 'nav.appointments',
+    section: 'operations',
+    icon: CalendarDays,
+    featured: true,
+  },
+  '/control-room': {
+    id: 'control-room',
+    labelKey: 'nav.controlRoom',
+    section: 'pilotage',
+    icon: Activity,
+  },
+  '/reports': {
+    id: 'reports',
+    labelKey: 'nav.reports',
+    section: 'pilotage',
+    icon: FileBarChart,
+  },
+  '/notifications': {
+    id: 'notifications',
+    labelKey: 'nav.notifications',
+    section: 'pilotage',
+    icon: Bell,
+  },
+  '/kiosk': { id: 'kiosk', labelKey: 'nav.kiosk', section: 'experiences', icon: Store },
+  '/display': {
+    id: 'display',
+    labelKey: 'nav.display',
+    section: 'experiences',
+    icon: Monitor,
+  },
+  '/onboarding': {
+    id: 'onboarding',
+    labelKey: 'nav.onboarding',
+    section: 'administration',
+    icon: Store,
+  },
+  '/settings/*': {
+    id: 'settings',
+    labelKey: 'nav.settings',
+    section: 'administration',
+    icon: Settings,
+    navigationPath: '/settings',
+  },
+  '/admin/users': {
+    id: 'users',
+    labelKey: 'nav.usersAdmin',
+    section: 'administration',
+    icon: UserCog,
+  },
+  '/admin/translations': {
+    id: 'translations',
+    labelKey: 'nav.translations',
+    section: 'system',
+    icon: Languages,
+  },
+  '/health': {
+    id: 'health',
+    labelKey: 'nav.health',
+    section: 'system',
+    icon: HeartPulse,
+  },
+  '/audit': { id: 'audit', labelKey: 'nav.audit', section: 'system', icon: ScrollText },
+};
+
+export const navigationRoutes: readonly NavigationRouteDefinition[] = protectedRoutes.flatMap(
+  (route) => {
+    const metadata = navigationMetadata[route.path];
+    if (!metadata) return [];
+    return [
+      {
+        id: metadata.id,
+        path: metadata.navigationPath ?? route.path,
+        labelKey: metadata.labelKey,
+        permissions: route.permissions,
+        section: metadata.section,
+        icon: metadata.icon,
+        featured: metadata.featured,
+      },
+    ];
+  },
+);
+
+export const publicNavigationRoutes: readonly NavigationRouteDefinition[] = [
+  {
+    id: 'tracking',
+    path: '/track',
+    labelKey: 'nav.tracking',
+    permissions: [],
+    section: 'experiences',
+    icon: Smartphone,
   },
 ];
 

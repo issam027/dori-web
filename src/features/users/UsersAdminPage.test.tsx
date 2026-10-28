@@ -28,7 +28,7 @@ function renderPage() {
   );
 }
 
-it('issues one user request after a typing burst reaches four characters', async () => {
+it('issues one user request after a typing burst reaches the shared threshold', async () => {
   findUsers.mockResolvedValue({
     data: { data: { page: 1, pageSize: 10, total: 0, totalPages: 0, items: [] } },
   });
@@ -38,10 +38,10 @@ it('issues one user request after a typing burst reaches four characters', async
   });
   findUsers.mockClear();
 
-  await userEvent.type(screen.getByRole('textbox', { name: /recherche/i }), 'abcd');
+  await userEvent.type(screen.getByRole('textbox', { name: /recherche/i }), 'ab');
 
   await waitFor(() => {
     expect(findUsers).toHaveBeenCalledOnce();
   });
-  expect(findUsers.mock.calls[0]?.[0]).toMatchObject({ search: 'abcd', pageSize: 10 });
+  expect(findUsers.mock.calls[0]?.[0]).toMatchObject({ search: 'ab', pageSize: 10 });
 });

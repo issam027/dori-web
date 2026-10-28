@@ -289,67 +289,6 @@
     color-mix(in srgb, var(--color-primary-soft) 72%, var(--color-background))
   );
 }
-.kiosk-header {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: clamp(1rem, 4vw, 2.5rem);
-}
-.kiosk-brand,
-.kiosk-session,
-.kiosk-session > span {
-  display: flex;
-  align-items: center;
-}
-.kiosk-brand {
-  gap: 0.75rem;
-  color: var(--color-ink);
-}
-.kiosk-brand > span {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border-radius: 13px;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  font-size: 1.2rem;
-  font-weight: 900;
-}
-.kiosk-brand strong,
-.kiosk-brand small {
-  display: block;
-}
-.kiosk-brand strong {
-  letter-spacing: 0.12em;
-}
-.kiosk-brand small {
-  color: var(--color-muted);
-}
-.kiosk-session {
-  gap: 0.65rem;
-}
-.kiosk-session > span {
-  gap: 0.4rem;
-  padding: 0.45rem 0.7rem;
-  border: 1px solid var(--color-line);
-  border-radius: 999px;
-  color: var(--color-muted);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-.kiosk-session i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-success);
-}
-.kiosk-session svg {
-  width: 0.9rem;
-}
 .kiosk-welcome {
   max-width: 680px;
   text-align: center;
@@ -560,23 +499,6 @@
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-surface) 94%, transparent);
   font-weight: 650;
-}
-.kiosk-error {
-  width: min(620px, 100%);
-  margin: 0 auto;
-  padding: 1rem 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--color-danger) 48%, var(--color-line));
-  border-inline-start: 5px solid var(--color-danger);
-  border-radius: 14px;
-  color: var(--color-danger);
-  background: var(--color-danger-soft);
-}
-.kiosk-error strong,
-.kiosk-error span {
-  display: block;
-}
-.kiosk-error p {
-  margin: 5px 0;
 }
 .kiosk-tiles button {
   border-radius: 15px;

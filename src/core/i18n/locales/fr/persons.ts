@@ -57,6 +57,10 @@ export const persons = {
   'persons.notes.editTitle': 'Modifier la note',
   'persons.notes.updated': 'Note modifiée',
   'persons.notes.deleted': 'Note supprimée',
+  'persons.notes.deleteTitle': 'Supprimer cette note ?',
+  'persons.notes.deleteDescription':
+    'Cette action est définitive et la note ne pourra pas être restaurée.',
+  'persons.notes.unknownPerson': 'Personne non renseignée',
   'persons.admin.deleteTitle': 'Supprimer cette personne ?',
   'persons.admin.deleteDescription':
     'La suppression sera traitée par le service et inclura les notes associées.',

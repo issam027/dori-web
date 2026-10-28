@@ -28,6 +28,7 @@ import { hasAnyPermission } from '@/core/permissions/permissions';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { useSettingsData } from '@/features/onboarding/public';
 import { queryKeys } from '@/api/client/query-keys';
 import {
@@ -73,7 +74,7 @@ export function UsersAdminPage() {
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [openActionsUserId, setOpenActionsUserId] = useState<string>();
   const [pending, setPending] = useState(false);
-  const debouncedSearch = useDebouncedFilter(draft.search, { delay: 350, minimumLength: 4 });
+  const debouncedSearch = useDebouncedFilter(draft.search, { delay: 350 });
   const effectiveFilters = { ...filters, search: debouncedSearch };
   useEffect(() => {
     if (openActionsUserId === undefined) return;
@@ -151,7 +152,9 @@ export function UsersAdminPage() {
             <span>
               <Search /> {t('admin.users.rechercherUnUtilisateur')}
             </span>
-            <small>{t('admin.users.nomEmailOuTypeDeCompte')}</small>
+            <small>
+              {t('admin.users.nomEmailOuTypeDeCompte', { count: SEARCH_MINIMUM_LENGTH })}
+            </small>
           </summary>
           <div className="admin-filter-grid">
             <label>
@@ -163,7 +166,7 @@ export function UsersAdminPage() {
                   const search = event.target.value;
                   setDraft({ ...draft, search });
                   setPage(1);
-                  if (search.trim().length <= 3) {
+                  if (search.trim().length < SEARCH_MINIMUM_LENGTH) {
                     setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
                   }
                 }}
@@ -221,7 +224,11 @@ export function UsersAdminPage() {
           </div>
         </div>
         <DataTable
+          error={users.isError}
+          onRetry={() => void users.refetch()}
           loading={users.isLoading}
+          empty={!users.isLoading && items.length === 0}
+          emptyTitle={t('common.noResults')}
           caption={t('admin.users.comptesUtilisateurs')}
           containerClassName="table-wrap admin-table-wrap"
           mobileRows={items}
