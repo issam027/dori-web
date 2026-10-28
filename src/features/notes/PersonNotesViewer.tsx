@@ -30,12 +30,14 @@ export function PersonNotesViewer({
   onOpenChange,
   initialMode = 'view',
   personName,
+  onNotesChanged,
 }: {
   personId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialMode?: 'view' | 'add';
   personName?: string;
+  onNotesChanged?: () => void;
 }) {
   const { t: __t, i18n } = useTranslation();
   const canManage = hasPermission(
@@ -60,6 +62,7 @@ export function PersonNotesViewer({
       setContent('');
       setAdding(false);
       setIndex(0);
+      onNotesChanged?.();
       notify({
         tone: 'success',
         title: __t('notifications.note.created'),
@@ -75,6 +78,7 @@ export function PersonNotesViewer({
       await updateNote.execute({ noteId: editingNoteId, content: content.trim() });
       setEditingNoteId(undefined);
       setContent('');
+      onNotesChanged?.();
       notify({ tone: 'success', title: __t('persons.notes.updated') });
     } catch (error) {
       notifyError(error);
@@ -85,6 +89,7 @@ export function PersonNotesViewer({
     try {
       await deleteNote.execute(current.noteId);
       setIndex(Math.max(0, index - 1));
+      onNotesChanged?.();
       notify({ tone: 'success', title: __t('persons.notes.deleted') });
     } catch (error) {
       notifyError(error);

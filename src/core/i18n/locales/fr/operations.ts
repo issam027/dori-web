@@ -199,6 +199,7 @@ export const operations = {
   'cockpit.eligibleCount': '{{count}} file(s) prête(s) pour l’appel centralisé',
   'cockpit.activity': 'Activité récente',
   'cockpit.recentPassages': 'Derniers passages',
+  'cockpit.printPassage': 'Imprimer le justificatif',
   'cockpit.noRecentPassages': 'Aucun passage terminé récemment.',
   'cockpit.counterNumber': 'Guichet {{number}}',
   'cockpit.served': 'Servi',

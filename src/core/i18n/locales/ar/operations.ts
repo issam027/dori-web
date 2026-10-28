@@ -196,6 +196,7 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.eligibleCount': '{{count}} قائمة انتظار جاهزة للنداء المركزي',
   'cockpit.activity': 'النشاط الأخير',
   'cockpit.recentPassages': 'آخر الزيارات',
+  'cockpit.printPassage': 'طباعة إثبات الزيارة',
   'cockpit.noRecentPassages': 'لا توجد زيارات مكتملة حديثاً.',
   'cockpit.counterNumber': 'الشباك {{number}}',
   'cockpit.served': 'تمت الخدمة',

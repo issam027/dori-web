@@ -5,7 +5,7 @@ describe('useActiveCallNavigationGuard', () => {
   it('prevents closing the page while an active call exists', () => {
     const { rerender, unmount } = renderHook(
       ({ enabled }: { enabled: boolean }) => {
-        useActiveCallNavigationGuard(enabled);
+        useActiveCallNavigationGuard(enabled, 'Leave?');
       },
       { initialProps: { enabled: true } },
     );
@@ -18,5 +18,20 @@ describe('useActiveCallNavigationGuard', () => {
     window.dispatchEvent(inactiveEvent);
     expect(inactiveEvent.defaultPrevented).toBe(false);
     unmount();
+  });
+
+  it('blocks internal link navigation when the operator refuses confirmation', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    renderHook(() => {
+      useActiveCallNavigationGuard(true, 'Leave?');
+    });
+    const link = document.createElement('a');
+    link.href = '/profile';
+    document.body.append(link);
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+    link.dispatchEvent(event);
+    expect(window.confirm).toHaveBeenCalledWith('Leave?');
+    expect(event.defaultPrevented).toBe(true);
+    link.remove();
   });
 });

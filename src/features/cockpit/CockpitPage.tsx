@@ -46,6 +46,7 @@ import { RegistrationDetailsModal } from '@/features/queue-operations/public';
 import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
 import { CockpitVersionSwitch } from './components/CockpitVersionSwitch';
+import { CockpitPassagePrintButton } from './components/CockpitPassagePrintButton';
 import {
   mergeCockpitQueue,
   refreshCockpitQueue,
@@ -86,6 +87,7 @@ export function CockpitPage() {
   const [replaceSessionId, setReplaceSessionId] = useState<string>();
   const [counterName, setCounterName] = useState('');
   const [notesPersonId, setNotesPersonId] = useState<string>();
+  const [notesQueueId, setNotesQueueId] = useState<string>();
   const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
   const [confirmation, setConfirmation] = useState<ConfirmationState>(null);
   const [historyOutcome, setHistoryOutcome] = useState<'all' | 'served' | 'no_show'>('all');
@@ -172,7 +174,7 @@ export function CockpitPage() {
         }),
     [i18n.language, preferences.favoriteQueueIds, preferences.sort, queueSearch, queues],
   );
-  useActiveCallNavigationGuard(activeQueues.length > 0);
+  useActiveCallNavigationGuard(activeQueues.length > 0, t('cockpit.leaveWarning'));
   useCockpitCrossTab(siteId, () => {
     void cockpit.refetch();
   });
@@ -533,6 +535,7 @@ export function CockpitPage() {
                           label={t('cockpit.addNote')}
                           onClick={() => {
                             setNotesMode('add');
+                            setNotesQueueId(queue.queueId);
                             setNotesPersonId(activeCall.person.personId);
                           }}
                         />
@@ -748,6 +751,7 @@ export function CockpitPage() {
                     }}
                     onNotes={(personId, mode = 'view') => {
                       setNotesMode(mode);
+                      setNotesQueueId(queue.queueId);
                       setNotesPersonId(personId);
                     }}
                     onDetails={setDetailsRegistrationId}
@@ -832,6 +836,13 @@ export function CockpitPage() {
                         {passage.outcome === 'served' ? t('cockpit.served') : t('cockpit.noShow')}
                       </span>
                       <time>{formatDateTime(asDate(passage.closedAt), i18n.language) ?? '—'}</time>
+                      {siteId ? (
+                        <CockpitPassagePrintButton
+                          passage={passage}
+                          siteId={siteId}
+                          label={t('cockpit.printPassage')}
+                        />
+                      ) : null}
                     </div>
                   </article>
                 ))}
@@ -893,8 +904,22 @@ export function CockpitPage() {
           personId={notesPersonId}
           open
           initialMode={notesMode}
+          onNotesChanged={() => {
+            if (!siteId || !notesQueueId) return;
+            void refreshCockpitQueue(siteId, notesQueueId)
+              .then((incoming) => {
+                queryClient.setQueryData<QueueEngineControllerGetCockpit200>(
+                  queryKeys.cockpit.bySite(siteId),
+                  (current) => mergeCockpitQueue(current, incoming),
+                );
+              })
+              .catch(notifyError);
+          }}
           onOpenChange={(open) => {
-            if (!open) setNotesPersonId(undefined);
+            if (!open) {
+              setNotesPersonId(undefined);
+              setNotesQueueId(undefined);
+            }
           }}
         />
       ) : null}

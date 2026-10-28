@@ -195,6 +195,7 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.eligibleCount': '{{count}} queue(s) ready for central calling',
   'cockpit.activity': 'Recent activity',
   'cockpit.recentPassages': 'Latest visits',
+  'cockpit.printPassage': 'Print receipt',
   'cockpit.noRecentPassages': 'No recently completed visit.',
   'cockpit.counterNumber': 'Counter {{number}}',
   'cockpit.served': 'Served',

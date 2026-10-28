@@ -10,6 +10,7 @@ import { restoreSession } from '@/core/auth/session-actions';
 import { NotificationCenter } from '@/design-system/components/NotificationCenter';
 import { onAuthenticationExpired } from '@/api/client/http-client';
 import { expireSession } from '@/core/auth/session-actions';
+import { SessionIdleWatchdog } from '@/core/auth/SessionIdleWatchdog';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
@@ -38,6 +39,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <PreferenceSynchronizer />
+            <SessionIdleWatchdog />
             {children}
             <NotificationCenter />
           </BrowserRouter>
