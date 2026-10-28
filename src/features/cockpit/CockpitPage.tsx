@@ -36,7 +36,7 @@ import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtim
 import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
-import { Card } from '@/design-system/components/Card';
+import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { FormField } from '@/design-system/components/FormField';
 import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
@@ -46,7 +46,6 @@ import { useSite } from '@/features/portfolio/public';
 import { RegistrationDetailsModal } from '@/features/queue-operations/public';
 import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
-import { CockpitVersionSwitch } from './components/CockpitVersionSwitch';
 import { CockpitPassagePrintButton } from './components/CockpitPassagePrintButton';
 import {
   mergeCockpitQueue,
@@ -56,7 +55,6 @@ import {
   useCockpitActions,
 } from './hooks/useCockpit';
 import { useCockpitPreferences, type CockpitSort } from './hooks/useCockpitPreferences';
-import { useActiveCallNavigationGuard } from './hooks/useActiveCallNavigationGuard';
 import { broadcastCockpitRefresh, useCockpitCrossTab } from './hooks/useCockpitCrossTab';
 import { elapsedMinutes, useServerClock } from './hooks/useServerClock';
 
@@ -176,7 +174,6 @@ export function CockpitPage() {
         }),
     [i18n.language, preferences.favoriteQueueIds, preferences.sort, queueSearch, queues],
   );
-  useActiveCallNavigationGuard(activeQueues.length > 0, t('cockpit.leaveWarning'));
   useCockpitCrossTab(siteId, () => {
     void cockpit.refetch();
   });
@@ -349,7 +346,6 @@ export function CockpitPage() {
                 time: formatDateTime(cockpit.dataUpdatedAt, i18n.language) ?? '—',
               })}
             </small>
-            <CockpitVersionSwitch version="new" />
             <Button
               variant="primary"
               icon={<PhoneCall />}
@@ -374,18 +370,25 @@ export function CockpitPage() {
       {cockpit.isError ? <ErrorState onRetry={() => void cockpit.refetch()} /> : null}
       {cockpit.data ? (
         <>
-          <section className="cockpit-metrics" aria-label={t('cockpit.summary')}>
-            <Metric icon={<Users />} label={t('cockpit.waiting')} value={totals.waiting} />
-            <Metric
+          <section className="metric-grid cockpit-metrics" aria-label={t('cockpit.summary')}>
+            <MetricCard icon={<Users />} label={t('cockpit.waiting')} value={totals.waiting} />
+            <MetricCard
               icon={<CalendarClock />}
               label={t('cockpit.appointments')}
               value={totals.appointments}
+              tone="info"
             />
-            <Metric icon={<MonitorUp />} label={t('cockpit.mySessions')} value={totals.sessions} />
-            <Metric
+            <MetricCard
+              icon={<MonitorUp />}
+              label={t('cockpit.mySessions')}
+              value={totals.sessions}
+              tone="success"
+            />
+            <MetricCard
               icon={<BellRing />}
               label={t('cockpit.activeCalls')}
               value={totals.activeCalls}
+              tone="warning"
             />
           </section>
 
@@ -467,6 +470,7 @@ export function CockpitPage() {
                       <div className="cockpit-active-overview-actions">
                         <Button
                           size="small"
+                          variant="info"
                           icon={<RefreshCw />}
                           label={t('cockpit.recall')}
                           disabled={pending}
@@ -483,6 +487,7 @@ export function CockpitPage() {
                         />
                         <Button
                           size="small"
+                          variant="success"
                           icon={<CheckCircle2 />}
                           label={t('cockpit.served')}
                           disabled={pending}
@@ -508,6 +513,7 @@ export function CockpitPage() {
                         />
                         <Button
                           size="small"
+                          variant="danger"
                           icon={<UserX />}
                           label={t('cockpit.noShow')}
                           disabled={pending}
@@ -612,6 +618,8 @@ export function CockpitPage() {
                       <div className="cockpit-view-actions">
                         <Button
                           icon={<LayoutGrid />}
+                          variant={preferences.density === 'compact' ? 'primary' : 'default'}
+                          aria-pressed={preferences.density === 'compact'}
                           label={
                             preferences.density === 'compact'
                               ? t('cockpit.comfortableView')
@@ -625,6 +633,8 @@ export function CockpitPage() {
                         />
                         <Button
                           icon={preferences.soundsEnabled ? <Volume2 /> : <VolumeX />}
+                          variant={preferences.soundsEnabled ? 'primary' : 'default'}
+                          aria-pressed={preferences.soundsEnabled}
                           label={
                             preferences.soundsEnabled
                               ? t('cockpit.disableSounds')
@@ -951,18 +961,6 @@ export function CockpitPage() {
   );
 }
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
-  return (
-    <article className="card cockpit-metric">
-      <span>{icon}</span>
-      <div>
-        <strong>{value}</strong>
-        <small>{label}</small>
-      </div>
-    </article>
-  );
-}
-
 function QueueCard(props: {
   queue: CockpitQueueItemDto;
   pending: boolean;
@@ -1016,6 +1014,7 @@ function QueueCard(props: {
             icon={<Star fill={props.favorite ? 'currentColor' : 'none'} />}
             label={props.favorite ? t('cockpit.removeFavorite') : t('cockpit.addFavorite')}
             labelMode="icon-only"
+            aria-pressed={props.favorite}
             onClick={props.onToggleFavorite}
           />
           <Button
@@ -1100,19 +1099,21 @@ function QueueCard(props: {
               <Button
                 icon={<RefreshCw />}
                 label={t('cockpit.recall')}
+                variant="info"
                 disabled={props.pending}
                 onClick={props.onRecall}
               />
               <Button
                 icon={<CheckCircle2 />}
                 label={t('cockpit.served')}
-                variant="primary"
+                variant="success"
                 disabled={props.pending}
                 onClick={props.onServed}
               />
               <Button
                 icon={<UserX />}
                 label={t('cockpit.noShow')}
+                variant="danger"
                 disabled={props.pending}
                 onClick={props.onNoShow}
               />
@@ -1162,31 +1163,33 @@ function QueueCard(props: {
             )}
           </section>
         )}
-        <footer>
-          {mine ? (
+        {!activeCall ? (
+          <footer>
+            {mine ? (
+              <Button
+                icon={<DoorOpen />}
+                label={t('cockpit.closeSession')}
+                disabled={props.pending}
+                onClick={props.onCloseSession}
+              />
+            ) : (
+              <Button
+                icon={<MonitorUp />}
+                label={t('cockpit.openSession')}
+                disabled={props.pending || !queue.sessionOpening.allowed}
+                onClick={props.onOpenSession}
+              />
+            )}
             <Button
-              icon={<DoorOpen />}
-              label={t('cockpit.closeSession')}
-              disabled={props.pending || Boolean(queue.activeCall)}
-              onClick={props.onCloseSession}
+              variant="primary"
+              icon={<PhoneCall />}
+              label={t('cockpit.callFromQueue')}
+              disabled={props.pending || !queue.centralizedNext.eligible}
+              title={nextUnavailableReason}
+              onClick={props.onCallNext}
             />
-          ) : (
-            <Button
-              icon={<MonitorUp />}
-              label={t('cockpit.openSession')}
-              disabled={props.pending || !queue.sessionOpening.allowed}
-              onClick={props.onOpenSession}
-            />
-          )}
-          <Button
-            variant="primary"
-            icon={<PhoneCall />}
-            label={t('cockpit.callFromQueue')}
-            disabled={props.pending || !queue.centralizedNext.eligible}
-            title={nextUnavailableReason}
-            onClick={props.onCallNext}
-          />
-        </footer>
+          </footer>
+        ) : null}
       </div>
     </article>
   );

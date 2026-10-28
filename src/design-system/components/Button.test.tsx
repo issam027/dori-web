@@ -23,6 +23,12 @@ describe('Button', () => {
     );
     expect(screen.getByRole('button')).toHaveClass('button', 'button-primary', 'button-small');
 
+    rerender(<Button variant="success">Servi</Button>);
+    expect(screen.getByRole('button')).toHaveClass('button', 'button-success');
+
+    rerender(<Button variant="info">Rappeler</Button>);
+    expect(screen.getByRole('button')).toHaveClass('button', 'button-info');
+
     rerender(
       <Button variant="danger" size="icon" aria-label="Supprimer">
         ×

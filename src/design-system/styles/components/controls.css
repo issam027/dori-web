@@ -539,6 +539,32 @@ select:focus-visible {
   color: var(--color-primary-contrast);
   background: var(--color-accent);
 }
+.button-success {
+  border-color: color-mix(in srgb, var(--color-success) 72%, var(--color-line));
+  color: color-mix(in srgb, var(--color-success) 78%, var(--color-ink));
+  background: var(--color-success-soft);
+}
+.button-success:not(:disabled):hover {
+  border-color: var(--color-success);
+  color: var(--color-primary-contrast);
+  background: var(--color-success);
+}
+.button-success:focus-visible {
+  outline-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+}
+.button-info {
+  border-color: color-mix(in srgb, var(--color-info) 64%, var(--color-line));
+  color: color-mix(in srgb, var(--color-info) 80%, var(--color-ink));
+  background: color-mix(in srgb, var(--color-info) 11%, var(--color-surface));
+}
+.button-info:not(:disabled):hover {
+  border-color: var(--color-info);
+  color: var(--color-primary-contrast);
+  background: var(--color-info);
+}
+.button-info:focus-visible {
+  outline-color: color-mix(in srgb, var(--color-info) 50%, transparent);
+}
 .button-danger {
   border-color: var(--m);
   color: var(--a);

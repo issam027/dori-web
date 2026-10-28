@@ -229,8 +229,6 @@ export const operations = {
   'cockpit.occupiedBy': 'Occupé par {{operator}}',
   'cockpit.replacementWarning':
     'Cette ouverture remplacera la session actuellement présente sur ce guichet.',
-  'cockpit.switchToLegacy': 'Afficher le cockpit historique',
-  'cockpit.switchToNew': 'Afficher le cockpit 2.0',
   'cockpit.priorityWorkspace': 'Espace prioritaire',
   'cockpit.justCalled': 'Appel à l’instant',
   'cockpit.elapsedMinutes_one': 'Depuis {{count}} minute',
@@ -280,7 +278,6 @@ export const operations = {
   'cockpit.searchHistory': 'Rechercher dans les passages',
   'cockpit.searchHistoryPlaceholder': 'Ticket, personne ou file',
   'cockpit.openQueue': 'Voir la file',
-  'cockpit.leaveWarning': 'Un ou plusieurs appels sont encore en cours.',
   'cockpit.operationalGuidance': 'Aide à la décision',
   'cockpit.recommendations': 'Recommandations opérationnelles',
   'cockpit.delayRecommendation': 'Attente estimée à {{minutes}} minutes.',

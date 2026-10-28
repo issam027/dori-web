@@ -9,14 +9,16 @@ export function MetricCard({
   value,
   detail,
   icon,
+  tone = 'accent',
 }: {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
   icon?: ReactNode;
+  tone?: 'accent' | 'info' | 'success' | 'warning';
 }) {
   return (
-    <Card className="metric-card">
+    <Card className={`metric-card metric-card-${tone}`}>
       <span className="metric-label">{label}</span>
       {icon ? (
         <span className="metric-icon" aria-hidden="true">

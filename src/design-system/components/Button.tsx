@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
-type ButtonVariant = 'default' | 'primary' | 'danger' | 'unstyled';
+type ButtonVariant = 'default' | 'primary' | 'success' | 'info' | 'danger' | 'unstyled';
 type ButtonSize = 'default' | 'small' | 'icon';
 type ButtonLabelMode = 'responsive' | 'always' | 'icon-only';
 
@@ -40,6 +40,8 @@ function buttonClassName(
     variant !== 'unstyled' && size === 'small' ? 'button-small' : undefined,
     variant !== 'unstyled' && size === 'icon' ? 'icon-button' : undefined,
     variant !== 'unstyled' && variant === 'primary' ? 'button-primary' : undefined,
+    variant !== 'unstyled' && variant === 'success' ? 'button-success' : undefined,
+    variant !== 'unstyled' && variant === 'info' ? 'button-info' : undefined,
     variant !== 'unstyled' && variant === 'danger' ? 'button-danger' : undefined,
     `button-label-${labelMode}`,
     hasIcon ? 'button-has-icon' : undefined,
