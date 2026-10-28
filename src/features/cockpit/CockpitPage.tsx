@@ -60,6 +60,16 @@ import { broadcastCockpitRefresh, useCockpitCrossTab } from './hooks/useCockpitC
 import { elapsedMinutes, useServerClock } from './hooks/useServerClock';
 
 type SessionDialogState = { queue: CockpitQueueItemDto } | null;
+type NotesDialogState = {
+  personId: string;
+  personName: string;
+  queueId: string;
+  mode: 'view' | 'add';
+} | null;
+type RegistrationDetailsDialogState = {
+  registrationId: string;
+  queueName: string;
+} | null;
 type ConfirmationState = {
   title: string;
   description: string;
@@ -87,15 +97,14 @@ export function CockpitPage() {
   const [selectedThread, setSelectedThread] = useState<number>();
   const [replaceSessionId, setReplaceSessionId] = useState<string>();
   const [counterName, setCounterName] = useState('');
-  const [notesPersonId, setNotesPersonId] = useState<string>();
-  const [notesQueueId, setNotesQueueId] = useState<string>();
-  const [notesMode, setNotesMode] = useState<'view' | 'add'>('view');
+  const [notesDialog, setNotesDialog] = useState<NotesDialogState>(null);
   const [confirmation, setConfirmation] = useState<ConfirmationState>(null);
   const [historyOutcome, setHistoryOutcome] = useState<'all' | 'served' | 'no_show'>('all');
   const [historyQueueId, setHistoryQueueId] = useState('all');
   const [historySearch, setHistorySearch] = useState('');
   const [queueSearch, setQueueSearch] = useState('');
-  const [detailsRegistrationId, setDetailsRegistrationId] = useState<string | null>(null);
+  const [registrationDetailsDialog, setRegistrationDetailsDialog] =
+    useState<RegistrationDetailsDialogState>(null);
   const realtimeRefreshTimers = useRef(new Map<string, number>());
   const queues = useMemo(() => cockpit.data?.data.queues ?? [], [cockpit.data]);
   const preferences = useCockpitPreferences(siteId);
@@ -360,7 +369,6 @@ export function CockpitPage() {
           </div>
         }
       />
-
       {cockpit.isError ? <ErrorState onRetry={() => void cockpit.refetch()} /> : null}
       {cockpit.data ? (
         <>
@@ -536,16 +544,22 @@ export function CockpitPage() {
                           size="small"
                           label={t('cockpit.addNote')}
                           onClick={() => {
-                            setNotesMode('add');
-                            setNotesQueueId(queue.queueId);
-                            setNotesPersonId(activeCall.person.personId);
+                            setNotesDialog({
+                              personId: activeCall.person.personId,
+                              personName: personName(activeCall.person),
+                              queueId: queue.queueId,
+                              mode: 'add',
+                            });
                           }}
                         />
                         <Button
                           size="small"
                           label={t('cockpit.openCustomerFile')}
                           onClick={() => {
-                            setDetailsRegistrationId(activeCall.registrationId);
+                            setRegistrationDetailsDialog({
+                              registrationId: activeCall.registrationId,
+                              queueName: queue.queueName,
+                            });
                           }}
                         />
                         <a href={`#cockpit-queue-${queue.queueId}`}>{t('cockpit.openQueue')}</a>
@@ -755,12 +769,20 @@ export function CockpitPage() {
                         },
                       });
                     }}
-                    onNotes={(personId, mode = 'view') => {
-                      setNotesMode(mode);
-                      setNotesQueueId(queue.queueId);
-                      setNotesPersonId(personId);
+                    onNotes={(person, mode = 'view') => {
+                      setNotesDialog({
+                        personId: person.personId,
+                        personName: personName(person),
+                        queueId: queue.queueId,
+                        mode,
+                      });
                     }}
-                    onDetails={setDetailsRegistrationId}
+                    onDetails={(registrationId) => {
+                      setRegistrationDetailsDialog({
+                        registrationId,
+                        queueName: queue.queueName,
+                      });
+                    }}
                   />
                 ))}
                 {displayedQueues.length === 0 ? (
@@ -903,14 +925,16 @@ export function CockpitPage() {
           } else open();
         }}
       />
-      {notesPersonId ? (
+      {notesDialog ? (
         <PersonNotesViewer
-          personId={notesPersonId}
+          key={`${notesDialog.personId}-${notesDialog.mode}`}
+          personId={notesDialog.personId}
+          personName={notesDialog.personName}
           open
-          initialMode={notesMode}
+          initialMode={notesDialog.mode}
           onNotesChanged={() => {
-            if (!siteId || !notesQueueId) return;
-            void refreshCockpitQueue(siteId, notesQueueId)
+            if (!siteId) return;
+            void refreshCockpitQueue(siteId, notesDialog.queueId)
               .then((incoming) => {
                 queryClient.setQueryData<QueueEngineControllerGetCockpit200>(
                   queryKeys.cockpit.bySite(siteId),
@@ -920,18 +944,16 @@ export function CockpitPage() {
               .catch(notifyError);
           }}
           onOpenChange={(open) => {
-            if (!open) {
-              setNotesPersonId(undefined);
-              setNotesQueueId(undefined);
-            }
+            if (!open) setNotesDialog(null);
           }}
         />
       ) : null}
       <RegistrationDetailsModal
-        registrationId={detailsRegistrationId}
-        open={Boolean(detailsRegistrationId)}
+        registrationId={registrationDetailsDialog?.registrationId ?? null}
+        queueName={registrationDetailsDialog?.queueName}
+        open={Boolean(registrationDetailsDialog)}
         onOpenChange={(open) => {
-          if (!open) setDetailsRegistrationId(null);
+          if (!open) setRegistrationDetailsDialog(null);
         }}
       />
       <ConfirmDialog
@@ -968,7 +990,10 @@ function QueueCard(props: {
   onRecall: () => void;
   onServed: () => void;
   onNoShow: () => void;
-  onNotes: (personId: string, mode?: 'view' | 'add') => void;
+  onNotes: (
+    person: { personId: string; firstName: string | null; lastName: string | null },
+    mode?: 'view' | 'add',
+  ) => void;
   onDetails: (registrationId: string) => void;
 }) {
   const { t } = useTranslation();
@@ -1114,13 +1139,13 @@ function QueueCard(props: {
               <Button
                 label={t('cockpit.viewNotes', { count: activeCall.notesCount })}
                 onClick={() => {
-                  props.onNotes(activeCall.person.personId);
+                  props.onNotes(activeCall.person);
                 }}
               />
               <Button
                 label={t('cockpit.addNote')}
                 onClick={() => {
-                  props.onNotes(activeCall.person.personId, 'add');
+                  props.onNotes(activeCall.person, 'add');
                 }}
               />
             </div>

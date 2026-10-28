@@ -3001,7 +3001,7 @@
 
 .registration-detail-hero {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
@@ -3033,12 +3033,19 @@
 }
 
 .registration-detail-hero small,
-.registration-detail-hero span {
+.registration-detail-hero > div > span {
   color: var(--color-text-muted);
 }
 
 .registration-detail-hero strong {
   font-size: 1.45rem;
+}
+
+.registration-detail-ticket-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .registration-detail-qr .tracking-qr {
@@ -3158,11 +3165,6 @@
   .registration-detail-qr {
     grid-column: 1 / -1;
     justify-self: center;
-  }
-
-  .registration-detail-hero > .status-badge {
-    grid-column: 1 / -1;
-    justify-self: start;
   }
 }
 

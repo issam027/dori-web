@@ -58,7 +58,10 @@ export function RegistrationDetailsModal({
             </span>
             <div>
               <small>{t('common.ticket')}</small>
-              <strong>{safeText(item.ticketNumber)}</strong>
+              <div className="registration-detail-ticket-line">
+                <strong>{safeText(item.ticketNumber)}</strong>
+                <StatusBadge tone={tone}>{status}</StatusBadge>
+              </div>
               <span>
                 {queueName ?? t('queues.registrationDetails.queueFallback', { id: item.queueId })}
               </span>
@@ -66,7 +69,6 @@ export function RegistrationDetailsModal({
             <div className="registration-detail-qr">
               <TrackingQr value={trackingUrlFromToken(item.registrationTrackingToken)} />
             </div>
-            <StatusBadge tone={tone}>{status}</StatusBadge>
           </header>
           <section className="registration-detail-section">
             <h3>
