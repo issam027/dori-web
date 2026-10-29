@@ -1,0 +1,16 @@
+name: dori-web
+
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8080:8080'
+    networks:
+      - dori-network
+
+networks:
+  dori-network:
+    external: true
