@@ -1,8 +1,8 @@
-name: dorify-frontend
+name: dorify-ui
 
 services:
-  web:
-    image: dorify/web:dev
+  app:
+    image: dorify/app:dev
     build:
       context: .
       target: runtime
