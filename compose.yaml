@@ -1,7 +1,8 @@
-name: dori-web
+name: dorify-frontend
 
 services:
   web:
+    image: dorify/web:dev
     build:
       context: .
       target: runtime
@@ -9,8 +10,8 @@ services:
     ports:
       - '127.0.0.1:8080:8080'
     networks:
-      - dori-network
+      - dorify-network
 
 networks:
-  dori-network:
+  dorify-network:
     external: true
