@@ -1,5 +1,9 @@
 // Tunisian derja (familiar street register). Partial: missing keys fall back to ar, then fr.
 export const supervision: Record<string, string> = {
+  'notifications.status.pending': 'في الانتظار',
+  'notifications.status.processing': 'قاعد يتبعث',
+  'notifications.status.delivered': 'وصلت',
+  'notifications.status.failed': 'فشلت',
   'supervision.controlRoom.resetDescription':
     'قائمة الانتظار «{{queue}}» باش تتعاود من الصفر. تسجيلات الانتظار متاع نهار اليوم باش تتسكر حسب الإعدادات. والخطوة هاذي ما فيهاش رجعة.',
   'supervision.controlRoom.resetting': 'قاعدين نعاودو فيها من الصفر',

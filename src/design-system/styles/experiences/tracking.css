@@ -28,13 +28,21 @@
 .tracking-screen {
   position: relative;
   width: min(355px, calc(100vw - 2rem));
-  min-height: 625px;
+  min-height: min(625px, calc(100dvh - 2rem));
   align-content: start;
   gap: 1rem;
   padding: 1.5rem 1.2rem;
   border-radius: 29px;
   color: var(--color-ink);
   background: linear-gradient(var(--color-surface), var(--color-primary-soft));
+}
+@media (max-width: 420px), (max-height: 700px) {
+  .tracking-screen {
+    width: 100%;
+    min-height: auto;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
 }
 .tracking-preview-layout .tracking-screen {
   border: 11px solid var(--s);

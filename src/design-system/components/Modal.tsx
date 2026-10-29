@@ -81,10 +81,12 @@ export function ConfirmDialog({
   confirmLabel,
   onConfirm,
   destructive = false,
+  pending = false,
 }: Omit<ModalProps, 'children' | 'actions'> & {
   confirmLabel: string;
   onConfirm: () => void;
   destructive?: boolean;
+  pending?: boolean;
 }) {
   return (
     <Modal
@@ -95,7 +97,11 @@ export function ConfirmDialog({
       className="confirmation-dialog"
       actions={
         <>
-          <Button variant={destructive ? 'danger' : 'primary'} onClick={onConfirm}>
+          <Button
+            variant={destructive ? 'danger' : 'primary'}
+            pending={pending}
+            onClick={onConfirm}
+          >
             {destructive ? <CircleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}
             {confirmLabel}
           </Button>

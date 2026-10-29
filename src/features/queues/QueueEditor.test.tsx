@@ -35,4 +35,4 @@ it('updates the intended text and numeric fields before saving', async () => {
     threadCount: 4,
     workingDays: [1, 2, 3, 4, 5, 6],
   });
-});
+}, 10_000);

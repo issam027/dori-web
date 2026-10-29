@@ -5,6 +5,7 @@ import { Button } from '@/design-system/components/Button';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { maskRecipient, notificationStatusTone } from './notification-utils';
+import { notificationStatusKey } from '@/shared/presentation/domain-labels';
 
 export function NotificationMobileCard({
   notification,
@@ -24,11 +25,11 @@ export function NotificationMobileCard({
   const { t } = useTranslation();
   return (
     <DataTableMobileCard
-      title={notification.ticketNumber ?? `#${notification.registrationId}`}
+      title={notification.ticketNumber ?? t('common.unknownTicket')}
       subtitle={createdAt}
       badge={
         <StatusBadge tone={notificationStatusTone(notification.notificationStatus)}>
-          {notification.notificationStatus}
+          {t(notificationStatusKey(notification.notificationStatus))}
         </StatusBadge>
       }
       fields={[
@@ -42,18 +43,12 @@ export function NotificationMobileCard({
       ]}
       actions={
         <>
-          <Button variant="unstyled" type="button" className="button button-small" onClick={onView}>
+          <Button size="small" type="button" onClick={onView}>
             <Search aria-hidden="true" />
             {t('supervision.notifications.detail')}
           </Button>
           {canResend ? (
-            <Button
-              variant="unstyled"
-              type="button"
-              className="button button-small"
-              disabled={resendPending}
-              onClick={onResend}
-            >
+            <Button size="small" type="button" disabled={resendPending} onClick={onResend}>
               <RefreshCcw aria-hidden="true" />
               {t('supervision.notifications.reemettre')}
             </Button>

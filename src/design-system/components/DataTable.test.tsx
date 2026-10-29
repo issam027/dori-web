@@ -33,6 +33,7 @@ describe('DataTable', () => {
     expect(within(table).getByRole('cell', { name: 'Ada' })).toBeVisible();
     expect(table.parentElement).toHaveClass('table-scroll');
     expect(table.parentElement).toHaveAttribute('tabindex', '0');
+    expect(table.closest('.table-scroll')?.querySelectorAll('.table-scroll')).toHaveLength(0);
   });
 
   it('preserves composed table markup and supports an existing outer container', () => {

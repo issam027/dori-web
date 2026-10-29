@@ -9,6 +9,7 @@ interface DataTableLoadingProps {
   empty?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  resultSummary?: ReactNode;
 }
 
 interface DataColumn<TRow> {
@@ -103,20 +104,32 @@ export function DataTable<TRow = never>(props: DataTableProps<TRow>) {
 
   if (hasMobileLayout && mobileRows && getMobileRowKey && props.renderMobileRow) {
     return (
-      <div className="responsive-data-table">
-        <div className="responsive-data-table-desktop">{tableContainer}</div>
-        <div className="responsive-data-table-mobile" role="list" aria-label={props.caption}>
-          {mobileRows.map((row) => (
-            <Fragment key={getMobileRowKey(row)}>{props.renderMobileRow?.(row)}</Fragment>
-          ))}
+      <>
+        {props.resultSummary ? (
+          <span className="sr-only" aria-live="polite">
+            {props.resultSummary}
+          </span>
+        ) : null}
+        <div className="responsive-data-table">
+          <div className="responsive-data-table-desktop">{tableContainer}</div>
+          <div className="responsive-data-table-mobile" role="list" aria-label={props.caption}>
+            {mobileRows.map((row) => (
+              <Fragment key={getMobileRowKey(row)}>{props.renderMobileRow?.(row)}</Fragment>
+            ))}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className={containerClassName} tabIndex={0}>
-      {table}
-    </div>
+    <>
+      {props.resultSummary ? (
+        <span className="sr-only" aria-live="polite">
+          {props.resultSummary}
+        </span>
+      ) : null}
+      {tableContainer}
+    </>
   );
 }

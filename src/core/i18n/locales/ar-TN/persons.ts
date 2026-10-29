@@ -71,6 +71,6 @@ export const persons: Record<string, string> = {
   'persons.personPickerOrCreate.personneConnue': 'حريف مقيّد عندنا ديجا',
   'persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat':
     'حط اللقب ونمرو تليفون صحيح ومريڤل.',
-  'persons.search.minimumCharacters': 'اكتب 3 حروف على الأقل باش نلوّجو',
+  'persons.search.minimumCharacters': 'اكتب {{count}} حروف على الأقل باش نلوّجو',
   'persons.phone.e164Label': 'نمرو تليفون دولي',
 };

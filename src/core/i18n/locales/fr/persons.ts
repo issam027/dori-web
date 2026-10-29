@@ -52,7 +52,7 @@ export const persons = {
   'persons.personPickerOrCreate.personneConnue': 'Personne connue',
   'persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat':
     'Renseignez un nom et un téléphone au format international.',
-  'persons.search.minimumCharacters': 'Saisissez au moins 3 caractères.',
+  'persons.search.minimumCharacters': 'Saisissez au moins {{count}} caractères.',
   'persons.phone.e164Label': 'Téléphone E.164',
   'persons.notes.editTitle': 'Modifier la note',
   'persons.notes.updated': 'Note modifiée',

@@ -35,26 +35,16 @@ export function SiteMobileCard({
       ]}
       actions={
         <>
-          <Button variant="unstyled" className="button button-small" type="button" onClick={onEdit}>
+          <Button size="small" type="button" onClick={onEdit}>
             <Pencil />
             {t('common.edit')}
           </Button>
-          <Button
-            variant="unstyled"
-            className="button button-small"
-            type="button"
-            onClick={onAssign}
-          >
+          <Button size="small" type="button" onClick={onAssign}>
             <UserPlus />
             {t('settings.assignUser')}
           </Button>
           <MobileCardActionsMenu label={t('common.actions')}>
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={onToggle}
-            >
+            <Button size="small" type="button" onClick={onToggle}>
               {site.isActive ? <PowerOff /> : <Power />}
               {site.isActive ? t('onboarding.settings.desactiver') : t('common.activate')}
             </Button>
@@ -103,28 +93,18 @@ export function QueueMobileCard({
       ]}
       actions={
         <>
-          <Button variant="unstyled" className="button button-small" type="button" onClick={onEdit}>
+          <Button size="small" type="button" onClick={onEdit}>
             <Pencil />
             {t('common.edit')}
           </Button>
           {canAssignOperators ? (
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={onManageOperators}
-            >
+            <Button size="small" type="button" onClick={onManageOperators}>
               <UserPlus />
               {t('settings.queueOperators.button')}
             </Button>
           ) : null}
           <MobileCardActionsMenu label={t('common.actions')}>
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={onToggle}
-            >
+            <Button size="small" type="button" onClick={onToggle}>
               {queue.isActive ? <PowerOff /> : <Power />}
               {queue.isActive ? t('onboarding.settings.desactiver') : t('common.activate')}
             </Button>

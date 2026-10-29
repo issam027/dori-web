@@ -19,6 +19,7 @@ import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { TranslationMobileCard } from './TranslationMobileCard';
 import { useAdminTranslations } from './hooks/useAdminTranslations';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
 
 const TRANSLATION_CATEGORIES = Object.values(CreateTranslationDtoCategory);
 type Form = {
@@ -153,81 +154,81 @@ export function TranslationsAdminPage() {
         title={t('onboarding.settings.traductions')}
         description={t('admin.translations.pageDescription')}
         actions={
-          <Button
-            variant="unstyled"
-            className="button button-primary"
-            labelMode="always"
-            type="button"
-            onClick={showCreate}
-          >
+          <Button variant="primary" labelMode="always" type="button" onClick={showCreate}>
             <Plus /> {t('onboarding.settings.nouvelleTraduction')}
           </Button>
         }
       />
-      <Card className="admin-filter-card">
-        <details>
-          <summary>
-            <span>
-              <Search /> {t('admin.translations.rechercherDansLesTraductions')}
-            </span>
-            <small>
-              {t('admin.translations.cleCategorieOuLangue', { count: SEARCH_MINIMUM_LENGTH })}
-            </small>
-          </summary>
-          <div className="admin-filter-grid">
-            <label>
-              {t('onboarding.settings.cle')}
-              <input
-                value={filterDraft.key}
-                onChange={(event) => {
-                  const key = event.target.value;
-                  setFilterDraft({ ...filterDraft, key });
-                  setPage(1);
-                  if (key.trim().length < SEARCH_MINIMUM_LENGTH) {
-                    setFilters((current) => ({ ...current, key: '' }));
-                  }
-                }}
-              />
-            </label>
-            <label>
-              {t('onboarding.settings.categorie')}
-              <select
-                value={filterDraft.category}
-                onChange={(event) => {
-                  const category = event.target.value;
-                  setFilterDraft({ ...filterDraft, category });
-                  setFilters((current) => ({ ...current, category }));
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('profile.profile.toutes')}</option>
-                {TRANSLATION_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {categoryLabel(category)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              {t('common.language')}
-              <select
-                value={filterDraft.locale}
-                onChange={(event) => {
-                  const locale = event.target.value;
-                  setFilterDraft({ ...filterDraft, locale });
-                  setFilters((current) => ({ ...current, locale }));
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('common.all')}</option>
-                <option value="fr">{t('locale.fr')}</option>
-                <option value="en">{t('common.english')}</option>
-                <option value="ar">{t('locale.ar')}</option>
-              </select>
-            </label>
-          </div>
-        </details>
-      </Card>{' '}
+      <FilterPanel
+        icon={<Search />}
+        title={t('admin.translations.rechercherDansLesTraductions')}
+        description={t('admin.translations.cleCategorieOuLangue', { count: SEARCH_MINIMUM_LENGTH })}
+        activeCount={
+          Number(Boolean(filterDraft.key)) +
+          Number(Boolean(filterDraft.category)) +
+          Number(Boolean(filterDraft.locale))
+        }
+        resetLabel={t('common.reset')}
+        onReset={() => {
+          const defaults = { key: '', category: '', locale: '' };
+          setFilterDraft(defaults);
+          setFilters(defaults);
+          setPage(1);
+        }}
+      >
+        <div className="admin-filter-grid">
+          <label>
+            {t('onboarding.settings.cle')}
+            <input
+              value={filterDraft.key}
+              onChange={(event) => {
+                const key = event.target.value;
+                setFilterDraft({ ...filterDraft, key });
+                setPage(1);
+                if (key.trim().length < SEARCH_MINIMUM_LENGTH) {
+                  setFilters((current) => ({ ...current, key: '' }));
+                }
+              }}
+            />
+          </label>
+          <label>
+            {t('onboarding.settings.categorie')}
+            <select
+              value={filterDraft.category}
+              onChange={(event) => {
+                const category = event.target.value;
+                setFilterDraft({ ...filterDraft, category });
+                setFilters((current) => ({ ...current, category }));
+                setPage(1);
+              }}
+            >
+              <option value="">{t('profile.profile.toutes')}</option>
+              {TRANSLATION_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {categoryLabel(category)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('common.language')}
+            <select
+              value={filterDraft.locale}
+              onChange={(event) => {
+                const locale = event.target.value;
+                setFilterDraft({ ...filterDraft, locale });
+                setFilters((current) => ({ ...current, locale }));
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              <option value="fr">{t('locale.fr')}</option>
+              <option value="en">{t('common.english')}</option>
+              <option value="ar">{t('locale.ar')}</option>
+            </select>
+          </label>
+        </div>
+      </FilterPanel>{' '}
       <Card className="settings-card">
         <div className="card-heading translation-catalog-heading">
           <span className="translation-heading-icon">
@@ -239,6 +240,7 @@ export function TranslationsAdminPage() {
           </div>
         </div>
         <DataTable
+          resultSummary={t('common.resultsCount', { count: translations.data?.data.total ?? 0 })}
           error={translations.isError}
           onRetry={() => void translations.refetch()}
           loading={translations.isLoading}

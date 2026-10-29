@@ -26,7 +26,7 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
     <DataTableMobileCard
       className="person-mobile-card"
       title={[person.firstName, person.lastName].filter(Boolean).join(' ')}
-      subtitle={`#${person.personId}`}
+      subtitle={person.email ?? person.phoneNumber ?? t('common.notProvided')}
       badge={
         <span className={`status-badge ${person.isActive ? 'status-success' : 'status-warning'}`}>
           {t(person.isActive ? 'common.active' : 'common.inactive')}
@@ -52,12 +52,7 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
       ]}
       actions={
         <>
-          <Button
-            variant="unstyled"
-            className="button button-small"
-            type="button"
-            onClick={props.onView}
-          >
+          <Button size="small" type="button" onClick={props.onView}>
             <Eye aria-hidden="true" />
             {t('common.view')}
           </Button>
@@ -67,30 +62,19 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
             onClick={props.onNotes}
           />
           <MobileCardActionsMenu label={t('common.actions')}>
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={props.onEdit}
-            >
+            <Button size="small" type="button" onClick={props.onEdit}>
               <Pencil />
               {t('common.edit')}
             </Button>
             {props.canDelete ? (
               person.isActive ? (
-                <Button
-                  variant="unstyled"
-                  className="button button-small button-danger"
-                  type="button"
-                  onClick={props.onDelete}
-                >
+                <Button variant="danger" size="small" type="button" onClick={props.onDelete}>
                   <Trash2 />
                   {t('common.delete')}
                 </Button>
               ) : (
                 <Button
-                  variant="unstyled"
-                  className="button button-small"
+                  size="small"
                   type="button"
                   disabled={props.pending}
                   onClick={props.onReactivate}

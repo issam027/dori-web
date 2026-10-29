@@ -226,6 +226,7 @@ export function PortfolioPage() {
                   labelMode="always"
                   type="button"
                   disabled={site.siteId === activeSiteId}
+                  unavailableReason={__t('common.currentSite')}
                   onClick={() => void activate(site.siteId, user.scope)}
                 >
                   <MapPin aria-hidden="true" />
@@ -270,6 +271,7 @@ export function PortfolioPage() {
             : __t('portfolio.confirmReactivate')
         }
         destructive={selectedSite?.isActive}
+        pending={pending}
         onConfirm={() => void changeSiteState()}
       />
     </div>

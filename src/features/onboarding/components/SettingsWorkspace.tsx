@@ -189,7 +189,7 @@ function Header({
           <Plus aria-hidden="true" /> {label}
         </Link>
       ) : action ? (
-        <Button variant="unstyled" type="submit" className="button button-primary" onClick={action}>
+        <Button variant="primary" type="submit" onClick={action}>
           <Plus aria-hidden="true" /> {label}
         </Button>
       ) : null}

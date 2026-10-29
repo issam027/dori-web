@@ -229,12 +229,6 @@
 .public-display footer {
   display: none;
 }
-.experience-preview-display .display-screen {
-  width: 100%;
-  height: auto;
-  min-height: 610px;
-  max-width: none;
-}
 .display-screen {
   background: radial-gradient(circle at 80% 0%, var(--cb), var(--b) 58%);
   color: var(--a);

@@ -357,7 +357,7 @@ function NotificationContentStep({
         </strong>
         <p>
           {t('supervision.notifications.inscription')}
-          {registration?.ticketNumber} · #{registration?.registrationId}
+          {registration?.ticketNumber ?? t('common.unknownTicket')}
         </p>
       </Card>
       <label className="form-field">

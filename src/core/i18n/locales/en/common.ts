@@ -169,5 +169,13 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.workingDaysHelp': 'Select at least one opening day.',
   'common.workingDaysInherited': "The site's working days will be used.",
   'common.noResults': 'No results to display',
+  'common.resultsCount': '{{count}} result(s)',
+  'common.receiptUnavailable': 'The receipt will be available after saving.',
+  'common.slotUnavailable': 'This time slot is unavailable.',
+  'common.noDataExport': 'No data is available to export.',
+  'common.currentSite': 'This site is already active.',
+  'common.completeRequiredFields': 'Complete the required fields to continue.',
   'common.unknownQueue': 'Unknown queue',
+  'common.unknownTicket': 'Ticket unavailable',
+  'controlRoom.queue': 'Monitored queue',
 };

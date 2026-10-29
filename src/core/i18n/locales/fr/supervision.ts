@@ -1,5 +1,9 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const supervision = {
+  'notifications.status.pending': 'En attente',
+  'notifications.status.processing': 'En cours d’envoi',
+  'notifications.status.delivered': 'Distribuée',
+  'notifications.status.failed': 'Échec',
   'supervision.controlRoom.resetDescription':
     'La file « {{queue}} » sera réinitialisée. Les inscriptions en attente du jour seront clôturées selon le mode configuré côté serveur. Cette action ne peut pas être annulée.',
   'supervision.controlRoom.resetting': 'Réinitialisation…',
@@ -286,6 +290,7 @@ export const supervision = {
   'reports.analytics.period': 'Période',
   'reports.analytics.walkins': 'Sans rendez-vous',
   'reports.noDataForPeriod': 'Aucune donnée pour cette période',
+  'reports.noDataForPeriodHint': 'Modifiez la période ou les files sélectionnées.',
   'reports.periodReportByQueue': 'Rapport consolidé par file sur la période',
   'health.applicationVersion': 'Version {{version}}',
   'controlRoom.alertCount': '{{count}} alerte(s)',

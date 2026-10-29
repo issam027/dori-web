@@ -173,5 +173,13 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.workingDaysHelp': 'يرجى تحديد يوم عمل واحد على الأقل.',
   'common.workingDaysInherited': 'سيتم اعتماد أيام عمل الموقع تلقائياً.',
   'common.noResults': 'لا توجد نتائج لعرضها',
+  'common.resultsCount': '{{count}} نتيجة',
+  'common.receiptUnavailable': 'سيصبح المستند متوفراً بعد الحفظ.',
+  'common.slotUnavailable': 'هذا الموعد غير متاح.',
+  'common.noDataExport': 'لا توجد بيانات متاحة للتصدير.',
+  'common.currentSite': 'هذا الموقع مفعّل بالفعل.',
+  'common.completeRequiredFields': 'أكمل الحقول المطلوبة للمتابعة.',
   'common.unknownQueue': 'قائمة انتظار غير معروفة',
+  'common.unknownTicket': 'تذكرة غير متوفرة',
+  'controlRoom.queue': 'قائمة انتظار تحت المراقبة',
 };

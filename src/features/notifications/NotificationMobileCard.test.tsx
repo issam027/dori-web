@@ -35,7 +35,7 @@ it('renders notification details and delegates its mobile actions', async () => 
   );
 
   expect(screen.getByRole('listitem')).toHaveTextContent('A-012');
-  expect(screen.getByRole('listitem')).toHaveTextContent('failed');
+  expect(screen.getByRole('listitem')).toHaveTextContent('Échec');
   await user.click(screen.getByRole('button', { name: /détail/i }));
   await user.click(screen.getByRole('button', { name: /réémettre/i }));
   expect(onView).toHaveBeenCalledOnce();

@@ -217,34 +217,6 @@ table td small {
   flex-wrap: nowrap;
 }
 
-.row-actions-menu {
-  position: relative;
-  width: max-content;
-}
-.row-actions-menu > summary {
-  list-style: none;
-  cursor: pointer;
-}
-.row-actions-menu > summary::-webkit-details-marker {
-  display: none;
-}
-.row-actions-popover {
-  position: absolute;
-  z-index: 20;
-  inset-inline-end: 0;
-  top: calc(100% + 6px);
-  display: grid;
-  min-width: 210px;
-  padding: 6px;
-  border: 1px solid var(--color-line);
-  border-radius: 12px;
-  background: var(--color-surface);
-  box-shadow: 0 14px 35px rgb(20 42 58 / 18%);
-}
-.row-actions-popover .button {
-  justify-content: flex-start;
-  border-color: transparent;
-}
 .user-detail-modern {
   display: grid;
   gap: var(--space-5);
@@ -361,12 +333,6 @@ table td small {
   white-space: nowrap;
   text-align: end;
 }
-.button-small {
-  min-height: 32px;
-  padding: 5px 9px;
-  font-size: 12px;
-}
-
 .assignment-flow {
   display: grid;
   gap: 18px;

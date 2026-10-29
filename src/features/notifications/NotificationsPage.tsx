@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, RefreshCcw, RotateCcw, Search } from 'lucide-react';
+import { Plus, RefreshCcw, Search } from 'lucide-react';
 import type {
   NotificationResponseDto,
   NotificationsControllerFindNotificationsSort,
@@ -22,6 +22,8 @@ import { useQueues } from '@/features/queues/hooks/useQueues';
 import { Button } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { NotificationMobileCard } from './NotificationMobileCard';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
+import { notificationStatusKey } from '@/shared/presentation/domain-labels';
 
 export function NotificationsPage() {
   const { t, i18n } = useTranslation();
@@ -38,7 +40,6 @@ export function NotificationsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [queueId, setQueueId] = useState<string>();
-  const [registrationId, setRegistrationId] = useState('');
   const [sort, setSort] = useState<NotificationsControllerFindNotificationsSort>('createdAt:desc');
   const [wizard, setWizard] = useState(false);
   const [detailId, setDetailId] = useState<string>();
@@ -49,7 +50,6 @@ export function NotificationsPage() {
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
     queueId,
-    registrationId: registrationId ? registrationId : undefined,
     siteId: siteId ?? undefined,
     sort,
   });
@@ -72,9 +72,8 @@ export function NotificationsPage() {
         actions={
           canSend ? (
             <Button
-              variant="unstyled"
+              variant="primary"
               type="button"
-              className="button button-primary"
               labelMode="always"
               onClick={() => {
                 setWizard(true);
@@ -86,145 +85,126 @@ export function NotificationsPage() {
           ) : null
         }
       />
-      <Card className="admin-filter-card notification-filter-card">
-        <details
-          onToggle={(event) => {
-            setFiltersOpen(event.currentTarget.open);
-          }}
-        >
-          <summary>
-            <span>
-              <Search aria-hidden="true" /> {t('notifications.filters.title')}
-            </span>
-            <small>{t('notifications.filters.help')}</small>
-          </summary>
-          <div className="admin-filter-grid notification-filter-grid">
-            <label>
-              {t('common.canal')}
-              <select
-                value={channel}
-                onChange={(event) => {
-                  setChannel(event.target.value as '' | 'sms' | 'email');
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('common.all')}</option>
-                <option value="sms">{t('common.sms')}</option>
-                <option value="email">{t('common.email')}</option>
-              </select>
-            </label>
-            <label>
-              {t('common.status')}
-              <select
-                value={status}
-                onChange={(event) => {
-                  setStatus(
-                    event.target.value as
-                      '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed',
-                  );
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('common.all')}</option>
-                {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              {t('reports.startDate')}
-              <input
-                type="date"
-                value={dateFrom}
-                max={dateTo || undefined}
-                onChange={(event) => {
-                  setDateFrom(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('reports.endDate')}
-              <input
-                type="date"
-                value={dateTo}
-                min={dateFrom || undefined}
-                onChange={(event) => {
-                  setDateTo(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('queues.singular')}
-              <select
-                value={queueId ?? ''}
-                onChange={(event) => {
-                  setQueueId(event.target.value || undefined);
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('common.all')}</option>
-                {queues.data?.data.items.map((queue) => (
-                  <option key={queue.queueId} value={queue.queueId}>
-                    {queue.queueName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              {t('notifications.filters.registrationId')}
-              <input
-                type="number"
-                min="1"
-                value={registrationId}
-                onChange={(event) => {
-                  setRegistrationId(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('notifications.filters.sort')}
-              <select
-                value={sort}
-                onChange={(event) => {
-                  setSort(event.target.value as NotificationsControllerFindNotificationsSort);
-                  setPage(1);
-                }}
-              >
-                <option value="createdAt:desc">{t('notifications.filters.newest')}</option>
-                <option value="createdAt:asc">{t('notifications.filters.oldest')}</option>
-                <option value="notificationStatus:asc">{t('common.status')}</option>
-                <option value="channel:asc">{t('common.canal')}</option>
-                <option value="sentAt:desc">{t('notifications.filters.recentlySent')}</option>
-              </select>
-            </label>
-            <div className="admin-filter-actions">
-              <Button
-                variant="unstyled"
-                className="button"
-                type="button"
-                onClick={() => {
-                  setChannel('');
-                  setStatus('');
-                  setDateFrom('');
-                  setDateTo('');
-                  setQueueId(undefined);
-                  setRegistrationId('');
-                  setSort('createdAt:desc');
-                  setPage(1);
-                }}
-              >
-                <RotateCcw aria-hidden="true" />
-                {t('common.reset')}
-              </Button>
-            </div>
-          </div>
-        </details>
-      </Card>
+      <FilterPanel
+        className="notification-filter-card"
+        icon={<Search />}
+        title={t('notifications.filters.title')}
+        description={t('notifications.filters.help')}
+        onOpenChange={setFiltersOpen}
+        activeCount={
+          Number(Boolean(channel)) +
+          Number(Boolean(status)) +
+          Number(Boolean(dateFrom)) +
+          Number(Boolean(dateTo)) +
+          Number(Boolean(queueId)) +
+          Number(sort !== 'createdAt:desc')
+        }
+        resetLabel={t('common.reset')}
+        onReset={() => {
+          setChannel('');
+          setStatus('');
+          setDateFrom('');
+          setDateTo('');
+          setQueueId(undefined);
+          setSort('createdAt:desc');
+          setPage(1);
+        }}
+      >
+        <div className="admin-filter-grid notification-filter-grid">
+          <label>
+            {t('common.canal')}
+            <select
+              value={channel}
+              onChange={(event) => {
+                setChannel(event.target.value as '' | 'sms' | 'email');
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              <option value="sms">{t('common.sms')}</option>
+              <option value="email">{t('common.email')}</option>
+            </select>
+          </label>
+          <label>
+            {t('common.status')}
+            <select
+              value={status}
+              onChange={(event) => {
+                setStatus(
+                  event.target.value as
+                    '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed',
+                );
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
+                <option key={value}>{value}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('reports.startDate')}
+            <input
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(event) => {
+                setDateFrom(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('reports.endDate')}
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(event) => {
+                setDateTo(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('queues.singular')}
+            <select
+              value={queueId ?? ''}
+              onChange={(event) => {
+                setQueueId(event.target.value || undefined);
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              {queues.data?.data.items.map((queue) => (
+                <option key={queue.queueId} value={queue.queueId}>
+                  {queue.queueName}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('notifications.filters.sort')}
+            <select
+              value={sort}
+              onChange={(event) => {
+                setSort(event.target.value as NotificationsControllerFindNotificationsSort);
+                setPage(1);
+              }}
+            >
+              <option value="createdAt:desc">{t('notifications.filters.newest')}</option>
+              <option value="createdAt:asc">{t('notifications.filters.oldest')}</option>
+              <option value="notificationStatus:asc">{t('common.status')}</option>
+              <option value="channel:asc">{t('common.canal')}</option>
+              <option value="sentAt:desc">{t('notifications.filters.recentlySent')}</option>
+            </select>
+          </label>
+        </div>
+      </FilterPanel>
       <Card className="settings-card notification-journal-card">
         <DataTable
+          resultSummary={t('common.resultsCount', { count: journal.data?.data.total ?? 0 })}
           error={journal.isError}
           onRetry={() => void journal.refetch()}
           loading={journal.isPending}
@@ -256,7 +236,7 @@ export function NotificationsPage() {
             {
               key: 'ticket',
               header: t('supervision.notifications.inscription'),
-              render: (row) => row.ticketNumber ?? `#${row.registrationId}`,
+              render: (row) => row.ticketNumber ?? t('common.unknownTicket'),
             },
             {
               key: 'channel',
@@ -273,7 +253,7 @@ export function NotificationsPage() {
               header: t('common.status'),
               render: (row) => (
                 <StatusBadge tone={notificationStatusTone(row.notificationStatus)}>
-                  {row.notificationStatus}
+                  {t(notificationStatusKey(row.notificationStatus))}
                 </StatusBadge>
               ),
             },
@@ -345,13 +325,13 @@ function NotificationDetail({ notification }: { notification?: NotificationRespo
   return (
     <dl className="detail-list">
       <dt>{t('supervision.notifications.inscription')}</dt>
-      <dd>#{notification.registrationId}</dd>
+      <dd>{notification.ticketNumber ?? t('common.unknownTicket')}</dd>
       <dt>{t('common.recipient')}</dt>
       <dd>{maskRecipient(notification.recipient)}</dd>
       <dt>{t('common.canal')}</dt>
       <dd>{notification.channel}</dd>
       <dt>{t('common.status')}</dt>
-      <dd>{notification.notificationStatus}</dd>
+      <dd>{t(notificationStatusKey(notification.notificationStatus))}</dd>
       <dt>{t('common.contenu')}</dt>
       <dd>{notification.notificationContent}</dd>
       <dt>{t('supervision.notifications.echec')}</dt>

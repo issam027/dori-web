@@ -9,6 +9,7 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { isValidPersonIdentity } from './person-validation';
 import { usePersonsSearch } from './hooks/usePersons';
 import { Button } from '@/design-system/components/Button';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 
 export type PersonChoice =
   { kind: 'existing'; person: PersonResponseDto } | { kind: 'new'; person: PersonIdentityDto };
@@ -94,11 +95,13 @@ export function PersonPickerOrCreate({
                 </span>
               </div>
             </FormField>
-            {search.trim().length > 0 && search.trim().length < 3 ? (
-              <small className="form-hint">{__t('persons.search.minimumCharacters')}</small>
+            {search.trim().length > 0 && search.trim().length < SEARCH_MINIMUM_LENGTH ? (
+              <small className="form-hint">
+                {__t('persons.search.minimumCharacters', { count: SEARCH_MINIMUM_LENGTH })}
+              </small>
             ) : null}
           </div>
-          {search.trim().length >= 3 ? (
+          {search.trim().length >= SEARCH_MINIMUM_LENGTH ? (
             <>
               <EntityPicker
                 compact

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, RotateCcw, Search } from 'lucide-react';
+import { Eye, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { AuditControllerSearchOutcome } from '@/api/generated/models';
 import { formatDateTime } from '@/core/i18n/date-format';
@@ -15,13 +15,15 @@ import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { AuditEventDetail } from './AuditEventDetail';
 import { AuditEventMobileCard } from './AuditEventMobileCard';
 import { useAuditEvent, useAuditEvents } from './hooks/useAudit';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import './audit.css';
 
 export function AuditPage() {
   const { t, i18n } = useTranslation();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebouncedFilter(search, { delay: 350, minimumLength: 2 });
+  const debouncedSearch = useDebouncedFilter(search, { delay: 350 });
   const [actorUserId, setActorUserId] = useState('');
   const [action, setAction] = useState('');
   const [targetType, setTargetType] = useState('');
@@ -32,7 +34,7 @@ export function AuditPage() {
 
   const journal = useAuditEvents({
     page,
-    search: debouncedSearch.length >= 2 ? debouncedSearch : undefined,
+    search: debouncedSearch.length >= SEARCH_MINIMUM_LENGTH ? debouncedSearch : undefined,
     actorUserId: actorUserId || undefined,
     action: action || undefined,
     targetType: targetType || undefined,
@@ -62,108 +64,104 @@ export function AuditPage() {
         title={t('audit.title')}
         description={t('audit.description')}
       />
-      <Card className="admin-filter-card">
-        <details>
-          <summary>
-            <span>
-              <Search aria-hidden="true" /> {t('audit.filters.title')}
-            </span>
-            <small>{t('audit.filters.help')}</small>
-          </summary>
-          <div className="admin-filter-grid">
-            <label>
-              {t('audit.filters.search')}
-              <input
-                value={search}
-                maxLength={100}
-                placeholder={t('audit.filters.searchPlaceholder')}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('audit.fields.actorId')}
-              <input
-                type="number"
-                min="1"
-                value={actorUserId}
-                onChange={(event) => {
-                  setActorUserId(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('audit.fields.action')}
-              <input
-                value={action}
-                maxLength={100}
-                onChange={(event) => {
-                  setAction(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('audit.fields.targetType')}
-              <input
-                value={targetType}
-                maxLength={50}
-                onChange={(event) => {
-                  setTargetType(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('audit.fields.outcome')}
-              <select
-                value={outcome}
-                onChange={(event) => {
-                  setOutcome(event.target.value as AuditControllerSearchOutcome | '');
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('common.all')}</option>
-                <option value="success">{t('audit.outcomes.success')}</option>
-                <option value="failure">{t('audit.outcomes.failure')}</option>
-              </select>
-            </label>
-            <label>
-              {t('audit.filters.dateFrom')}
-              <input
-                type="date"
-                value={dateFrom}
-                max={dateTo || undefined}
-                onChange={(event) => {
-                  setDateFrom(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <label>
-              {t('audit.filters.dateTo')}
-              <input
-                type="date"
-                value={dateTo}
-                min={dateFrom || undefined}
-                onChange={(event) => {
-                  setDateTo(event.target.value);
-                  setPage(1);
-                }}
-              />
-            </label>
-            <div className="admin-filter-actions">
-              <Button type="button" onClick={reset}>
-                <RotateCcw aria-hidden="true" />
-                {t('common.reset')}
-              </Button>
-            </div>
-          </div>
-        </details>
-      </Card>
+      <FilterPanel
+        icon={<Search />}
+        title={t('audit.filters.title')}
+        description={t('audit.filters.help')}
+        activeCount={
+          [search, actorUserId, action, targetType, outcome, dateFrom, dateTo].filter(Boolean)
+            .length
+        }
+        resetLabel={t('common.reset')}
+        onReset={reset}
+      >
+        <div className="admin-filter-grid">
+          <label>
+            {t('audit.filters.search')}
+            <input
+              value={search}
+              maxLength={100}
+              placeholder={t('audit.filters.searchPlaceholder')}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('audit.fields.actorId')}
+            <input
+              type="number"
+              min="1"
+              value={actorUserId}
+              onChange={(event) => {
+                setActorUserId(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('audit.fields.action')}
+            <input
+              value={action}
+              maxLength={100}
+              onChange={(event) => {
+                setAction(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('audit.fields.targetType')}
+            <input
+              value={targetType}
+              maxLength={50}
+              onChange={(event) => {
+                setTargetType(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('audit.fields.outcome')}
+            <select
+              value={outcome}
+              onChange={(event) => {
+                setOutcome(event.target.value as AuditControllerSearchOutcome | '');
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              <option value="success">{t('audit.outcomes.success')}</option>
+              <option value="failure">{t('audit.outcomes.failure')}</option>
+            </select>
+          </label>
+          <label>
+            {t('audit.filters.dateFrom')}
+            <input
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(event) => {
+                setDateFrom(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('audit.filters.dateTo')}
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(event) => {
+                setDateTo(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+        </div>
+      </FilterPanel>
       <Card className="settings-card">
         {journal.isError ? <ErrorState onRetry={() => void journal.refetch()} /> : null}
         {journal.isSuccess && items.length === 0 ? (

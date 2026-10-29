@@ -73,6 +73,7 @@ export function ReportsPage() {
             type="button"
             className="button"
             disabled={!queueItems.length}
+            unavailableReason={__t('common.noDataExport')}
             onClick={exportCsv}
           >
             <Download aria-hidden="true" />
@@ -244,7 +245,10 @@ export function ReportsPage() {
         />
       ) : null}
       {!reports.isLoading && !queueItems.length ? (
-        <EmptyState title={__t('reports.noDataForPeriod')} />
+        <EmptyState
+          title={__t('reports.noDataForPeriod')}
+          description={__t('reports.noDataForPeriodHint')}
+        />
       ) : (
         <Card>
           <h2>{__t('supervision.reports.performanceParFile')}</h2>

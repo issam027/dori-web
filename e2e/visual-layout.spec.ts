@@ -63,7 +63,7 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
                   '00000000-0000-4000-8000-000000000001',
                   '00000000-0000-4000-8000-000000000002',
                 ],
-                queueIds: [],
+                queueIds: ['00000000-0000-4000-8000-000000000010'],
               },
         }),
       });
@@ -100,6 +100,44 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
           timezone: 'Europe/Paris',
           locale: 'fr',
           isActive: true,
+        }),
+      });
+    if (/^\/api\/v1\/sites\/[^/]+\/cockpit$/.test(path))
+      return route.fulfill({
+        json: envelope({
+          siteId: '00000000-0000-4000-8000-000000000001',
+          siteName: 'Clinique El Manar',
+          serverTime: '2026-10-08T12:00:00Z',
+          operator: {
+            userId: '00000000-0000-4000-8000-000000000001',
+            username: 'root',
+            fullName: 'Root Operator',
+          },
+          queues: [
+            {
+              queueId: '00000000-0000-4000-8000-000000000010',
+              queueCode: 'ACC',
+              queueName: 'Accueil',
+              waitingCount: 4,
+              remainingAppointmentsCount: 0,
+              estimatedWaitMinutes: 12,
+              threadCount: 2,
+              occupiedThreadsCount: 0,
+              availableThreadNumbers: [1, 2],
+              sessions: [],
+              currentOperatorSessionId: null,
+              sessionOpening: {
+                allowed: true,
+                availableThreadNumbers: [1, 2],
+                requiresReplacement: false,
+                replaceableSessions: [],
+              },
+              centralizedNext: { eligible: false, unavailableReason: 'no_session' },
+              activeCall: null,
+              nextCandidates: [],
+            },
+          ],
+          recentPassages: [],
         }),
       });
     if (/^\/api\/v1\/queues\/[^/]+\/availability$/.test(path))
@@ -597,6 +635,27 @@ test('desktop, tablet, mobile and TV remain usable in all four themes', async ({
       ).toBe(true);
     }
   }
+});
+
+test('cockpit visual hierarchy remains stable on desktop and mobile', async ({ page }) => {
+  await mockAuthenticatedApi(page);
+  await activateFirstSite(page);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/desk');
+  await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+  await expect(page).toHaveScreenshot('cockpit-desktop-light.png', {
+    animations: 'disabled',
+    fullPage: true,
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/desk');
+  await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+  await expect(page).toHaveScreenshot('cockpit-mobile-light.png', {
+    animations: 'disabled',
+    fullPage: true,
+  });
 });
 
 test('application content keeps a denser scale without shrinking the sidebar or wasting wide screens', async ({

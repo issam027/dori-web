@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import type { TranslationResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
+import { MobileCardActionsMenu } from '@/design-system/components/MobileCardActionsMenu';
 
 export function TranslationMobileCard({
   translation,
@@ -40,17 +41,14 @@ export function TranslationMobileCard({
       ]}
       actions={
         <>
-          <Button variant="unstyled" className="button button-small" type="button" onClick={onEdit}>
+          <Button size="small" type="button" onClick={onEdit}>
             <Pencil aria-hidden="true" /> {t('common.edit')}
           </Button>
-          <Button
-            variant="unstyled"
-            className="button button-small button-danger"
-            type="button"
-            onClick={onDelete}
-          >
-            <Trash2 aria-hidden="true" /> {t('common.delete')}
-          </Button>
+          <MobileCardActionsMenu label={t('common.actions')}>
+            <Button variant="danger" size="small" type="button" onClick={onDelete}>
+              <Trash2 aria-hidden="true" /> {t('common.delete')}
+            </Button>
+          </MobileCardActionsMenu>
         </>
       }
     />

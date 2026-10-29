@@ -764,7 +764,7 @@ export function KioskWizard() {
             >
               {__t('public-experiences.kiosk.imprimerMonTicket')}
             </Button>
-            <Button variant="unstyled" type="button" className="primary" onClick={purge}>
+            <Button variant="primary" type="button" onClick={purge}>
               {__t('common.terminer')}
             </Button>
           </div>

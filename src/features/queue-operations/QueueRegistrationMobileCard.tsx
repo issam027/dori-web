@@ -6,6 +6,7 @@ import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
+import { entryTypeKey, registrationStatusKey } from '@/shared/presentation/domain-labels';
 
 interface QueueRegistrationMobileCardProps {
   registration: RegistrationResponseDto;
@@ -31,11 +32,13 @@ export function QueueRegistrationMobileCard({
       className="queue-registration-mobile-card"
       title={personName}
       subtitle={registration.ticketNumber}
-      badge={<StatusBadge tone="neutral">{registration.status}</StatusBadge>}
+      badge={
+        <StatusBadge tone="neutral">{t(registrationStatusKey(registration.status))}</StatusBadge>
+      }
       fields={[
         { label: t('queues.myQueues.siteAndQueue'), value: queueName, wide: true },
         { label: t('common.position'), value: position },
-        { label: t('common.type'), value: registration.entryType },
+        { label: t('common.type'), value: t(entryTypeKey(registration.entryType)) },
         {
           label: t('common.tier'),
           value: (
@@ -52,7 +55,7 @@ export function QueueRegistrationMobileCard({
       ]}
       actions={
         <>
-          <Button variant="unstyled" className="button button-small" type="button" onClick={onView}>
+          <Button size="small" type="button" onClick={onView}>
             <Eye aria-hidden="true" /> {t('queues.myQueues.consulter')}
           </Button>
           <PersonNotesButton

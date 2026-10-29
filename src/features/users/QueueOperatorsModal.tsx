@@ -18,6 +18,7 @@ import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { queryKeys } from '@/api/client/query-keys';
 import { Button } from '@/design-system/components/Button';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 type View = 'assigned' | 'add';
 
@@ -216,9 +217,7 @@ export function QueueOperatorsModal({
                 {t('settings.searchUserMinimum', { count: SEARCH_MINIMUM_LENGTH })}
               </p>
             ) : searchPending || users.isFetching ? (
-              <p className="muted" role="status">
-                {t('common.loading')}
-              </p>
+              <DorifyLoader compact />
             ) : candidates.length ? (
               <div className="assignment-user-results">
                 {candidates.map((user) => (

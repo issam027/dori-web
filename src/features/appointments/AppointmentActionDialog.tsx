@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated/models';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
-import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
 import { TrackingQr } from '@/features/public-experiences/TrackingQr';
@@ -42,6 +41,8 @@ import {
 } from './appointment-actions';
 import { useAvailability } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
+import { EmptyState } from '@/design-system/components/FeedbackState';
 import { printDocument } from '@/shared/printing/print-document';
 
 type ActionMode = 'summary' | 'reschedule' | 'cancel';
@@ -119,7 +120,6 @@ export function AppointmentActionDialog({
     try {
       await action();
     } catch (cause) {
-      notifyError(cause);
       if (slotSensitive && (cause as { status?: number }).status === 409) {
         setError(t('appointments.actions.slotConflict'));
         await availability.refetch();
@@ -133,8 +133,7 @@ export function AppointmentActionDialog({
     if (note) {
       try {
         await addNote.execute(note);
-      } catch (cause) {
-        notifyError(cause);
+      } catch {
         notify({
           tone: 'warning',
           title: t('appointments.actions.noteFailedTitle'),
@@ -170,8 +169,7 @@ export function AppointmentActionDialog({
         title: t('notifications.appointment.updated'),
         message: t('appointments.actions.presentSuccess'),
       });
-    } catch (cause) {
-      notifyError(cause);
+    } catch {
       setError(t('appointments.actions.failed'));
     } finally {
       setPending(false);
@@ -185,6 +183,7 @@ export function AppointmentActionDialog({
         className="button button-small"
         type="button"
         disabled={!printReady}
+        unavailableReason={t('common.receiptUnavailable')}
         onClick={() => {
           printDocument({ datasetKey: 'printKioskTicket' });
         }}
@@ -284,11 +283,12 @@ export function AppointmentActionDialog({
         <span className="button-label">{t('common.previous')}</span>
       </Button>
       <Button
-        variant="unstyled"
-        className="button button-small button-danger"
+        variant="danger"
+        size="small"
         type="button"
         title={t('appointments.actions.confirmCancellation')}
-        disabled={!cancellationReason.trim() || pending}
+        disabled={!cancellationReason.trim()}
+        pending={pending}
         onClick={() => {
           void perform({
             action: () => cancelAppointment(appointment.registrationId),
@@ -303,31 +303,29 @@ export function AppointmentActionDialog({
         }}
       >
         <Ban aria-hidden="true" />
-        <span className="button-label">
-          {pending ? t('common.loading') : t('appointments.actions.confirmCancellation')}
-        </span>
+        <span className="button-label">{t('appointments.actions.confirmCancellation')}</span>
       </Button>
     </>
   ) : (
     <>
       <Button
-        variant="unstyled"
-        className="button button-small"
+        size="small"
         type="button"
         labelMode="responsive"
         title={t('common.previous')}
-        disabled={pending}
+        pending={pending}
         onClick={goBack}
       >
         <ArrowLeft aria-hidden="true" />
         <span className="button-label">{t('common.previous')}</span>
       </Button>
       <Button
-        variant="unstyled"
-        className="button button-small button-primary"
+        variant="primary"
+        size="small"
         type="button"
         title={t('appointments.actions.confirmReschedule')}
-        disabled={!time || pending}
+        disabled={!time}
+        pending={pending}
         onClick={() => {
           void perform({
             action: () =>
@@ -347,9 +345,7 @@ export function AppointmentActionDialog({
         }}
       >
         <Save aria-hidden="true" />
-        <span className="button-label">
-          {pending ? t('common.loading') : t('appointments.actions.confirmReschedule')}
-        </span>
+        <span className="button-label">{t('appointments.actions.confirmReschedule')}</span>
       </Button>
     </>
   );
@@ -538,9 +534,9 @@ export function AppointmentActionDialog({
                 }}
               />
             </label>
-            {availability.isPending ? <p>{t('common.loading')}</p> : null}
+            {availability.isPending ? <DorifyLoader compact /> : null}
             {!availability.isPending && slots.length === 0 ? (
-              <p>{t('appointments.actions.noSlots')}</p>
+              <EmptyState title={t('appointments.actions.noSlots')} />
             ) : null}
             <div className="appointment-slot-grid">
               {slots.map((slot) => {
@@ -553,6 +549,7 @@ export function AppointmentActionDialog({
                     type="button"
                     key={slot.time}
                     disabled={!isSlotAvailable(slot)}
+                    unavailableReason={t('common.slotUnavailable')}
                     onClick={() => {
                       setTime(value);
                     }}

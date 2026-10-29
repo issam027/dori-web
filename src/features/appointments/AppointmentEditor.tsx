@@ -7,11 +7,11 @@ import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice } from '@/features/persons/PersonPickerOrCreate';
 import { createAppointment } from './appointment-actions';
 import { appointmentUtcIso, dateInTimeZone, isSlotAvailable, slotTime } from './appointment-rules';
-import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
+import { FormField } from '@/design-system/components/FormField';
 
 export function AppointmentEditor({
   open,
@@ -49,12 +49,14 @@ export function AppointmentEditor({
   const [date, setDate] = useState(initialDate);
   const [time, setTime] = useState(initialTime ?? '09:00');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const tiers = useAppointmentTiers('appointment-editor');
   const availability = useAvailability(queueId, date);
   const serviceTimeZone = availability.data?.data.timezone || timeZone;
   const submit = async () => {
     if (!person || !queueId || !tierId) return;
     setError('');
+    setSubmitting(true);
     try {
       await createAppointment({
         queueId,
@@ -73,11 +75,12 @@ export function AppointmentEditor({
       });
       onOpenChange(false);
     } catch (cause) {
-      notifyError(cause);
       if ((cause as { status?: number }).status === 409) {
         setError(__t('appointments.appointmentEditor.ceCreneauVientDEtreReserveLesDisponib'));
         await availability.refetch();
       } else setError(__t('appointments.appointmentEditor.creationImpossible'));
+    } finally {
+      setSubmitting(false);
     }
   };
   const day =
@@ -107,8 +110,6 @@ export function AppointmentEditor({
         <>
           {step === 2 ? (
             <Button
-              variant="unstyled"
-              className="button"
               type="button"
               onClick={() => {
                 setStep(1);
@@ -119,10 +120,10 @@ export function AppointmentEditor({
           ) : null}
           {step === 1 ? (
             <Button
-              variant="unstyled"
-              className="button button-primary"
+              variant="primary"
               type="button"
               disabled={!person}
+              unavailableReason={__t('common.completeRequiredFields')}
               onClick={() => {
                 setStep(2);
               }}
@@ -132,10 +133,11 @@ export function AppointmentEditor({
             </Button>
           ) : (
             <Button
-              variant="unstyled"
-              className="button button-primary"
+              variant="primary"
               type="button"
               disabled={!person || !queueId || !tierId}
+              pending={submitting}
+              unavailableReason={__t('common.completeRequiredFields')}
               onClick={() => void submit()}
             >
               <CalendarPlus aria-hidden="true" />
@@ -180,8 +182,7 @@ export function AppointmentEditor({
                 </span>
               </div>
               <Button
-                variant="unstyled"
-                className="button button-small"
+                size="small"
                 type="button"
                 onClick={() => {
                   setStep(1);
@@ -200,8 +201,7 @@ export function AppointmentEditor({
               </div>
             </div>
             <div className="form-grid">
-              <label>
-                {__t('queues.singular')}
+              <FormField label={__t('queues.singular')}>
                 <select
                   value={queueId}
                   onChange={(e) => {
@@ -217,9 +217,8 @@ export function AppointmentEditor({
                       </option>
                     ))}
                 </select>
-              </label>
-              <label>
-                {__t('common.tier')}
+              </FormField>
+              <FormField label={__t('common.tier')}>
                 <select
                   value={tierId}
                   onChange={(e) => {
@@ -233,9 +232,8 @@ export function AppointmentEditor({
                     </option>
                   ))}
                 </select>
-              </label>
-              <label>
-                {__t('common.date')}
+              </FormField>
+              <FormField label={__t('common.date')}>
                 <input
                   type="date"
                   min={dateInTimeZone(timeZone)}
@@ -244,9 +242,8 @@ export function AppointmentEditor({
                     setDate(e.target.value);
                   }}
                 />
-              </label>
-              <label>
-                {__t('appointments.appointmentEditor.creneau')}
+              </FormField>
+              <FormField label={__t('appointments.appointmentEditor.creneau')}>
                 <select
                   value={effectiveTime}
                   onChange={(e) => {
@@ -262,7 +259,7 @@ export function AppointmentEditor({
                     );
                   })}
                 </select>
-              </label>
+              </FormField>
             </div>
             {error ? (
               <p role="alert" className="field-error">

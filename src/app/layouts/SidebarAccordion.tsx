@@ -25,12 +25,13 @@ const sections: readonly NavSection[] = sectionOrder.map((id) => ({
 }));
 
 export function SidebarAccordion({
+  portfolioAvailable = true,
   collapsed = false,
   mobileOpen = false,
   onToggleCollapsed = () => undefined,
   onCloseMobile = () => undefined,
 }: {
-  siteCount?: number;
+  portfolioAvailable?: boolean;
   collapsed?: boolean;
   mobileOpen?: boolean;
   onToggleCollapsed?: () => void;
@@ -44,10 +45,14 @@ export function SidebarAccordion({
       sections
         .map((section) => ({
           ...section,
-          items: section.items.filter((item) => hasAnyPermission(user, item.permissions)),
+          items: section.items.filter(
+            (item) =>
+              hasAnyPermission(user, item.permissions) &&
+              (item.id !== 'portfolio' || portfolioAvailable),
+          ),
         }))
         .filter((section) => section.items.length > 0),
-    [user],
+    [portfolioAvailable, user],
   );
   const activeSection = visibleSections.find((section) =>
     section.items.some((item) => location.pathname.startsWith(item.path)),

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import type { SiteResponseDto, UpdateSiteDto } from '@/api/generated/models';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { presentError } from '@/core/notifications/error-presentation';
-import { notify } from '@/core/notifications/notification-store';
 import { WorkingDaysField } from '@/features/queues/WorkingDaysField';
 
 const time = (value?: string) => value?.slice(0, 5) ?? '';
@@ -101,7 +100,6 @@ export function SiteEditor({
     } catch (cause) {
       const message = presentError(cause);
       setError(message.message);
-      notify({ tone: 'error', ...message });
     } finally {
       setSaving(false);
     }

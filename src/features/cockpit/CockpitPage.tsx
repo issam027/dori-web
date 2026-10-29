@@ -39,7 +39,7 @@ import { Button } from '@/design-system/components/Button';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
 import { FormField } from '@/design-system/components/FormField';
-import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
+import { ConfirmDialog } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { PersonNotesViewer } from '@/features/notes/public';
@@ -48,6 +48,10 @@ import { RegistrationDetailsModal } from '@/features/queue-operations/public';
 import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
 import { CockpitPassagePrintButton } from './components/CockpitPassagePrintButton';
+import {
+  CockpitSessionModal,
+  type CockpitSessionDialogState,
+} from './components/CockpitSessionModal';
 import {
   mergeCockpitQueue,
   refreshCockpitQueue,
@@ -59,7 +63,6 @@ import { useCockpitPreferences, type CockpitSort } from './hooks/useCockpitPrefe
 import { broadcastCockpitRefresh, useCockpitCrossTab } from './hooks/useCockpitCrossTab';
 import { elapsedMinutes, useServerClock } from './hooks/useServerClock';
 
-type SessionDialogState = { queue: CockpitQueueItemDto } | null;
 type NotesDialogState = {
   personId: string;
   personName: string;
@@ -105,7 +108,7 @@ export function CockpitPage() {
   const cockpit = useCockpit(siteId);
   const site = useSite(siteId);
   const actions = useCockpitActions(siteId);
-  const [sessionDialog, setSessionDialog] = useState<SessionDialogState>(null);
+  const [sessionDialog, setSessionDialog] = useState<CockpitSessionDialogState>(null);
   const [selectedThread, setSelectedThread] = useState<number>();
   const [replaceSessionId, setReplaceSessionId] = useState<string>();
   const [counterName, setCounterName] = useState('');
@@ -903,7 +906,7 @@ export function CockpitPage() {
         </>
       ) : null}
 
-      <SessionModal
+      <CockpitSessionModal
         state={sessionDialog}
         selectedThread={selectedThread}
         replaceSessionId={replaceSessionId}
@@ -1235,112 +1238,5 @@ function QueueCard(props: {
         ) : null}
       </div>
     </article>
-  );
-}
-
-function SessionModal(props: {
-  state: SessionDialogState;
-  selectedThread?: number;
-  replaceSessionId?: string;
-  counterName: string;
-  pending: boolean;
-  onThreadChange: (
-    thread: number,
-    replacement?: CockpitQueueItemDto['sessionOpening']['replaceableSessions'][number],
-  ) => void;
-  onCounterNameChange: (value: string) => void;
-  onClose: () => void;
-  onSubmit: () => void;
-}) {
-  const { t } = useTranslation();
-  const queue = props.state?.queue;
-  const options = queue
-    ? [
-        ...queue.sessionOpening.availableThreadNumbers.map((threadNumber) => ({
-          threadNumber,
-          available: true as const,
-        })),
-        ...queue.sessionOpening.replaceableSessions.map((session) => ({
-          ...session,
-          available: false as const,
-        })),
-      ]
-    : [];
-  return (
-    <Modal
-      open={Boolean(queue)}
-      onOpenChange={(open) => {
-        if (!open) props.onClose();
-      }}
-      title={t('cockpit.openSession')}
-      description={queue?.queueName}
-      actions={
-        <Button
-          variant="primary"
-          pending={props.pending}
-          disabled={!props.selectedThread}
-          onClick={props.onSubmit}
-        >
-          {t('cockpit.confirmOpenSession')}
-        </Button>
-      }
-    >
-      <div className="cockpit-session-form">
-        <fieldset>
-          <legend>{t('cockpit.chooseCounter')}</legend>
-          <div className="cockpit-thread-options">
-            {options.map((option) => (
-              <label
-                key={`${String(option.threadNumber)}-${String(option.available)}`}
-                className={
-                  props.selectedThread === option.threadNumber &&
-                  props.replaceSessionId === (option.available ? undefined : option.sessionId)
-                    ? 'is-selected'
-                    : ''
-                }
-              >
-                <input
-                  type="radio"
-                  name="thread"
-                  checked={
-                    props.selectedThread === option.threadNumber &&
-                    props.replaceSessionId === (option.available ? undefined : option.sessionId)
-                  }
-                  onChange={() => {
-                    props.onThreadChange(
-                      option.threadNumber,
-                      option.available ? undefined : option,
-                    );
-                  }}
-                />
-                <span>
-                  <strong>{t('cockpit.counterNumber', { number: option.threadNumber })}</strong>
-                  <small>
-                    {option.available
-                      ? t('cockpit.freeCounter')
-                      : t('cockpit.occupiedBy', { operator: option.operatorName })}
-                  </small>
-                </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <FormField label={t('desk.counterName')} hint={t('desk.counterNameHint')}>
-          <input
-            value={props.counterName}
-            maxLength={100}
-            placeholder={t('desk.counterNamePlaceholder')}
-            onChange={(event) => {
-              props.onCounterNameChange(event.target.value);
-            }}
-          />
-        </FormField>
-        {props.replaceSessionId ? (
-          <p className="field-hint cockpit-replacement-warning">
-            {t('cockpit.replacementWarning')}
-          </p>
-        ) : null}
-      </div>
-    </Modal>
   );
 }

@@ -18,6 +18,7 @@ import { getUserDisplayName, getUserInitials } from './user-display';
 import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 import { Button } from '@/design-system/components/Button';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 export interface AssignmentTarget {
   kind: 'site' | 'queue';
@@ -115,6 +116,7 @@ export function UserAssignmentModal({
           className="button button-primary"
           type="button"
           disabled={!selectedUser || !roleId || saving}
+          unavailableReason={t('common.completeRequiredFields')}
           onClick={() => void assign()}
         >
           <UserPlus aria-hidden="true" />
@@ -147,9 +149,7 @@ export function UserAssignmentModal({
               {t('settings.searchUserMinimum', { count: SEARCH_MINIMUM_LENGTH })}
             </p>
           ) : searchPending || users.isFetching ? (
-            <p className="muted" role="status">
-              {t('common.loading')}
-            </p>
+            <DorifyLoader compact />
           ) : results.length ? (
             <div className="assignment-user-results">
               {results.map((user) => (

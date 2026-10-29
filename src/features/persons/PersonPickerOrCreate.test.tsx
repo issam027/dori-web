@@ -31,7 +31,7 @@ function renderPicker() {
   );
 }
 
-it('searches automatically from the third character with the active site and five results', async () => {
+it('searches automatically from the shared minimum length with the active site and five results', async () => {
   const requests: URL[] = [];
   mockServer.use(
     http.get('http://localhost:3000/api/v1/persons', ({ request }) => {
@@ -43,14 +43,14 @@ it('searches automatically from the third character with the active site and fiv
   );
   renderPicker();
   const input = screen.getByRole('textbox', { name: /rechercher une personne/i });
-  await userEvent.type(input, 'ab');
+  await userEvent.type(input, 'a');
   expect(requests).toHaveLength(0);
-  await userEvent.type(input, 'c');
+  await userEvent.type(input, 'b');
   await waitFor(() => {
     expect(requests).toHaveLength(1);
   });
   expect(requests[0]?.searchParams.get('siteId')).toBe('00000000-0000-4000-8000-000000000017');
-  expect(requests[0]?.searchParams.get('search')).toBe('abc');
+  expect(requests[0]?.searchParams.get('search')).toBe('ab');
   expect(requests[0]?.searchParams.get('pageSize')).toBe('5');
 });
 

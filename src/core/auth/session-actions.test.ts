@@ -24,7 +24,7 @@ describe('hydrateSession', () => {
     useScopeStore.getState().clear();
   });
 
-  it('hydrates identity, permissions, scope and the first authorized site from /auth/me', async () => {
+  it('hydrates identity, permissions and scope without guessing site activity from /auth/me', async () => {
     mockServer.use(
       http.get('http://localhost:3000/api/v1/auth/me', () =>
         HttpResponse.json({
@@ -54,7 +54,7 @@ describe('hydrateSession', () => {
       status: 'authenticated',
       user: { userId: '00000000-0000-4000-8000-000000000007', permissions: ['queue_view'] },
     });
-    expect(useScopeStore.getState().activeSiteId).toBe('00000000-0000-4000-8000-000000000012');
+    expect(useScopeStore.getState().activeSiteId).toBeNull();
   });
 
   it('restores an access token before loading /auth/me after a page reload', async () => {

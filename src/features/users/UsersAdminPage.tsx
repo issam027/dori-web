@@ -23,6 +23,7 @@ import { Pagination } from '@/design-system/components/Pagination';
 import { UserAccountWizard } from '@/features/users/UserAccountWizard';
 import { getUserDisplayName } from '@/features/users/user-display';
 import { useScopeStore } from '@/core/scope/scope-store';
+import { userTypeKey } from '@/shared/presentation/domain-labels';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import { notifyError } from '@/core/notifications/error-presentation';
@@ -44,6 +45,7 @@ import { DataTable } from '@/design-system/components/DataTable';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { UserMobileCard } from './UserMobileCard';
 import { userPasswordResetDto } from './user-password-reset';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
 
 export function UsersAdminPage() {
   const { t, i18n } = useTranslation();
@@ -134,8 +136,7 @@ export function UsersAdminPage() {
         description={t('admin.users.pageDescription')}
         actions={
           <Button
-            variant="unstyled"
-            className="button button-primary"
+            variant="primary"
             labelMode="always"
             type="button"
             onClick={() => {
@@ -146,73 +147,79 @@ export function UsersAdminPage() {
           </Button>
         }
       />
-      <Card className="admin-filter-card">
-        <details>
-          <summary>
-            <span>
-              <Search /> {t('admin.users.rechercherUnUtilisateur')}
-            </span>
-            <small>
-              {t('admin.users.nomEmailOuTypeDeCompte', { count: SEARCH_MINIMUM_LENGTH })}
-            </small>
-          </summary>
-          <div className="admin-filter-grid">
-            <label>
-              {t('admin.users.recherche')}
-              <input
-                value={draft.search}
-                placeholder={t('admin.users.nomDUtilisateurOuEmail')}
-                onChange={(event) => {
-                  const search = event.target.value;
-                  setDraft({ ...draft, search });
-                  setPage(1);
-                  if (search.trim().length < SEARCH_MINIMUM_LENGTH) {
-                    setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
-                  }
-                }}
-              />
-            </label>
-            <label>
-              {t('profile.profile.typeDeCompte')}
-              <select
-                value={draft.userType}
-                onChange={(event) => {
-                  const userType = event.target.value;
-                  setDraft({ ...draft, userType });
-                  setFilters((currentFilters) => ({ ...currentFilters, userType }));
-                  setPage(1);
-                }}
-              >
-                <option value="">{t('supervision.notifications.tous')}</option>
-                <option value="human">{t('common.humain')}</option>
-                <option value="kiosk">{t('admin.users.kiosque')}</option>
-              </select>
-            </label>
-            <label>
-              {t('notifications.filters.sort')}
-              <select
-                value={draft.sort}
-                onChange={(event) => {
-                  const sort = event.target.value;
-                  setDraft({ ...draft, sort });
-                  setFilters((currentFilters) => ({ ...currentFilters, sort }));
-                  setPage(1);
-                }}
-              >
-                <option value="username:asc">
-                  {t('common.name')} · {t('common.sortAscending')}
-                </option>
-                <option value="username:desc">
-                  {t('common.name')} · {t('common.sortDescending')}
-                </option>
-                <option value="lastLogin:desc">{t('admin.users.lastLogin')} ↓</option>
-                <option value="lastLogin:asc">{t('admin.users.lastLogin')} ↑</option>
-                <option value="createdAt:desc">{t('common.createdAt')} ↓</option>
-              </select>
-            </label>
-          </div>
-        </details>
-      </Card>
+      <FilterPanel
+        icon={<Search />}
+        title={t('admin.users.rechercherUnUtilisateur')}
+        description={t('admin.users.nomEmailOuTypeDeCompte', { count: SEARCH_MINIMUM_LENGTH })}
+        activeCount={
+          Number(Boolean(draft.search)) +
+          Number(Boolean(draft.userType)) +
+          Number(draft.sort !== 'username:asc')
+        }
+        resetLabel={t('common.reset')}
+        onReset={() => {
+          const defaults = { search: '', userType: '', sort: 'username:asc' };
+          setDraft(defaults);
+          setFilters(defaults);
+          setPage(1);
+        }}
+      >
+        <div className="admin-filter-grid">
+          <label>
+            {t('admin.users.recherche')}
+            <input
+              value={draft.search}
+              placeholder={t('admin.users.nomDUtilisateurOuEmail')}
+              onChange={(event) => {
+                const search = event.target.value;
+                setDraft({ ...draft, search });
+                setPage(1);
+                if (search.trim().length < SEARCH_MINIMUM_LENGTH) {
+                  setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
+                }
+              }}
+            />
+          </label>
+          <label>
+            {t('profile.profile.typeDeCompte')}
+            <select
+              value={draft.userType}
+              onChange={(event) => {
+                const userType = event.target.value;
+                setDraft({ ...draft, userType });
+                setFilters((currentFilters) => ({ ...currentFilters, userType }));
+                setPage(1);
+              }}
+            >
+              <option value="">{t('supervision.notifications.tous')}</option>
+              <option value="human">{t('common.humain')}</option>
+              <option value="kiosk">{t('admin.users.kiosque')}</option>
+            </select>
+          </label>
+          <label>
+            {t('notifications.filters.sort')}
+            <select
+              value={draft.sort}
+              onChange={(event) => {
+                const sort = event.target.value;
+                setDraft({ ...draft, sort });
+                setFilters((currentFilters) => ({ ...currentFilters, sort }));
+                setPage(1);
+              }}
+            >
+              <option value="username:asc">
+                {t('common.name')} · {t('common.sortAscending')}
+              </option>
+              <option value="username:desc">
+                {t('common.name')} · {t('common.sortDescending')}
+              </option>
+              <option value="lastLogin:desc">{t('admin.users.lastLogin')} ↓</option>
+              <option value="lastLogin:asc">{t('admin.users.lastLogin')} ↑</option>
+              <option value="createdAt:desc">{t('common.createdAt')} ↓</option>
+            </select>
+          </label>
+        </div>
+      </FilterPanel>
       <Card className="settings-card">
         <div className="card-heading">
           <div>
@@ -224,6 +231,7 @@ export function UsersAdminPage() {
           </div>
         </div>
         <DataTable
+          resultSummary={t('common.resultsCount', { count: users.data?.data.total ?? 0 })}
           error={users.isError}
           onRetry={() => void users.refetch()}
           loading={users.isLoading}
@@ -294,7 +302,7 @@ export function UsersAdminPage() {
                   </small>
                 </td>
                 <td>
-                  <span className="status-badge status-info">{user.userType}</span>
+                  <span className="status-badge status-info">{t(userTypeKey(user.userType))}</span>
                 </td>
                 <td>{user.languagePreference.toUpperCase()}</td>
                 <td>

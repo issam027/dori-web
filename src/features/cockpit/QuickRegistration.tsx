@@ -205,6 +205,7 @@ export function QuickRegistration({
                   labelMode="always"
                   type="button"
                   disabled={!canSubmit}
+                  unavailableReason={__t('common.completeRequiredFields')}
                   onClick={() => void submit()}
                 >
                   <TicketCheck aria-hidden="true" />
@@ -221,6 +222,7 @@ export function QuickRegistration({
                   className="button"
                   type="button"
                   disabled={!printReady}
+                  unavailableReason={__t('common.receiptUnavailable')}
                   onClick={() => {
                     printDocument({ datasetKey: 'printKioskTicket' });
                   }}

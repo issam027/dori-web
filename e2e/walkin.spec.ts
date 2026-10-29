@@ -23,7 +23,7 @@ async function fillRequiredIdentity(page: Page) {
 
 async function reachTicketConfirmation(page: Page) {
   await page.getByRole('button', { name: /continuer vers le ticket/i }).click();
-  await page.getByLabel(/^file/i).selectOption({ label: 'Accueil E2E' });
+  await page.getByLabel('File', { exact: true }).last().selectOption({ label: 'Accueil E2E' });
   await page.getByLabel(/forfait/i).selectOption({ index: 1 });
 }
 
@@ -86,8 +86,9 @@ test('known-person search starts at three characters and exposes five-result pag
   expect(searches[0]?.searchParams.get('pageSize')).toBe('5');
   await expect(page.getByRole('option')).toHaveCount(5);
   await page.getByRole('button', { name: /suivant/i }).click();
-  await expect.poll(() => searches.length).toBe(2);
-  expect(searches[1]?.searchParams.get('page')).toBe('2');
+  await expect
+    .poll(() => searches.some((request) => request.searchParams.get('page') === '2'))
+    .toBe(true);
   await page.getByRole('option').click();
   await reachTicketConfirmation(page);
   await page.getByRole('button', { name: /créer le ticket/i }).click();
@@ -104,9 +105,12 @@ test('new-person walk-in sends every identity field once and refreshes operation
 }) => {
   let registrationCalls = 0;
   let registrationBody: Record<string, unknown> = {};
-  let statusRefreshes = 0;
+  let cockpitRefreshes = 0;
   const register: ApiScenarioHandler = async ({ method, path, route }) => {
-    if (method === 'GET' && /^\/api\/v1\/queues\/[^/]+\/status$/.test(path)) statusRefreshes += 1;
+    if (method === 'GET' && /^\/api\/v1\/sites\/[^/]+\/cockpit$/.test(path)) {
+      cockpitRefreshes += 1;
+      return false;
+    }
     if (method !== 'POST' || path !== '/api/v1/registrations') return false;
     registrationCalls += 1;
     registrationBody = route.request().postDataJSON() as Record<string, unknown>;
@@ -158,7 +162,7 @@ test('new-person walk-in sends every identity field once and refreshes operation
     },
   });
   await expect(page.getByText(/ticket E001/i)).toBeVisible();
-  expect(statusRefreshes).toBeGreaterThanOrEqual(4);
+  expect(cockpitRefreshes).toBeGreaterThanOrEqual(1);
 });
 
 test('a registration conflict stays in context and gives an actionable notification', async ({

@@ -5,6 +5,7 @@ import { Button } from '@/design-system/components/Button';
 import { MobileCardActionsMenu } from '@/design-system/components/MobileCardActionsMenu';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
 import { getUserDisplayName } from './user-display';
+import { userTypeKey } from '@/shared/presentation/domain-labels';
 
 interface UserMobileCardProps {
   user: UserSummaryItemDto;
@@ -26,7 +27,7 @@ export function UserMobileCard(props: UserMobileCardProps) {
     <DataTableMobileCard
       title={getUserDisplayName(user)}
       subtitle={`@${user.username}`}
-      badge={<span className="status-badge status-info">{user.userType}</span>}
+      badge={<span className="status-badge status-info">{t(userTypeKey(user.userType))}</span>}
       fields={[
         { label: t('common.email'), value: user.email ?? t('settings.noEmail'), wide: true },
         { label: t('common.language'), value: user.languagePreference.toUpperCase() },
@@ -34,29 +35,19 @@ export function UserMobileCard(props: UserMobileCardProps) {
       ]}
       actions={
         <>
-          <Button
-            variant="unstyled"
-            className="button button-small"
-            type="button"
-            onClick={props.onView}
-          >
+          <Button size="small" type="button" onClick={props.onView}>
             <Eye />
             {t('common.view')}
           </Button>
-          <Button
-            variant="unstyled"
-            className="button button-small"
-            type="button"
-            onClick={props.onEdit}
-          >
+          <Button size="small" type="button" onClick={props.onEdit}>
             <Pencil />
             {t('common.edit')}
           </Button>
           <MobileCardActionsMenu label={t('common.actions')}>
             {props.canDelete ? (
               <Button
-                variant="unstyled"
-                className="button button-small button-danger"
+                variant="danger"
+                size="small"
                 type="button"
                 disabled={props.deleteDisabled}
                 onClick={props.onDelete}
@@ -65,30 +56,15 @@ export function UserMobileCard(props: UserMobileCardProps) {
                 {t('common.delete')}
               </Button>
             ) : null}
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={props.onToggleStatus}
-            >
+            <Button size="small" type="button" onClick={props.onToggleStatus}>
               {user.isActive ? <UserX /> : <UserCheck />}
               {user.isActive ? t('admin.users.suspend') : t('common.activate')}
             </Button>
-            <Button
-              variant="unstyled"
-              className="button button-small"
-              type="button"
-              onClick={props.onResetPassword}
-            >
+            <Button size="small" type="button" onClick={props.onResetPassword}>
               <KeyRound />
               {t('onboarding.settings.reinitialiserMdp')}
             </Button>
-            <Button
-              variant="unstyled"
-              className="button button-small button-danger"
-              type="button"
-              onClick={props.onDisconnect}
-            >
+            <Button variant="danger" size="small" type="button" onClick={props.onDisconnect}>
               <LogOut />
               {t('admin.users.deconnecter')}
             </Button>

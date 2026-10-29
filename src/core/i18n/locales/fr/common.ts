@@ -168,5 +168,13 @@ export const common = {
   'common.workingDaysHelp': 'Sélectionnez au moins un jour d’ouverture.',
   'common.workingDaysInherited': 'Les jours du site seront utilisés.',
   'common.noResults': 'Aucun résultat à afficher',
+  'common.resultsCount': '{{count}} résultat(s)',
+  'common.receiptUnavailable': 'Le justificatif sera disponible après l’enregistrement.',
+  'common.slotUnavailable': 'Ce créneau est indisponible.',
+  'common.noDataExport': 'Aucune donnée disponible à exporter.',
+  'common.currentSite': 'Ce site est déjà actif.',
+  'common.completeRequiredFields': 'Complétez les champs obligatoires pour continuer.',
   'common.unknownQueue': 'File non identifiée',
+  'common.unknownTicket': 'Ticket non renseigné',
+  'controlRoom.queue': 'File supervisée',
 } as const;

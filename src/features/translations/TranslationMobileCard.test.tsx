@@ -29,7 +29,8 @@ it('renders long translated content and delegates mobile actions', async () => {
   expect(screen.getByRole('listitem')).toHaveTextContent('veryLongTranslationKey');
   expect(screen.getByText('محتوى مترجم طويل للاختبار')).toHaveAttribute('dir', 'auto');
   await user.click(screen.getByRole('button', { name: /modifier/i }));
-  await user.click(screen.getByRole('button', { name: /supprimer/i }));
+  await user.click(screen.getByRole('button', { name: /actions/i }));
+  await user.click(screen.getByRole('menuitem', { name: /supprimer/i }));
   expect(onEdit).toHaveBeenCalledOnce();
   expect(onDelete).toHaveBeenCalledOnce();
 });

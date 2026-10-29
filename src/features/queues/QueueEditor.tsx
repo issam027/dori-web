@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import type { CreateQueueDto, QueueResponseDto } from '@/api/generated/models';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { presentError } from '@/core/notifications/error-presentation';
-import { notify } from '@/core/notifications/notification-store';
 import { WorkingDaysField } from './WorkingDaysField';
 
 const defaults: CreateQueueDto = {
@@ -103,7 +102,6 @@ export function QueueEditor({
     } catch (cause) {
       const message = presentError(cause);
       setError(message.message);
-      notify({ tone: 'error', ...message });
     } finally {
       setSaving(false);
     }

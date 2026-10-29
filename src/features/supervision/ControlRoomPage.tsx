@@ -464,7 +464,7 @@ export function ControlRoomPage() {
             <Card key={queue.queueId} className={`supervision-queue-card supervision-${tone}`}>
               <div className="card-head">
                 <div>
-                  <span className="eyebrow">#{queue.queueId}</span>
+                  <span className="eyebrow">{t('controlRoom.queue')}</span>
                   <h2>{queue.queueName}</h2>
                 </div>
                 <div className="supervision-card-actions">

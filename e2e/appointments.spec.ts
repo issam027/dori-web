@@ -59,6 +59,39 @@ async function openEmptySlot(page: Page) {
   await expect(page.getByRole('dialog')).toBeVisible();
 }
 
+test('the current day and time remain visible on desktop and mobile', async ({ page }) => {
+  await useFixedClock(page, '2026-10-09T08:15:00Z');
+  await installApiScenario(page, {
+    profile: 'operator',
+    sites: [site],
+    queues: [appointmentQueue],
+    handlers: [
+      async ({ path, url, route }) => {
+        if (!/^\/api\/v1\/queues\/[^/]+\/availability$/.test(path)) return false;
+        await route.fulfill({
+          json: apiEnvelope(availability(url.searchParams.get('dateFrom') ?? '')),
+        });
+        return true;
+      },
+    ],
+  });
+
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/appointments');
+    await expect(page.locator('.calendar-day.is-today')).toBeVisible();
+    await expect(page.locator('.calendar-current-time')).toBeVisible();
+    expect(
+      await page.evaluate<boolean>(
+        'document.documentElement.scrollWidth <= document.documentElement.clientWidth',
+      ),
+    ).toBe(true);
+  }
+});
+
 test('the page title follows the selected queue and only shows the selector when useful', async ({
   page,
 }) => {

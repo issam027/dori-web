@@ -53,7 +53,7 @@ export const persons: DomainTranslations<typeof import('../fr/persons').persons>
   'persons.personPickerOrCreate.personneConnue': 'Existing person',
   'persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat':
     'Enter a last name and a valid international phone number.',
-  'persons.search.minimumCharacters': 'Enter at least three characters.',
+  'persons.search.minimumCharacters': 'Enter at least {{count}} characters.',
   'persons.phone.e164Label': 'International phone number',
   'persons.notes.editTitle': 'Edit note',
   'persons.notes.updated': 'Note updated',

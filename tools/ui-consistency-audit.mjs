@@ -19,6 +19,44 @@ requireText(
   'navigationRoutes',
   'La sidebar doit utiliser le registre de navigation partagé.',
 );
+
+for (const path of [
+  'src/features/persons/PersonMobileCard.tsx',
+  'src/features/persons/PersonsPage.tsx',
+  'src/features/notifications/NotificationMobileCard.tsx',
+  'src/features/notifications/NotificationsPage.tsx',
+  'src/features/supervision/ControlRoomPage.tsx',
+  'src/features/queue-operations/RegistrationDetailsModal.tsx',
+]) {
+  if (/#[{`]?(?:\$\{)?\w+(?:Id|id)/.test(read(path))) {
+    failures.push(`${path} ne doit pas exposer un identifiant technique dans l’IHM.`);
+  }
+}
+
+for (const path of [
+  'src/features/users/UsersAdminPage.tsx',
+  'src/features/translations/TranslationsAdminPage.tsx',
+  'src/features/persons/PersonsPage.tsx',
+]) {
+  requireText(path, 'FilterPanel', `${path} doit utiliser le panneau de filtres partagé.`);
+}
+for (const path of [
+  'src/features/users/UsersAdminPage.tsx',
+  'src/features/translations/TranslationsAdminPage.tsx',
+]) {
+  requireText(path, 'SEARCH_MINIMUM_LENGTH', `${path} doit partager le seuil de recherche.`);
+}
+
+forbidText(
+  'src/features/notifications/NotificationsPage.tsx',
+  'notifications.filters.registrationId',
+  'Le filtre technique registrationId ne doit pas être exposé dans le journal courant.',
+);
+requireText(
+  'src/design-system/components/DataTable.tsx',
+  'aria-live="polite"',
+  'Les résultats filtrés doivent être annoncés aux technologies d’assistance.',
+);
 requireText(
   'src/app/layouts/CommandPalette.tsx',
   'navigationRoutes',

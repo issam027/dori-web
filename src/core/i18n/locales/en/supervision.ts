@@ -1,6 +1,10 @@
 import type { DomainTranslations } from '../../types';
 
 export const supervision: DomainTranslations<typeof import('../fr/supervision').supervision> = {
+  'notifications.status.pending': 'Pending',
+  'notifications.status.processing': 'Sending',
+  'notifications.status.delivered': 'Delivered',
+  'notifications.status.failed': 'Failed',
   'supervision.controlRoom.resetDescription':
     'The queue “{{queue}}” will be reset. Today’s waiting registrations will be closed according to the server configuration. This action cannot be undone.',
   'supervision.controlRoom.resetting': 'Resetting…',
@@ -283,6 +287,7 @@ export const supervision: DomainTranslations<typeof import('../fr/supervision').
   'reports.analytics.period': 'Period',
   'reports.analytics.walkins': 'Walk-ins',
   'reports.noDataForPeriod': 'No data for this period',
+  'reports.noDataForPeriodHint': 'Change the period or the selected queues.',
   'reports.periodReportByQueue': 'Consolidated report by queue for the period',
   'health.applicationVersion': 'Version {{version}}',
   'controlRoom.alertCount': '{{count}} alert(s)',

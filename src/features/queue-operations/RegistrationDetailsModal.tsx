@@ -9,6 +9,7 @@ import { TrackingQr } from '@/features/public-experiences/TrackingQr';
 import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { formatDate, formatDateTime } from '@/core/i18n/date-format';
+import { entryTypeKey, registrationStatusKey } from '@/shared/presentation/domain-labels';
 
 const safeText = (value: unknown, fallback = '—') =>
   typeof value === 'string' || typeof value === 'number' ? String(value) : fallback;
@@ -60,7 +61,7 @@ export function RegistrationDetailsModal({
               <small>{t('common.ticket')}</small>
               <div className="registration-detail-ticket-line">
                 <strong>{safeText(item.ticketNumber)}</strong>
-                <StatusBadge tone={tone}>{status}</StatusBadge>
+                <StatusBadge tone={tone}>{t(registrationStatusKey(status))}</StatusBadge>
               </div>
               <span>{queueName ?? t('common.unknownQueue')}</span>
             </div>
@@ -104,7 +105,6 @@ export function RegistrationDetailsModal({
               <CalendarDays aria-hidden="true" /> {t('supervision.notifications.inscription')}
             </h3>
             <div className="registration-detail-grid">
-              <Detail icon={<Hash />} label={t('common.identifier')} value={item.registrationId} />
               <Detail
                 icon={<CalendarDays />}
                 label={t('common.businessDate')}
@@ -123,7 +123,7 @@ export function RegistrationDetailsModal({
               <Detail
                 icon={<Ticket />}
                 label={t('common.entryType')}
-                value={safeText(item.entryType)}
+                value={t(entryTypeKey(item.entryType))}
               />
               <Detail
                 icon={<Hash />}
@@ -132,7 +132,7 @@ export function RegistrationDetailsModal({
                   <span
                     className={`service-tier-badge ${serviceTierVisualClass(item.tierId, item.tierName)}`}
                   >
-                    {item.tierName ?? `#${item.tierId}`}
+                    {item.tierName ?? t('common.notProvided')}
                   </span>
                 }
               />

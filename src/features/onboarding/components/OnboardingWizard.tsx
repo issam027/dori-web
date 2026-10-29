@@ -663,7 +663,7 @@ function QueuesStep({
         title={__t('onboarding.onboarding.filesGuichets')}
         text={__t('onboarding.queueOverrideHelp')}
         action={
-          <Button variant="unstyled" type="submit" className="button button-primary" onClick={open}>
+          <Button variant="primary" type="submit" onClick={open}>
             {__t('onboarding.onboarding.ajouterUneFile')}
           </Button>
         }

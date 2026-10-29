@@ -348,7 +348,50 @@ export async function installApiScenario(
       return;
     }
     if (request.path === '/api/v1/sites') {
-      await route.fulfill({ json: apiEnvelope(paginated(sites)) });
+      const activeFilter = request.url.searchParams.get('isActive');
+      const filteredSites =
+        activeFilter === null
+          ? sites
+          : sites.filter((site) => String(site.isActive) === activeFilter);
+      await route.fulfill({ json: apiEnvelope(paginated(filteredSites)) });
+      return;
+    }
+    if (/^\/api\/v1\/sites\/[^/]+\/cockpit$/.test(request.path)) {
+      const siteId = request.path.split('/')[4] ?? '';
+      const cockpitQueues = queues
+        .filter((queue) => queue.siteId === siteId && queue.isActive !== false)
+        .map((queue) => ({
+          queueId: queue.queueId,
+          queueCode: queue.queueCode,
+          queueName: queue.queueName,
+          waitingCount: 0,
+          remainingAppointmentsCount: 0,
+          estimatedWaitMinutes: null,
+          threadCount: 1,
+          occupiedThreadsCount: 0,
+          availableThreadNumbers: [1],
+          sessions: [],
+          currentOperatorSessionId: null,
+          sessionOpening: {
+            allowed: true,
+            availableThreadNumbers: [1],
+            requiresReplacement: false,
+            replaceableSessions: [],
+          },
+          centralizedNext: { eligible: false, unavailableReason: 'no_session' },
+          activeCall: null,
+          nextCandidates: [],
+        }));
+      await route.fulfill({
+        json: apiEnvelope({
+          siteId,
+          siteName: sites.find((site) => site.siteId === siteId)?.siteName ?? 'Site E2E',
+          serverTime: '2026-10-09T10:00:00Z',
+          operator: { userId: '00000000-0000-4000-8000-000000000001', username: profile },
+          queues: cockpitQueues,
+          recentPassages: [],
+        }),
+      });
       return;
     }
     if (/^\/api\/v1\/sites\/[^/]+$/.test(request.path)) {

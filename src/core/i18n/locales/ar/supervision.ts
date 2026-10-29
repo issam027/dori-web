@@ -1,6 +1,10 @@
 import type { DomainTranslations } from '../../types';
 
 export const supervision: DomainTranslations<typeof import('../fr/supervision').supervision> = {
+  'notifications.status.pending': 'قيد الانتظار',
+  'notifications.status.processing': 'جارٍ الإرسال',
+  'notifications.status.delivered': 'تم التسليم',
+  'notifications.status.failed': 'فشل',
   'supervision.controlRoom.resetDescription':
     'ستتم إعادة ضبط قائمة الانتظار «{{queue}}». ستُغلق تسجيلات الانتظار لهذا اليوم وفق إعدادات الخادم. لا يمكن التراجع عن هذا الإجراء.',
   'supervision.controlRoom.resetting': 'جارٍ إعادة الضبط…',
@@ -285,6 +289,7 @@ export const supervision: DomainTranslations<typeof import('../fr/supervision').
   'reports.analytics.period': 'الفترة',
   'reports.analytics.walkins': 'بدون موعد',
   'reports.noDataForPeriod': 'لا توجد بيانات لهذه الفترة',
+  'reports.noDataForPeriodHint': 'غيّر الفترة أو قوائم الانتظار المحددة.',
   'reports.periodReportByQueue': 'تقرير موحَّد حسب قائمة الانتظار للفترة',
   'health.applicationVersion': 'الإصدار {{version}}',
   'controlRoom.alertCount': '{{count}} تنبيه',

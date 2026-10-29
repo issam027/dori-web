@@ -17,7 +17,7 @@ export function useSites(
         ? [...queryKeys.sites.portfolio, { includeInactive }]
         : queryKeys.sites.contextSwitcher,
     queryFn: ({ signal }) =>
-      usage === 'portfolio' && includeInactive ? findAllSites(signal) : findSites(signal),
+      usage === 'portfolio' && includeInactive ? findAllSites(signal) : findSites(signal, true),
     enabled,
   });
 }

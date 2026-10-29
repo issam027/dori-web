@@ -9,9 +9,10 @@ import { SidebarAccordion } from './SidebarAccordion';
 import { Topbar } from './Topbar';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { AppErrorBoundary } from '@/app/AppErrorBoundary';
-import { useActiveSite, useSite } from '@/features/portfolio/hooks/useSites';
+import { useActiveSite, useSite, useSites } from '@/features/portfolio/hooks/useSites';
 import { routeRequiresActiveSite } from './site-context-rules';
 import { storageKeys } from '@/core/storage/storage-keys';
+import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
 
 const sidebarPreferenceKey = storageKeys.session.sidebarCollapsed;
@@ -39,26 +40,37 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [pageHeaderVisible, setPageHeaderVisible] = useState(false);
   const [pageTitle, setPageTitle] = useState<string>();
   const appContentRef = useRef<HTMLElement>(null);
+  const activeSitesQuery = useSites('context-switcher');
+  const accessibleSitesQuery = useSites('portfolio', true, true);
   const activeSiteQuery = useSite(activeSiteId);
+  const accessibleSites = useMemo(() => {
+    const items = accessibleSitesQuery.data?.data.items ?? [];
+    return items.filter(
+      (site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId),
+    );
+  }, [accessibleSitesQuery.data, user]);
+  const activeAccessibleSites = useMemo(() => {
+    const items = activeSitesQuery.data?.data.items ?? [];
+    return items.filter(
+      (site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId),
+    );
+  }, [activeSitesQuery.data, user]);
   const sites = useMemo(() => {
-    const scoped =
-      user?.scope.siteIds.map((id) => ({
-        id,
-        name:
-          activeSiteQuery.data?.data.siteId === id
-            ? activeSiteQuery.data.data.siteName
-            : t('site.fallback', { id }),
-      })) ?? [];
+    const scoped = activeAccessibleSites.map((site) => ({
+      id: site.siteId,
+      name: site.siteName,
+    }));
     const active = activeSiteQuery.data?.data;
     return active && !scoped.some((site) => site.id === active.siteId)
       ? [{ id: active.siteId, name: active.siteName }, ...scoped]
       : scoped;
-  }, [activeSiteQuery.data, t, user]);
+  }, [activeAccessibleSites, activeSiteQuery.data]);
   useEffect(() => {
-    const onlySite = sites.length === 1 ? sites[0] : undefined;
+    const onlySite = activeAccessibleSites.length === 1 ? activeAccessibleSites[0] : undefined;
     if (!user || activeSiteId !== null || !onlySite) return;
-    void activate(onlySite.id, user.scope);
-  }, [activate, activeSiteId, sites, user]);
+    useScopeStore.getState().setActiveSite(onlySite.siteId, user.scope);
+    void activate(onlySite.siteId, user.scope);
+  }, [activate, activeAccessibleSites, activeSiteId, user]);
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
     const mediumQuery = window.matchMedia('(min-width: 621px) and (max-width: 900px)');
@@ -112,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className={`app-shell${effectiveSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
       <SidebarAccordion
-        siteCount={sites.length}
+        portfolioAvailable={accessibleSites.length > 1}
         collapsed={effectiveSidebarCollapsed}
         mobileOpen={mobileNavigationOpen}
         onToggleCollapsed={() => {

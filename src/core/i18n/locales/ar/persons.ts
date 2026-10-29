@@ -53,7 +53,7 @@ export const persons: DomainTranslations<typeof import('../fr/persons').persons>
   'persons.personPickerOrCreate.personneConnue': 'حريف مسجل مسبقاً',
   'persons.personPickerOrCreate.renseignezUnNomEtUnTelephoneAuFormat':
     'أدخل اللقب ورقم هاتف بصيغة دولية صالحة.',
-  'persons.search.minimumCharacters': 'أدخل ثلاثة أحرف على الأقل.',
+  'persons.search.minimumCharacters': 'أدخل {{count}} أحرف على الأقل.',
   'persons.phone.e164Label': 'رقم هاتف دولي',
   'persons.notes.editTitle': 'تحيين الملاحظة',
   'persons.notes.updated': 'تم تحيين الملاحظة بنجاح',

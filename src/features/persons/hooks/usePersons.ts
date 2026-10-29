@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/client/query-keys';
 import { findPerson, findPersons } from '../api/persons-api';
 import type { PersonsControllerFindPersonsSort } from '@/api/generated/models';
+import { SEARCH_MINIMUM_LENGTH } from '@/shared/forms/search-config';
 
 export function usePersonsSearch(options: {
   siteId: string | null;
@@ -25,7 +26,10 @@ export function usePersonsSearch(options: {
       if (options.siteId === null) throw new Error('An active site is required');
       return findPersons({ siteId: options.siteId, search, page: options.page, pageSize }, signal);
     },
-    enabled: options.enabled !== false && options.siteId !== null && search.length >= 3,
+    enabled:
+      options.enabled !== false &&
+      options.siteId !== null &&
+      search.length >= SEARCH_MINIMUM_LENGTH,
   });
 }
 
