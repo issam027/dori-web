@@ -37,8 +37,14 @@ export async function hydrateSession(): Promise<void> {
     const restoredSiteIsAllowed =
       restoredSite !== null &&
       (response.data.scope.isGlobal || response.data.scope.siteIds.includes(restoredSite));
+    const technicalSite =
+      response.data.userType === 'kiosk' && response.data.scope.siteIds.length === 1
+        ? response.data.scope.siteIds[0]
+        : undefined;
     if (restoredSiteIsAllowed) {
       useScopeStore.getState().setActiveSite(restoredSite, response.data.scope);
+    } else if (technicalSite) {
+      useScopeStore.getState().setActiveSite(technicalSite, response.data.scope);
     } else {
       useScopeStore.getState().clear();
     }

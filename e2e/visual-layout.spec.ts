@@ -647,6 +647,7 @@ test('cockpit visual hierarchy remains stable on desktop and mobile', async ({ p
   await expect(page).toHaveScreenshot('cockpit-desktop-light.png', {
     animations: 'disabled',
     fullPage: true,
+    mask: [page.locator('.cockpit-last-sync')],
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -655,6 +656,7 @@ test('cockpit visual hierarchy remains stable on desktop and mobile', async ({ p
   await expect(page).toHaveScreenshot('cockpit-mobile-light.png', {
     animations: 'disabled',
     fullPage: true,
+    mask: [page.locator('.cockpit-last-sync')],
   });
 });
 

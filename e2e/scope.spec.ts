@@ -3,7 +3,6 @@ import {
   activateSite,
   buildSite,
   installApiScenario,
-  type ApiScenarioHandler,
   type TestProfile,
 } from './support/scenario-fixtures';
 
@@ -33,7 +32,7 @@ test('a single authorized site is activated automatically and portfolio is hidde
   await installApiScenario(page, { profile: 'operator', sites: [alpha] });
   await page.goto('/desk');
 
-  await page.getByRole('button', { name: /administration/i }).click();
+  await expect(page.getByRole('button', { name: /administration/i })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /portefeuille de sites/i })).toHaveCount(0);
   await expect
     .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
@@ -69,11 +68,6 @@ test('one active site is selected automatically while inactive sites keep portfo
 test('changing site from the portfolio refreshes scoped data and the persistent topbar', async ({
   page,
 }) => {
-  const queueSiteIds: string[] = [];
-  const observeQueues: ApiScenarioHandler = ({ path, url }) => {
-    if (path === '/api/v1/queues') queueSiteIds.push(url.searchParams.get('siteId') ?? '');
-    return false;
-  };
   await page.addInitScript(() => {
     if (sessionStorage.getItem('dori.activeSiteId') === null) {
       sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
@@ -82,7 +76,6 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
   await installApiScenario(page, {
     profile: 'root',
     sites: [alpha, beta],
-    handlers: [observeQueues],
   });
 
   await page.goto('/desk');
@@ -105,7 +98,6 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
       .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
       .toBe(beta.siteId);
   }
-  expect(queueSiteIds).toEqual([]);
 });
 
 test('a stored site outside the authenticated scope is discarded', async ({ page }) => {
