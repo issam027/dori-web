@@ -38,7 +38,7 @@ it('issues one user request after a typing burst reaches the shared threshold', 
   });
   findUsers.mockClear();
 
-  await userEvent.type(screen.getByRole('textbox', { name: /recherche/i }), 'ab');
+  await userEvent.type(screen.getByRole('searchbox', { name: /recherche/i }), 'ab');
 
   await waitFor(() => {
     expect(findUsers).toHaveBeenCalledOnce();

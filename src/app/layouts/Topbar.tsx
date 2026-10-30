@@ -68,8 +68,18 @@ export function Topbar({
       if (!accountMenuRef.current?.contains(event.target as Node)) setAccountMenuOpen(false);
     };
     document.addEventListener('pointerdown', close);
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setAccountMenuOpen(false);
+        accountMenuRef.current
+          ?.querySelector<HTMLButtonElement>('.mobile-account-trigger')
+          ?.focus();
+      }
+    };
+    document.addEventListener('keydown', keyboard);
     return () => {
       document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', keyboard);
     };
   }, [accountMenuOpen]);
   return (
@@ -105,7 +115,9 @@ export function Topbar({
         <Button variant="unstyled" className="command-trigger" onClick={onOpenCommands}>
           {t('commands.open')} <kbd>{t('shell.layouts.topbar.k')}</kbd>
         </Button>
-        <ThemeSwitcher />
+        <div className="topbar-theme">
+          <ThemeSwitcher />
+        </div>
         <div className="topbar-desktop-account">
           <LocaleSwitcher />
           <Link className="avatar" to="/profile" aria-label={t('profile.title')}>
@@ -147,6 +159,21 @@ export function Topbar({
                 <span>{t('locale.label')}</span>
                 <LocaleSwitcher />
               </div>
+              <div className="mobile-account-language">
+                <span>{t('mobile.preferences')}</span>
+                <ThemeSwitcher />
+              </div>
+              {sites.length > 1 ? (
+                <Link
+                  to="/portfolio"
+                  role="menuitem"
+                  onClick={() => {
+                    setAccountMenuOpen(false);
+                  }}
+                >
+                  {t('mobile.changeSite')}
+                </Link>
+              ) : null}
               <Button variant="unstyled" labelMode="always" role="menuitem" onClick={onLogout}>
                 <LogOut aria-hidden="true" />
                 {t('auth.logout')}

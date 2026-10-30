@@ -128,6 +128,27 @@ export function PersonsPage() {
         }
       />
       <FilterPanel
+        context={t(
+          status === 'all'
+            ? 'persons.admin.allStatuses'
+            : status === 'active'
+              ? 'common.active'
+              : 'common.inactive',
+        )}
+        primary={
+          <label>
+            {t('common.search')}
+            <input
+              type="search"
+              value={searchDraft}
+              placeholder={t('persons.admin.searchPlaceholder')}
+              onChange={(event) => {
+                setSearchDraft(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+        }
         icon={<Search />}
         title={t('persons.admin.searchTitle')}
         description={t('persons.admin.searchHint')}
@@ -145,17 +166,6 @@ export function PersonsPage() {
         }}
       >
         <div className="admin-filter-grid persons-filter-grid">
-          <label>
-            {t('common.search')}
-            <input
-              value={searchDraft}
-              placeholder={t('persons.admin.searchPlaceholder')}
-              onChange={(event) => {
-                setSearchDraft(event.target.value);
-                setPage(1);
-              }}
-            />
-          </label>
           <label>
             {t('persons.admin.statusFilter')}
             <select

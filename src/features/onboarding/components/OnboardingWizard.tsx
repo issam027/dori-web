@@ -40,6 +40,7 @@ import {
 } from '../model/onboarding-workflow';
 import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
+import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
 import { WorkingDaysField } from '@/features/queues/WorkingDaysField';
 
 const stepKeys = [
@@ -250,29 +251,33 @@ export function OnboardingWizard() {
       ) : null}
       <div className="onboarding-layout">
         <Card className="setup-navigation">
-          <h2>{__t('onboarding.onboarding.parcoursDeConfiguration')}</h2>
-          {stepKeys.map((key, index) => (
-            <Button
-              variant="unstyled"
-              type="submit"
-              key={key}
-              className={`setup-nav-row ${draft.step === index + 1 ? 'active' : ''}`}
-              disabled={index + 1 > draft.step}
-              onClick={() => {
-                save({ ...draft, step: index + 1 });
-              }}
-            >
-              <span className="ticket-chip">{index + 1}</span>
-              <span>
-                <b>{__t(key)}</b>
-              </span>
-              {index + 1 < draft.step ? (
-                <span className="status-badge status-success">
-                  {__t('onboarding.onboarding.termine')}
+          <ResponsiveDetails
+            summary={`${String(draft.step)} / ${String(stepKeys.length)} · ${__t(stepKeys[draft.step - 1] ?? stepKeys[0])}`}
+          >
+            <h2>{__t('onboarding.onboarding.parcoursDeConfiguration')}</h2>
+            {stepKeys.map((key, index) => (
+              <Button
+                variant="unstyled"
+                type="submit"
+                key={key}
+                className={`setup-nav-row ${draft.step === index + 1 ? 'active' : ''}`}
+                disabled={index + 1 > draft.step}
+                onClick={() => {
+                  save({ ...draft, step: index + 1 });
+                }}
+              >
+                <span className="ticket-chip">{index + 1}</span>
+                <span>
+                  <b>{__t(key)}</b>
                 </span>
-              ) : null}
-            </Button>
-          ))}
+                {index + 1 < draft.step ? (
+                  <span className="status-badge status-success">
+                    {__t('onboarding.onboarding.termine')}
+                  </span>
+                ) : null}
+              </Button>
+            ))}
+          </ResponsiveDetails>
         </Card>
         <Card className="setup-content">
           <div className="setup-progress">

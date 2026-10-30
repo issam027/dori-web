@@ -142,7 +142,8 @@ test('new-person walk-in sends every identity field once and refreshes operation
   await reachTicketConfirmation(page);
 
   const submit = page.getByRole('button', { name: /créer le ticket/i });
-  await submit.evaluate((button: { click(): void }) => {
+  await submit.evaluate((element) => {
+    const button = element as HTMLButtonElement;
     button.click();
     button.click();
   });

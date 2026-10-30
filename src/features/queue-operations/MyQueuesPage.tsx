@@ -80,6 +80,21 @@ export function MyQueuesPage() {
       ) : null}
       {queues.data?.data.items.length ? (
         <FilterPanel
+          context={`${selectedDate} · ${queueId ? getQueueName(queueId) : __t('common.all')} · ${status ? __t(registrationStatusKey(status)) : __t('common.all')}`}
+          primary={
+            <label>
+              {__t('queues.myQueues.clientOuTicket')}
+              <input
+                type="search"
+                value={searchDraft}
+                placeholder={__t('queues.search.example')}
+                onChange={(event) => {
+                  setSearchDraft(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </label>
+          }
           className="queue-customer-search"
           icon={<Search />}
           title={__t('queues.myQueues.rechercherUnClient')}
@@ -134,18 +149,7 @@ export function MyQueuesPage() {
                   ))}
                 </select>
               </label>
-              <label>
-                {__t('queues.myQueues.clientOuTicket')}
-                <input
-                  type="search"
-                  value={searchDraft}
-                  placeholder={__t('queues.search.example')}
-                  onChange={(event) => {
-                    setSearchDraft(event.target.value);
-                    setPage(1);
-                  }}
-                />
-              </label>
+
               <label>
                 {__t('common.status')}
                 <select

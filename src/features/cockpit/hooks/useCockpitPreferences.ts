@@ -19,8 +19,8 @@ const defaults: CockpitPreferences = {
   soundsEnabled: false,
 };
 
-export function useCockpitPreferences(siteId: string | null) {
-  const key = `dori:cockpit:${siteId ?? 'none'}:preferences`;
+export function useCockpitPreferences(siteId: string | null, userId?: string) {
+  const key = `dori:cockpit:${siteId ?? 'none'}${userId ? `:user:${userId}` : ''}:preferences`;
   const [, setRevision] = useState(0);
   const preferences = (() => {
     try {

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { MOBILE_QUERY } from '@/shared/useMediaQuery';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { CommandPalette } from './CommandPalette';
 import { SidebarAccordion } from './SidebarAccordion';
 import { Topbar } from './Topbar';
+import { MobileNavigation } from './MobileNavigation';
 import { EmptyState } from '@/design-system/components/FeedbackState';
 import { AppErrorBoundary } from '@/app/AppErrorBoundary';
 import { useActiveSite, useSite, useSites } from '@/features/portfolio/hooks/useSites';
@@ -35,8 +37,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mediumViewport, setMediumViewport] = useState(() =>
     mediaMatches('(min-width: 621px) and (max-width: 900px)'),
   );
-  const [mobileViewport, setMobileViewport] = useState(() => mediaMatches('(max-width: 620px)'));
+  const [mobileViewport, setMobileViewport] = useState(() => mediaMatches(MOBILE_QUERY));
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+  const closeMobileNavigation = useCallback(() => {
+    setMobileNavigationOpen(false);
+  }, []);
   const [pageHeaderVisible, setPageHeaderVisible] = useState(false);
   const [pageTitle, setPageTitle] = useState<string>();
   const appContentRef = useRef<HTMLElement>(null);
@@ -74,7 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
     const mediumQuery = window.matchMedia('(min-width: 621px) and (max-width: 900px)');
-    const mobileQuery = window.matchMedia('(max-width: 620px)');
+    const mobileQuery = window.matchMedia(MOBILE_QUERY);
     const synchronize = () => {
       setMediumViewport(mediumQuery.matches);
       setMobileViewport(mobileQuery.matches);
@@ -134,9 +139,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             return next;
           });
         }}
-        onCloseMobile={() => {
-          setMobileNavigationOpen(false);
-        }}
+        onCloseMobile={closeMobileNavigation}
       />
       {mobileNavigationOpen ? (
         <Button
@@ -194,6 +197,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           </AppErrorBoundary>
         </main>
       </div>
+      <MobileNavigation
+        open={mobileNavigationOpen}
+        onMore={() => {
+          setMobileNavigationOpen(true);
+        }}
+      />
       <CommandPalette open={commandsOpen} onOpenChange={setCommandsOpen} />
     </div>
   );

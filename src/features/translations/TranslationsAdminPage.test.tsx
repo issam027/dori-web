@@ -31,7 +31,7 @@ it('issues one translation request after a typing burst reaches the shared thres
   });
   findTranslations.mockClear();
 
-  await userEvent.type(screen.getByRole('textbox', { name: /clé/i }), 'ab');
+  await userEvent.type(screen.getByRole('searchbox', { name: /clé/i }), 'ab');
 
   await waitFor(() => {
     expect(findTranslations).toHaveBeenCalledOnce();

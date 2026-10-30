@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import { Check, CircleAlert, X } from 'lucide-react';
@@ -29,11 +29,30 @@ export function Modal({
   loading = false,
 }: ModalProps) {
   const { t } = useTranslation();
+  const contentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport) return;
+    const resize = () => {
+      contentRef.current?.style.setProperty('--dialog-height', `${String(viewport.height)}px`);
+      contentRef.current?.style.setProperty('--dialog-top', `${String(viewport.offsetTop)}px`);
+    };
+    resize();
+    viewport.addEventListener('resize', resize);
+    viewport.addEventListener('scroll', resize);
+    return () => {
+      viewport.removeEventListener('resize', resize);
+      viewport.removeEventListener('scroll', resize);
+    };
+  }, [open]);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className={`dialog-content${className ? ` ${className}` : ''}`}>
+        <Dialog.Content
+          ref={contentRef}
+          className={`dialog-content${className ? ` ${className}` : ''}`}
+        >
           <header className="dialog-header">
             <div>
               <Dialog.Title>{title}</Dialog.Title>

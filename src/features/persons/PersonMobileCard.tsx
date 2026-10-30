@@ -26,7 +26,7 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
     <DataTableMobileCard
       className="person-mobile-card"
       title={[person.firstName, person.lastName].filter(Boolean).join(' ')}
-      subtitle={person.email ?? person.phoneNumber ?? t('common.notProvided')}
+      subtitle={undefined}
       badge={
         <span className={`status-badge ${person.isActive ? 'status-success' : 'status-warning'}`}>
           {t(person.isActive ? 'common.active' : 'common.inactive')}
@@ -44,11 +44,6 @@ export function PersonMobileCard(props: PersonMobileCardProps) {
           ),
           wide: true,
         },
-        {
-          label: t('persons.personPickerOrCreate.birthDate'),
-          value: props.formatDate(person.birthDate),
-        },
-        { label: t('common.language'), value: props.formatLanguage(person.preferredLanguage) },
       ]}
       actions={
         <>

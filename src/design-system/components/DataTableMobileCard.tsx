@@ -45,7 +45,7 @@ export function DataTableMobileCard({
             ))}
           </dl>
         </div>
-        <footer className="data-table-mobile-card-footer">{actions}</footer>
+        {actions ? <footer className="data-table-mobile-card-footer">{actions}</footer> : null}
       </article>
     </ButtonLabelModeProvider>
   );

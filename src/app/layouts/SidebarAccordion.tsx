@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -38,6 +39,41 @@ export function SidebarAccordion({
   onCloseMobile?: () => void;
 }) {
   const { t } = useTranslation();
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const panelRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panelRef.current?.querySelector<HTMLButtonElement>('.sidebar-mobile-close')?.focus();
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onCloseMobile();
+      }
+      if (event.key !== 'Tab') return;
+      const targets = [
+        ...(panelRef.current?.querySelectorAll<HTMLElement>('a, button') ?? []),
+      ].filter((element) => element.getBoundingClientRect().height > 0);
+      const first = targets[0],
+        last = targets.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener('keydown', keyboard);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', keyboard);
+      previousFocus?.focus();
+    };
+  }, [mobileOpen, onCloseMobile]);
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
   const visibleSections = useMemo(
@@ -68,6 +104,11 @@ export function SidebarAccordion({
 
   return (
     <aside
+      ref={panelRef}
+      inert={mobile && !mobileOpen}
+      role={mobileOpen ? 'dialog' : undefined}
+      aria-modal={mobileOpen || undefined}
+      aria-label={mobileOpen ? t('nav.main') : undefined}
       className={`sidebar${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
     >
       <div className="sidebar-brand">

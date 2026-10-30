@@ -11,6 +11,7 @@ import {
 import type { ReportBucketViewModel, ReportMetricsViewModel } from './report-utils';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
+import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
 import type { QueueReportRow } from './report-utils';
 import { formatReportNumber, formatReportPercent } from '@/core/i18n/number-format';
 
@@ -169,6 +170,31 @@ export function ReportAnalyticsSections({
           caption={t('reports.analytics.chronology')}
           rows={buckets}
           getRowKey={(row) => row.periodStart}
+          renderMobileRow={(row) => (
+            <DataTableMobileCard
+              title={`${row.periodStart.slice(0, 10)} → ${row.periodEnd.slice(0, 10)}`}
+              fields={[
+                { label: t('common.registered'), value: row.volume.registered },
+                { label: t('common.servedPlural'), value: row.volume.served },
+                { label: t('reports.analytics.walkins'), value: row.volume.walkin },
+                { label: t('common.rdv'), value: row.volume.appointments },
+                {
+                  label: t('reports.averageWaitAbbreviation'),
+                  value: format(
+                    row.timing.averageWaitMinutes,
+                    i18n.language,
+                    ` ${t('common.min')}`,
+                  ),
+                },
+                {
+                  label: t('reports.p90Wait'),
+                  value: format(row.timing.p90WaitMinutes, i18n.language, ` ${t('common.min')}`),
+                },
+                { label: t('common.noShow'), value: percent(row.rates.noShowRate, i18n.language) },
+              ]}
+              actions={null}
+            />
+          )}
           columns={[
             {
               key: 'period',

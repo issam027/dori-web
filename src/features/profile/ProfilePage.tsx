@@ -30,6 +30,7 @@ import { accentColors } from '@/core/theme/theme';
 import { getUserDisplayName, getUserInitials } from '@/features/users/user-display';
 import { Button, ButtonLabelModeProvider } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
+import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -121,7 +122,7 @@ export function ProfilePage() {
   };
   return (
     <ButtonLabelModeProvider value="always">
-      <div className="page-stack">
+      <div className="page-stack profile-page">
         <PageHeader
           eyebrow={__t('profile.title')}
           title={__t('profile.profile.monProfil')}
@@ -138,51 +139,53 @@ export function ProfilePage() {
                 {__t('profile.profile.compteActif')}
               </span>
             </div>
-            <dl className="detail-list">
-              <div>
-                <dt>{__t('profile.profile.typeDeCompte')}</dt>
-                <dd className="profile-compact-value">
-                  {user.userType === 'human'
-                    ? __t('common.humain')
-                    : __t('profile.profile.technique')}
-                </dd>
-              </div>
-              <div className="profile-permissions-row">
-                <dt>{__t('profile.profile.permissions')}</dt>
-                <dd className="profile-permissions-count">{user.permissions.length}</dd>
-              </div>
-              <div>
-                <dt>{__t('profile.profile.derniereConnexion')}</dt>
-                <dd className="profile-compact-value">
-                  {formatDateTime(user.lastLogin, i18n.language) ?? '—'}
-                </dd>
-              </div>
-              <div>
-                <dt>{__t('common.scope')}</dt>
-                <dd>
-                  {user.scope.isGlobal
-                    ? __t('profile.profile.global')
-                    : __t('profile.scope.sitesAndQueues', {
-                        value0: user.scope.siteIds.length,
-                        value1: user.scope.queueIds.length,
-                      })}
-                </dd>
-              </div>
-            </dl>
-            <footer className="profile-identity-footer">
-              <p>{__t('profile.globalLogout.help')}</p>
-              <Button
-                variant="unstyled"
-                className="button button-danger"
-                type="button"
-                onClick={() => {
-                  setGlobalLogoutOpen(true);
-                }}
-              >
-                <LogOut aria-hidden="true" />
-                {__t('profile.globalLogout.action')}
-              </Button>
-            </footer>
+            <ResponsiveDetails summary={__t('mobile.details')}>
+              <dl className="detail-list">
+                <div>
+                  <dt>{__t('profile.profile.typeDeCompte')}</dt>
+                  <dd className="profile-compact-value">
+                    {user.userType === 'human'
+                      ? __t('common.humain')
+                      : __t('profile.profile.technique')}
+                  </dd>
+                </div>
+                <div className="profile-permissions-row">
+                  <dt>{__t('profile.profile.permissions')}</dt>
+                  <dd className="profile-permissions-count">{user.permissions.length}</dd>
+                </div>
+                <div>
+                  <dt>{__t('profile.profile.derniereConnexion')}</dt>
+                  <dd className="profile-compact-value">
+                    {formatDateTime(user.lastLogin, i18n.language) ?? '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{__t('common.scope')}</dt>
+                  <dd>
+                    {user.scope.isGlobal
+                      ? __t('profile.profile.global')
+                      : __t('profile.scope.sitesAndQueues', {
+                          value0: user.scope.siteIds.length,
+                          value1: user.scope.queueIds.length,
+                        })}
+                  </dd>
+                </div>
+              </dl>
+              <footer className="profile-identity-footer">
+                <p>{__t('profile.globalLogout.help')}</p>
+                <Button
+                  variant="unstyled"
+                  className="button button-danger"
+                  type="button"
+                  onClick={() => {
+                    setGlobalLogoutOpen(true);
+                  }}
+                >
+                  <LogOut aria-hidden="true" />
+                  {__t('profile.globalLogout.action')}
+                </Button>
+              </footer>
+            </ResponsiveDetails>
           </Card>
           <Card className="profile-settings-card">
             <div className="card-heading">
@@ -230,57 +233,59 @@ export function ProfilePage() {
                 {__t('common.save')}
               </Button>
             </form>
-            <section
-              className="profile-appearance-panel"
-              aria-labelledby="profile-appearance-title"
-            >
-              <div className="profile-appearance-heading">
-                <span className="profile-appearance-icon" aria-hidden="true">
-                  <Palette />
-                </span>
-                <div>
-                  <strong id="profile-appearance-title">{__t('profile.appearance.title')}</strong>
-                  <p>{__t('profile.appearance.description')}</p>
-                </div>
-              </div>
-              <div
-                className="profile-color-palette"
-                role="radiogroup"
-                aria-label={__t('profile.appearance.dominantColor')}
+            <ResponsiveDetails summary={__t('profile.appearance.title')}>
+              <section
+                className="profile-appearance-panel"
+                aria-labelledby="profile-appearance-title"
               >
-                {accentColors.map((color) => {
-                  const selected = color.id === accentColor;
-                  const label = __t(color.labelKey);
-                  return (
-                    <Button
-                      variant="unstyled"
-                      key={color.id}
-                      className={'profile-color-swatch' + (selected ? ' is-selected' : '')}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      aria-label={label}
-                      title={label}
-                      style={{ backgroundColor: color.value }}
-                      onClick={() => {
-                        setAccentColor(color.id);
-                      }}
-                    >
-                      {selected ? <Check aria-hidden="true" /> : null}
-                    </Button>
-                  );
-                })}
-              </div>
-              <small className="profile-color-selection">
-                {__t('profile.appearance.selectedColor')} ?{' '}
-                <strong>
-                  {__t(
-                    accentColors.find((color) => color.id === accentColor)?.labelKey ??
-                      accentColors[0].labelKey,
-                  )}
-                </strong>
-              </small>
-            </section>
+                <div className="profile-appearance-heading">
+                  <span className="profile-appearance-icon" aria-hidden="true">
+                    <Palette />
+                  </span>
+                  <div>
+                    <strong id="profile-appearance-title">{__t('profile.appearance.title')}</strong>
+                    <p>{__t('profile.appearance.description')}</p>
+                  </div>
+                </div>
+                <div
+                  className="profile-color-palette"
+                  role="radiogroup"
+                  aria-label={__t('profile.appearance.dominantColor')}
+                >
+                  {accentColors.map((color) => {
+                    const selected = color.id === accentColor;
+                    const label = __t(color.labelKey);
+                    return (
+                      <Button
+                        variant="unstyled"
+                        key={color.id}
+                        className={'profile-color-swatch' + (selected ? ' is-selected' : '')}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        aria-label={label}
+                        title={label}
+                        style={{ backgroundColor: color.value }}
+                        onClick={() => {
+                          setAccentColor(color.id);
+                        }}
+                      >
+                        {selected ? <Check aria-hidden="true" /> : null}
+                      </Button>
+                    );
+                  })}
+                </div>
+                <small className="profile-color-selection">
+                  {__t('profile.appearance.selectedColor')} ?{' '}
+                  <strong>
+                    {__t(
+                      accentColors.find((color) => color.id === accentColor)?.labelKey ??
+                        accentColors[0].labelKey,
+                    )}
+                  </strong>
+                </small>
+              </section>
+            </ResponsiveDetails>
             <div className={`profile-security-panel${passwordEditing ? ' is-editing' : ''}`}>
               {!passwordEditing ? (
                 <>
@@ -370,29 +375,33 @@ export function ProfilePage() {
             </div>
           </Card>
         </div>
-        <div className="metrics-grid profile-scope-metrics">
-          <MetricCard
-            label={__t('common.perimetre')}
-            value={
-              user.scope.isGlobal
-                ? __t('profile.profile.global')
-                : __t('profile.scope.sites', {
-                    value0: user.scope.siteIds.length,
-                  })
-            }
-            icon={<Globe2 />}
-          />
-          <MetricCard
-            label={__t('profile.profile.filesAutorisees')}
-            value={user.scope.isGlobal ? __t('profile.profile.toutes') : user.scope.queueIds.length}
-            icon={<ListChecks />}
-          />
-          <MetricCard
-            label={__t('common.language')}
-            value={user.languagePreference ?? __t('common.fr')}
-            icon={<Languages />}
-          />
-        </div>
+        <ResponsiveDetails summary={__t('common.scope')}>
+          <div className="metrics-grid profile-scope-metrics">
+            <MetricCard
+              label={__t('common.perimetre')}
+              value={
+                user.scope.isGlobal
+                  ? __t('profile.profile.global')
+                  : __t('profile.scope.sites', {
+                      value0: user.scope.siteIds.length,
+                    })
+              }
+              icon={<Globe2 />}
+            />
+            <MetricCard
+              label={__t('profile.profile.filesAutorisees')}
+              value={
+                user.scope.isGlobal ? __t('profile.profile.toutes') : user.scope.queueIds.length
+              }
+              icon={<ListChecks />}
+            />
+            <MetricCard
+              label={__t('common.language')}
+              value={user.languagePreference ?? __t('common.fr')}
+              icon={<Languages />}
+            />
+          </div>
+        </ResponsiveDetails>
         <Modal
           open={globalLogoutOpen}
           onOpenChange={(open) => {

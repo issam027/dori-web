@@ -148,6 +148,24 @@ export function UsersAdminPage() {
         }
       />
       <FilterPanel
+        primary={
+          <label>
+            {t('admin.users.recherche')}
+            <input
+              type="search"
+              value={draft.search}
+              placeholder={t('admin.users.nomDUtilisateurOuEmail')}
+              onChange={(event) => {
+                const search = event.target.value;
+                setDraft({ ...draft, search });
+                setPage(1);
+                if (search.trim().length < SEARCH_MINIMUM_LENGTH) {
+                  setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
+                }
+              }}
+            />
+          </label>
+        }
         icon={<Search />}
         title={t('admin.users.rechercherUnUtilisateur')}
         description={t('admin.users.nomEmailOuTypeDeCompte', { count: SEARCH_MINIMUM_LENGTH })}
@@ -165,21 +183,6 @@ export function UsersAdminPage() {
         }}
       >
         <div className="admin-filter-grid">
-          <label>
-            {t('admin.users.recherche')}
-            <input
-              value={draft.search}
-              placeholder={t('admin.users.nomDUtilisateurOuEmail')}
-              onChange={(event) => {
-                const search = event.target.value;
-                setDraft({ ...draft, search });
-                setPage(1);
-                if (search.trim().length < SEARCH_MINIMUM_LENGTH) {
-                  setFilters((currentFilters) => ({ ...currentFilters, search: '' }));
-                }
-              }}
-            />
-          </label>
           <label>
             {t('profile.profile.typeDeCompte')}
             <select

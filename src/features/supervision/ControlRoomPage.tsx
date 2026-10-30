@@ -27,6 +27,7 @@ import { ControlRoomInsights } from './ControlRoomInsights';
 import { slaTone } from './sla';
 import { useMonitoringLive, useMonitoringSeries, useResetQueue } from './hooks/useControlRoom';
 import { Button } from '@/design-system/components/Button';
+import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
 
 type PressureFilter = 'all' | 'danger' | 'warning' | 'healthy';
 type Period = '2h' | '8h' | 'today' | '24h' | '7d';
@@ -444,12 +445,14 @@ export function ControlRoomPage() {
           </ul>
         </Card>
       ) : null}
-      <ControlRoomInsights
-        queues={filtered.map(({ queue }) => queue)}
-        buckets={series.data?.data.series ?? []}
-        isError={series.isError}
-        onRetry={() => void series.refetch()}
-      />
+      <ResponsiveDetails summary={t('mobile.details')} className="control-room-insights-disclosure">
+        <ControlRoomInsights
+          queues={filtered.map(({ queue }) => queue)}
+          buckets={series.data?.data.series ?? []}
+          isError={series.isError}
+          onRetry={() => void series.refetch()}
+        />
+      </ResponsiveDetails>
       {!live.isLoading && !filtered.length ? (
         <EmptyState
           title={

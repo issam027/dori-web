@@ -91,7 +91,7 @@ export function PortfolioPage() {
           ) : null
         }
       />
-      <div className="metrics-grid">
+      <div className="metrics-grid portfolio-overview">
         <MetricCard
           label={__t('portfolio.portfolio.sitesAutorises')}
           value={allowed.length}

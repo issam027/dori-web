@@ -10,7 +10,7 @@ import { hasPermission } from '@/core/permissions/permissions';
 import { notify } from '@/core/notifications/notification-store';
 import { Card } from '@/design-system/components/Card';
 import { DataTable } from '@/design-system/components/DataTable';
-import { Modal } from '@/design-system/components/Modal';
+import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
@@ -43,6 +43,7 @@ export function NotificationsPage() {
   const [sort, setSort] = useState<NotificationsControllerFindNotificationsSort>('createdAt:desc');
   const [wizard, setWizard] = useState(false);
   const [detailId, setDetailId] = useState<string>();
+  const [resendId, setResendId] = useState<string>();
   const journal = useNotifications({
     page,
     channel: channel || undefined,
@@ -55,6 +56,7 @@ export function NotificationsPage() {
   });
   const detail = useNotification(detailId);
   const resend = useResendNotification(() => {
+    setResendId(undefined);
     notify({
       tone: 'success',
       title: t('notifications.delivery.requeued'),
@@ -86,6 +88,28 @@ export function NotificationsPage() {
         }
       />
       <FilterPanel
+        primary={
+          <label>
+            {t('common.status')}
+            <select
+              value={status}
+              onChange={(event) => {
+                setStatus(
+                  event.target.value as
+                    '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed',
+                );
+                setPage(1);
+              }}
+            >
+              <option value="">{t('common.all')}</option>
+              {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
+                <option key={value} value={value}>
+                  {t(notificationStatusKey(value))}
+                </option>
+              ))}
+            </select>
+          </label>
+        }
         className="notification-filter-card"
         icon={<Search />}
         title={t('notifications.filters.title')}
@@ -125,24 +149,7 @@ export function NotificationsPage() {
               <option value="email">{t('common.email')}</option>
             </select>
           </label>
-          <label>
-            {t('common.status')}
-            <select
-              value={status}
-              onChange={(event) => {
-                setStatus(
-                  event.target.value as
-                    '' | 'pending' | 'processing' | 'sent' | 'delivered' | 'failed',
-                );
-                setPage(1);
-              }}
-            >
-              <option value="">{t('common.all')}</option>
-              {['pending', 'processing', 'sent', 'delivered', 'failed'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
+
           <label>
             {t('reports.startDate')}
             <input
@@ -223,7 +230,7 @@ export function NotificationsPage() {
                 setDetailId(row.notificationId);
               }}
               onResend={() => {
-                resend.run(row.notificationId);
+                setResendId(row.notificationId);
               }}
             />
           )}
@@ -286,7 +293,7 @@ export function NotificationsPage() {
                       className="button button-small"
                       disabled={resend.isPending}
                       onClick={() => {
-                        resend.run(row.notificationId);
+                        setResendId(row.notificationId);
                       }}
                     >
                       <RefreshCcw aria-hidden="true" />
@@ -305,6 +312,19 @@ export function NotificationsPage() {
         />
       </Card>
       <ManualNotificationWizard open={wizard} onOpenChange={setWizard} />
+      <ConfirmDialog
+        open={Boolean(resendId)}
+        onOpenChange={(open) => {
+          if (!open && !resend.isPending) setResendId(undefined);
+        }}
+        title={t('supervision.notifications.reemettre')}
+        description={t('mobile.resendHelp')}
+        confirmLabel={t('supervision.notifications.reemettre')}
+        pending={resend.isPending}
+        onConfirm={() => {
+          if (resendId) resend.run(resendId);
+        }}
+      />
       <Modal
         loading={detail.isPending}
         open={Boolean(detailId)}

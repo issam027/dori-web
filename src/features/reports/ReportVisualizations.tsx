@@ -11,6 +11,7 @@ import { Card } from '@/design-system/components/Card';
 import { formatReportNumber } from '@/core/i18n/number-format';
 import { Button } from '@/design-system/components/Button';
 import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
+import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
 
 type View = 'trend' | 'comparison' | 'distribution';
 type Metric =
@@ -65,10 +66,11 @@ function Chart({
   showLegend?: boolean;
 }) {
   const { i18n } = useTranslation();
+  const mobile = useMediaQuery(MOBILE_QUERY);
   const [hovered, setHovered] = useState<number>();
   const values = series.flatMap((item) => item.values);
   const max = Math.max(...values, 1);
-  const width = 700;
+  const width = mobile ? 240 : 700;
   const height = 230;
   const x = (index: number) =>
     45 + (buckets.length <= 1 ? width / 2 : (index / (buckets.length - 1)) * width);
@@ -76,13 +78,17 @@ function Chart({
   const band = buckets.length <= 1 ? width : width / Math.max(buckets.length - 1, 1);
   return (
     <div className="report-chart-canvas">
-      <svg viewBox="0 0 780 315" role="img">
+      <svg
+        viewBox={`0 0 ${String(width + 80)} 315`}
+        role="img"
+        aria-label={series.map((item) => item.label).join(', ')}
+      >
         {[0, 1, 2, 3, 4].map((line) => {
           const value = max - (max * line) / 4;
           const py = 20 + (height * line) / 4;
           return (
             <g key={line}>
-              <line x1="45" x2="745" y1={py} y2={py} className="report-grid-line" />
+              <line x1="45" x2={width + 45} y1={py} y2={py} className="report-grid-line" />
               <text x="36" y={py + 4} textAnchor="end" className="report-axis-label">
                 {formatReportNumber(value, i18n.language)}
               </text>
@@ -90,7 +96,7 @@ function Chart({
           );
         })}
         <line x1="45" x2="45" y1="20" y2="250" className="report-axis" />
-        <line x1="45" x2="745" y1="250" y2="250" className="report-axis" />
+        <line x1="45" x2={width + 45} y1="250" y2="250" className="report-axis" />
         {series.map((item) => (
           <g key={item.id}>
             <polyline
@@ -117,7 +123,7 @@ function Chart({
             key={bucket.periodStart}
             x={Math.max(45, x(index) - band / 2)}
             y="20"
-            width={Math.min(band, 745 - Math.max(45, x(index) - band / 2))}
+            width={Math.min(band, width + 45 - Math.max(45, x(index) - band / 2))}
             height="230"
             className="report-hover-band"
             tabIndex={0}
@@ -161,7 +167,7 @@ function Chart({
           })}
         {hovered !== undefined && buckets[hovered] ? (
           <SvgChartTooltip
-            x={Math.min(x(hovered) + 8, 545)}
+            x={Math.max(8, Math.min(x(hovered) + 8, width - 130))}
             y={28}
             width={190}
             header={buckets[hovered].periodStart.slice(0, 10)}
@@ -188,6 +194,8 @@ function Chart({
 
 function TrendChart({ buckets }: { buckets: readonly ReportBucketViewModel[] }) {
   const { t } = useTranslation();
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const [mobileMetric, setMobileMetric] = useState('registered');
   const [selected, setSelected] = useState<string[]>(['registered', 'served']);
   const available: Series[] = [
     {
@@ -286,36 +294,57 @@ function TrendChart({ buckets }: { buckets: readonly ReportBucketViewModel[] }) 
   };
   return (
     <div className="report-trend">
+      {mobile ? (
+        <label className="chart-metric-select">
+          {t('mobile.chartMetric')}
+          <select
+            value={mobileMetric}
+            onChange={(event) => {
+              setMobileMetric(event.target.value);
+            }}
+          >
+            {available.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <Chart
         buckets={buckets}
-        series={available.filter((item) => selected.includes(item.id))}
+        series={available.filter((item) =>
+          mobile ? item.id === mobileMetric : selected.includes(item.id),
+        )}
         showLegend={false}
       />
-      <div
-        className="report-series-picker"
-        role="group"
-        aria-label={t('reports.visual.indicatorsToDisplay')}
-      >
-        {available.map((item) => {
-          const active = selected.includes(item.id);
-          return (
-            <Button
-              variant="unstyled"
-              labelMode="always"
-              key={item.id}
-              type="button"
-              className={active ? 'active' : ''}
-              aria-pressed={active}
-              onClick={() => {
-                toggle(item.id);
-              }}
-            >
-              <i style={{ background: item.color }} />
-              {item.label}
-            </Button>
-          );
-        })}
-      </div>
+      {!mobile ? (
+        <div
+          className="report-series-picker"
+          role="group"
+          aria-label={t('reports.visual.indicatorsToDisplay')}
+        >
+          {available.map((item) => {
+            const active = selected.includes(item.id);
+            return (
+              <Button
+                variant="unstyled"
+                labelMode="always"
+                key={item.id}
+                type="button"
+                className={active ? 'active' : ''}
+                aria-pressed={active}
+                onClick={() => {
+                  toggle(item.id);
+                }}
+              >
+                <i style={{ background: item.color }} />
+                {item.label}
+              </Button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

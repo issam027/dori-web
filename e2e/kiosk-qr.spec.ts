@@ -165,9 +165,9 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
   await expect(qr).toBeVisible();
   expect((await qr.boundingBox())?.width).toBeGreaterThan(100);
   await expect(qr).toHaveJSProperty('complete', true);
-  expect(
-    await qr.evaluate((image) => (image as { naturalWidth: number }).naturalWidth),
-  ).toBeGreaterThan(100);
+  expect(await qr.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(
+    100,
+  );
   await expect(page.locator('.kiosk-ticket-result .tracking-qr-logo')).toContainText('DORIFY');
   await page.screenshot({ path: testInfo.outputPath('kiosk-ticket-with-qr.png'), fullPage: true });
 

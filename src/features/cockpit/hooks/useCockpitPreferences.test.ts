@@ -28,6 +28,16 @@ describe('cockpit preferences', () => {
     expect(second.result.current.sort).toBe('operational');
   });
 
+  it('keeps each operator’s collapsed queues separate on a shared device', () => {
+    const first = renderHook(() => useCockpitPreferences('site-1', 'operator-1'));
+    act(() => {
+      first.result.current.toggleCollapsed('queue-1');
+    });
+    const second = renderHook(() => useCockpitPreferences('site-1', 'operator-2'));
+    expect(first.result.current.collapsedQueueIds).toEqual(['queue-1']);
+    expect(second.result.current.collapsedQueueIds).toEqual([]);
+  });
+
   it('persists operator display and feedback preferences', () => {
     const { result } = renderHook(() => useCockpitPreferences('site-1'));
     act(() => {

@@ -13,6 +13,7 @@ export type ApiScenarioHandler = (request: ApiScenarioRequest) => Promise<boolea
 
 const permissionsByProfile: Record<TestProfile, string[]> = {
   root: [
+    'audit_view',
     'site_view',
     'site_create',
     'site_edit',

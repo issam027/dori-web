@@ -65,6 +65,21 @@ export function AuditPage() {
         description={t('audit.description')}
       />
       <FilterPanel
+        primary={
+          <label>
+            {t('audit.filters.search')}
+            <input
+              type="search"
+              value={search}
+              maxLength={100}
+              placeholder={t('audit.filters.searchPlaceholder')}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+        }
         icon={<Search />}
         title={t('audit.filters.title')}
         description={t('audit.filters.help')}
@@ -76,18 +91,6 @@ export function AuditPage() {
         onReset={reset}
       >
         <div className="admin-filter-grid">
-          <label>
-            {t('audit.filters.search')}
-            <input
-              value={search}
-              maxLength={100}
-              placeholder={t('audit.filters.searchPlaceholder')}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
-            />
-          </label>
           <label>
             {t('audit.fields.actorId')}
             <input

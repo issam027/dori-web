@@ -8,6 +8,7 @@ import { slaTone } from './sla';
 import { Button } from '@/design-system/components/Button';
 import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
 import { formatDateTime, formatDateValue } from '@/core/i18n/date-format';
+import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
 
 type FlowMetric = 'registered' | 'served' | 'noShow' | 'cancelled';
 const colors: Record<FlowMetric, string> = {
@@ -19,15 +20,17 @@ const colors: Record<FlowMetric, string> = {
 
 function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] }) {
   const { t, i18n } = useTranslation();
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const chartWidth = mobile ? 230 : 650;
   const [visible, setVisible] = useState<FlowMetric[]>(['registered', 'served']);
   const [hovered, setHovered] = useState<number>();
   const metrics: FlowMetric[] = ['registered', 'served', 'noShow', 'cancelled'];
   const values = visible.flatMap((metric) => buckets.map((bucket) => bucket[metric]));
   const max = Math.max(...values, 1);
   const x = (index: number) =>
-    42 + (buckets.length < 2 ? 330 : (index / (buckets.length - 1)) * 650);
+    42 + (buckets.length < 2 ? chartWidth / 2 : (index / (buckets.length - 1)) * chartWidth);
   const y = (value: number) => 20 + 190 - (value / max) * 190;
-  const band = buckets.length < 2 ? 650 : 650 / Math.max(buckets.length - 1, 1);
+  const band = buckets.length < 2 ? chartWidth : chartWidth / Math.max(buckets.length - 1, 1);
   const formatTime = (value: string) =>
     formatDateValue(value, i18n.language, {
       weekday: buckets.length > 24 ? 'short' : undefined,
@@ -38,13 +41,17 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
   return (
     <>
       <div className="control-room-chart">
-        <svg viewBox="0 0 735 250" role="img" aria-label={t('controlRoom.flowChart')}>
+        <svg
+          viewBox={`0 0 ${String(chartWidth + 85)} 250`}
+          role="img"
+          aria-label={t('controlRoom.flowChart')}
+        >
           {[0, 1, 2, 3, 4].map((line) => {
             const value = max - (max * line) / 4;
             const py = 20 + (190 * line) / 4;
             return (
               <g key={line}>
-                <line x1="42" x2="692" y1={py} y2={py} className="report-grid-line" />
+                <line x1="42" x2={chartWidth + 42} y1={py} y2={py} className="report-grid-line" />
                 <text x="34" y={py + 4} textAnchor="end" className="report-axis-label">
                   {formatReportNumber(value, i18n.language)}
                 </text>
@@ -52,7 +59,7 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
             );
           })}
           <line x1="42" x2="42" y1="20" y2="210" className="report-axis" />
-          <line x1="42" x2="692" y1="210" y2="210" className="report-axis" />
+          <line x1="42" x2={chartWidth + 42} y1="210" y2="210" className="report-axis" />
           {visible.map((metric) => (
             <g key={metric}>
               <polyline
@@ -79,7 +86,7 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
               key={bucket.periodStart}
               x={Math.max(42, x(index) - band / 2)}
               y="20"
-              width={Math.min(band, 692 - Math.max(42, x(index) - band / 2))}
+              width={Math.min(band, chartWidth + 42 - Math.max(42, x(index) - band / 2))}
               height="190"
               className="report-hover-band"
               tabIndex={0}
@@ -123,7 +130,7 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
             })}
           {hovered !== undefined && buckets[hovered] ? (
             <SvgChartTooltip
-              x={Math.min(x(hovered) + 8, 515)}
+              x={Math.max(8, Math.min(x(hovered) + 8, chartWidth - 130))}
               y={24}
               width={170}
               header={formatTooltipTime(buckets[hovered].periodStart)}

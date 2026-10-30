@@ -12,6 +12,7 @@ export function Pagination({
   onPageChange: (page: number) => void;
 }) {
   const { t } = useTranslation();
+  const pageCount = Math.max(1, totalPages);
   return (
     <nav className="pagination" aria-label={t('pagination.label')}>
       <Button
@@ -26,12 +27,12 @@ export function Pagination({
         <ChevronLeft aria-hidden="true" />
         {t('pagination.previous')}
       </Button>
-      <span>{t('pagination.position', { page, totalPages })}</span>
+      <span>{t('pagination.position', { page, totalPages: pageCount })}</span>
       <Button
         variant="unstyled"
         type="button"
         className="button"
-        disabled={page >= totalPages}
+        disabled={page >= pageCount}
         onClick={() => {
           onPageChange(page + 1);
         }}

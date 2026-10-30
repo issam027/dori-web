@@ -15,7 +15,7 @@ type ButtonVariant = 'default' | 'primary' | 'success' | 'info' | 'danger' | 'un
 type ButtonSize = 'default' | 'small' | 'icon';
 type ButtonLabelMode = 'responsive' | 'always' | 'icon-only';
 
-const ButtonLabelModeContext = createContext<ButtonLabelMode>('responsive');
+const ButtonLabelModeContext = createContext<ButtonLabelMode>('always');
 
 export const ButtonLabelModeProvider = ButtonLabelModeContext.Provider;
 
@@ -53,9 +53,12 @@ function buttonClassName(
 
 function containsIcon(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
-    if (!isValidElement<{ children?: ReactNode }>(child)) return false;
+    if (!isValidElement<{ children?: ReactNode; 'aria-hidden'?: boolean }>(child)) return false;
     if (child.type === Fragment) return containsIcon(child.props.children);
-    return child.type !== 'span' && child.type !== 'div';
+    return (
+      child.type === 'svg' ||
+      (typeof child.type !== 'string' && child.props['aria-hidden'] === true)
+    );
   });
 }
 

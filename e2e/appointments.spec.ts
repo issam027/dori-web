@@ -82,8 +82,14 @@ test('the current day and time remain visible on desktop and mobile', async ({ p
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/appointments');
-    await expect(page.locator('.calendar-day.is-today')).toBeVisible();
-    await expect(page.locator('.calendar-current-time')).toBeVisible();
+    if (viewport.width < 621) {
+      await expect(page.locator('.mobile-agenda')).toBeVisible();
+      await expect(page.locator('.agenda-date-controls input')).toHaveValue('2026-10-09');
+      await expect(page.locator('.agenda-days button[aria-pressed="true"]')).toContainText('09');
+    } else {
+      await expect(page.locator('.calendar-day.is-today')).toBeVisible();
+      await expect(page.locator('.calendar-current-time')).toBeVisible();
+    }
     expect(
       await page.evaluate<boolean>(
         'document.documentElement.scrollWidth <= document.documentElement.clientWidth',

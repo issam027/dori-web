@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import type { AuditEventDetailResponseDto } from '@/api/generated/models';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
 
 function value(value: string | number | null | undefined): string {
   return value === null || value === undefined || value === '' ? '—' : String(value);
@@ -99,35 +100,37 @@ export function AuditEventDetail({ event }: { event: AuditEventDetailResponseDto
           </div>
         </dl>
       </section>
-      <section aria-labelledby="audit-detail-context">
-        <h3 id="audit-detail-context">{t('audit.detail.context')}</h3>
-        <dl className="detail-list">
-          <div>
-            <dt>{t('audit.fields.site')}</dt>
-            <dd>{value(event.siteScopeDisplayName)}</dd>
-          </div>
-          <div>
-            <dt>{t('audit.fields.location')}</dt>
-            <dd>{value(event.siteScopeLocation)}</dd>
-          </div>
-          <div>
-            <dt>{t('audit.fields.timezone')}</dt>
-            <dd>{value(event.siteScopeTimezone)}</dd>
-          </div>
-          <div>
-            <dt>{t('audit.fields.request')}</dt>
-            <dd>
-              <code>
-                {event.requestMethod} {event.requestPath}
-              </code>
-            </dd>
-          </div>
-          <div>
-            <dt>{t('audit.fields.failureType')}</dt>
-            <dd>{value(event.failureType)}</dd>
-          </div>
-        </dl>
-      </section>
+      <ResponsiveDetails summary={t('audit.detail.context')}>
+        <section aria-labelledby="audit-detail-context">
+          <h3 id="audit-detail-context">{t('audit.detail.context')}</h3>
+          <dl className="detail-list">
+            <div>
+              <dt>{t('audit.fields.site')}</dt>
+              <dd>{value(event.siteScopeDisplayName)}</dd>
+            </div>
+            <div>
+              <dt>{t('audit.fields.location')}</dt>
+              <dd>{value(event.siteScopeLocation)}</dd>
+            </div>
+            <div>
+              <dt>{t('audit.fields.timezone')}</dt>
+              <dd>{value(event.siteScopeTimezone)}</dd>
+            </div>
+            <div>
+              <dt>{t('audit.fields.request')}</dt>
+              <dd>
+                <code>
+                  {event.requestMethod} {event.requestPath}
+                </code>
+              </dd>
+            </div>
+            <div>
+              <dt>{t('audit.fields.failureType')}</dt>
+              <dd>{value(event.failureType)}</dd>
+            </div>
+          </dl>
+        </section>
+      </ResponsiveDetails>
     </div>
   );
 }

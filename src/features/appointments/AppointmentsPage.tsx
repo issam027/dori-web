@@ -20,11 +20,15 @@ import { useAppointment, useAppointments, useAvailabilityRange } from './hooks/u
 import { Button } from '@/design-system/components/Button';
 import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 import { ErrorState } from '@/design-system/components/FeedbackState';
+import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
+import { MobileAgenda } from './MobileAgenda';
 
 export function AppointmentsPage() {
   const { t: __t, i18n } = useTranslation();
   const siteId = useScopeStore((state) => state.activeSiteId);
   const [view, setView] = useState<'week' | 'month'>('week');
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const [agendaDate, setAgendaDate] = useState('');
   const [anchor, setAnchor] = useState(() => new Date());
   const [queueId, setQueueId] = useState('');
   const [editor, setEditor] = useState<{
@@ -49,6 +53,7 @@ export function AppointmentsPage() {
     : __t('appointments.title');
   const timeZone = site.data?.data.timezone ?? 'UTC';
   const currentLocal = appointmentLocalParts(now.toISOString(), timeZone);
+  const selectedDate = agendaDate || currentLocal.date;
   const [currentHour, currentMinute = '0'] = currentLocal.time.split(':');
   const currentTimeProgress = `${String((Number(currentMinute) / 60) * 100)}%`;
   const displayedMonth = `${String(anchor.getUTCFullYear())}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -57,10 +62,11 @@ export function AppointmentsPage() {
     year: 'numeric',
     timeZone: 'UTC',
   }).format(anchor);
-  const dates = useMemo(
-    () => (view === 'week' ? weekDates(anchor) : monthDates(anchor)),
-    [anchor, view],
-  );
+  const dates = mobile
+    ? weekDates(new Date(`${selectedDate}T12:00:00Z`))
+    : view === 'week'
+      ? weekDates(anchor)
+      : monthDates(anchor);
   const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
   const availabilityQuery = useAvailabilityRange(selectedQueue?.queueId, dates);
   const calendarLoading = appointmentsQuery.isPending || availabilityQuery.isPending;
@@ -152,32 +158,38 @@ export function AppointmentsPage() {
       <PageHeader
         eyebrow={__t('nav.appointments')}
         title={pageTitle}
-        description={__t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')}
+        description={
+          mobile
+            ? undefined
+            : __t('appointments.appointments.donneesEtDisponibilitesChargeesDepuisLApi')
+        }
         actions={
-          <div className="segmented">
-            <Button
-              variant="unstyled"
-              className={`button${view === 'week' ? ' button-primary' : ''}`}
-              type="button"
-              aria-pressed={view === 'week'}
-              onClick={() => {
-                setView('week');
-              }}
-            >
-              {__t('appointments.appointments.semaine')}
-            </Button>
-            <Button
-              variant="unstyled"
-              className={`button${view === 'month' ? ' button-primary' : ''}`}
-              type="button"
-              aria-pressed={view === 'month'}
-              onClick={() => {
-                setView('month');
-              }}
-            >
-              {__t('appointments.appointments.mois')}
-            </Button>
-          </div>
+          !mobile ? (
+            <div className="segmented">
+              <Button
+                variant="unstyled"
+                className={`button${view === 'week' ? ' button-primary' : ''}`}
+                type="button"
+                aria-pressed={view === 'week'}
+                onClick={() => {
+                  setView('week');
+                }}
+              >
+                {__t('appointments.appointments.semaine')}
+              </Button>
+              <Button
+                variant="unstyled"
+                className={`button${view === 'month' ? ' button-primary' : ''}`}
+                type="button"
+                aria-pressed={view === 'month'}
+                onClick={() => {
+                  setView('month');
+                }}
+              >
+                {__t('appointments.appointments.mois')}
+              </Button>
+            </div>
+          ) : undefined
         }
       />
       {queues.isPending || site.isPending ? (
@@ -207,7 +219,7 @@ export function AppointmentsPage() {
       ) : null}
       {availableQueues.length > 0 ? (
         <>
-          <div className="calendar-toolbar">
+          <div className={`calendar-toolbar${mobile ? ' is-agenda' : ''}`}>
             {availableQueues.length > 1 ? (
               <select
                 aria-label={__t('queues.singular')}
@@ -223,31 +235,35 @@ export function AppointmentsPage() {
                 ))}
               </select>
             ) : null}
-            <Button
-              variant="unstyled"
-              className="button"
-              type="button"
-              onClick={() => {
-                move(-1);
-              }}
-            >
-              {__t('appointments.appointments.precedent')}
-            </Button>
-            <strong>
-              {view === 'month'
-                ? displayedMonthLabel
-                : [dates[0], dates.at(-1)].filter(Boolean).join(' — ')}
-            </strong>
-            <Button
-              variant="unstyled"
-              className="button"
-              type="button"
-              onClick={() => {
-                move(1);
-              }}
-            >
-              {__t('common.next')}
-            </Button>
+            {!mobile ? (
+              <>
+                <Button
+                  variant="unstyled"
+                  className="button"
+                  type="button"
+                  onClick={() => {
+                    move(-1);
+                  }}
+                >
+                  {__t('appointments.appointments.precedent')}
+                </Button>
+                <strong>
+                  {view === 'month'
+                    ? displayedMonthLabel
+                    : [dates[0], dates.at(-1)].filter(Boolean).join(' — ')}
+                </strong>
+                <Button
+                  variant="unstyled"
+                  className="button"
+                  type="button"
+                  onClick={() => {
+                    move(1);
+                  }}
+                >
+                  {__t('common.next')}
+                </Button>
+              </>
+            ) : null}
           </div>
           {calendarError ? (
             <ErrorState
@@ -259,6 +275,22 @@ export function AppointmentsPage() {
             <div className="appointment-calendar-loading">
               <DorifyLoader compact />
             </div>
+          ) : mobile ? (
+            <MobileAgenda
+              date={selectedDate}
+              today={currentLocal.date}
+              timeZone={timeZone}
+              appointments={byDate(selectedDate)}
+              open={isOpen(selectedDate)}
+              onDate={(date) => {
+                setAgendaDate(date);
+                setAnchor(new Date(`${date}T12:00:00Z`));
+              }}
+              onCreate={() => {
+                setEditor({ date: selectedDate });
+              }}
+              onSelect={setSelectedId}
+            />
           ) : view === 'week' ? (
             <div className="week-calendar">
               {dates.map((date) => {
@@ -459,6 +491,10 @@ export function AppointmentsPage() {
                         <Button
                           variant="unstyled"
                           className="calendar-date-button"
+                          aria-label={new Intl.DateTimeFormat(i18n.language, {
+                            dateStyle: 'full',
+                            timeZone: 'UTC',
+                          }).format(new Date(`${date}T12:00:00Z`))}
                           type="button"
                           onClick={(event) => {
                             event.stopPropagation();

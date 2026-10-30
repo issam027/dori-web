@@ -82,9 +82,9 @@ describe('Button', () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('uses responsive labels by default and supports explicit label modes', () => {
+  it('keeps labels by default and supports explicit label modes', () => {
     const { rerender } = render(<Button icon={<Save />} label="Enregistrer" />);
-    expect(screen.getByRole('button')).toHaveClass('button-label-responsive', 'button-has-icon');
+    expect(screen.getByRole('button')).toHaveClass('button-label-always', 'button-has-icon');
 
     rerender(<Button icon={<Save />} label="Enregistrer" labelMode="always" />);
     expect(screen.getByRole('button')).toHaveClass('button-label-always', 'button-has-icon');
@@ -93,6 +93,15 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Enregistrer' })).toHaveClass(
       'button-label-icon-only',
     );
+  });
+
+  it('does not treat formatted day numbers as icons', () => {
+    render(
+      <Button>
+        <strong>30</strong>
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: '30' })).not.toHaveClass('button-has-icon');
   });
 
   it('inherits the label mode from its layout context', () => {

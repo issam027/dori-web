@@ -160,6 +160,23 @@ export function TranslationsAdminPage() {
         }
       />
       <FilterPanel
+        primary={
+          <label>
+            {t('onboarding.settings.cle')}
+            <input
+              type="search"
+              value={filterDraft.key}
+              onChange={(event) => {
+                const key = event.target.value;
+                setFilterDraft({ ...filterDraft, key });
+                setPage(1);
+                if (key.trim().length < SEARCH_MINIMUM_LENGTH) {
+                  setFilters((current) => ({ ...current, key: '' }));
+                }
+              }}
+            />
+          </label>
+        }
         icon={<Search />}
         title={t('admin.translations.rechercherDansLesTraductions')}
         description={t('admin.translations.cleCategorieOuLangue', { count: SEARCH_MINIMUM_LENGTH })}
@@ -177,20 +194,6 @@ export function TranslationsAdminPage() {
         }}
       >
         <div className="admin-filter-grid">
-          <label>
-            {t('onboarding.settings.cle')}
-            <input
-              value={filterDraft.key}
-              onChange={(event) => {
-                const key = event.target.value;
-                setFilterDraft({ ...filterDraft, key });
-                setPage(1);
-                if (key.trim().length < SEARCH_MINIMUM_LENGTH) {
-                  setFilters((current) => ({ ...current, key: '' }));
-                }
-              }}
-            />
-          </label>
           <label>
             {t('onboarding.settings.categorie')}
             <select

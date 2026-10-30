@@ -28,6 +28,7 @@ import type {
 } from '@/api/generated/models';
 import { queryKeys } from '@/api/client/query-keys';
 import { getAccessToken } from '@/core/auth/access-token';
+import { useSessionStore } from '@/core/auth/session-store';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
@@ -47,6 +48,8 @@ import { useSite } from '@/features/portfolio/public';
 import { RegistrationDetailsModal } from '@/features/queue-operations/public';
 import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
+import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
+import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
 import { CockpitPassagePrintButton } from './components/CockpitPassagePrintButton';
 import {
   CockpitSessionModal,
@@ -103,8 +106,11 @@ function actionTargetsQueue(action: { isPending: boolean; variables?: unknown },
 
 export function CockpitPage() {
   const { t, i18n } = useTranslation();
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const [mobileTab, setMobileTab] = useState<'work' | 'summary' | 'activity'>('work');
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
+  const userId = useSessionStore((state) => state.user?.userId);
   const cockpit = useCockpit(siteId);
   const site = useSite(siteId);
   const actions = useCockpitActions(siteId);
@@ -122,7 +128,7 @@ export function CockpitPage() {
     useState<RegistrationDetailsDialogState>(null);
   const realtimeRefreshTimers = useRef(new Map<string, number>());
   const queues = useMemo(() => cockpit.data?.data.queues ?? [], [cockpit.data]);
-  const preferences = useCockpitPreferences(siteId);
+  const preferences = useCockpitPreferences(siteId, userId);
   const serverNow = useServerClock(cockpit.data?.data.serverTime);
   const queueIds = useMemo(() => queues.map((queue) => queue.queueId), [queues]);
   const health = useQueueDisplayRealtime({
@@ -385,9 +391,39 @@ export function CockpitPage() {
         }
       />
       {cockpit.isError ? <ErrorState onRetry={() => void cockpit.refetch()} /> : null}
+      {mobile && cockpit.data ? (
+        <div className="mobile-section-tabs" role="group" aria-label={t('cockpit.title')}>
+          {(['work', 'summary', 'activity'] as const).map((tab) => (
+            <Button
+              key={tab}
+              variant={mobileTab === tab ? 'primary' : 'default'}
+              aria-pressed={mobileTab === tab}
+              onClick={() => {
+                setMobileTab(tab);
+              }}
+            >
+              {t(tab === 'work' ? 'mobile.operational' : `mobile.${tab}`)}
+            </Button>
+          ))}
+        </div>
+      ) : null}
+      {mobile && cockpit.data && mobileTab === 'work' ? (
+        <div className="cockpit-mobile-counts" aria-label={t('cockpit.summary')}>
+          <span>
+            <strong>{totals.waiting}</strong> {t('cockpit.waiting')}
+          </span>
+          <span>
+            <strong>{totals.activeCalls}</strong> {t('cockpit.activeCalls')}
+          </span>
+        </div>
+      ) : null}
       {cockpit.data ? (
         <>
-          <section className="metric-grid cockpit-metrics" aria-label={t('cockpit.summary')}>
+          <section
+            hidden={mobile && mobileTab !== 'summary'}
+            className="metric-grid cockpit-metrics"
+            aria-label={t('cockpit.summary')}
+          >
             <MetricCard icon={<Users />} label={t('cockpit.waiting')} value={totals.waiting} />
             <MetricCard
               icon={<CalendarClock />}
@@ -410,7 +446,11 @@ export function CockpitPage() {
           </section>
 
           {recommendations.length ? (
-            <section className="cockpit-recommendations" aria-labelledby="recommendations-title">
+            <section
+              hidden={mobile && mobileTab !== 'work'}
+              className="cockpit-recommendations"
+              aria-labelledby="recommendations-title"
+            >
               <div className="cockpit-section-heading">
                 <div>
                   <p className="eyebrow">{t('cockpit.operationalGuidance')}</p>
@@ -454,11 +494,17 @@ export function CockpitPage() {
           ) : null}
 
           {activeQueues.length ? (
-            <section className="cockpit-active-overview" aria-labelledby="active-calls-title">
+            <section
+              hidden={mobile && mobileTab !== 'work'}
+              className="cockpit-active-overview"
+              aria-labelledby="active-calls-title"
+            >
               <div className="cockpit-section-heading">
                 <div>
                   <p className="eyebrow">{t('cockpit.priorityWorkspace')}</p>
-                  <h2 id="active-calls-title">{t('cockpit.activeCalls')}</h2>
+                  <h2 id="active-calls-title">
+                    {t(mobile ? 'mobile.work' : 'cockpit.activeCalls')}
+                  </h2>
                 </div>
               </div>
               <div className="cockpit-active-overview-grid">
@@ -586,12 +632,14 @@ export function CockpitPage() {
             </section>
           ) : null}
 
-          <QuickRegistration siteId={siteId} queues={queues} />
+          <div className="cockpit-registration" hidden={mobile && mobileTab !== 'work'}>
+            <QuickRegistration siteId={siteId} queues={queues} />
+          </div>
 
           {queues.length === 0 ? (
             <EmptyState title={t('cockpit.noQueues')} description={t('cockpit.noQueuesHint')} />
           ) : (
-            <section className="cockpit-queue-section">
+            <section hidden={mobile && mobileTab !== 'work'} className="cockpit-queue-section">
               <div className="cockpit-section-heading cockpit-queue-heading">
                 <div>
                   <p className="eyebrow">{t('cockpit.authorizedQueues')}</p>
@@ -625,49 +673,55 @@ export function CockpitPage() {
                           }}
                         />
                       </label>
-                      <label>
-                        {t('cockpit.sortQueues')}
-                        <select
-                          value={preferences.sort}
-                          onChange={(event) => {
-                            preferences.setSort(event.target.value as CockpitSort);
-                          }}
-                        >
-                          <option value="operational">{t('cockpit.sortOperational')}</option>
-                          <option value="waiting">{t('cockpit.sortWaiting')}</option>
-                          <option value="name">{t('cockpit.sortName')}</option>
-                        </select>
-                      </label>
-                      <div className="cockpit-view-actions">
-                        <Button
-                          icon={<LayoutGrid />}
-                          variant={preferences.density === 'compact' ? 'primary' : 'default'}
-                          aria-pressed={preferences.density === 'compact'}
-                          label={
-                            preferences.density === 'compact'
-                              ? t('cockpit.comfortableView')
-                              : t('cockpit.compactView')
-                          }
-                          onClick={() => {
-                            preferences.setDensity(
-                              preferences.density === 'compact' ? 'comfortable' : 'compact',
-                            );
-                          }}
-                        />
-                        <Button
-                          icon={preferences.soundsEnabled ? <Volume2 /> : <VolumeX />}
-                          variant={preferences.soundsEnabled ? 'primary' : 'default'}
-                          aria-pressed={preferences.soundsEnabled}
-                          label={
-                            preferences.soundsEnabled
-                              ? t('cockpit.disableSounds')
-                              : t('cockpit.enableSounds')
-                          }
-                          onClick={() => {
-                            preferences.setSoundsEnabled(!preferences.soundsEnabled);
-                          }}
-                        />
-                      </div>
+                      <ResponsiveDetails
+                        unwrappedOnDesktop
+                        summary={t('mobile.preferences')}
+                        className="cockpit-filter-preferences"
+                      >
+                        <label>
+                          {t('cockpit.sortQueues')}
+                          <select
+                            value={preferences.sort}
+                            onChange={(event) => {
+                              preferences.setSort(event.target.value as CockpitSort);
+                            }}
+                          >
+                            <option value="operational">{t('cockpit.sortOperational')}</option>
+                            <option value="waiting">{t('cockpit.sortWaiting')}</option>
+                            <option value="name">{t('cockpit.sortName')}</option>
+                          </select>
+                        </label>
+                        <div className="cockpit-view-actions">
+                          <Button
+                            icon={<LayoutGrid />}
+                            variant={preferences.density === 'compact' ? 'primary' : 'default'}
+                            aria-pressed={preferences.density === 'compact'}
+                            label={
+                              preferences.density === 'compact'
+                                ? t('cockpit.comfortableView')
+                                : t('cockpit.compactView')
+                            }
+                            onClick={() => {
+                              preferences.setDensity(
+                                preferences.density === 'compact' ? 'comfortable' : 'compact',
+                              );
+                            }}
+                          />
+                          <Button
+                            icon={preferences.soundsEnabled ? <Volume2 /> : <VolumeX />}
+                            variant={preferences.soundsEnabled ? 'primary' : 'default'}
+                            aria-pressed={preferences.soundsEnabled}
+                            label={
+                              preferences.soundsEnabled
+                                ? t('cockpit.disableSounds')
+                                : t('cockpit.enableSounds')
+                            }
+                            onClick={() => {
+                              preferences.setSoundsEnabled(!preferences.soundsEnabled);
+                            }}
+                          />
+                        </div>
+                      </ResponsiveDetails>
                     </div>
                   </div>
                 </details>
@@ -819,7 +873,7 @@ export function CockpitPage() {
             </section>
           )}
 
-          <section className="card cockpit-history">
+          <section hidden={mobile && mobileTab !== 'activity'} className="card cockpit-history">
             <div className="cockpit-section-heading">
               <div>
                 <p className="eyebrow">{t('cockpit.activity')}</p>
@@ -1070,6 +1124,22 @@ function QueueCard(props: {
           />
         </div>
       </header>
+      {props.collapsed ? (
+        <div className="cockpit-collapsed-summary">
+          <span>
+            <strong>{queue.waitingCount}</strong> {t('cockpit.waiting')}
+          </span>
+          <span>
+            {queue.estimatedWaitMinutes == null ? '—' : `${String(queue.estimatedWaitMinutes)} min`}
+          </span>
+          <span>{mine ? t('cockpit.sessionActive') : t('cockpit.noOpenSession')}</span>
+          {activeCall ? (
+            <strong>
+              {activeCall.ticketNumber} · {t('cockpit.currentCall')}
+            </strong>
+          ) : null}
+        </div>
+      ) : null}
       <div className="cockpit-queue-card-body">
         <div className="cockpit-queue-stats">
           <div>
@@ -1183,7 +1253,9 @@ function QueueCard(props: {
             />
           </section>
         ) : (
-          <section className="cockpit-candidates">
+          <section
+            className={`cockpit-candidates${queue.nextCandidates.length ? '' : ' is-empty'}`}
+          >
             <div>
               <strong>{t('cockpit.nextCandidates')}</strong>
               <small>{t('cockpit.previewOnly')}</small>

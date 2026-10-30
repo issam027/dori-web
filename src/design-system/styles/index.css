@@ -9,4 +9,5 @@
 @import './experiences/kiosk.css';
 @import './experiences/display.css';
 @import './experiences/tracking.css';
+@import './layouts/mobile.css';
 @import './print/documents.css';

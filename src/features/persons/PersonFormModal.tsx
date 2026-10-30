@@ -111,6 +111,7 @@ export function PersonFormModal({
           </span>
           <input
             required
+            autoComplete="family-name"
             value={form.lastName}
             onChange={(event) => {
               setForm({ ...form, lastName: event.target.value });
@@ -121,6 +122,7 @@ export function PersonFormModal({
           {t('common.firstName')}
           <input
             value={form.firstName}
+            autoComplete="given-name"
             onChange={(event) => {
               setForm({ ...form, firstName: event.target.value });
             }}
@@ -147,6 +149,7 @@ export function PersonFormModal({
           {t('common.email')}
           <input
             type="email"
+            autoComplete="email"
             value={form.email}
             onChange={(event) => {
               setForm({ ...form, email: event.target.value });
@@ -157,6 +160,7 @@ export function PersonFormModal({
           {t('persons.personPickerOrCreate.birthDate')}
           <input
             type="date"
+            autoComplete="bday"
             value={form.birthDate}
             onChange={(event) => {
               setForm({ ...form, birthDate: event.target.value });
