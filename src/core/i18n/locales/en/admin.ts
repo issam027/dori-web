@@ -18,7 +18,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.status.offline': 'Offline',
   'edge.status.never_connected': 'Never connected',
   'edge.deploymentStatus.active': 'Active deployment',
-  'edge.deploymentStatus.inactive': 'Inactive deployment',
+  'edge.deploymentStatus.revoked': 'Revoked deployment',
   'edge.healthCheck': 'Run diagnostics',
   'edge.syncNow': 'Refresh status',
   'edge.commandHistory': 'Command history',
@@ -30,10 +30,12 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.create': 'Create installation',
   'edge.name': 'Installation name',
   'edge.activate': 'Activate deployment',
-  'edge.deactivate': 'Deactivate deployment',
-  'edge.local.inactiveTitle': 'Intra installation disabled',
-  'edge.local.inactiveMessage':
-    'The cloud disabled this deployment. Local features remain available.',
+  'edge.revoke': 'Revoke deployment',
+  'edge.local.revokedTitle': 'Intra installation revoked',
+  'edge.local.revokedMessage':
+    'Dorify Cloud suspended this installation. The local platform is unavailable until reactivation.',
+  'edge.local.revokedOfflineMessage':
+    'The cloud is currently unreachable. Access remains blocked until reactivation is confirmed.',
   'edge.local.unreachableTitle': 'Cloud status cannot be verified',
   'edge.local.unreachableMessage':
     'Internet or the cloud service is unavailable. Local features remain available.',

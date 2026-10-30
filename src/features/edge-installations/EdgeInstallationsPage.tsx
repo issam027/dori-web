@@ -156,12 +156,12 @@ export function EdgeInstallationsPage() {
                 <Button
                   variant={selected.deploymentStatus === 'active' ? 'danger' : 'primary'}
                   label={t(
-                    selected.deploymentStatus === 'active' ? 'edge.deactivate' : 'edge.activate',
+                    selected.deploymentStatus === 'active' ? 'edge.revoke' : 'edge.activate',
                   )}
                   pending={updateStatus.isPending}
                   onClick={() => {
                     updateStatus.mutate(
-                      selected.deploymentStatus === 'active' ? 'inactive' : 'active',
+                      selected.deploymentStatus === 'active' ? 'revoked' : 'active',
                       { onError: notifyError },
                     );
                   }}

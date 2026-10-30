@@ -4136,12 +4136,6 @@
   border-bottom: 1px solid var(--color-border-warning, #e8c66a);
 }
 
-.intra-deployment-banner.is-inactive {
-  color: var(--color-text-danger, #8b1e1e);
-  background: var(--color-background-danger, #fff0f0);
-  border-bottom-color: var(--color-border-danger, #e5a0a0);
-}
-
 .intra-deployment-banner svg {
   flex: 0 0 auto;
   width: 20px;
@@ -4155,4 +4149,24 @@
 
 .intra-deployment-banner span {
   font-size: var(--font-size-sm);
+}
+
+.intra-deployment-blocked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 42rem);
+  justify-content: center;
+  align-content: center;
+  gap: var(--space-5);
+  min-height: calc(100vh - 5rem);
+  color: var(--color-text-danger, #8b1e1e);
+  background: var(--color-background-danger, #fff0f0);
+}
+
+.intra-deployment-blocked > svg {
+  width: 40px;
+  height: 40px;
+}
+
+.intra-deployment-blocked h1 {
+  margin-top: 0;
 }

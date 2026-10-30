@@ -33,5 +33,5 @@ export const createEdgeCommand = (
 
 export const updateEdgeInstallationStatus = (
   installationId: string,
-  deploymentStatus: 'active' | 'inactive',
+  deploymentStatus: 'active' | 'revoked',
 ) => edgeAdminControllerUpdateStatus(installationId, { deploymentStatus });

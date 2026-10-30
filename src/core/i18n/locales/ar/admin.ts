@@ -16,7 +16,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.status.offline': 'غير متصل',
   'edge.status.never_connected': 'لم يتصل بعد',
   'edge.deploymentStatus.active': 'نشر نشط',
-  'edge.deploymentStatus.inactive': 'نشر غير نشط',
+  'edge.deploymentStatus.revoked': 'نشر ملغى',
   'edge.healthCheck': 'تشغيل التشخيص',
   'edge.syncNow': 'تحديث الحالة',
   'edge.commandHistory': 'سجل الأوامر',
@@ -28,9 +28,12 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.create': 'إنشاء التركيب',
   'edge.name': 'اسم التركيب',
   'edge.activate': 'تفعيل النشر',
-  'edge.deactivate': 'إيقاف النشر',
-  'edge.local.inactiveTitle': 'التركيب الداخلي غير نشط',
-  'edge.local.inactiveMessage': 'تم إيقاف هذا النشر من السحابة. تظل الوظائف المحلية متاحة.',
+  'edge.revoke': 'إلغاء النشر',
+  'edge.local.revokedTitle': 'تم إلغاء التركيب الداخلي',
+  'edge.local.revokedMessage':
+    'أوقفت سحابة Dorify هذا التركيب. المنصة المحلية غير متاحة حتى إعادة التفعيل.',
+  'edge.local.revokedOfflineMessage':
+    'يتعذر الوصول إلى السحابة حاليًا. سيبقى الحظر حتى تأكيد إعادة التفعيل.',
   'edge.local.unreachableTitle': 'تعذر التحقق من حالة السحابة',
   'edge.local.unreachableMessage':
     'الإنترنت أو الخدمة السحابية غير متاحة. تظل الوظائف المحلية متاحة.',

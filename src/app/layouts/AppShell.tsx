@@ -16,7 +16,7 @@ import { routeRequiresActiveSite } from './site-context-rules';
 import { storageKeys } from '@/core/storage/storage-keys';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
-import { IntraDeploymentStatusBanner } from '@/features/edge-installations/IntraDeploymentStatusBanner';
+import { IntraDeploymentStatusGate } from '@/features/edge-installations/IntraDeploymentStatusBanner';
 
 const sidebarPreferenceKey = storageKeys.session.sidebarCollapsed;
 
@@ -176,28 +176,29 @@ export function AppShell({ children }: { children: ReactNode }) {
             });
           }}
         />
-        <IntraDeploymentStatusBanner />
-        <main ref={appContentRef} className="app-content">
-          <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
-            {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
-              <div className="site-required-card">
-                <EmptyState
-                  title={t('shell.layouts.appShell.choisissezUnSiteActif')}
-                  description={t(
-                    'shell.layouts.appShell.selectionnezLeSiteSurLequelVousSouhaitezT',
-                  )}
-                  action={
-                    <Link className="button button-primary" to="/portfolio">
-                      {t('shell.layouts.appShell.ouvrirLePortefeuilleDeSites')}
-                    </Link>
-                  }
-                />
-              </div>
-            ) : (
-              children
-            )}
-          </AppErrorBoundary>
-        </main>
+        <IntraDeploymentStatusGate>
+          <main ref={appContentRef} className="app-content">
+            <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
+              {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
+                <div className="site-required-card">
+                  <EmptyState
+                    title={t('shell.layouts.appShell.choisissezUnSiteActif')}
+                    description={t(
+                      'shell.layouts.appShell.selectionnezLeSiteSurLequelVousSouhaitezT',
+                    )}
+                    action={
+                      <Link className="button button-primary" to="/portfolio">
+                        {t('shell.layouts.appShell.ouvrirLePortefeuilleDeSites')}
+                      </Link>
+                    }
+                  />
+                </div>
+              ) : (
+                children
+              )}
+            </AppErrorBoundary>
+          </main>
+        </IntraDeploymentStatusGate>
       </div>
       <MobileNavigation
         open={mobileNavigationOpen}

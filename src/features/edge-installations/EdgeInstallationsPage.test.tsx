@@ -100,7 +100,7 @@ describe('EdgeInstallationsPage', () => {
     });
   });
 
-  it('deactivates an intra installation from its detail', async () => {
+  it('revokes an intra installation from its detail', async () => {
     let requestedStatus: string | undefined;
     const installation = {
       installationId,
@@ -145,11 +145,9 @@ describe('EdgeInstallationsPage', () => {
 
     renderPage();
     await userEvent.click(await screen.findByRole('button', { name: /agence centrale/i }));
-    await userEvent.click(
-      await screen.findByRole('button', { name: /désactiver le déploiement/i }),
-    );
+    await userEvent.click(await screen.findByRole('button', { name: /révoquer le déploiement/i }));
     await waitFor(() => {
-      expect(requestedStatus).toBe('inactive');
+      expect(requestedStatus).toBe('revoked');
     });
   });
 });

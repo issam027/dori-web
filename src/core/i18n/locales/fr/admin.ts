@@ -17,7 +17,7 @@ export const admin = {
   'edge.status.offline': 'Hors ligne',
   'edge.status.never_connected': 'Jamais connectée',
   'edge.deploymentStatus.active': 'Déploiement actif',
-  'edge.deploymentStatus.inactive': 'Déploiement inactif',
+  'edge.deploymentStatus.revoked': 'Déploiement révoqué',
   'edge.healthCheck': 'Lancer un diagnostic',
   'edge.syncNow': 'Actualiser l’état',
   'edge.commandHistory': 'Historique des commandes',
@@ -29,10 +29,12 @@ export const admin = {
   'edge.create': 'Créer l’installation',
   'edge.name': 'Nom de l’installation',
   'edge.activate': 'Activer le déploiement',
-  'edge.deactivate': 'Désactiver le déploiement',
-  'edge.local.inactiveTitle': 'Installation intra désactivée',
-  'edge.local.inactiveMessage':
-    'Le cloud a désactivé ce déploiement. Les fonctions locales restent disponibles.',
+  'edge.revoke': 'Révoquer le déploiement',
+  'edge.local.revokedTitle': 'Installation intra révoquée',
+  'edge.local.revokedMessage':
+    'Dorify Cloud a suspendu cette installation. La plateforme locale est indisponible jusqu’à sa réactivation.',
+  'edge.local.revokedOfflineMessage':
+    'Le cloud est actuellement inaccessible. Le blocage restera actif jusqu’à la prochaine confirmation de réactivation.',
   'edge.local.unreachableTitle': 'Statut cloud non vérifiable',
   'edge.local.unreachableMessage':
     'Internet ou le service cloud est indisponible. Les fonctions locales restent disponibles.',

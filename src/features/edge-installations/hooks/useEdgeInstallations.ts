@@ -51,7 +51,7 @@ export function useCreateEdgeCommand(installationId: string | null) {
 export function useUpdateEdgeInstallationStatus(installationId: string | null) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (deploymentStatus: 'active' | 'inactive') =>
+    mutationFn: (deploymentStatus: 'active' | 'revoked') =>
       updateEdgeInstallationStatus(installationId as string, deploymentStatus),
     onSuccess: async () => {
       await Promise.all([
