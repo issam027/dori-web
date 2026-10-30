@@ -17,6 +17,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.status.online': 'Online',
   'edge.status.offline': 'Offline',
   'edge.status.never_connected': 'Never connected',
+  'edge.deploymentStatus.active': 'Active deployment',
+  'edge.deploymentStatus.inactive': 'Inactive deployment',
   'edge.healthCheck': 'Run diagnostics',
   'edge.syncNow': 'Refresh status',
   'edge.commandHistory': 'Command history',
@@ -27,6 +29,14 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.copyToken': 'Copy token',
   'edge.create': 'Create installation',
   'edge.name': 'Installation name',
+  'edge.activate': 'Activate deployment',
+  'edge.deactivate': 'Deactivate deployment',
+  'edge.local.inactiveTitle': 'Intra installation disabled',
+  'edge.local.inactiveMessage':
+    'The cloud disabled this deployment. Local features remain available.',
+  'edge.local.unreachableTitle': 'Cloud status cannot be verified',
+  'edge.local.unreachableMessage':
+    'Internet or the cloud service is unavailable. Local features remain available.',
   'admin.translations.updateSuccess': 'Translation updated',
   'admin.translations.createSuccess': 'Translation created',
   'admin.translations.createdLocales': '{{key}} · FR, EN, AR',

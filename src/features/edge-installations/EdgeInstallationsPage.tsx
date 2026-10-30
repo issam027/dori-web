@@ -16,6 +16,7 @@ import {
   useCreateEdgeInstallation,
   useEdgeInstallation,
   useEdgeInstallations,
+  useUpdateEdgeInstallationStatus,
 } from './hooks/useEdgeInstallations';
 import './edge-installations.css';
 
@@ -32,6 +33,7 @@ export function EdgeInstallationsPage() {
   const detail = useEdgeInstallation(selectedId);
   const createInstallation = useCreateEdgeInstallation();
   const createCommand = useCreateEdgeCommand(selectedId);
+  const updateStatus = useUpdateEdgeInstallationStatus(selectedId);
   const [createOpen, setCreateOpen] = useState(false);
   const [name, setName] = useState('');
   const [issuedToken, setIssuedToken] = useState<string | null>(null);
@@ -113,9 +115,16 @@ export function EdgeInstallationsPage() {
                         t('edge.neverConnected')}
                     </small>
                   </span>
-                  <StatusBadge tone={statusTone(installation.status)}>
-                    {t(`edge.status.${installation.status}`)}
-                  </StatusBadge>
+                  <span className="cluster">
+                    <StatusBadge
+                      tone={installation.deploymentStatus === 'active' ? 'success' : 'danger'}
+                    >
+                      {t(`edge.deploymentStatus.${installation.deploymentStatus}`)}
+                    </StatusBadge>
+                    <StatusBadge tone={statusTone(installation.status)}>
+                      {t(`edge.status.${installation.status}`)}
+                    </StatusBadge>
+                  </span>
                 </Button>
               ))}
             </div>
@@ -134,11 +143,29 @@ export function EdgeInstallationsPage() {
                   <h2>{selected.name}</h2>
                   <p>{selected.installationId}</p>
                 </div>
-                <StatusBadge tone={statusTone(selected.status)}>
-                  {t(`edge.status.${selected.status}`)}
-                </StatusBadge>
+                <span className="cluster">
+                  <StatusBadge tone={selected.deploymentStatus === 'active' ? 'success' : 'danger'}>
+                    {t(`edge.deploymentStatus.${selected.deploymentStatus}`)}
+                  </StatusBadge>
+                  <StatusBadge tone={statusTone(selected.status)}>
+                    {t(`edge.status.${selected.status}`)}
+                  </StatusBadge>
+                </span>
               </div>
               <div className="cluster">
+                <Button
+                  variant={selected.deploymentStatus === 'active' ? 'danger' : 'primary'}
+                  label={t(
+                    selected.deploymentStatus === 'active' ? 'edge.deactivate' : 'edge.activate',
+                  )}
+                  pending={updateStatus.isPending}
+                  onClick={() => {
+                    updateStatus.mutate(
+                      selected.deploymentStatus === 'active' ? 'inactive' : 'active',
+                      { onError: notifyError },
+                    );
+                  }}
+                />
                 <Button
                   icon={<Activity />}
                   label={t('edge.healthCheck')}

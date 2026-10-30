@@ -5,6 +5,7 @@ import {
   createEdgeInstallation,
   fetchEdgeInstallation,
   fetchEdgeInstallations,
+  updateEdgeInstallationStatus,
 } from '../api/edge-installations-api';
 
 export const edgeInstallationKeys = {
@@ -44,5 +45,19 @@ export function useCreateEdgeCommand(installationId: string | null) {
       createEdgeCommand(installationId as string, type),
     onSuccess: () =>
       client.invalidateQueries({ queryKey: edgeInstallationKeys.detail(installationId) }),
+  });
+}
+
+export function useUpdateEdgeInstallationStatus(installationId: string | null) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (deploymentStatus: 'active' | 'inactive') =>
+      updateEdgeInstallationStatus(installationId as string, deploymentStatus),
+    onSuccess: async () => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: edgeInstallationKeys.all }),
+        client.invalidateQueries({ queryKey: edgeInstallationKeys.detail(installationId) }),
+      ]);
+    },
   });
 }

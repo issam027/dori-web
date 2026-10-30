@@ -16,6 +16,7 @@ import { routeRequiresActiveSite } from './site-context-rules';
 import { storageKeys } from '@/core/storage/storage-keys';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
+import { IntraDeploymentStatusBanner } from '@/features/edge-installations/IntraDeploymentStatusBanner';
 
 const sidebarPreferenceKey = storageKeys.session.sidebarCollapsed;
 
@@ -175,6 +176,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             });
           }}
         />
+        <IntraDeploymentStatusBanner />
         <main ref={appContentRef} className="app-content">
           <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
             {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (

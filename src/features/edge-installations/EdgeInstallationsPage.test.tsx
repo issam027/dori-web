@@ -48,6 +48,8 @@ describe('EdgeInstallationsPage', () => {
             {
               installationId,
               name: 'Agence centrale',
+              deploymentType: 'intra',
+              deploymentStatus: 'active',
               status: 'online',
               lastSeenAt: '2026-10-30T08:00:00.000Z',
               createdAt: '2026-10-30T07:00:00.000Z',
@@ -63,6 +65,8 @@ describe('EdgeInstallationsPage', () => {
           data: {
             installationId,
             name: 'Agence centrale',
+            deploymentType: 'intra',
+            deploymentStatus: 'active',
             status: 'online',
             lastSeenAt: '2026-10-30T08:00:00.000Z',
             createdAt: '2026-10-30T07:00:00.000Z',
@@ -93,6 +97,59 @@ describe('EdgeInstallationsPage', () => {
     await userEvent.click(await screen.findByRole('button', { name: /lancer un diagnostic/i }));
     await waitFor(() => {
       expect(commandQueued).toBe(true);
+    });
+  });
+
+  it('deactivates an intra installation from its detail', async () => {
+    let requestedStatus: string | undefined;
+    const installation = {
+      installationId,
+      name: 'Agence centrale',
+      deploymentType: 'intra',
+      deploymentStatus: 'active',
+      status: 'online',
+      lastSeenAt: '2026-10-30T08:00:00.000Z',
+      createdAt: '2026-10-30T07:00:00.000Z',
+    };
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/edge/installations', () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: [installation],
+        }),
+      ),
+      http.get(`http://localhost:3000/api/v1/edge/installations/${installationId}`, () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: { ...installation, commands: [] },
+        }),
+      ),
+      http.patch(
+        `http://localhost:3000/api/v1/edge/installations/${installationId}/status`,
+        async ({ request }) => {
+          requestedStatus = ((await request.json()) as { deploymentStatus: string })
+            .deploymentStatus;
+          return HttpResponse.json({
+            code: 'OK',
+            translationKey: null,
+            translationParams: {},
+            data: { ...installation, deploymentStatus: requestedStatus },
+          });
+        },
+      ),
+    );
+
+    renderPage();
+    await userEvent.click(await screen.findByRole('button', { name: /agence centrale/i }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: /désactiver le déploiement/i }),
+    );
+    await waitFor(() => {
+      expect(requestedStatus).toBe('inactive');
     });
   });
 });

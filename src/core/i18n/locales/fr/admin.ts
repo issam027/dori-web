@@ -16,6 +16,8 @@ export const admin = {
   'edge.status.online': 'En ligne',
   'edge.status.offline': 'Hors ligne',
   'edge.status.never_connected': 'Jamais connectée',
+  'edge.deploymentStatus.active': 'Déploiement actif',
+  'edge.deploymentStatus.inactive': 'Déploiement inactif',
   'edge.healthCheck': 'Lancer un diagnostic',
   'edge.syncNow': 'Actualiser l’état',
   'edge.commandHistory': 'Historique des commandes',
@@ -26,6 +28,14 @@ export const admin = {
   'edge.copyToken': 'Copier le jeton',
   'edge.create': 'Créer l’installation',
   'edge.name': 'Nom de l’installation',
+  'edge.activate': 'Activer le déploiement',
+  'edge.deactivate': 'Désactiver le déploiement',
+  'edge.local.inactiveTitle': 'Installation intra désactivée',
+  'edge.local.inactiveMessage':
+    'Le cloud a désactivé ce déploiement. Les fonctions locales restent disponibles.',
+  'edge.local.unreachableTitle': 'Statut cloud non vérifiable',
+  'edge.local.unreachableMessage':
+    'Internet ou le service cloud est indisponible. Les fonctions locales restent disponibles.',
   'admin.translations.updateSuccess': 'Traduction modifiée',
   'admin.translations.createSuccess': 'Traduction créée',
   'admin.translations.createdLocales': '{{key}} · FR, EN, AR',

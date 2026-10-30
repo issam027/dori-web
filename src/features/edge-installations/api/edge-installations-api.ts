@@ -3,6 +3,7 @@ import {
   edgeAdminControllerCreate,
   edgeAdminControllerDetail,
   edgeAdminControllerList,
+  edgeAdminControllerUpdateStatus,
 } from '@/api/generated/edge-administration/edge-administration';
 import type {
   CreateEdgeCommandDtoType,
@@ -29,3 +30,8 @@ export const createEdgeCommand = (
   type: CreateEdgeCommandDtoType,
 ): Promise<EdgeAdminControllerCommand201> =>
   edgeAdminControllerCommand(installationId, { type, payload: {} });
+
+export const updateEdgeInstallationStatus = (
+  installationId: string,
+  deploymentStatus: 'active' | 'inactive',
+) => edgeAdminControllerUpdateStatus(installationId, { deploymentStatus });
