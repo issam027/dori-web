@@ -11,33 +11,43 @@ export function Pagination({
   totalPages: number;
   onPageChange: (page: number) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const pageCount = Math.max(1, totalPages);
+  const number = new Intl.NumberFormat(i18n.language);
   return (
     <nav className="pagination" aria-label={t('pagination.label')}>
       <Button
         variant="unstyled"
         type="button"
         className="button"
+        aria-label={t('pagination.previous')}
         disabled={page <= 1}
         onClick={() => {
           onPageChange(page - 1);
         }}
       >
         <ChevronLeft aria-hidden="true" />
-        {t('pagination.previous')}
+        <span className="pagination-button-label">{t('pagination.previous')}</span>
       </Button>
-      <span>{t('pagination.position', { page, totalPages: pageCount })}</span>
+      <span className="pagination-position" role="status">
+        <span className="pagination-position-full">
+          {t('pagination.position', { page, totalPages: pageCount })}
+        </span>
+        <span className="pagination-position-compact" aria-hidden="true" dir="ltr">
+          {number.format(page)} / {number.format(pageCount)}
+        </span>
+      </span>
       <Button
         variant="unstyled"
         type="button"
         className="button"
+        aria-label={t('pagination.next')}
         disabled={page >= pageCount}
         onClick={() => {
           onPageChange(page + 1);
         }}
       >
-        {t('pagination.next')}
+        <span className="pagination-button-label">{t('pagination.next')}</span>
         <ChevronRight aria-hidden="true" />
       </Button>
     </nav>

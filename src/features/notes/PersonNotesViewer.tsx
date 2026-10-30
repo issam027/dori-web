@@ -238,32 +238,38 @@ export function PersonNotesViewer({
               ) : null}
             </div>
             {items.length > 1 ? (
-              <div className="note-pagination">
+              <div className="pagination note-pagination">
                 <Button
                   variant="unstyled"
                   className="button"
                   type="button"
+                  aria-label={__t('persons.personNotesViewer.precedente')}
                   disabled={index >= items.length - 1}
                   onClick={() => {
                     setIndex(index + 1);
                   }}
                 >
                   <ChevronLeft aria-hidden="true" />
-                  {__t('persons.personNotesViewer.precedente')}
+                  <span className="pagination-button-label">
+                    {__t('persons.personNotesViewer.precedente')}
+                  </span>
                 </Button>
-                <span>
+                <span className="pagination-position" role="status">
                   {index + 1} / {items.length}
                 </span>
                 <Button
                   variant="unstyled"
                   className="button"
                   type="button"
+                  aria-label={__t('persons.personNotesViewer.suivante')}
                   disabled={index === 0}
                   onClick={() => {
                     setIndex(index - 1);
                   }}
                 >
-                  {__t('persons.personNotesViewer.suivante')}
+                  <span className="pagination-button-label">
+                    {__t('persons.personNotesViewer.suivante')}
+                  </span>
                   <ChevronRight aria-hidden="true" />
                 </Button>
               </div>

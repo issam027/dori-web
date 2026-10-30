@@ -1,5 +1,6 @@
 import {
   Children,
+  useCallback,
   cloneElement,
   isValidElement,
   useEffect,
@@ -16,20 +17,22 @@ import { Button } from './Button';
 export function MobileCardActionsMenu({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<'top' | 'bottom'>('bottom');
+  const [maxHeight, setMaxHeight] = useState<number>();
   const menuRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const pendingFocus = useRef<number | null>(null);
   const menuId = useId();
 
-  const focusItem = (index: number) => {
+  const focusItem = useCallback((index: number) => {
     const items = popoverRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
     if (!items?.length) return;
     items[(index + items.length) % items.length]?.focus();
-  };
+  }, []);
 
   const close = (restoreFocus = false) => {
     setOpen(false);
-    if (restoreFocus) requestAnimationFrame(() => triggerRef.current?.focus());
+    if (restoreFocus) triggerRef.current?.focus();
   };
 
   useEffect(() => {
@@ -44,10 +47,39 @@ export function MobileCardActionsMenu({ label, children }: { label: string; chil
   }, [open]);
 
   useLayoutEffect(() => {
-    if (!open || !popoverRef.current) return;
-    const bounds = popoverRef.current.getBoundingClientRect();
-    setPlacement(bounds.bottom > window.innerHeight - 8 ? 'top' : 'bottom');
-  }, [open]);
+    if (!open) return;
+    const viewport = window.visualViewport;
+    const update = () => {
+      const popover = popoverRef.current,
+        trigger = triggerRef.current;
+      if (!popover || !trigger) return;
+      const bounds = trigger.getBoundingClientRect();
+      const top = viewport?.offsetTop ?? 0;
+      let bottom = top + (viewport?.height ?? window.innerHeight);
+      const navigation = document.querySelector('.mobile-bottom-nav')?.getBoundingClientRect();
+      if (navigation && navigation.width > navigation.height && navigation.height > 0)
+        bottom = Math.min(bottom, navigation.top);
+      const above = Math.max(0, Math.min(bounds.top, bottom) - top - 8);
+      const below = Math.max(0, bottom - Math.max(bounds.bottom, top) - 8);
+      const next = popover.scrollHeight <= below || below >= above ? 'bottom' : 'top';
+      setPlacement(next);
+      setMaxHeight(Math.max(44, next === 'bottom' ? below : above));
+    };
+    update();
+    if (pendingFocus.current !== null) {
+      const index = pendingFocus.current;
+      pendingFocus.current = null;
+      focusItem(index);
+    }
+    window.addEventListener('resize', update);
+    document.addEventListener('scroll', update, true);
+    viewport?.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      document.removeEventListener('scroll', update, true);
+      viewport?.removeEventListener('resize', update);
+    };
+  }, [open, focusItem]);
 
   const menuItems = Children.map(children, (child) =>
     isValidElement(child)
@@ -72,10 +104,12 @@ export function MobileCardActionsMenu({ label, children }: { label: string; chil
         onKeyDown={(event) => {
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();
-            setOpen(true);
-            requestAnimationFrame(() => {
-              focusItem(event.key === 'ArrowDown' ? 0 : -1);
-            });
+            const index = event.key === 'ArrowDown' ? 0 : -1;
+            if (open) focusItem(index);
+            else {
+              pendingFocus.current = index;
+              setOpen(true);
+            }
           }
         }}
         onClick={() => {
@@ -89,6 +123,7 @@ export function MobileCardActionsMenu({ label, children }: { label: string; chil
           ref={popoverRef}
           id={menuId}
           className="row-actions-popover"
+          style={{ maxHeight, overflowY: 'auto' }}
           data-placement={placement}
           role="menu"
           aria-label={label}

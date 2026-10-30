@@ -15,6 +15,7 @@ interface ModalProps {
   hideDismissAction?: boolean;
   className?: string;
   loading?: boolean;
+  mobileLayout?: 'fullscreen' | 'confirmation';
 }
 
 export function Modal({
@@ -27,6 +28,7 @@ export function Modal({
   hideDismissAction = false,
   className,
   loading = false,
+  mobileLayout = 'fullscreen',
 }: ModalProps) {
   const { t } = useTranslation();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,8 @@ export function Modal({
     const resize = () => {
       contentRef.current?.style.setProperty('--dialog-height', `${String(viewport.height)}px`);
       contentRef.current?.style.setProperty('--dialog-top', `${String(viewport.offsetTop)}px`);
+      contentRef.current?.style.setProperty('--dialog-width', `${String(viewport.width)}px`);
+      contentRef.current?.style.setProperty('--dialog-left', `${String(viewport.offsetLeft)}px`);
     };
     resize();
     viewport.addEventListener('resize', resize);
@@ -51,6 +55,7 @@ export function Modal({
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
           ref={contentRef}
+          data-mobile-layout={mobileLayout}
           className={`dialog-content${className ? ` ${className}` : ''}`}
         >
           <header className="dialog-header">
@@ -114,6 +119,7 @@ export function ConfirmDialog({
       title={title}
       description={description}
       className="confirmation-dialog"
+      mobileLayout="confirmation"
       actions={
         <>
           <Button
