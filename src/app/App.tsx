@@ -14,6 +14,7 @@ import { AppProviders } from './AppProviders';
 import { AppShell } from './layouts/AppShell';
 import { ExperiencePreview } from './layouts/ExperiencePreview';
 import { PublicExperienceLayout } from './layouts/PublicExperienceLayout';
+import { isCloudDeployment } from '@/core/config/deployment-mode';
 
 const lazyNamed = <P extends object, K extends string>(
   loader: () => Promise<Record<K, ComponentType<P>>>,
@@ -151,21 +152,23 @@ function AppRoutes() {
           }
         />
       </Route>
-      {protectedRoutes.map((route) => (
-        <Route
-          key={route.path}
-          element={
-            <ProtectedRoute
-              permissions={route.permissions}
-              userTypes={
-                route.allUserTypes ? undefined : route.technicalUser ? ['kiosk'] : ['human']
-              }
-            />
-          }
-        >
-          <Route path={route.path} element={<ConfiguredProtectedPage view={route} />} />
-        </Route>
-      ))}
+      {protectedRoutes
+        .filter((route) => !route.cloudOnly || isCloudDeployment)
+        .map((route) => (
+          <Route
+            key={route.path}
+            element={
+              <ProtectedRoute
+                permissions={route.permissions}
+                userTypes={
+                  route.allUserTypes ? undefined : route.technicalUser ? ['kiosk'] : ['human']
+                }
+              />
+            }
+          >
+            <Route path={route.path} element={<ConfiguredProtectedPage view={route} />} />
+          </Route>
+        ))}
       <Route
         path="/forbidden"
         element={

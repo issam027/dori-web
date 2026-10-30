@@ -56,6 +56,7 @@ export function Topbar({
           '/admin/users': 'nav.usersAdmin',
           '/onboarding': 'nav.onboarding',
           '/admin/translations': 'nav.translations',
+          '/admin/edge-installations': 'nav.edgeInstallations',
           '/health': 'nav.health',
           '/audit': 'nav.audit',
           '/profile': 'profile.title',

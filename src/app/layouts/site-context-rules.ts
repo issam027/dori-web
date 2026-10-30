@@ -7,6 +7,7 @@ const siteIndependentPaths = new Set([
   '/audit',
   '/legal',
   '/admin/translations',
+  '/admin/edge-installations',
 ]);
 
 export function routeRequiresActiveSite(pathname: string): boolean {

@@ -1,0 +1,60 @@
+.edge-installations-page .content-grid-sidebar {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) minmax(0, 1.4fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.edge-installations-page .stack-list {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.edge-installations-page .selection-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: inherit;
+  text-align: start;
+}
+
+.edge-installations-page button.selection-card {
+  cursor: pointer;
+}
+
+.edge-installations-page .selection-card.is-selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.edge-installations-page .selection-card > span:first-child {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.edge-installations-page .selection-card small {
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted);
+}
+
+.credential-token {
+  display: block;
+  padding: var(--space-4);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+@media (max-width: 800px) {
+  .edge-installations-page .content-grid-sidebar {
+    grid-template-columns: 1fr;
+  }
+}

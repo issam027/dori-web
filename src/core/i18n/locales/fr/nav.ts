@@ -39,6 +39,7 @@ export const nav = {
   'nav.translations': 'Traductions',
   'nav.health': 'État de la plateforme',
   'nav.audit': 'Journal d’audit',
+  'nav.edgeInstallations': 'Installations intra',
   'nav.legal': 'Mentions légales · Confidentialité',
   'commands.open': 'Commandes',
   'commands.title': 'Palette de commandes',

@@ -1,6 +1,32 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'edge.title': 'Intra installations',
+  'edge.description':
+    'Monitor connected autonomous deployments without changing their local business configuration.',
+  'edge.register': 'Register an installation',
+  'edge.registerHelp':
+    'Create a cloud identity, then configure the issued token on the intra agent.',
+  'edge.inventory': 'Connected fleet',
+  'edge.inventoryHelp': 'Status reported automatically by each agent.',
+  'edge.empty': 'No registered installation',
+  'edge.emptyHelp': 'Register the first installation to issue its credentials.',
+  'edge.select': 'Select an installation',
+  'edge.selectHelp': 'Review its status and command history.',
+  'edge.neverConnected': 'Never connected',
+  'edge.status.online': 'Online',
+  'edge.status.offline': 'Offline',
+  'edge.status.never_connected': 'Never connected',
+  'edge.healthCheck': 'Run diagnostics',
+  'edge.syncNow': 'Refresh status',
+  'edge.commandHistory': 'Command history',
+  'edge.noCommands': 'No command has been sent.',
+  'edge.commandQueued': 'Command queued',
+  'edge.tokenTitle': 'Installation token',
+  'edge.tokenWarning': 'Copy this token now: it will not be displayed again.',
+  'edge.copyToken': 'Copy token',
+  'edge.create': 'Create installation',
+  'edge.name': 'Installation name',
   'admin.translations.updateSuccess': 'Translation updated',
   'admin.translations.createSuccess': 'Translation created',
   'admin.translations.createdLocales': '{{key}} · FR, EN, AR',

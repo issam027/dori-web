@@ -1,5 +1,6 @@
 import { lazy, type ComponentType } from 'react';
 import type { CurrentUserResponseDto } from '@/api/generated/models';
+import { isCloudDeployment } from '@/core/config/deployment-mode';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import {
   Activity,
@@ -13,6 +14,7 @@ import {
   LayoutDashboard,
   Monitor,
   ScrollText,
+  ServerCog,
   Settings,
   Smartphone,
   Store,
@@ -35,6 +37,7 @@ export interface ProtectedRouteDefinition {
   allUserTypes?: boolean;
   experienceMode?: 'kiosk' | 'display';
   publicMode?: 'public' | 'device';
+  cloudOnly?: boolean;
 }
 
 export interface NavigationRouteDefinition {
@@ -157,6 +160,16 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
     frame: 'shell',
   },
   {
+    path: '/admin/edge-installations',
+    permissions: ['system_manage'],
+    cloudOnly: true,
+    component: lazyNamed(
+      () => import('@/features/edge-installations/EdgeInstallationsPage'),
+      'EdgeInstallationsPage',
+    ),
+    frame: 'shell',
+  },
+  {
     path: '/health',
     permissions: ['system_manage'],
     component: lazyNamed(() => import('@/features/health/HealthPage'), 'HealthPage'),
@@ -266,11 +279,18 @@ const navigationMetadata: Readonly<
     section: 'system',
     icon: HeartPulse,
   },
+  '/admin/edge-installations': {
+    id: 'edge-installations',
+    labelKey: 'nav.edgeInstallations',
+    section: 'system',
+    icon: ServerCog,
+  },
   '/audit': { id: 'audit', labelKey: 'nav.audit', section: 'system', icon: ScrollText },
 };
 
 export const navigationRoutes: readonly NavigationRouteDefinition[] = protectedRoutes.flatMap(
   (route) => {
+    if (route.cloudOnly && !isCloudDeployment) return [];
     const metadata = navigationMetadata[route.path];
     if (!metadata) return [];
     return [

@@ -39,6 +39,7 @@ export const nav: Record<string, string> = {
   'nav.translations': 'الترجمات',
   'nav.health': 'صحة السيستام',
   'nav.audit': 'سجلّ المراقبة',
+  'nav.edgeInstallations': 'التركيبات الداخلية',
   'nav.legal': 'الشروط والخصوصية',
   'commands.open': 'الأوامر السريعة',
   'commands.title': 'لوحة الأوامر',

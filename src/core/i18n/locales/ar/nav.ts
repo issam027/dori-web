@@ -40,6 +40,7 @@ export const nav: DomainTranslations<typeof import('../fr/nav').nav> = {
   'nav.translations': 'الترجمات',
   'nav.health': 'صحة المنصة',
   'nav.audit': 'سجل التدقيق',
+  'nav.edgeInstallations': 'التركيبات الداخلية',
   'nav.legal': 'الشروط القانونية والخصوصية',
   'commands.open': 'الأوامر السريعة',
   'commands.title': 'لوحة الأوامر',
