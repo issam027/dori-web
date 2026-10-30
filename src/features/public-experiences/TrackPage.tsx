@@ -221,6 +221,13 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
               </span>
             </header>
 
+            {position?.sourceConnectivity === 'offline' ? (
+              <div className="tracking-source-offline" role="status">
+                <TriangleAlert aria-hidden="true" />
+                <span>{__t('tracking.sourceOffline')}</span>
+              </div>
+            ) : null}
+
             {completed ? (
               <div className="tracking-completed" role="status">
                 <span className="tracking-completed-icon" aria-hidden="true">

@@ -1,5 +1,7 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const experiences = {
+  'tracking.sourceOffline':
+    'Le site Intra est hors ligne. La dernière position connue est affichée.',
   'tracking.error.invalidTitle': 'Lien de suivi invalide',
   'tracking.error.invalidText':
     'Ce lien ne correspond à aucun ticket. Vérifiez le lien reçu avec votre ticket.',

@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
 
 export const experiences: DomainTranslations<typeof import('../fr/experiences').experiences> = {
+  'tracking.sourceOffline':
+    'الموقع الداخلي غير متصل. يتم عرض آخر موضع معروف.',
   'tracking.error.invalidTitle': 'رابط المتابعة غير صالح',
   'tracking.error.invalidText':
     'هذا الرابط لا يطابق أي تذكرة. يرجى التثبت من الرابط المرفق بتذكرتكم.',

@@ -1,5 +1,7 @@
 // Tunisian derja (familiar street register). Partial: missing keys fall back to ar, then fr.
 export const experiences: Record<string, string> = {
+  'tracking.sourceOffline':
+    'الموقع الداخلي غير متصل. يتم عرض آخر موضع معروف.',
   'public-experiences.kiosk.imprimerMonTicket': 'اطبعلي تذكرتي فيسع',
   'public-experiences.kiosk.creerMonTicket': 'خرّجلي تذكرة وخلينا نبداو',
   'public-experiences.kiosk.jAiUnRendezVous': 'عندي رونديفو مقيّد ومريڤل',
