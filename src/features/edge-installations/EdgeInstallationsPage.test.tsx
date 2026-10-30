@@ -17,6 +17,25 @@ function renderPage() {
 }
 
 describe('EdgeInstallationsPage', () => {
+  it('keeps the installation creation available when the inventory is empty', async () => {
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/edge/installations', () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: [],
+        }),
+      ),
+    );
+
+    renderPage();
+    expect(await screen.findByText(/aucune installation enregistrée/i)).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: /enregistrer une installation/i }));
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.getByLabelText(/nom de l’installation/i)).toBeVisible();
+  });
+
   it('lists an installation, opens its detail and queues a health check', async () => {
     let commandQueued = false;
     mockServer.use(
