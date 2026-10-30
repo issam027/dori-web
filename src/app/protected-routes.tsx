@@ -161,7 +161,7 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
   },
   {
     path: '/admin/edge-installations',
-    permissions: ['system_manage'],
+    permissions: ['edge_installation_manage'],
     cloudOnly: true,
     component: lazyNamed(
       () => import('@/features/edge-installations/EdgeInstallationsPage'),
