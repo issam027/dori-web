@@ -1,0 +1,20 @@
+name: intra-dorify-ui
+
+services:
+  app:
+    image: dorify/app:dev
+    build:
+      context: .
+      target: runtime
+      args:
+        VITE_APP_ENV: development
+        VITE_DORIFY_DEPLOYMENT_MODE: intra
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:18080:8080'
+    networks:
+      - dorify-intra-network
+
+networks:
+  dorify-intra-network:
+    external: true

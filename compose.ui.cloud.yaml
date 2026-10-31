@@ -1,0 +1,20 @@
+name: cloud-dorify-ui
+
+services:
+  app:
+    image: dorify/app:dev
+    build:
+      context: .
+      target: runtime
+      args:
+        VITE_APP_ENV: development
+        VITE_DORIFY_DEPLOYMENT_MODE: cloud
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:58080:8080'
+    networks:
+      - dorify-cloud-network
+
+networks:
+  dorify-cloud-network:
+    external: true
