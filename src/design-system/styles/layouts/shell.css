@@ -48,6 +48,26 @@
   gap: 24px;
   margin-bottom: 24px;
 }
+.page-header-copy {
+  min-width: 0;
+}
+.page-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.page-title-row > h1 {
+  min-width: 0;
+}
+.page-title-status {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.page-title-status :is(.status-badge, .realtime-connection-indicator) {
+  white-space: nowrap;
+}
 .app-shell {
   display: grid;
   min-height: 100vh;

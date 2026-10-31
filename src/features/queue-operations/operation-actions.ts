@@ -1,6 +1,7 @@
 import { queueEngineControllerCallNext } from '@/api/generated/queue-engine/queue-engine';
-import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
+import { ErrorCode, type CallNextRegistrationResponseDto } from '@/api/generated/models';
 import { useOperationStore } from '@/shared/queue-operations/operation-store';
+import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 
 export type CallNextOutcome = 'called' | 'empty';
 
@@ -20,9 +21,21 @@ function isEmptyCallNextPayload(value: unknown): boolean {
 }
 
 export async function callNextAndCommit(queueId: string): Promise<CallNextOutcome> {
-  const response = await queueEngineControllerCallNext(queueId);
+  let response;
+  try {
+    response = await queueEngineControllerCallNext(queueId);
+  } catch (error) {
+    if (
+      error instanceof NormalizedApiError &&
+      error.code === ErrorCode.NO_CALLABLE_REGISTRATION &&
+      error.status === 404
+    ) {
+      return 'empty';
+    }
+    throw error;
+  }
   const registration: unknown = response.data;
-  if (response.code === 'QUEUE_EMPTY' || isEmptyCallNextPayload(registration)) return 'empty';
+  if (isEmptyCallNextPayload(registration)) return 'empty';
   if (!isCalledRegistration(registration)) throw new Error('Invalid call-next response payload');
 
   useOperationStore.getState().startCall(queueId, registration);

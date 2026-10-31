@@ -1,8 +1,7 @@
 import type { DomainTranslations } from '../../types';
 
 export const experiences: DomainTranslations<typeof import('../fr/experiences').experiences> = {
-  'tracking.sourceOffline':
-    'The on-premise site is offline. The last known position is displayed.',
+  'tracking.sourceOffline': 'The on-premise site is offline. The last known position is displayed.',
   'tracking.error.invalidTitle': 'Invalid tracking link',
   'tracking.error.invalidText':
     'This link does not match any ticket. Check the link you received with your ticket.',

@@ -1,5 +1,8 @@
+import { apiErrorMessages } from './api-errors';
+
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const errors = {
+  ...apiErrorMessages,
   'errors.rejectedPromise': 'Promesse rejetée',
   'errors.http.badRequest': 'Les informations envoyées ne sont pas valides. Vérifiez votre saisie.',
   'errors.http.unauthorized': 'Votre session a expiré. Reconnectez-vous pour continuer.',

@@ -151,7 +151,7 @@ export function ControlRoomPage() {
         eyebrow={t('common.pilotage')}
         title={t('supervision.controlRoom.supervisionTempsReel')}
         description={t('controlRoom.liveDescription')}
-        actions={
+        status={
           <StatusBadge tone={dangerCount ? 'danger' : 'success'}>
             <Activity />
             {dangerCount

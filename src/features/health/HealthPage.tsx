@@ -24,16 +24,16 @@ export function HealthPage() {
       <PageHeader
         eyebrow={__t('nav.health')}
         title={__t('health.health.santeDeLaPlateforme')}
-        description={__t('health.health.etatDeclareParLApiActualiseAutomatiquement')}
-        actions={
-          <div className="cluster">
-            <StatusBadge>
-              {__t('health.applicationVersion', { version: APP_VERSION_LABEL })}
-            </StatusBadge>
-            <StatusBadge tone={healthy ? 'success' : 'danger'}>
-              {healthy ? __t('health.health.operationnelle') : __t('health.health.degradee')}
-            </StatusBadge>
-          </div>
+        description={
+          <>
+            {__t('health.health.etatDeclareParLApiActualiseAutomatiquement')} ·{' '}
+            {__t('health.applicationVersion', { version: APP_VERSION_LABEL })}
+          </>
+        }
+        status={
+          <StatusBadge tone={healthy ? 'success' : 'danger'}>
+            {healthy ? __t('health.health.operationnelle') : __t('health.health.degradee')}
+          </StatusBadge>
         }
       />
       <div className="metric-grid">

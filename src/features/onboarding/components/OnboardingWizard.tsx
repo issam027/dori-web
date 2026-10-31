@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import {
   associateTier,
   createQueueForSite,
@@ -213,7 +213,7 @@ export function OnboardingWizard() {
         eyebrow={__t('onboarding.guidedAdministration')}
         title={__t('onboarding.onboarding.configurerUnNouveauSite')}
         description={__t('onboarding.onboarding.uneConfigurationProgressiveEnregistreeAChaq')}
-        actions={
+        status={
           <span className="status-badge status-info">
             {__t('common.etape')}
             {draft.step} {__t('onboarding.totalSteps')}
@@ -320,6 +320,7 @@ export function OnboardingWizard() {
                 save(moveToPreviousOnboardingStep(draft));
               }}
             >
+              <ArrowLeft aria-hidden="true" />
               {__t('onboarding.onboarding.precedent')}
             </Button>
             <div>

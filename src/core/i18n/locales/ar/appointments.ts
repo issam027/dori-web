@@ -39,6 +39,9 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   'appointments.calendar.moreCount': '+{{count}} إضافي',
   'appointments.calendar.collapse': 'طي',
   'appointments.calendar.closed': 'مغلق',
+  'appointments.calendar.closedDayTitle': 'اليوم مغلق',
+  'appointments.calendar.closedDayDescription':
+    'لا يمكن إنشاء مواعيد في هذا اليوم. اختر تاريخًا آخر للاطلاع على الأوقات المتاحة.',
   'appointments.calendar.today': 'اليوم',
   'appointments.calendar.currentTime': 'الوقت الحالي: {{time}}',
   'appointments.availability.loading': 'جارٍ استرجاع الأوقات المتاحة…',

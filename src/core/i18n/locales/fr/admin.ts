@@ -1,5 +1,9 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const admin = {
+  'admin.users.temporaryPasswordTitle': 'Mot de passe temporaire',
+  'admin.users.temporaryPasswordDescription':
+    'Copiez ce mot de passe maintenant. Il ne sera plus affiché après la fermeture.',
+  'admin.users.copyTemporaryPassword': 'Copier le mot de passe',
   'edge.title': 'Installations intra',
   'edge.description':
     'Supervisez les déploiements autonomes connectés, sans modifier leur configuration métier locale.',
@@ -24,8 +28,17 @@ export const admin = {
   'edge.noCommands': 'Aucune commande envoyée.',
   'edge.commandQueued': 'Commande mise en file',
   'edge.tokenTitle': 'Jeton de l’installation',
-  'edge.tokenWarning': 'Copiez ce jeton maintenant : il ne sera plus affiché.',
+  'edge.tokenWarning':
+    'Enregistrez ces identifiants maintenant. Le jeton ne sera plus jamais visible après la fermeture de cette fenêtre.',
   'edge.copyToken': 'Copier le jeton',
+  'edge.credentialsTitle': 'Identifiants de l’installation',
+  'edge.credentialsHelp': 'Configurez ces deux valeurs sur l’agent de cette installation intra.',
+  'edge.agentConfigurationHelp':
+    'Copiez la configuration complète dans le fichier .env utilisé par l’agent.',
+  'edge.installationId': 'Identifiant de l’installation',
+  'edge.installationToken': 'Jeton secret de l’installation',
+  'edge.copyCredentials': 'Copier la configuration',
+  'edge.credentialsCopied': 'Configuration de l’agent copiée',
   'edge.create': 'Créer l’installation',
   'edge.name': 'Nom de l’installation',
   'edge.activate': 'Activer le déploiement',

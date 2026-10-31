@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
 import {
+  ArrowLeft,
   CalendarCheck2,
   CalendarX2,
   Check,
@@ -569,6 +570,7 @@ export function KioskWizard() {
                 else dispatch({ type: 'BACK' });
               }}
             >
+              <ArrowLeft aria-hidden="true" />
               {__t('common.retour')}
             </Button>
             <Button

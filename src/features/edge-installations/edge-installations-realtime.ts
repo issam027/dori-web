@@ -23,7 +23,10 @@ export function subscribeEdgeInstallations(
       return fetch(input, { ...init, headers });
     },
     onopen: async (response) => {
-      if (response.ok && (response.headers.get('content-type') ?? '').includes('text/event-stream')) {
+      if (
+        response.ok &&
+        (response.headers.get('content-type') ?? '').includes('text/event-stream')
+      ) {
         if (opened) onChange();
         opened = true;
         return;

@@ -1,7 +1,10 @@
 import { useState, type SyntheticEvent } from 'react';
-import { Activity, CloudCog, Copy, Plus, RefreshCw } from 'lucide-react';
+import { Activity, CloudCog, Copy, Plus, RefreshCw, TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { EdgeInstallationResponseDto } from '@/api/generated/models';
+import type {
+  EdgeInstallationCredentialResponseDto,
+  EdgeInstallationResponseDto,
+} from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
@@ -38,18 +41,30 @@ export function EdgeInstallationsPage() {
   const updateStatus = useUpdateEdgeInstallationStatus(selectedId);
   const [createOpen, setCreateOpen] = useState(false);
   const [name, setName] = useState('');
-  const [issuedToken, setIssuedToken] = useState<string | null>(null);
+  const [issuedCredential, setIssuedCredential] =
+    useState<EdgeInstallationCredentialResponseDto | null>(null);
 
   const submitInstallation = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     createInstallation.mutate(name.trim(), {
       onSuccess: (response) => {
-        setIssuedToken(response.data.token);
+        setIssuedCredential(response.data);
         setSelectedId(response.data.installationId);
         setName('');
       },
       onError: notifyError,
     });
+  };
+
+  const copyAgentConfiguration = async () => {
+    if (!issuedCredential) return;
+    await navigator.clipboard.writeText(
+      [
+        `DORIFY_INSTALLATION_ID=${issuedCredential.installationId}`,
+        `DORIFY_CLOUD_TOKEN=${issuedCredential.token}`,
+      ].join('\n'),
+    );
+    notify({ tone: 'success', title: t('edge.credentialsCopied') });
   };
 
   const sendCommand = (type: 'RUN_HEALTH_CHECK' | 'SYNC_NOW') => {
@@ -214,17 +229,17 @@ export function EdgeInstallationsPage() {
         open={createOpen}
         onOpenChange={(open) => {
           setCreateOpen(open);
-          if (!open) setIssuedToken(null);
+          if (!open) setIssuedCredential(null);
         }}
-        title={issuedToken ? t('edge.tokenTitle') : t('edge.register')}
-        description={issuedToken ? t('edge.tokenWarning') : t('edge.registerHelp')}
+        title={issuedCredential ? t('edge.credentialsTitle') : t('edge.register')}
+        description={issuedCredential ? t('edge.credentialsHelp') : t('edge.registerHelp')}
         actions={
-          issuedToken ? (
+          issuedCredential ? (
             <Button
               variant="primary"
               icon={<Copy />}
-              label={t('edge.copyToken')}
-              onClick={() => void navigator.clipboard.writeText(issuedToken)}
+              label={t('edge.copyCredentials')}
+              onClick={() => void copyAgentConfiguration()}
             />
           ) : (
             <Button
@@ -240,8 +255,30 @@ export function EdgeInstallationsPage() {
           )
         }
       >
-        {issuedToken ? (
-          <code className="credential-token">{issuedToken}</code>
+        {issuedCredential ? (
+          <div className="edge-credential-delivery">
+            <div className="edge-credential-warning" role="alert">
+              <TriangleAlert aria-hidden="true" />
+              <strong>{t('edge.tokenWarning')}</strong>
+            </div>
+            <p>{t('edge.agentConfigurationHelp')}</p>
+            <dl className="edge-credential-fields">
+              <div>
+                <dt>{t('edge.installationId')}</dt>
+                <dd>
+                  <span>DORIFY_INSTALLATION_ID</span>
+                  <code>{issuedCredential.installationId}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>{t('edge.installationToken')}</dt>
+                <dd>
+                  <span>DORIFY_CLOUD_TOKEN</span>
+                  <code>{issuedCredential.token}</code>
+                </dd>
+              </div>
+            </dl>
+          </div>
         ) : (
           <form id="edge-installation-form" onSubmit={submitInstallation}>
             <label className="form-field">

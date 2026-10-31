@@ -122,7 +122,7 @@ export const common = {
   'common.firstName': 'Prénom',
   'common.rdv': 'RDV',
   'common.rechercherUnePersonne': 'Rechercher une personne',
-  'common.retour': '← Retour',
+  'common.retour': 'Retour',
   'common.save': 'Enregistrer',
   'common.scope': 'Périmètre',
   'common.search': 'Rechercher',

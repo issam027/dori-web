@@ -36,6 +36,53 @@ describe('EdgeInstallationsPage', () => {
     expect(screen.getByLabelText(/nom de l’installation/i)).toBeVisible();
   });
 
+  it('shows both one-time agent credentials after creating an installation', async () => {
+    const token = 'installation-token-that-is-only-displayed-once';
+    mockServer.use(
+      http.get('http://localhost:3000/api/v1/edge/installations', () =>
+        HttpResponse.json({
+          code: 'OK',
+          translationKey: null,
+          translationParams: {},
+          data: [],
+        }),
+      ),
+      http.post('http://localhost:3000/api/v1/edge/installations', () =>
+        HttpResponse.json(
+          {
+            code: 'OK',
+            translationKey: null,
+            translationParams: {},
+            data: {
+              installationId,
+              name: 'Agence test',
+              deploymentType: 'intra',
+              deploymentStatus: 'active',
+              status: 'never_connected',
+              lastSeenAt: null,
+              createdAt: '2026-10-31T08:00:00.000Z',
+              token,
+            },
+          },
+          { status: 201 },
+        ),
+      ),
+    );
+
+    renderPage();
+    await userEvent.click(
+      await screen.findByRole('button', { name: /enregistrer une installation/i }),
+    );
+    await userEvent.type(screen.getByLabelText(/nom de l’installation/i), 'Agence test');
+    await userEvent.click(screen.getByRole('button', { name: /créer l’installation/i }));
+
+    expect(await screen.findByText(installationId)).toBeVisible();
+    expect(screen.getByText(token)).toBeVisible();
+    expect(screen.getByText('DORIFY_INSTALLATION_ID')).toBeVisible();
+    expect(screen.getByText('DORIFY_CLOUD_TOKEN')).toBeVisible();
+    expect(screen.getByText(/ne sera plus jamais visible/i)).toBeVisible();
+  });
+
   it('lists an installation, opens its detail and queues a health check', async () => {
     let commandQueued = false;
     mockServer.use(

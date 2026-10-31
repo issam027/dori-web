@@ -41,7 +41,9 @@ export function useEdgeInstallationsRealtime(installationId: string | null) {
       }
     };
     void subscribeEdgeInstallations(invalidate, controller.signal).catch(() => undefined);
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [client, installationId]);
 }
 

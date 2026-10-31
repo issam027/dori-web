@@ -2,12 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Plus, Printer, TicketCheck } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { CreateRegistrationDto, CreateRegistrationResponseDto } from '@/api/generated/models';
+import { ErrorCode } from '@/api/generated/models';
 import { registerPerson } from './api/quick-registration-api';
 import { Card } from '@/design-system/components/Card';
 import { FormField } from '@/design-system/components/FormField';
 import { Modal } from '@/design-system/components/Modal';
 import { PersonPickerOrCreate, type PersonChoice, findPersons } from '@/features/persons/public';
-import { notifyError } from '@/core/notifications/error-presentation';
+import { notifyError, presentError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { appointmentUtcIso, isSlotAvailable, slotTime } from '@/features/appointments/public';
 import {
@@ -73,7 +74,11 @@ export function QuickRegistration({
       try {
         response = await registerPerson(dto);
       } catch (error) {
-        if (!(error instanceof NormalizedApiError) || error.status !== 409 || choice.kind !== 'new')
+        if (
+          !(error instanceof NormalizedApiError) ||
+          error.code !== ErrorCode.CONFLICT ||
+          choice.kind !== 'new'
+        )
           throw error;
         const people = await findPersons({
           siteId,
@@ -100,8 +105,8 @@ export function QuickRegistration({
         message: __t('notifications.visit.ticketMessage', { ticket: response.data.ticketNumber }),
       });
     } catch (error) {
-      if (error instanceof NormalizedApiError && error.status === 409) {
-        setSubmitError(__t('quickRegistration.activeConflict'));
+      if (error instanceof NormalizedApiError) {
+        setSubmitError(presentError(error).message);
       } else {
         notifyError(error);
       }

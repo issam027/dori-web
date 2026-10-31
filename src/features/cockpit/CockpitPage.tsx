@@ -22,10 +22,12 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import type {
-  CockpitQueueItemDto,
-  QueueEngineControllerGetCockpit200,
+import {
+  ErrorCode,
+  type CockpitQueueItemDto,
+  type QueueEngineControllerGetCockpit200,
 } from '@/api/generated/models';
+import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { queryKeys } from '@/api/client/query-keys';
 import { getAccessToken } from '@/core/auth/access-token';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -246,16 +248,28 @@ export function CockpitPage() {
     [preferences.soundsEnabled, siteId],
   );
   const callBestNext = useCallback(
-    () =>
-      run(async () => {
+    async () => {
+      try {
         const response = await actions.callNextForSite.execute(undefined);
-        const ticket = response.data.ticketNumber;
+        broadcastCockpitRefresh(siteId);
+        playCockpitTone(preferences.soundsEnabled, 'success');
         notify({
-          tone: ticket ? 'success' : 'info',
-          title: ticket ? t('cockpit.ticketCalled', { ticket }) : t('cockpit.noCandidate'),
+          tone: 'success',
+          title: t('cockpit.ticketCalled', { ticket: response.data.ticketNumber }),
         });
-      }),
-    [actions.callNextForSite, run, t],
+      } catch (error) {
+        if (
+          error instanceof NormalizedApiError &&
+          error.code === ErrorCode.NO_CALLABLE_REGISTRATION
+        ) {
+          notify({ tone: 'info', title: t('cockpit.noCandidate') });
+          return;
+        }
+        playCockpitTone(preferences.soundsEnabled, 'warning');
+        notifyError(error);
+      }
+    },
+    [actions.callNextForSite, preferences.soundsEnabled, siteId, t],
   );
 
   useEffect(() => {
@@ -365,13 +379,13 @@ export function CockpitPage() {
       <PageHeader
         eyebrow={cockpit.data?.data.siteName ?? t('nav.operations')}
         title={t('cockpit.title')}
+        status={<RealtimeConnectionIndicator health={health} />}
         description={t('cockpit.description', {
           operator:
             cockpit.data?.data.operator.fullName ?? cockpit.data?.data.operator.username ?? '',
         })}
         actions={
           <div className="cockpit-header-actions">
-            <RealtimeConnectionIndicator health={health} />
             <small className="cockpit-last-sync">
               {t('cockpit.lastSync', {
                 time: formatDateTime(cockpit.dataUpdatedAt, i18n.language) ?? '—',

@@ -47,7 +47,7 @@ export const onboarding = {
     'Occuper un guichet, appeler puis servir.',
   'onboarding.onboarding.ouvrirLesUtilisateurs': 'Ouvrir les utilisateurs',
   'onboarding.onboarding.parcoursDeConfiguration': 'Parcours de configuration',
-  'onboarding.onboarding.precedent': '← Précédent',
+  'onboarding.onboarding.precedent': 'Précédent',
   'onboarding.onboarding.principeDHeritage': 'Principe d’héritage',
   'onboarding.onboarding.prive': 'Privé',
   'onboarding.onboarding.public': 'Public',

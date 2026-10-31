@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
+import { apiErrorMessages } from './api-errors';
 
 export const errors: DomainTranslations<typeof import('../fr/errors').errors> = {
+  ...apiErrorMessages,
   'errors.rejectedPromise': 'وعد مرفوض (Promise)',
   'errors.http.badRequest': 'المعطيات المدخلة غير صالحة. يرجى التثبت من صحة ما أدخلتموه.',
   'errors.http.unauthorized': 'انتهت صلاحية جلستكم. يرجى تسجيل الدخول مجدداً للمتابعة.',

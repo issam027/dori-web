@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { CalendarDays, CalendarOff, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import type { RegistrationResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { EmptyState } from '@/design-system/components/FeedbackState';
@@ -92,7 +92,6 @@ export function MobileAgenda({
         ))}
       </div>
       <h2>{label(date, { dateStyle: 'full' })}</h2>
-      {!open ? <p role="status">{t('appointments.calendar.closed')}</p> : null}
       {open ? (
         <Button
           variant="primary"
@@ -101,7 +100,17 @@ export function MobileAgenda({
           onClick={onCreate}
         />
       ) : null}
-      {appointments.length ? (
+      {!open ? (
+        <section className="agenda-closed-state" role="status">
+          <div className="agenda-closed-icon" aria-hidden="true">
+            <CalendarOff />
+          </div>
+          <div>
+            <h3>{t('appointments.calendar.closedDayTitle')}</h3>
+            <p>{t('appointments.calendar.closedDayDescription')}</p>
+          </div>
+        </section>
+      ) : appointments.length ? (
         <div className="agenda-list">
           {[...appointments]
             .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime))

@@ -8,7 +8,8 @@ export const supervision = {
   'health.agent.reachability.unreachable': 'Injoignable',
   'health.agent.reachability.not_configured': 'Non configurée',
   'health.agent.title': 'Agent de liaison Intra',
-  'health.agent.description': 'État de la liaison sortante entre cette installation et Dorify Cloud.',
+  'health.agent.description':
+    'État de la liaison sortante entre cette installation et Dorify Cloud.',
   'health.agent.lastCloudContact': 'Dernier contact Cloud réussi',
   'notifications.status.pending': 'En attente',
   'notifications.status.processing': 'En cours d’envoi',
@@ -115,7 +116,7 @@ export const supervision = {
   'supervision.notifications.quelPassageEstConcerne': 'Quel passage est concerné ?',
   'supervision.notifications.recherchezLaPersonneConcerneeParSonNomOu':
     'Recherchez la personne concernée par son nom ou ses coordonnées.',
-  'supervision.notifications.redigerLeMessage': 'Rédiger le message →',
+  'supervision.notifications.redigerLeMessage': 'Rédiger le message',
   'supervision.notifications.redigezVotreMessage': 'Rédigez votre message',
   'supervision.notifications.reemettre': 'Réémettre',
   'supervision.notifications.saisissezUnMessageClairEtConcis':

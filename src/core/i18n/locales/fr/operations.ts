@@ -69,7 +69,7 @@ export const operations = {
   'queue-operations.quickRegistration.creerUnTicket': 'Créer un ticket',
   'queue-operations.quickRegistration.dateDuRendezVous': 'Date du rendez-vous',
   'queue-operations.quickRegistration.heureDisponible': 'Heure disponible',
-  'queue-operations.quickRegistration.modifierLaPersonne': '← Modifier la personne',
+  'queue-operations.quickRegistration.modifierLaPersonne': 'Modifier la personne',
   'queue-operations.quickRegistration.placeS': 'place(s)',
   'queue-operations.quickRegistration.qualificationDuTicket': 'Qualification du ticket',
   'queue-operations.quickRegistration.quiAccueillezVous': 'Qui accueillez-vous ?',

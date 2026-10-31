@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
+import { apiErrorMessages } from './api-errors';
 
 export const errors: DomainTranslations<typeof import('../fr/errors').errors> = {
+  ...apiErrorMessages,
   'errors.rejectedPromise': 'Rejected promise',
   'errors.http.badRequest': 'The information sent is not valid. Check your input.',
   'errors.http.unauthorized': 'Your session has expired. Sign in again to continue.',

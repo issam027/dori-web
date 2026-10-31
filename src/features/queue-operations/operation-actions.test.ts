@@ -53,12 +53,15 @@ it('commits an irreversible call only after server confirmation', async () => {
 it('treats an empty queue as a normal outcome and keeps local state unchanged', async () => {
   mockServer.use(
     http.post('http://localhost:3000/api/v1/queues/00000000-0000-4000-8000-000000000004/next', () =>
-      HttpResponse.json({
-        code: 'QUEUE_EMPTY',
-        translationKey: 'queue.next.empty',
-        translationParams: {},
-        data: null,
-      }),
+      HttpResponse.json(
+        {
+          code: 'NO_CALLABLE_REGISTRATION',
+          translationKey: 'queue.next.no_callable_registration',
+          translationParams: {},
+          data: null,
+        },
+        { status: 404 },
+      ),
     ),
   );
 

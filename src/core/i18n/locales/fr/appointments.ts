@@ -18,7 +18,7 @@ export const appointments = {
   'appointments.appointmentEditor.creneau': 'Créneau',
   'appointments.appointmentEditor.ficheExistante': 'Fiche existante',
   'appointments.appointmentEditor.nouveauRendezVous': 'Nouveau rendez-vous',
-  'appointments.appointmentEditor.personne': '← Personne',
+  'appointments.appointmentEditor.personne': 'Personne',
   'appointments.appointmentEditor.placeS': 'place(s)',
   'appointments.appointmentEditor.quiSouhaitezVousRecevoir': 'Qui souhaitez-vous recevoir ?',
   'appointments.editor.personSearchHint':
@@ -40,6 +40,9 @@ export const appointments = {
   'appointments.calendar.moreCount': '+{{count}} autre',
   'appointments.calendar.collapse': 'Réduire',
   'appointments.calendar.closed': 'Fermé',
+  'appointments.calendar.closedDayTitle': 'Journée fermée',
+  'appointments.calendar.closedDayDescription':
+    'Aucun rendez-vous ne peut être créé ce jour. Sélectionnez une autre date pour consulter les disponibilités.',
   'appointments.calendar.today': 'Aujourd’hui',
   'appointments.calendar.currentTime': 'Heure actuelle : {{time}}',
   'appointments.availability.loading': 'Chargement des disponibilités…',

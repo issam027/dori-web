@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   KeyRound,
+  Copy,
   Eye,
   LogOut,
   MoreHorizontal,
@@ -44,7 +45,6 @@ import { Button } from '@/design-system/components/Button';
 import { DataTable } from '@/design-system/components/DataTable';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { UserMobileCard } from './UserMobileCard';
-import { userPasswordResetDto } from './user-password-reset';
 import { FilterPanel } from '@/design-system/components/FilterPanel';
 
 export function UsersAdminPage() {
@@ -76,8 +76,23 @@ export function UsersAdminPage() {
   const [disconnecting, setDisconnecting] = useState<UserSummaryItemDto>();
   const [openActionsUserId, setOpenActionsUserId] = useState<string>();
   const [pending, setPending] = useState(false);
+  const [temporaryPassword, setTemporaryPassword] = useState<string>();
   const debouncedSearch = useDebouncedFilter(draft.search, { delay: 350 });
   const effectiveFilters = { ...filters, search: debouncedSearch };
+  const resetPassword = (user: UserSummaryItemDto) => {
+    void setUserPassword(user.userId, {})
+      .then((response) => {
+        const password = response.data.temporaryPassword;
+        if (!password) throw new Error('Temporary password was not returned by the API');
+        setTemporaryPassword(password);
+        notify({
+          tone: 'success',
+          title: t('admin.users.passwordResetSuccess'),
+          message: getUserDisplayName(user),
+        });
+      })
+      .catch(notifyError);
+  };
   useEffect(() => {
     if (openActionsUserId === undefined) return;
     const close = (event: PointerEvent) => {
@@ -269,15 +284,7 @@ export function UsersAdminPage() {
                   .catch(notifyError);
               }}
               onResetPassword={() => {
-                void setUserPassword(user.userId, userPasswordResetDto())
-                  .then(() =>
-                    notify({
-                      tone: 'success',
-                      title: t('admin.users.passwordResetSuccess'),
-                      message: getUserDisplayName(user),
-                    }),
-                  )
-                  .catch(notifyError);
+                resetPassword(user);
               }}
               onDisconnect={() => {
                 setDisconnecting(user);
@@ -396,17 +403,9 @@ export function UsersAdminPage() {
                             className="button button-small"
                             type="button"
                             title={t('onboarding.settings.reinitialiserMdp')}
-                            onClick={() =>
-                              void setUserPassword(user.userId, userPasswordResetDto())
-                                .then(() =>
-                                  notify({
-                                    tone: 'success',
-                                    title: t('admin.users.passwordResetSuccess'),
-                                    message: getUserDisplayName(user),
-                                  }),
-                                )
-                                .catch(notifyError)
-                            }
+                            onClick={() => {
+                              resetPassword(user);
+                            }}
                           >
                             <KeyRound /> {t('onboarding.settings.reinitialiserMdp')}
                           </Button>
@@ -565,6 +564,27 @@ export function UsersAdminPage() {
           </label>
         </div>
       </Modal>
+      <Modal
+        open={Boolean(temporaryPassword)}
+        onOpenChange={(open) => {
+          if (!open) setTemporaryPassword(undefined);
+        }}
+        title={t('admin.users.temporaryPasswordTitle')}
+        description={t('admin.users.temporaryPasswordDescription')}
+        actions={
+          <Button
+            variant="primary"
+            icon={<Copy />}
+            label={t('admin.users.copyTemporaryPassword')}
+            onClick={() => {
+              if (temporaryPassword) void navigator.clipboard.writeText(temporaryPassword);
+            }}
+          />
+        }
+      >
+        <code className="credential-token">{temporaryPassword}</code>
+      </Modal>
+
       <Modal
         open={Boolean(disconnecting)}
         onOpenChange={(next) => {

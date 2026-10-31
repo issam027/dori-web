@@ -1,6 +1,10 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'admin.users.temporaryPasswordTitle': 'كلمة مرور مؤقتة',
+  'admin.users.temporaryPasswordDescription':
+    'انسخ كلمة المرور الآن. لن يتم عرضها مرة أخرى بعد الإغلاق.',
+  'admin.users.copyTemporaryPassword': 'نسخ كلمة المرور',
   'edge.title': 'التركيبات الداخلية',
   'edge.description': 'راقب التركيبات المستقلة المتصلة دون تعديل إعداداتها المحلية.',
   'edge.register': 'تسجيل تركيب',
@@ -23,8 +27,16 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.noCommands': 'لم يتم إرسال أي أمر.',
   'edge.commandQueued': 'تمت إضافة الأمر',
   'edge.tokenTitle': 'رمز التركيب',
-  'edge.tokenWarning': 'انسخ الرمز الآن، فلن يتم عرضه مرة أخرى.',
+  'edge.tokenWarning':
+    'احفظ بيانات الاعتماد الآن. لن يظهر الرمز مرة أخرى بعد إغلاق هذه النافذة.',
   'edge.copyToken': 'نسخ الرمز',
+  'edge.credentialsTitle': 'بيانات اعتماد التركيب',
+  'edge.credentialsHelp': 'اضبط هاتين القيمتين على وكيل هذا التركيب الداخلي.',
+  'edge.agentConfigurationHelp': 'انسخ الإعداد الكامل إلى ملف .env الذي يستخدمه الوكيل.',
+  'edge.installationId': 'معرّف التركيب',
+  'edge.installationToken': 'رمز التركيب السري',
+  'edge.copyCredentials': 'نسخ الإعداد',
+  'edge.credentialsCopied': 'تم نسخ إعداد الوكيل',
   'edge.create': 'إنشاء التركيب',
   'edge.name': 'اسم التركيب',
   'edge.activate': 'تفعيل النشر',

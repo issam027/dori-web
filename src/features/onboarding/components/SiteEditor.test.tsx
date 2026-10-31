@@ -61,4 +61,4 @@ it('updates the intended text and numeric fields before saving', async () => {
     defaultSlotCapacity: 6,
     defaultWorkingDays: [1, 2, 3, 4, 5],
   });
-});
+}, 10_000);

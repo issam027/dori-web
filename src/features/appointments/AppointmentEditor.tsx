@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarPlus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { PersonResponseDto, QueueResponseDto } from '@/api/generated/models';
@@ -115,6 +115,7 @@ export function AppointmentEditor({
                 setStep(1);
               }}
             >
+              <ArrowLeft aria-hidden="true" />
               {__t('appointments.appointmentEditor.personne')}
             </Button>
           ) : null}

@@ -9,7 +9,8 @@ export const supervision: DomainTranslations<typeof import('../fr/supervision').
   'health.agent.reachability.unreachable': 'Unreachable',
   'health.agent.reachability.not_configured': 'Not configured',
   'health.agent.title': 'On-premise relay agent',
-  'health.agent.description': 'Outbound connection status between this installation and Dorify Cloud.',
+  'health.agent.description':
+    'Outbound connection status between this installation and Dorify Cloud.',
   'health.agent.lastCloudContact': 'Last successful Cloud contact',
   'notifications.status.pending': 'Pending',
   'notifications.status.processing': 'Sending',

@@ -1,5 +1,8 @@
+import { apiErrorMessages } from '../ar/api-errors';
+
 // Tunisian derja (familiar street register). Partial: missing keys fall back to ar, then fr.
 export const errors: Record<string, string> = {
+  ...apiErrorMessages,
   'errors.http.badRequest': 'المعطيات اللي كتبتها فيها غلطة، ثبّت مليح في معلوماتك',
   'errors.http.unauthorized': 'وفات الجلسة متاعك، عاود ادخل باش تكمّل الخدمة',
   'errors.http.forbidden': 'ما عندكش الصلاحية باش تعمل هذا، اطلب الإذن مالأدمين',

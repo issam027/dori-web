@@ -47,7 +47,7 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   'onboarding.onboarding.occuperUnGuichetAppelerPuisServir': 'Take a desk, call, then serve.',
   'onboarding.onboarding.ouvrirLesUtilisateurs': 'Open users',
   'onboarding.onboarding.parcoursDeConfiguration': 'Setup journey',
-  'onboarding.onboarding.precedent': '← Previous',
+  'onboarding.onboarding.precedent': 'Previous',
   'onboarding.onboarding.principeDHeritage': 'Inheritance principle',
   'onboarding.onboarding.prive': 'Private',
   'onboarding.onboarding.public': 'Public',

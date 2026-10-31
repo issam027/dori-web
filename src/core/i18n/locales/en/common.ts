@@ -122,7 +122,7 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.firstName': 'First name',
   'common.rdv': 'Appointments',
   'common.rechercherUnePersonne': 'Search for a person',
-  'common.retour': '← Back',
+  'common.retour': 'Back',
   'common.save': 'Save',
   'common.scope': 'Scope',
   'common.search': 'Search',

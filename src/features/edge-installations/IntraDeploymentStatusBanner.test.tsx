@@ -4,6 +4,10 @@ import { http, HttpResponse } from 'msw';
 import { mockServer } from '@/shared/testing/mock-server';
 import { IntraDeploymentStatusGate } from './IntraDeploymentStatusBanner';
 
+vi.mock('@/core/config/deployment-mode', () => ({
+  isCloudDeployment: false,
+}));
+
 function renderBanner() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(

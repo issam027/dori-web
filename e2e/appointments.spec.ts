@@ -406,4 +406,12 @@ test('the queue calendar renders API-closed days compactly and prevents appointm
   await expect(closed.locator('.calendar-slot')).toHaveCount(0);
   await closed.click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const dateInput = page.getByLabel(/choisir une date/i);
+  await dateInput.fill('2026-10-06');
+  await expect(page.getByRole('status')).toContainText(/journée fermée/i);
+  await expect(page.getByRole('status')).toContainText(/sélectionnez une autre date/i);
+  await expect(page.getByText(/aucun rendez-vous pour cette journée/i)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /nouveau rendez-vous/i })).toHaveCount(0);
 });

@@ -69,7 +69,7 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'queue-operations.quickRegistration.creerUnTicket': 'Create a ticket',
   'queue-operations.quickRegistration.dateDuRendezVous': 'Appointment date',
   'queue-operations.quickRegistration.heureDisponible': 'Available time',
-  'queue-operations.quickRegistration.modifierLaPersonne': '← Change customer',
+  'queue-operations.quickRegistration.modifierLaPersonne': 'Change customer',
   'queue-operations.quickRegistration.placeS': 'place(s)',
   'queue-operations.quickRegistration.qualificationDuTicket': 'Ticket details',
   'queue-operations.quickRegistration.quiAccueillezVous': 'Who are you welcoming?',

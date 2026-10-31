@@ -145,9 +145,10 @@ describe('untranslated text (ratchet)', () => {
 });
 
 describe('glossary and typography', () => {
-  it.each(['en', 'ar', 'ar-TN'] as const)('%s respects the glossary', (locale) => {
+  it.each(['fr', 'en', 'ar', 'ar-TN'] as const)('%s respects the glossary', (locale) => {
     const violations: string[] = [];
-    for (const [key, value] of Object.entries(catalogs[locale])) {
+    const catalog = locale === 'fr' ? frCatalog : catalogs[locale];
+    for (const [key, value] of Object.entries(catalog)) {
       for (const { pattern, reason } of FORBIDDEN[locale]) {
         if (pattern.test(value)) violations.push(`${key}: "${value}" → ${reason}`);
       }

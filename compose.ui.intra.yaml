@@ -3,6 +3,11 @@ name: intra-dorify-ui
 services:
   app:
     image: dorify/app:dev
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     build:
       context: .
       target: runtime

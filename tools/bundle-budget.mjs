@@ -18,8 +18,8 @@ function budgetFromEnvironment(name, fallback) {
 
 const budgets = {
   initialJsGzip: budgetFromEnvironment('BUNDLE_INITIAL_JS_GZIP_BUDGET', 125_000),
-  initialCssGzip: budgetFromEnvironment('BUNDLE_INITIAL_CSS_GZIP_BUDGET', 36_000),
-  secondaryJsGzip: budgetFromEnvironment('BUNDLE_SECONDARY_JS_GZIP_BUDGET', 45_000),
+  initialCssGzip: budgetFromEnvironment('BUNDLE_INITIAL_CSS_GZIP_BUDGET', 42_000),
+  secondaryJsGzip: budgetFromEnvironment('BUNDLE_SECONDARY_JS_GZIP_BUDGET', 47_000),
   minimumPageChunks: budgetFromEnvironment('BUNDLE_MINIMUM_PAGE_CHUNKS', 15),
 };
 

@@ -1,6 +1,10 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'admin.users.temporaryPasswordTitle': 'Temporary password',
+  'admin.users.temporaryPasswordDescription':
+    'Copy this password now. It will not be displayed again after closing.',
+  'admin.users.copyTemporaryPassword': 'Copy password',
   'edge.title': 'Intra installations',
   'edge.description':
     'Monitor connected autonomous deployments without changing their local business configuration.',
@@ -25,8 +29,17 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.noCommands': 'No command has been sent.',
   'edge.commandQueued': 'Command queued',
   'edge.tokenTitle': 'Installation token',
-  'edge.tokenWarning': 'Copy this token now: it will not be displayed again.',
+  'edge.tokenWarning':
+    'Save these credentials now. The token will never be visible again after this window is closed.',
   'edge.copyToken': 'Copy token',
+  'edge.credentialsTitle': 'Installation credentials',
+  'edge.credentialsHelp': 'Configure both values on this intra installation agent.',
+  'edge.agentConfigurationHelp':
+    'Copy the complete configuration into the .env file used by the agent.',
+  'edge.installationId': 'Installation ID',
+  'edge.installationToken': 'Secret installation token',
+  'edge.copyCredentials': 'Copy configuration',
+  'edge.credentialsCopied': 'Agent configuration copied',
   'edge.create': 'Create installation',
   'edge.name': 'Installation name',
   'edge.activate': 'Activate deployment',

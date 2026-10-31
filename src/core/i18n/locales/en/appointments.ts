@@ -18,7 +18,7 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   'appointments.appointmentEditor.creneau': 'Time slot',
   'appointments.appointmentEditor.ficheExistante': 'Existing record',
   'appointments.appointmentEditor.nouveauRendezVous': 'New appointment',
-  'appointments.appointmentEditor.personne': '← Person',
+  'appointments.appointmentEditor.personne': 'Person',
   'appointments.appointmentEditor.placeS': 'place(s)',
   'appointments.appointmentEditor.quiSouhaitezVousRecevoir': 'Who would you like to receive?',
   'appointments.editor.personSearchHint':
@@ -40,6 +40,9 @@ export const appointments: DomainTranslations<typeof import('../fr/appointments'
   'appointments.calendar.moreCount': '+{{count}} more',
   'appointments.calendar.collapse': 'Collapse',
   'appointments.calendar.closed': 'Closed',
+  'appointments.calendar.closedDayTitle': 'Closed day',
+  'appointments.calendar.closedDayDescription':
+    'Appointments cannot be created on this day. Select another date to view availability.',
   'appointments.calendar.today': 'Today',
   'appointments.calendar.currentTime': 'Current time: {{time}}',
   'appointments.availability.loading': 'Loading availability…',
