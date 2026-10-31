@@ -56,6 +56,11 @@ export function PersonNotesViewer({
   const displayName = personName?.trim() || __t('persons.notes.unknownPerson');
   const items = notes.data?.data.items ?? [];
   const current = items[index];
+  const returnToNotes = () => {
+    setAdding(false);
+    setEditingNoteId(undefined);
+    setContent('');
+  };
   const add = async () => {
     if (!content.trim()) return;
     try {
@@ -102,19 +107,29 @@ export function PersonNotesViewer({
         loading={notes.isPending}
         open={open}
         onOpenChange={(next) => {
-          if (!next && (editingNoteId || adding)) {
-            setEditingNoteId(undefined);
-            setAdding(false);
-            setContent('');
-            return;
+          if (!next) {
+            returnToNotes();
+            setDeletingNoteId(undefined);
+            setIndex(0);
           }
           onOpenChange(next);
         }}
-        title={__t('persons.notes.title', { name: displayName })}
+        dismissLabel={__t(adding || editingNoteId ? 'common.cancel' : 'common.close')}
+        title={
+          adding || editingNoteId
+            ? __t(
+                editingNoteId
+                  ? 'persons.notes.editTitle'
+                  : 'persons.personNotesViewer.nouvelleNote',
+              ) +
+              ' - ' +
+              displayName
+            : __t('persons.notes.title', { name: displayName })
+        }
         description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
         actions={
           <>
-            {adding && items.length > 0 ? (
+            {(adding || editingNoteId) && items.length > 0 ? (
               <Button
                 variant="unstyled"
                 className="button"
@@ -123,9 +138,7 @@ export function PersonNotesViewer({
                 label={__t('persons.personNotesViewer.retourAuxNotes')}
                 labelMode="responsive"
                 title={__t('persons.personNotesViewer.retourAuxNotes')}
-                onClick={() => {
-                  setAdding(false);
-                }}
+                onClick={returnToNotes}
               />
             ) : null}
             {editingNoteId ? (
@@ -133,7 +146,7 @@ export function PersonNotesViewer({
                 variant="unstyled"
                 className="button button-primary"
                 type="button"
-                disabled={!content.trim()}
+                disabled={!content.trim() || updateNote.isPending || addNote.isPending}
                 onClick={() => void saveEdit()}
               >
                 <Save aria-hidden="true" />
@@ -144,7 +157,7 @@ export function PersonNotesViewer({
                 variant="unstyled"
                 className="button button-primary"
                 type="button"
-                disabled={!content.trim()}
+                disabled={!content.trim() || addNote.isPending}
                 onClick={() => void add()}
               >
                 <Save aria-hidden="true" />
@@ -156,6 +169,8 @@ export function PersonNotesViewer({
                 className="button button-primary"
                 type="button"
                 onClick={() => {
+                  setContent('');
+                  setEditingNoteId(undefined);
                   setAdding(true);
                 }}
               >

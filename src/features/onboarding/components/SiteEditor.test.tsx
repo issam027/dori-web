@@ -62,3 +62,18 @@ it('updates the intended text and numeric fields before saving', async () => {
     defaultWorkingDays: [1, 2, 3, 4, 5],
   });
 }, 10_000);
+
+it('reloads site values and the first step when reopened', async () => {
+  const user = userEvent.setup();
+  const props = { site, onSave: vi.fn(), onOpenChange: vi.fn() };
+  const { rerender } = render(<SiteEditor {...props} open />);
+  await user.clear(screen.getByRole('textbox', { name: /^nom/i }));
+  await user.type(screen.getByRole('textbox', { name: /^nom/i }), 'Brouillon abandonne');
+  await user.click(screen.getByRole('button', { name: /suivant/i }));
+  await user.click(screen.getByRole('button', { name: /^annuler$/i }));
+  expect(props.onOpenChange).toHaveBeenCalledWith(false);
+  rerender(<SiteEditor {...props} open={false} />);
+  rerender(<SiteEditor {...props} site={{ ...site, siteName: 'Autre site' }} open />);
+  expect(screen.getByRole('textbox', { name: /^nom/i })).toHaveValue('Autre site');
+  expect(screen.queryByRole('button', { name: /terminer/i })).not.toBeInTheDocument();
+});

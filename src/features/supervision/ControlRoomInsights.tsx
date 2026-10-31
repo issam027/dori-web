@@ -69,16 +69,18 @@ function FlowChart({ buckets }: { buckets: readonly MonitoringSeriesBucketDto[] 
                 className="report-line"
                 style={{ stroke: colors[metric] }}
               />
-              {buckets.map((bucket, index) => (
-                <circle
-                  key={bucket.periodStart}
-                  cx={x(index)}
-                  cy={y(bucket[metric])}
-                  r="3.5"
-                  className="report-point"
-                  style={{ fill: colors[metric] }}
-                />
-              ))}
+              {buckets.map((bucket, index) =>
+                buckets.length === 1 || hovered === index ? (
+                  <circle
+                    key={bucket.periodStart}
+                    cx={x(index)}
+                    cy={y(bucket[metric])}
+                    r="2.5"
+                    className="report-point"
+                    style={{ fill: colors[metric] }}
+                  />
+                ) : null,
+              )}
             </g>
           ))}
           {buckets.map((bucket, index) => (

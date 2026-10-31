@@ -184,6 +184,8 @@ export function OnboardingWizard() {
         const { activatedSiteName: activatedSite, nextDraft } = completeSiteActivation(draft);
         clearOnboardingDraft();
         setState(nextDraft);
+        setEditingQueueCode(undefined);
+        setQueueOpen(false);
         notify({
           tone: 'success',
           title: __t('notifications.site.activated'),

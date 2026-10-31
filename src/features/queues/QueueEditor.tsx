@@ -64,17 +64,18 @@ const initialValue = (initial?: QueueResponseDto | CreateQueueDto): QueueEditorV
   };
 };
 
-export function QueueEditor({
-  open,
-  onOpenChange,
-  initial,
-  onSave,
-}: {
+interface QueueEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial?: QueueResponseDto | CreateQueueDto;
   onSave: (value: QueueEditorValue) => Promise<void> | void;
-}) {
+}
+
+export function QueueEditor(props: QueueEditorProps) {
+  return props.open ? <QueueEditorForm {...props} /> : null;
+}
+
+function QueueEditorForm({ open, onOpenChange, initial, onSave }: QueueEditorProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);

@@ -13,6 +13,7 @@ interface ModalProps {
   children: ReactNode;
   actions?: ReactNode;
   hideDismissAction?: boolean;
+  dismissLabel?: string;
   className?: string;
   loading?: boolean;
   mobileLayout?: 'fullscreen' | 'confirmation';
@@ -26,6 +27,7 @@ export function Modal({
   children,
   actions,
   hideDismissAction = false,
+  dismissLabel,
   className,
   loading = false,
   mobileLayout = 'fullscreen',
@@ -82,9 +84,9 @@ export function Modal({
                 <Dialog.Close asChild>
                   <Button
                     icon={<X />}
-                    label={t('common.cancel')}
+                    label={dismissLabel ?? t('common.cancel')}
                     labelMode="responsive"
-                    title={t('common.cancel')}
+                    title={dismissLabel ?? t('common.cancel')}
                   />
                 </Dialog.Close>
               ) : null}

@@ -65,17 +65,18 @@ const initialValue = (site: SiteResponseDto): UpdateSiteDto => ({
   defaultDailyResetTime: time(site.defaultDailyResetTime),
 });
 
-export function SiteEditor({
-  open,
-  site,
-  onOpenChange,
-  onSave,
-}: {
+interface SiteEditorProps {
   open: boolean;
   site: SiteResponseDto;
   onOpenChange: (open: boolean) => void;
   onSave: (value: UpdateSiteDto) => Promise<void>;
-}) {
+}
+
+export function SiteEditor(props: SiteEditorProps) {
+  return props.open ? <SiteEditorForm {...props} /> : null;
+}
+
+function SiteEditorForm({ open, site, onOpenChange, onSave }: SiteEditorProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);

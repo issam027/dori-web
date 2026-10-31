@@ -49,7 +49,7 @@ const palette = [
   'color-mix(in srgb, var(--color-primary) 64%, #ec4899)',
   'color-mix(in srgb, var(--color-primary) 58%, #84cc16)',
   'color-mix(in srgb, var(--color-primary) 54%, #f97316)',
-  'color-mix(in srgb, var(--color-primary) 78%, var(--color-text))',
+  'color-mix(in srgb, var(--color-primary) 78%, var(--color-ink))',
   'color-mix(in srgb, var(--color-primary) 60%, var(--color-success))',
   'color-mix(in srgb, var(--color-primary) 55%, var(--color-warning))',
   'color-mix(in srgb, var(--color-primary) 42%, var(--color-text-muted))',
@@ -106,16 +106,18 @@ function Chart({
               className="report-line"
               style={{ stroke: item.color }}
             />
-            {item.values.map((value, index) => (
-              <circle
-                key={index}
-                cx={x(index)}
-                cy={y(value)}
-                r="4"
-                className="report-point"
-                style={{ fill: item.color }}
-              />
-            ))}
+            {item.values.map((value, index) =>
+              item.values.length === 1 || hovered === index ? (
+                <circle
+                  key={index}
+                  cx={x(index)}
+                  cy={y(value)}
+                  r="2.5"
+                  className="report-point"
+                  style={{ fill: item.color }}
+                />
+              ) : null,
+            )}
           </g>
         ))}
         {buckets.map((bucket, index) => (

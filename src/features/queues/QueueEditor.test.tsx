@@ -36,3 +36,32 @@ it('updates the intended text and numeric fields before saving', async () => {
     workingDays: [1, 2, 3, 4, 5, 6],
   });
 }, 10_000);
+
+it.each(['save', 'cancel'])(
+  'starts a fresh queue after %s and reopening',
+  async (action) => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+    const props = { onSave, onOpenChange };
+    const { rerender } = render(<QueueEditor {...props} open />);
+    await user.type(screen.getByRole('textbox', { name: /code/i }), 'OLD');
+    await user.type(screen.getByRole('textbox', { name: /^nom/i }), 'Ancienne file');
+    await user.clear(screen.getByRole('spinbutton', { name: /guichets/i }));
+    await user.type(screen.getByRole('spinbutton', { name: /guichets/i }), '4');
+    await user.click(screen.getByRole('button', { name: /suivant/i }));
+    if (action === 'save') {
+      await user.click(screen.getByRole('button', { name: /suivant/i }));
+      await user.click(screen.getByRole('button', { name: /terminer/i }));
+      await waitFor(() => expect(onSave).toHaveBeenCalledOnce());
+    } else await user.click(screen.getByRole('button', { name: /^annuler$/i }));
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    rerender(<QueueEditor {...props} open={false} />);
+    rerender(<QueueEditor {...props} open />);
+    expect(screen.getByRole('textbox', { name: /code/i })).toHaveValue('');
+    expect(screen.getByRole('textbox', { name: /^nom/i })).toHaveValue('');
+    expect(screen.getByRole('spinbutton', { name: /guichets/i })).toHaveValue(1);
+    expect(screen.queryByRole('button', { name: /terminer/i })).not.toBeInTheDocument();
+  },
+  10_000,
+);
