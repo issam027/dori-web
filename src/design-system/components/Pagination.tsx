@@ -12,8 +12,9 @@ export function Pagination({
   onPageChange: (page: number) => void;
 }) {
   const { t, i18n } = useTranslation();
-  const pageCount = Math.max(1, totalPages);
   const number = new Intl.NumberFormat(i18n.language);
+  if (totalPages <= 1) return null;
+  const pageCount = totalPages;
   return (
     <nav className="pagination" aria-label={t('pagination.label')}>
       <Button
