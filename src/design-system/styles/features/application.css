@@ -3843,6 +3843,15 @@
   gap: var(--space-4);
 }
 
+.reports-page .metric-grid,
+.reports-page .report-percentiles {
+  gap: var(--space-4);
+}
+
+.reports-page .report-percentiles .metric-card {
+  min-height: 7rem;
+}
+
 .report-analysis-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(15rem, 0.8fr);

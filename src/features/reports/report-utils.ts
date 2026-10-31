@@ -55,10 +55,10 @@ export function toReportMetricsViewModel(
     timing: {
       averageWaitMinutes: value.averageWaitMinutes,
       averageServiceMinutes: value.averageServiceMinutes,
-      medianWaitMinutes: null,
-      p90WaitMinutes: null,
-      medianServiceMinutes: null,
-      p90ServiceMinutes: null,
+      medianWaitMinutes: value.medianWaitMinutes ?? null,
+      p90WaitMinutes: value.p90WaitMinutes ?? null,
+      medianServiceMinutes: value.medianServiceMinutes ?? null,
+      p90ServiceMinutes: value.p90ServiceMinutes ?? null,
     },
     rates: {
       noShowRate: value.registered ? value.noShow / value.registered : null,

@@ -41,7 +41,7 @@ import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
-import { FormField } from '@/design-system/components/FormField';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
 import { ConfirmDialog } from '@/design-system/components/Modal';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
@@ -52,7 +52,7 @@ import { QuickRegistration } from './QuickRegistration';
 import { playCockpitTone } from './cockpit-feedback';
 import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
 import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';
-import { CockpitPassagePrintButton } from './components/CockpitPassagePrintButton';
+import { CockpitRecentPassagesTable } from './components/CockpitRecentPassagesTable';
 import {
   CockpitSessionModal,
   type CockpitSessionDialogState,
@@ -247,30 +247,27 @@ export function CockpitPage() {
     },
     [preferences.soundsEnabled, siteId],
   );
-  const callBestNext = useCallback(
-    async () => {
-      try {
-        const response = await actions.callNextForSite.execute(undefined);
-        broadcastCockpitRefresh(siteId);
-        playCockpitTone(preferences.soundsEnabled, 'success');
-        notify({
-          tone: 'success',
-          title: t('cockpit.ticketCalled', { ticket: response.data.ticketNumber }),
-        });
-      } catch (error) {
-        if (
-          error instanceof NormalizedApiError &&
-          error.code === ErrorCode.NO_CALLABLE_REGISTRATION
-        ) {
-          notify({ tone: 'info', title: t('cockpit.noCandidate') });
-          return;
-        }
-        playCockpitTone(preferences.soundsEnabled, 'warning');
-        notifyError(error);
+  const callBestNext = useCallback(async () => {
+    try {
+      const response = await actions.callNextForSite.execute(undefined);
+      broadcastCockpitRefresh(siteId);
+      playCockpitTone(preferences.soundsEnabled, 'success');
+      notify({
+        tone: 'success',
+        title: t('cockpit.ticketCalled', { ticket: response.data.ticketNumber }),
+      });
+    } catch (error) {
+      if (
+        error instanceof NormalizedApiError &&
+        error.code === ErrorCode.NO_CALLABLE_REGISTRATION
+      ) {
+        notify({ tone: 'info', title: t('cockpit.noCandidate') });
+        return;
       }
-    },
-    [actions.callNextForSite, preferences.soundsEnabled, siteId, t],
-  );
+      playCockpitTone(preferences.soundsEnabled, 'warning');
+      notifyError(error);
+    }
+  }, [actions.callNextForSite, preferences.soundsEnabled, siteId, t]);
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -887,7 +884,7 @@ export function CockpitPage() {
             </section>
           )}
 
-          <section hidden={mobile && mobileTab !== 'activity'} className="card cockpit-history">
+          <section hidden={mobile && mobileTab !== 'activity'} className="cockpit-history">
             <div className="cockpit-section-heading">
               <div>
                 <p className="eyebrow">{t('cockpit.activity')}</p>
@@ -895,81 +892,69 @@ export function CockpitPage() {
               </div>
               <History aria-hidden="true" />
             </div>
-            <div className="cockpit-history-filters">
-              <FormField label={t('cockpit.searchHistory')}>
-                <input
-                  value={historySearch}
-                  placeholder={t('cockpit.searchHistoryPlaceholder')}
-                  onChange={(event) => {
-                    setHistorySearch(event.target.value);
-                  }}
-                />
-              </FormField>
-              <FormField label={t('cockpit.historyOutcome')}>
-                <select
-                  value={historyOutcome}
-                  onChange={(event) => {
-                    setHistoryOutcome(event.target.value as typeof historyOutcome);
-                  }}
-                >
-                  <option value="all">{t('cockpit.allOutcomes')}</option>
-                  <option value="served">{t('cockpit.served')}</option>
-                  <option value="no_show">{t('cockpit.noShow')}</option>
-                </select>
-              </FormField>
-              <FormField label={t('cockpit.historyQueue')}>
-                <select
-                  value={historyQueueId}
-                  onChange={(event) => {
-                    setHistoryQueueId(event.target.value);
-                  }}
-                >
-                  <option value="all">{t('cockpit.allQueues')}</option>
-                  {queues.map((queue) => (
-                    <option key={queue.queueId} value={queue.queueId}>
-                      {queue.queueName}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-            </div>
-            {recentPassages.length ? (
-              <div className="cockpit-history-list">
-                {recentPassages.map((passage) => (
-                  <article key={passage.registrationId}>
-                    <div>
-                      <strong>{passage.ticketNumber}</strong>
-                      <span>{passage.personName}</span>
-                    </div>
-                    <div>
-                      <span>{passage.queueName}</span>
-                      <small>
-                        {passage.counterName ??
-                          t('cockpit.counterNumber', { number: passage.threadNumber })}
-                      </small>
-                    </div>
-                    <div>
-                      <StatusBadge tone={passage.outcome === 'served' ? 'success' : 'warning'}>
-                        {passage.outcome === 'served' ? t('cockpit.served') : t('cockpit.noShow')}
-                      </StatusBadge>
-                      <time>{formatDateTime(asDate(passage.closedAt), i18n.language) ?? '—'}</time>
-                      {siteId ? (
-                        <CockpitPassagePrintButton
-                          passage={passage}
-                          site={site.data?.data}
-                          label={t('cockpit.printPassage')}
-                        />
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
+            <FilterPanel
+              className="cockpit-history-filters"
+              icon={<Search />}
+              title={t('cockpit.searchHistory')}
+              activeCount={
+                Number(Boolean(historySearch)) +
+                Number(historyOutcome !== 'all') +
+                Number(historyQueueId !== 'all')
+              }
+              resetLabel={t('common.reset')}
+              onReset={() => {
+                setHistorySearch('');
+                setHistoryOutcome('all');
+                setHistoryQueueId('all');
+              }}
+            >
+              <div className="cockpit-history-filter-grid">
+                <label>
+                  {t('cockpit.searchHistory')}
+                  <input
+                    type="search"
+                    value={historySearch}
+                    placeholder={t('cockpit.searchHistoryPlaceholder')}
+                    onChange={(event) => {
+                      setHistorySearch(event.target.value);
+                    }}
+                  />
+                </label>
+                <label>
+                  {t('cockpit.historyOutcome')}
+                  <select
+                    value={historyOutcome}
+                    onChange={(event) => {
+                      setHistoryOutcome(event.target.value as typeof historyOutcome);
+                    }}
+                  >
+                    <option value="all">{t('cockpit.allOutcomes')}</option>
+                    <option value="served">{t('cockpit.served')}</option>
+                    <option value="no_show">{t('cockpit.noShow')}</option>
+                  </select>
+                </label>
+                <label>
+                  {t('cockpit.historyQueue')}
+                  <select
+                    value={historyQueueId}
+                    onChange={(event) => {
+                      setHistoryQueueId(event.target.value);
+                    }}
+                  >
+                    <option value="all">{t('cockpit.allQueues')}</option>
+                    {queues.map((queue) => (
+                      <option key={queue.queueId} value={queue.queueId}>
+                        {queue.queueName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
-            ) : (
-              <EmptyState
-                title={t('cockpit.noRecentPassages')}
-                description={t('cockpit.noRecentPassagesHint')}
-              />
-            )}
+            </FilterPanel>
+            <CockpitRecentPassagesTable
+              passages={recentPassages}
+              site={siteId ? site.data?.data : undefined}
+            />
           </section>
         </>
       ) : null}

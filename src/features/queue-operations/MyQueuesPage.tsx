@@ -327,14 +327,12 @@ export function MyQueuesPage() {
               },
             ]}
           />
+          <Pagination
+            page={page}
+            totalPages={registrations.data?.data.totalPages ?? 1}
+            onPageChange={setPage}
+          />
         </Card>
-      ) : null}
-      {queues.data?.data.items.length ? (
-        <Pagination
-          page={page}
-          totalPages={registrations.data?.data.totalPages ?? 1}
-          onPageChange={setPage}
-        />
       ) : null}
       {registrationDetails ? (
         <RegistrationDetailsModal

@@ -46,25 +46,32 @@ export function useReports(options: {
         periodStart: bucket.periodStart,
         periodEnd: data.series[index + 1]?.periodStart ?? data.appliedFilters.to,
       }));
-      const queueSeries = await Promise.all(
-        data.breakdowns.byQueue.map(async (queue) => {
-          const queueResponse = await monitoringControllerSeries(
-            { ...requestParams, queueIds: queue.queueId },
-            undefined,
-            signal,
-          );
-          return { queue, data: queueResponse.data };
-        }),
-      );
-      const groups: ReportGroupViewModel[] = queueSeries.map(({ queue, data: queueData }) => ({
-        ...toReportMetricsViewModel(queue),
-        dimension: { queueId: queue.queueId, queueName: queue.queueName },
-        buckets: queueData.series.map((bucket, index) => ({
-          ...toReportMetricsViewModel(bucket),
-          periodStart: bucket.periodStart,
-          periodEnd: queueData.series[index + 1]?.periodStart ?? queueData.appliedFilters.to,
-        })),
-      }));
+      const periods = data.series.map((bucket) => bucket.periodStart);
+      const groups: ReportGroupViewModel[] = data.breakdowns.byQueue.map((queue) => {
+        const queueBuckets = new Map(queue.series.map((bucket) => [bucket.periodStart, bucket]));
+        return {
+          ...toReportMetricsViewModel(queue),
+          dimension: { queueId: queue.queueId, queueName: queue.queueName },
+          buckets: periods.map((periodStart, index) => ({
+            ...toReportMetricsViewModel(
+              queueBuckets.get(periodStart) ?? {
+                registered: 0,
+                served: 0,
+                noShow: 0,
+                cancelled: 0,
+                averageWaitMinutes: null,
+                medianWaitMinutes: null,
+                p90WaitMinutes: null,
+                averageServiceMinutes: null,
+                medianServiceMinutes: null,
+                p90ServiceMinutes: null,
+              },
+            ),
+            periodStart,
+            periodEnd: periods[index + 1] ?? data.appliedFilters.to,
+          })),
+        };
+      });
       return { ...response, data: { ...data, summary, buckets, groups } };
     },
   });
