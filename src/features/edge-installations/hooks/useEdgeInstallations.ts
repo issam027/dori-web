@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { CreateEdgeCommandDtoType } from '@/api/generated/models';
 import {
@@ -7,6 +8,7 @@ import {
   fetchEdgeInstallations,
   updateEdgeInstallationStatus,
 } from '../api/edge-installations-api';
+import { subscribeEdgeInstallations } from '../edge-installations-realtime';
 
 export const edgeInstallationKeys = {
   all: ['edge-installations'] as const,
@@ -17,7 +19,6 @@ export function useEdgeInstallations() {
   return useQuery({
     queryKey: edgeInstallationKeys.all,
     queryFn: ({ signal }) => fetchEdgeInstallations(signal),
-    refetchInterval: 30_000,
   });
 }
 
@@ -26,8 +27,22 @@ export function useEdgeInstallation(installationId: string | null) {
     queryKey: edgeInstallationKeys.detail(installationId),
     queryFn: ({ signal }) => fetchEdgeInstallation(installationId as string, signal),
     enabled: Boolean(installationId),
-    refetchInterval: 15_000,
   });
+}
+
+export function useEdgeInstallationsRealtime(installationId: string | null) {
+  const client = useQueryClient();
+  useEffect(() => {
+    const controller = new AbortController();
+    const invalidate = () => {
+      void client.invalidateQueries({ queryKey: edgeInstallationKeys.all });
+      if (installationId) {
+        void client.invalidateQueries({ queryKey: edgeInstallationKeys.detail(installationId) });
+      }
+    };
+    void subscribeEdgeInstallations(invalidate, controller.signal).catch(() => undefined);
+    return () => controller.abort();
+  }, [client, installationId]);
 }
 
 export function useCreateEdgeInstallation() {

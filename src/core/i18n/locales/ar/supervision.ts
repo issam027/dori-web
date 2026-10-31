@@ -1,6 +1,16 @@
 import type { DomainTranslations } from '../../types';
 
 export const supervision: DomainTranslations<typeof import('../fr/supervision').supervision> = {
+  'health.agent.status': 'الوكيل الداخلي',
+  'health.agent.configured': 'مُعدّ',
+  'health.agent.notConfigured': 'غير مُعدّ',
+  'health.agent.cloudConnectivity': 'الاتصال بالسحابة',
+  'health.agent.reachability.connected': 'متصل',
+  'health.agent.reachability.unreachable': 'غير متاح',
+  'health.agent.reachability.not_configured': 'غير مُعدّ',
+  'health.agent.title': 'وكيل الربط الداخلي',
+  'health.agent.description': 'حالة الاتصال الصادر بين هذا التثبيت وسحابة Dorify.',
+  'health.agent.lastCloudContact': 'آخر اتصال ناجح بالسحابة',
   'notifications.status.pending': 'قيد الانتظار',
   'notifications.status.processing': 'جارٍ الإرسال',
   'notifications.status.delivered': 'تم التسليم',

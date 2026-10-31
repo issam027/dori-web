@@ -1,5 +1,15 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const supervision = {
+  'health.agent.status': 'Agent Intra',
+  'health.agent.configured': 'Configuré',
+  'health.agent.notConfigured': 'Non configuré',
+  'health.agent.cloudConnectivity': 'Connexion Cloud',
+  'health.agent.reachability.connected': 'Connecté',
+  'health.agent.reachability.unreachable': 'Injoignable',
+  'health.agent.reachability.not_configured': 'Non configurée',
+  'health.agent.title': 'Agent de liaison Intra',
+  'health.agent.description': 'État de la liaison sortante entre cette installation et Dorify Cloud.',
+  'health.agent.lastCloudContact': 'Dernier contact Cloud réussi',
   'notifications.status.pending': 'En attente',
   'notifications.status.processing': 'En cours d’envoi',
   'notifications.status.delivered': 'Distribuée',

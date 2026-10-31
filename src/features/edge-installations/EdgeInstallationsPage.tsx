@@ -16,6 +16,7 @@ import {
   useCreateEdgeInstallation,
   useEdgeInstallation,
   useEdgeInstallations,
+  useEdgeInstallationsRealtime,
   useUpdateEdgeInstallationStatus,
 } from './hooks/useEdgeInstallations';
 import './edge-installations.css';
@@ -30,6 +31,7 @@ export function EdgeInstallationsPage() {
   const { t, i18n } = useTranslation();
   const installations = useEdgeInstallations();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  useEdgeInstallationsRealtime(selectedId);
   const detail = useEdgeInstallation(selectedId);
   const createInstallation = useCreateEdgeInstallation();
   const createCommand = useCreateEdgeCommand(selectedId);
