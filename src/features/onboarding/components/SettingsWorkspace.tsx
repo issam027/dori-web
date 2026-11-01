@@ -562,7 +562,7 @@ function QueuesPanel({
 function TiersPanel({ queues, tiers }: { queues: QueueResponseDto[]; tiers: Tiers }) {
   const { t: __t } = useTranslation();
   return (
-    <section>
+    <section className="services-panel">
       <Header title={__t('common.niveauxDeService')} text={__t('settings.tiersHelp')} />
       <QueueServiceSettings queues={queues} tiers={tiers} />
     </section>
