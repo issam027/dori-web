@@ -331,18 +331,6 @@ function SitesPanel({
               <h3>{__t('settings.managers')}</h3>
               <p>{__t('settings.managersHelp')}</p>
             </div>
-            <Button
-              variant="unstyled"
-              className="button button-primary"
-              type="button"
-              onClick={() => {
-                const site = items[0];
-                if (site) assign({ kind: 'site', id: site.siteId, label: site.siteName });
-              }}
-            >
-              <UserPlus />
-              {__t('settings.addManager')}
-            </Button>
           </div>
           {directUsers.length ? (
             <ul className="manager-list">
