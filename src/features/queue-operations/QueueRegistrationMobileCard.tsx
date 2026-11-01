@@ -4,7 +4,7 @@ import type { RegistrationResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { StatusBadge } from '@/design-system/components/StatusBadge';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
-import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
+import { PersonNotesButton } from '@/features/notes/public';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
 import { entryTypeKey, registrationStatusKey } from '@/shared/presentation/domain-labels';
 

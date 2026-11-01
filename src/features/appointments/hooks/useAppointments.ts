@@ -1,3 +1,4 @@
+import { mapConcurrent } from '@/shared/async/map-concurrent';
 import { useQuery } from '@tanstack/react-query';
 import {
   registrationsControllerFindOne,
@@ -16,7 +17,7 @@ export function useAppointments(options: {
   const dateTo = options.dates.at(-1);
 
   return useQuery({
-    queryKey: queryKeys.appointments.byQueueRange(options.queueId, dateFrom, dateTo),
+    queryKey: queryKeys.appointments.byQueueRange(options.queueId, dateFrom, dateTo, options.siteId),
     queryFn: async ({ signal }: { signal: AbortSignal }) => {
       const params = {
         siteId: options.siteId ?? undefined,
@@ -38,14 +39,11 @@ export function useAppointments(options: {
       );
       if (first.data.totalPages <= 1) return first.data.items;
 
-      const remaining = await Promise.all(
-        Array.from({ length: first.data.totalPages - 1 }, (_, index) =>
-          registrationsControllerFindRegistrations(
-            { ...params, page: index + 2 },
-            undefined,
-            signal,
-          ),
-        ),
+      const remaining = await mapConcurrent(
+        Array.from({ length: first.data.totalPages - 1 }, (_, index) => index + 2),
+        4,
+        (page) => registrationsControllerFindRegistrations({ ...params, page }, undefined, signal),
+        signal,
       );
       return [first, ...remaining].flatMap((response) => response.data.items);
     },

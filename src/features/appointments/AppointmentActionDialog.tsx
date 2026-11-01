@@ -16,11 +16,11 @@ import type { PersonResponseDto, RegistrationResponseDto } from '@/api/generated
 import { invalidateAppointments } from '@/api/client/query-invalidations';
 import { notify } from '@/core/notifications/notification-store';
 import { Modal } from '@/design-system/components/Modal';
-import { TrackingQr } from '@/features/public-experiences/TrackingQr';
-import { trackingUrlFromToken } from '@/features/public-experiences/tracking-url';
-import { KioskTicketPrintDocument } from '@/features/public-experiences/components/kiosk/KioskTicketPrintDocument';
-import { useAddPersonNote } from '@/features/notes/hooks/usePersonNotes';
-import { usePerson } from '@/features/persons/hooks/usePersons';
+import { TrackingQr } from '@/features/public-experiences/public';
+import { trackingUrlFromToken } from '@/features/public-experiences/public';
+import { KioskTicketPrintDocument } from '@/features/public-experiences/public';
+import { useAddPersonNote } from '@/features/notes/public';
+import { usePerson } from '@/features/persons/public';
 import {
   appointmentLocalParts,
   appointmentStatusKey,

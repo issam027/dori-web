@@ -3,6 +3,10 @@ import { invalidateQueueCall, invalidateQueueSession } from './query-invalidatio
 import { queryKeys } from './query-keys';
 
 describe('queryKeys', () => {
+  it('isolates appointments by site even for identical queue and range', () => {
+    expect(queryKeys.appointments.byQueueRange('queue', 'from', 'to', 'site-a'))
+      .not.toEqual(queryKeys.appointments.byQueueRange('queue', 'from', 'to', 'site-b'));
+  });
   it('keeps scope, filters, pagination and language-dependent values distinct', () => {
     expect(
       queryKeys.persons.search('00000000-0000-4000-8000-000000000001', 'ali', 1, 5, 'fr'),

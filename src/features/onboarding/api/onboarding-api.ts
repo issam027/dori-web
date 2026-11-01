@@ -5,6 +5,7 @@ export {
   queuesControllerUpdate as updateQueue,
 } from '@/api/generated/queues/queues';
 export {
+  sitesControllerRemoveDirectUser as removeDirectSiteUser,
   sitesControllerCreateSite as createSite,
   sitesControllerDeleteSite as deleteSite,
   sitesControllerFindSites as findSites,

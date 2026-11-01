@@ -275,6 +275,17 @@ async function mockAuthenticatedApi(page: Page, technical = false) {
               {
                 queueId: '00000000-0000-4000-8000-000000000010',
                 queueName: 'Accueil',
+                series: [
+                  {
+                    periodStart: '2026-10-08T00:00:00.000Z',
+                    registered: 10,
+                    served: 7,
+                    noShow: 1,
+                    cancelled: 0,
+                    averageWaitMinutes: 12,
+                    averageServiceMinutes: 6,
+                  },
+                ],
                 registered: 10,
                 served: 7,
                 noShow: 1,
@@ -644,6 +655,7 @@ test('cockpit visual hierarchy remains stable on desktop and mobile', async ({ p
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/desk');
   await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+  await expect(page.locator('.topbar-title-site')).toHaveAttribute('aria-hidden', 'false');
   await expect(page).toHaveScreenshot('cockpit-desktop-light.png', {
     animations: 'disabled',
     fullPage: true,
@@ -653,6 +665,7 @@ test('cockpit visual hierarchy remains stable on desktop and mobile', async ({ p
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/desk');
   await expect(page.getByRole('main').getByRole('heading', { name: /cockpit/i })).toBeVisible();
+  await expect(page.locator('.topbar-title-site')).toHaveAttribute('aria-hidden', 'false');
   await expect(page).toHaveScreenshot('cockpit-mobile-light.png', {
     animations: 'disabled',
     fullPage: true,

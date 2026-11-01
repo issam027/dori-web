@@ -1,18 +1,8 @@
-import { useQueueServiceSelection } from '@/design-system/use-queue-service-selection';
+import { KioskSuccess } from './KioskSuccess';
+import { useQueueServiceSelection } from '@/shared/queue-services/use-queue-service-selection';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
-import {
-  ArrowLeft,
-  CalendarCheck2,
-  CalendarX2,
-  Check,
-  Clock3,
-  LockKeyhole,
-  Phone,
-  Search,
-  TriangleAlert,
-  UserRound,
-} from 'lucide-react';
+import { ArrowLeft, CalendarCheck2, CalendarX2, Clock3, LockKeyhole, Phone, Search, TriangleAlert, UserRound } from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
   RegistrationResponseDto,
@@ -21,26 +11,16 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Card } from '@/design-system/components/Card';
 import { InternationalPhoneInput } from '@/design-system/components/InternationalPhoneInput';
-import { TrackingQr } from '../../TrackingQr';
 import { kioskIdleMs, useKioskWatchdog } from '../../useKioskWatchdog';
 import { presentError } from '@/core/notifications/error-presentation';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { useKioskCatalog, useKioskRegistration } from '../../hooks/usePublicExperiences';
 
 import { initialKioskWizardState, kioskWizardReducer } from '../../model/kiosk-wizard-state';
-import {
-  KioskIdentityStep,
-  KioskQueueStep,
-  KioskReviewStep,
-  KioskTicketResult,
-  KioskTierStep,
-  KioskWelcomeStep,
-} from './KioskSteps';
-import { KioskTicketPrintDocument } from './KioskTicketPrintDocument';
+import { KioskIdentityStep, KioskQueueStep, KioskReviewStep, KioskTierStep, KioskWelcomeStep } from './KioskSteps';
 import { trackingUrlFromToken } from '../../tracking-url';
-import { useSite } from '@/features/portfolio/hooks/useSites';
+import { useSite } from '@/features/portfolio/public';
 import { Button } from '@/design-system/components/Button';
-import { printDocument } from '@/shared/printing/print-document';
 import { DataTable } from '@/design-system/components/DataTable';
 type Result = Pick<CreateRegistrationResponseDto, 'ticketNumber'> & {
   trackingUrl: string | null;
@@ -77,6 +57,7 @@ export function KioskWizard() {
     activeSiteId,
     queueId,
     validScope,
+    flow === 'walkin' && walkinStep === 3,
   );
   const { activeTiers, tier, setTierId } = useQueueServiceSelection(
     queueId,
@@ -746,50 +727,7 @@ export function KioskWizard() {
         </div>
       ) : null}
       {flow === 'result' && result ? (
-        <KioskTicketResult>
-          <div className="kiosk-result-heading">
-            <span className="kiosk-result-check" aria-hidden="true">
-              <Check />
-            </span>
-            <div>
-              <p className="eyebrow">{__t('common.registrationConfirmed')}</p>
-              <h1>{__t('public-experiences.kiosk.votreTicketEstPret')}</h1>
-            </div>
-          </div>
-          <div className="kiosk-ticket-result">
-            <div>
-              <small>{__t('kiosk.ticket.numberHeading')}</small>
-              <strong>{result.ticketNumber}</strong>
-              <span>{result.queueName}</span>
-            </div>
-            <TrackingQr value={result.trackingUrl} />
-          </div>
-          <p className="kiosk-result-guidance">
-            {__t('public-experiences.kiosk.conservezCeTicketEtSuivezLEcranDeSalleS')}
-          </p>
-          <div className="kiosk-result-actions">
-            <Button
-              variant="unstyled"
-              type="button"
-              disabled={!printReady}
-              onClick={() => {
-                printDocument({ datasetKey: 'printKioskTicket' });
-              }}
-            >
-              {__t('public-experiences.kiosk.imprimerMonTicket')}
-            </Button>
-            <Button variant="primary" type="button" onClick={purge}>
-              {__t('common.terminer')}
-            </Button>
-          </div>
-          <KioskTicketPrintDocument
-            ticketNumber={result.ticketNumber}
-            siteName={site.data?.data.siteName}
-            queueName={result.queueName}
-            trackingUrl={result.trackingUrl}
-            onReady={handlePrintReady}
-          />
-        </KioskTicketResult>
+        <KioskSuccess result={result} siteName={site.data?.data.siteName} printReady={printReady} onReady={handlePrintReady} onDone={purge} />
       ) : null}
     </section>
   );

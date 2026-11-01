@@ -92,6 +92,10 @@ export async function changeActiveSite(
   scope: UserScopeDto,
 ): Promise<void> {
   const previousSiteId = useScopeStore.getState().activeSiteId;
+  if (previousSiteId !== siteId) {
+    await queryClient.cancelQueries();
+    queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== 'sites' });
+  }
   useScopeStore.getState().setActiveSite(siteId, scope);
   useBrandStore.getState().reset();
   if (previousSiteId !== null && previousSiteId !== siteId) {

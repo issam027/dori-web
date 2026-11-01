@@ -213,7 +213,14 @@ test('mobile reports show readable charts and cards with advanced details collap
               totals: metrics,
               series: [{ ...metrics, periodStart: '2026-10-09T00:00:00Z' }],
               breakdowns: {
-                byQueue: [{ ...metrics, queueId: queue.queueId, queueName: queue.queueName }],
+                byQueue: [
+                  {
+                    ...metrics,
+                    queueId: queue.queueId,
+                    queueName: queue.queueName,
+                    series: [{ ...metrics, periodStart: '2026-10-09T00:00:00Z' }],
+                  },
+                ],
                 byEntryType: [{ entryType: 'walkin', count: 20 }],
                 byUser: [],
                 byTier: [],

@@ -29,3 +29,5 @@ export const legalConfig: LegalConfig = {
   email: import.meta.env.VITE_LEGAL_EMAIL || '',
   registration: import.meta.env.VITE_LEGAL_REGISTRATION || '',
 };
+
+if (import.meta.env.VITE_APP_ENV === 'production') validateProductionLegalConfig(legalConfig);

@@ -26,6 +26,6 @@ export function useQueueServiceSelection(
     activeTiers,
     choice.queueId === queueId ? choice.tierId : undefined,
   );
-  const setTierId = useCallback((tierId: string) => setChoice({ queueId, tierId }), [queueId]);
+  const setTierId = useCallback((tierId: string) => { setChoice({ queueId, tierId }); }, [queueId]);
   return { activeTiers, tier, tierId: tier?.tierId ?? '', setTierId };
 }

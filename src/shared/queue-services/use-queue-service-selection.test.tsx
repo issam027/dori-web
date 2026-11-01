@@ -59,7 +59,7 @@ describe('queue service selection', () => {
     const { result, rerender } = renderHook(({ items }) => useQueueServiceSelection('a', items), {
       initialProps: { items: services },
     });
-    act(() => result.current.setTierId('free'));
+    act(() => { result.current.setTierId('free'); });
     rerender({ items: [...services] });
     expect(result.current.tierId).toBe('free');
     rerender({ items: services.map((item) => ({ ...item, isActive: item.tierId !== 'free' })) });
@@ -70,7 +70,7 @@ describe('queue service selection', () => {
       ({ queueId }) => useQueueServiceSelection(queueId, services),
       { initialProps: { queueId: 'a' } },
     );
-    act(() => result.current.setTierId('free'));
+    act(() => { result.current.setTierId('free'); });
     rerender({ queueId: 'b' });
     expect(result.current.tierId).toBe('premium');
   });

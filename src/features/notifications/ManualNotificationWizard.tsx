@@ -11,7 +11,7 @@ import { notify } from '@/core/notifications/notification-store';
 import { Card } from '@/design-system/components/Card';
 import { Modal } from '@/design-system/components/Modal';
 import { Pagination } from '@/design-system/components/Pagination';
-import { usePersonsSearch } from '@/features/persons/hooks/usePersons';
+import { usePersonsSearch } from '@/features/persons/public';
 import { maskRecipient } from './notification-utils';
 import { usePersonRegistrations, useSendNotification } from './hooks/useNotifications';
 import {

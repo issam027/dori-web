@@ -100,7 +100,7 @@ describe('useReports', () => {
       { wrapper },
     );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
     expect(requestCount).toBe(1);
     expect(result.current.data?.data.groups[0]).toMatchObject({
       dimension: { queueId, queueName: 'Accueil' },

@@ -19,6 +19,7 @@ export function ExperiencePreview({
     <section
       className={`experience-preview experience-preview-${mode}`}
       aria-label={t(labelKeys[mode])}
+      tabIndex={0}
     >
       <div className="experience-preview-stage">{children}</div>
     </section>

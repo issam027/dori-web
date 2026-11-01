@@ -11,7 +11,7 @@ import {
   UserMinus,
   UserPlus,
 } from 'lucide-react';
-import { sitesControllerRemoveDirectUser } from '@/api/generated/sites/sites';
+import { removeDirectSiteUser } from '../api/onboarding-api';
 import type { SiteDirectUserResponseDto, SiteResponseDto } from '@/api/generated/models';
 import { createQueueForSite, updateQueue, updateSite } from '../api/onboarding-api';
 import type { findSites, findTiers } from '../api/onboarding-api';
@@ -22,9 +22,9 @@ import { hasPermission } from '@/core/permissions/permissions';
 import { Card, MetricCard } from '@/design-system/components/Card';
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Pagination } from '@/design-system/components/Pagination';
-import { QueueEditor } from '@/features/queues/QueueEditor';
-import { type AssignmentTarget, UserAssignmentModal } from '@/features/users/UserAssignmentModal';
-import { QueueOperatorsModal } from '@/features/users/QueueOperatorsModal';
+import { QueueEditor } from '@/features/queues/public';
+import { type AssignmentTarget, UserAssignmentModal } from '@/features/users/public';
+import { QueueOperatorsModal } from '@/features/users/public';
 import { notify } from '@/core/notifications/notification-store';
 
 import { type SettingsSection } from '../settings-routes';
@@ -40,6 +40,11 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
   const { t: __t } = useTranslation();
   const activeSiteId = useScopeStore((s) => s.activeSiteId);
   const [queueStatus, setQueueStatus] = useState<'active' | 'inactive' | 'all'>('active');
+  const [queueOpen, setQueueOpen] = useState(false),
+    [editQueue, setEditQueue] = useState<QueueResponseDto>(),
+    [editSite, setEditSite] = useState<SiteResponseDto | null>(null),
+    [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null),
+    [operatorsQueue, setOperatorsQueue] = useState<QueueResponseDto | null>(null);
   const {
     sites: ss,
     queues: qs,
@@ -48,15 +53,15 @@ export function SettingsWorkspace({ section }: { section: SettingsSection }) {
     directUsers,
     refreshDirectUsers,
     refresh: refreshData,
-  } = useSettingsData(activeSiteId, queueStatus);
+  } = useSettingsData(activeSiteId, queueStatus, {
+    sites: section === 'sites',
+    directUsers: section === 'sites',
+    roles: Boolean(assignmentTarget),
+  });
   const refresh = () => {
     void Promise.all([refreshData(), refreshDirectUsers()]);
   };
-  const [queueOpen, setQueueOpen] = useState(false),
-    [editQueue, setEditQueue] = useState<QueueResponseDto>(),
-    [editSite, setEditSite] = useState<SiteResponseDto | null>(null),
-    [assignmentTarget, setAssignmentTarget] = useState<AssignmentTarget | null>(null),
-    [operatorsQueue, setOperatorsQueue] = useState<QueueResponseDto | null>(null);
+
   return (
     <div className="page-stack admin-page">
       <PageHeader
@@ -356,10 +361,7 @@ function SitesPanel({
                     type="button"
                     onClick={() => {
                       const site = items[0];
-                      if (site)
-                        void sitesControllerRemoveDirectUser(site.siteId, user.userId).then(
-                          refresh,
-                        );
+                      if (site) void removeDirectSiteUser(site.siteId, user.userId).then(refresh);
                     }}
                   >
                     <UserMinus />

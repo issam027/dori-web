@@ -427,7 +427,7 @@ table td small {
 .form-span {
   grid-column: 1/-1;
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .onboarding-layout {
     grid-template-columns: 1fr;
   }
@@ -511,7 +511,6 @@ table td small {
   font-weight: 700;
 }
 
-.tier-default-option,
 .tier-options-fieldset > label:not(.tier-threshold-field) {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -519,23 +518,12 @@ table td small {
   gap: 10px;
 }
 
-.tier-default-option input,
 .tier-options-fieldset input[type='checkbox'] {
   width: 18px;
   height: 18px;
   min-height: 18px;
   margin-top: 2px;
   accent-color: var(--color-primary);
-}
-
-.tier-default-option span {
-  display: grid;
-  gap: 2px;
-}
-
-.tier-default-option small {
-  color: var(--color-muted);
-  font-weight: 500;
 }
 
 .tier-options-fieldset {
@@ -1278,6 +1266,19 @@ table td small {
   gap: 6px;
 }
 
+@media (max-width: 720px) {
+  .admin-page > .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  .admin-page > .metrics-grid > .metric-card {
+    min-height: 0;
+    padding: var(--space-3);
+  }
+  .admin-page > .metrics-grid .metric-value {
+    font-size: var(--font-size-lg);
+  }
+}
 .queue-default-service {
   display: grid;
   gap: 8px;

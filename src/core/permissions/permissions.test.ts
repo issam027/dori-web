@@ -1,6 +1,6 @@
 import type { CurrentUserResponseDto } from '@/api/generated/models';
 import { findFirstAuthorizedPath } from '@/app/protected-routes';
-import { hasAnyPermission, hasPermission, isWithinScope } from './permissions';
+import { hasAnyPermission, hasPermission } from './permissions';
 
 const user: CurrentUserResponseDto = {
   userId: '00000000-0000-4000-8000-000000000001',
@@ -17,18 +17,9 @@ const user: CurrentUserResponseDto = {
 };
 
 describe('permissions and scope', () => {
-  it('checks permissions and territorial scope independently', () => {
+  it('checks effective permissions', () => {
     expect(hasPermission(user, 'queue_view')).toBe(true);
     expect(hasAnyPermission(user, ['site_edit', 'registration_call'])).toBe(true);
-    expect(
-      isWithinScope(user.scope, {
-        siteId: '00000000-0000-4000-8000-000000000010',
-        queueId: '00000000-0000-4000-8000-000000000020',
-      }),
-    ).toBe(true);
-    expect(isWithinScope(user.scope, { queueId: '00000000-0000-4000-8000-000000000099' })).toBe(
-      false,
-    );
   });
 
   it('keeps technical kiosk identities on technical routes', () => {

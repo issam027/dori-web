@@ -1296,7 +1296,15 @@
   margin-block: 4px;
 }
 
+.appointments-page {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.appointments-page > * { min-width: 0; }
 .week-calendar {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   display: flex;
   gap: var(--space-2);
   overflow-x: auto;
@@ -3534,25 +3542,6 @@
   pointer-events: none;
 }
 
-.report-point-primary {
-  fill: var(--ad);
-}
-
-.report-point-success {
-  fill: var(--ae);
-}
-
-.report-hit-point {
-  fill: transparent;
-  cursor: crosshair;
-  outline: none;
-}
-
-.report-hit-point:focus {
-  stroke: var(--color-primary);
-  stroke-width: 2;
-}
-
 .report-hover-band {
   fill: transparent;
   cursor: crosshair;
@@ -3588,15 +3577,6 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   /* Keep the whole curve visible, including on wide charts and long series. */
-}
-
-.report-line-primary {
-  stroke: var(--ad);
-}
-
-.report-line-success {
-  stroke: var(--ae);
-  animation-delay: 0.12s;
 }
 
 .report-legend {
@@ -3657,12 +3637,6 @@
   border-radius: 50%;
 }
 
-.report-comparison-bars {
-  display: grid;
-  gap: 0.8rem;
-  animation: report-reveal 0.4s ease-out both;
-}
-
 .report-comparison-empty {
   display: grid;
   min-height: 16rem;
@@ -3711,28 +3685,6 @@
   margin: 0;
   padding: 0;
   accent-color: var(--color-primary);
-}
-
-.report-comparison-row {
-  display: grid;
-  grid-template-columns: minmax(8rem, 1fr) 4fr 3rem;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.report-comparison-row > div {
-  height: 0.85rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--color-surface-muted);
-}
-
-.report-comparison-row i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  animation: report-grow 0.75s ease-out both;
-  transform-origin: left;
 }
 
 .report-donut-grid {
@@ -3999,7 +3951,6 @@
     flex: 1 0 auto;
   }
 
-  .report-comparison-row,
   .report-comparison-controls {
     grid-template-columns: 1fr;
   }
@@ -4127,7 +4078,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .report-line,
-  .report-comparison-row i,
   .report-donut,
   .report-chart-canvas {
     animation: none;

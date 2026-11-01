@@ -4,14 +4,14 @@ import {
   paginated,
   buildQueue,
   installApiScenario,
-  useFixedClock,
+  useFixedClock as installFixedClock,
 } from './support/scenario-fixtures';
 
 const queueId = '00000000-0000-4000-8000-000000000010';
 const freeId = '00000000-0000-4000-8000-000000000001';
 const premiumId = '00000000-0000-4000-8000-000000000002';
 async function scenario(page: Page, mode: 'sole' | 'default' | 'none', kiosk = false) {
-  await useFixedClock(page, '2026-10-09T08:15:00Z');
+  await installFixedClock(page, '2026-10-09T08:15:00Z');
   const tiers = [
     { tierId: freeId, tierName: 'Basic', tierCode: 'free', isActive: true },
     { tierId: premiumId, tierName: 'Premium', tierCode: 'premium', isActive: true },
@@ -162,12 +162,12 @@ test('onboarding saves no default even when queue creation supplied a free defau
           return true;
         }
         if (path === '/api/v1/queues/' + queueId + '/tiers' && method === 'POST') {
-          associations.push(route.request().postDataJSON());
+          associations.push(route.request().postDataJSON() as Record<string, unknown>);
           await route.fulfill({ json: apiEnvelope({}) });
           return true;
         }
         if (path === '/api/v1/queues/' + queueId + '/tiers/' + freeId && method === 'PATCH') {
-          patches.push(route.request().postDataJSON());
+          patches.push(route.request().postDataJSON() as Record<string, unknown>);
           await route.fulfill({ json: apiEnvelope({}) });
           return true;
         }
@@ -176,8 +176,7 @@ test('onboarding saves no default even when queue creation supplied a free defau
     ],
   });
   await page.addInitScript(
-    ({ queueId, premiumId }) =>
-      localStorage.setItem(
+    ({ queueId, premiumId }) => { localStorage.setItem(
         'dori:onboarding:v3',
         JSON.stringify({
           draftVersion: 3,
@@ -207,7 +206,7 @@ test('onboarding saves no default even when queue creation supplied a free defau
           completedUserIds: [],
           testValidated: false,
         }),
-      ),
+      ); },
     { queueId, premiumId },
   );
   await page.goto('/onboarding');

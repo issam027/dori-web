@@ -14,8 +14,8 @@ import {
   weekDates,
 } from './appointment-rules';
 import { serviceTierVisualClass } from '@/design-system/service-tier';
-import { useQueues } from '@/features/queues/hooks/useQueues';
-import { useSite } from '@/features/portfolio/hooks/useSites';
+import { useQueues } from '@/features/queues/public';
+import { useSite } from '@/features/portfolio/public';
 import { useAppointment, useAppointments, useAvailabilityRange } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
 import { DorifyLoader } from '@/design-system/components/DorifyLoader';
@@ -154,7 +154,7 @@ export function AppointmentsPage() {
     setAnchor(next);
   };
   return (
-    <div className="page-stack">
+    <div className="page-stack appointments-page">
       <PageHeader
         eyebrow={__t('nav.appointments')}
         title={pageTitle}
@@ -292,7 +292,12 @@ export function AppointmentsPage() {
               onSelect={setSelectedId}
             />
           ) : view === 'week' ? (
-            <div className="week-calendar">
+            <div
+              className="week-calendar"
+              tabIndex={0}
+              role="region"
+              aria-label={__t('nav.appointments')}
+            >
               {dates.map((date) => {
                 const dayIsOpen = isOpen(date);
                 const isToday = date === currentLocal.date;

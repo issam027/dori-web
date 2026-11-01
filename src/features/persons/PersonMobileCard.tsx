@@ -4,7 +4,7 @@ import type { PersonResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
 import { MobileCardActionsMenu } from '@/design-system/components/MobileCardActionsMenu';
-import { PersonNotesButton } from '@/features/notes/PersonNotesButton';
+import { PersonNotesButton } from '@/features/notes/public';
 
 interface PersonMobileCardProps {
   person: PersonResponseDto;

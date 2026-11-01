@@ -11,11 +11,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version: 22.22.0
           cache: npm
       - run: npm ci
       - run: npm run api:check
+      - run: npm run audit:architecture
       - run: npm run audit:phase11
+      - run: npm run audit:i18n
+      - run: npm run audit:env
+      - run: npm run audit:ui
       - run: npm run audit:tokens
       - run: npm run audit:security
       - run: npm run lint

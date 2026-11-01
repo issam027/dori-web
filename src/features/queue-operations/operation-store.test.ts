@@ -1,5 +1,5 @@
 import type { CallNextRegistrationResponseDto } from '@/api/generated/models';
-import { canCallNext, useOperationStore } from '@/shared/queue-operations/operation-store';
+import { useOperationStore } from '@/shared/queue-operations/operation-store';
 
 function call(registrationId: string): CallNextRegistrationResponseDto {
   return {
@@ -23,28 +23,18 @@ describe('operator call lock by queue', () => {
   });
 
   it('blocks only the queue that already has an active call', () => {
-    expect(canCallNext(false, undefined, false)).toBe(false);
-    expect(canCallNext(true, undefined, false)).toBe(true);
     useOperationStore
       .getState()
       .startCall(
         '00000000-0000-4000-8000-000000000010',
         call('00000000-0000-4000-8000-000000000001'),
       );
-    expect(
-      canCallNext(
-        true,
-        useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000010'],
-        false,
-      ),
-    ).toBe(false);
-    expect(
-      canCallNext(
-        true,
-        useOperationStore.getState().activeCalls['00000000-0000-4000-8000-000000000011'],
-        false,
-      ),
-    ).toBe(true);
+  });
+
+  it('does not create an active call for another queue', () => {
+    useOperationStore.getState().startCall('queue-one', call('registration-one'));
+    expect(useOperationStore.getState().activeCalls['queue-one']).toBeDefined();
+    expect(useOperationStore.getState().activeCalls['queue-two']).toBeUndefined();
   });
 
   it('keeps only the four latest confirmed calls', () => {

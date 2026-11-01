@@ -62,10 +62,3 @@ export const useRealtimeStatusStore = create<RealtimeStatusState>((set) => ({
     }));
   },
 }));
-
-export function getRealtimeConnection(
-  channel: QueueRealtimeChannel,
-  queueId: string,
-): RealtimeConnectionState | undefined {
-  return useRealtimeStatusStore.getState().connections[connectionKey(channel, queueId)];
-}

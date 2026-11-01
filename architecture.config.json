@@ -1,0 +1,9 @@
+{
+  "tsconfig": "tsconfig.app.json",
+  "entrypoints": [
+    "src/main.tsx",
+    "src/core/i18n/glossary.ts",
+    "src/core/i18n/locales/allow-identical.ts",
+    "src/shared/testing/setup-tests.ts"
+  ]
+}

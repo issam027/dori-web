@@ -281,7 +281,7 @@ describe('changeActiveSite cockpit preservation', () => {
     ).toBe('00000000-0000-4000-8000-000000000009');
   });
 
-  it('purges the active call but preserves cached page data when the operator changes site', async () => {
+  it('purges active calls and obsolete page queries when the operator changes site', async () => {
     const queryClient = new QueryClient();
     queryClient.setQueryData(['queues', 'site', 12], {
       siteId: '00000000-0000-4000-8000-000000000012',
@@ -290,9 +290,7 @@ describe('changeActiveSite cockpit preservation', () => {
     await changeActiveSite(queryClient, '00000000-0000-4000-8000-000000000013', scope);
 
     expect(useOperationStore.getState().activeCalls).toEqual({});
-    expect(queryClient.getQueryData(['queues', 'site', 12])).toEqual({
-      siteId: '00000000-0000-4000-8000-000000000012',
-    });
+    expect(queryClient.getQueryData(['queues', 'site', 12])).toBeUndefined();
     expect(
       queryClient.getQueryData(['sites', 'detail', '00000000-0000-4000-8000-000000000013']),
     ).toBeDefined();

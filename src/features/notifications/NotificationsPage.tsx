@@ -18,7 +18,7 @@ import { ManualNotificationWizard } from './ManualNotificationWizard';
 import { canResendNotification, maskRecipient, notificationStatusTone } from './notification-utils';
 import { useNotification, useNotifications, useResendNotification } from './hooks/useNotifications';
 import { useScopeStore } from '@/core/scope/scope-store';
-import { useQueues } from '@/features/queues/hooks/useQueues';
+import { useQueues } from '@/features/queues/public';
 import { Button } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { NotificationMobileCard } from './NotificationMobileCard';

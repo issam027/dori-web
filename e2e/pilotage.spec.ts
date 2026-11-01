@@ -57,7 +57,7 @@ const reportSeries = (from: string, to: string, queueId?: string) => {
     totals,
     series: [{ periodStart: from, ...totals }],
     breakdowns: {
-      byQueue: selected,
+      byQueue: selected.map((queue) => ({ ...queue, series: [{ periodStart: from, ...queue }] })),
       byUser: [],
       byTier: [],
       byEntryType: [
@@ -184,19 +184,14 @@ test('reports apply the selected period to every queue and render an empty state
   await endDate.fill('2026-09-20');
   await expect
     .poll(() =>
-      [
-        ...new Set(
-          requests
-            .filter(
-              (request) =>
-                request.from.startsWith('2026-09-18') && request.to.startsWith('2026-09-21'),
-            )
-            .map((request) => request.queueIds)
-            .filter((queueIds): queueIds is string => Boolean(queueIds)),
-        ),
-      ].sort(),
+      requests.some(
+        (request) =>
+          request.from.startsWith('2026-09-18') &&
+          request.to.startsWith('2026-09-21') &&
+          request.queueIds === null,
+      ),
     )
-    .toEqual(['00000000-0000-4000-8000-000000000010', '00000000-0000-4000-8000-000000000011']);
+    .toBe(true);
   await expect(page.getByRole('main').getByRole('heading', { name: /rapports/i })).toBeVisible();
 
   await page.route('**/api/v1/monitoring/series**', async (route) => {

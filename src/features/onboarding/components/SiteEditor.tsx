@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { SiteResponseDto, UpdateSiteDto } from '@/api/generated/models';
 import { WizardModal } from '@/design-system/components/WizardModal';
 import { presentError } from '@/core/notifications/error-presentation';
-import { WorkingDaysField } from '@/features/queues/WorkingDaysField';
+import { WorkingDaysField } from '@/features/queues/public';
 
 const time = (value?: string) => value?.slice(0, 5) ?? '';
 const optionalTime = (value?: string) => (value ? value.slice(0, 5) : undefined);

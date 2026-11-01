@@ -51,7 +51,7 @@ function filesIn(directory) {
 
 function isVisibleText(value) {
   const normalized = value.replace(/\s+/g, ' ').trim();
-  if (new Set(['expired', 'invalid', 'unavailable']).has(normalized)) return false;
+  if (new Set(['expired', 'invalid', 'unavailable', 'DORIFY_INSTALLATION_ID', 'DORIFY_CLOUD_TOKEN']).has(normalized)) return false;
   return /[A-Za-z\u00c0-\u00ff]/.test(normalized);
 }
 

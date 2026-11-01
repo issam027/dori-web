@@ -14,5 +14,7 @@ describe('public experience privacy', () => {
       }),
     ).toBe(true);
     expect(isPublicDisplaySnapshot({ firstName: 'Private' })).toBe(false);
+    expect(isPublicDisplaySnapshot({ queueName: 'Phone services', threads: [{ ticket: 'A1' }] })).toBe(true);
+    expect(isPublicDisplaySnapshot({ threads: [{ first_name: 'Private' }] })).toBe(false);
   });
 });

@@ -251,15 +251,19 @@
   backdrop-filter: blur(12px);
 }
 .topbar-title h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 18px;
 }
 .topbar-title {
   display: grid;
-  min-width: 13rem;
-  flex: 0 0 auto;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .topbar-title-site,
 .topbar-title-route {
+  min-width: 0;
   grid-area: 1 / 1;
   transition:
     opacity 180ms ease,

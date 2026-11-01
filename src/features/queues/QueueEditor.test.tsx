@@ -53,9 +53,9 @@ it.each(['save', 'cancel'])(
     if (action === 'save') {
       await user.click(screen.getByRole('button', { name: /suivant/i }));
       await user.click(screen.getByRole('button', { name: /terminer/i }));
-      await waitFor(() => expect(onSave).toHaveBeenCalledOnce());
+      await waitFor(() => { expect(onSave).toHaveBeenCalledOnce(); });
     } else await user.click(screen.getByRole('button', { name: /^annuler$/i }));
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    await waitFor(() => { expect(onOpenChange).toHaveBeenCalledWith(false); });
     rerender(<QueueEditor {...props} open={false} />);
     rerender(<QueueEditor {...props} open />);
     expect(screen.getByRole('textbox', { name: /code/i })).toHaveValue('');

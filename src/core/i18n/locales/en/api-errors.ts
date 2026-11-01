@@ -21,7 +21,6 @@ export const apiErrorMessages = {
   'apiErrors.SESSION_ALREADY_OPEN': 'A counter session is already open.',
   'apiErrors.TIER_NOT_OFFERED_BY_QUEUE': 'This service level is not offered in this queue.',
   'apiErrors.TIER_IS_SYSTEM': 'This system service level cannot be changed this way.',
-  'apiErrors.DUPLICATE_ACTIVE_REGISTRATION': 'This person already has an active registration for that day.',
   'apiErrors.APPOINTMENT_SLOT_FULL': 'This appointment slot is full.',
   'apiErrors.APPOINTMENT_EXPIRED': 'This appointment slot has already passed.',
   'apiErrors.REGISTRATION_NOT_IN_PROGRESS': 'This registration is no longer in progress.',

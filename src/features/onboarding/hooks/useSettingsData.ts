@@ -67,7 +67,7 @@ export function useSettingsData(
     roles: roles.data?.data.items ?? [],
     tiers: tiers.data?.data.items ?? [],
     directUsers: directUsers.data?.data.items ?? [],
-    refreshDirectUsers: () => directUsers.refetch(),
+    refreshDirectUsers: () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.siteDirectUsers(siteId) }),
     refresh: () => invalidateAdmin(queryClient),
   };
 }

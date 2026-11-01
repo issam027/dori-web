@@ -56,11 +56,3 @@ export const useOperationStore = create<OperationState>()((set) => ({
     set({ activeCalls: {}, recentCalls: [], passages: [] });
   },
 }));
-
-export function canCallNext(
-  hasActiveSession: boolean,
-  activeCall: CallNextRegistrationResponseDto | undefined,
-  pending: boolean,
-): boolean {
-  return hasActiveSession && !activeCall && !pending;
-}

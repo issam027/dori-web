@@ -175,7 +175,7 @@
     height: 20px;
   }
   .mobile-bottom-nav .active {
-    color: var(--color-primary);
+    color: var(--color-text);
     background: var(--color-primary-soft);
   }
   .mobile-bottom-nav :focus-visible {
@@ -522,13 +522,6 @@
   .app-content .cockpit-collapsed-summary {
     font-size: 13px;
   }
-  .app-content .quick-registration-panel {
-    padding: 14px;
-    gap: 12px;
-  }
-  .app-content .quick-registration-panel h2 {
-    font-size: 18px;
-  }
   .app-content .quick-registration-launcher {
     padding: 14px;
     gap: 10px;
@@ -579,7 +572,6 @@
     width: 100%;
   }
   .app-content .portfolio-status-filter button,
-  .app-content .control-room-queue-filter button,
   .app-content .queue-choice-list button {
     min-height: 44px;
   }
@@ -1150,5 +1142,26 @@
 @media print {
   .mobile-bottom-nav {
     display: none;
+  }
+}
+
+/* Touch comfort also applies to tablets with desktop navigation. */
+@media (pointer: coarse) and (min-width: 721px) {
+  .app-shell .app-content {
+    zoom: 1;
+  }
+  .app-shell .button,
+  .app-shell .icon-button,
+  .dialog-content .button {
+    min-height: 44px;
+  }
+  .app-shell .icon-button {
+    min-width: 44px;
+  }
+  .app-shell input:not([type='checkbox']):not([type='radio']),
+  .app-shell select,
+  .app-shell textarea {
+    min-height: 44px;
+    font-size: max(16px, 1rem);
   }
 }

@@ -1,4 +1,4 @@
-import { getRealtimeConnection, useRealtimeStatusStore } from './realtime-status-store';
+import { useRealtimeStatusStore } from './realtime-status-store';
 
 describe('realtime status store', () => {
   beforeEach(() => {
@@ -11,14 +11,14 @@ describe('realtime status store', () => {
     state.updateStatus('display', 'queue-1', 'reconnecting');
     state.reportError('display', 'queue-1', new Error('network unavailable'));
 
-    expect(getRealtimeConnection('display', 'queue-1')).toMatchObject({
+    expect(useRealtimeStatusStore.getState().connections['display:queue-1']).toMatchObject({
       status: 'reconnecting',
       lastError: 'network unavailable',
     });
 
     state.updateStatus('display', 'queue-1', 'connected');
 
-    expect(getRealtimeConnection('display', 'queue-1')).toMatchObject({
+    expect(useRealtimeStatusStore.getState().connections['display:queue-1']).toMatchObject({
       status: 'connected',
       lastError: undefined,
     });

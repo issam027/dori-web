@@ -27,7 +27,7 @@ import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { usePreferencesStore } from '@/core/theme/preferences-store';
 import { accentColors } from '@/core/theme/theme';
-import { getUserDisplayName, getUserInitials } from '@/features/users/user-display';
+import { getUserDisplayName, getUserInitials } from '@/features/users/public';
 import { Button, ButtonLabelModeProvider } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { ResponsiveDetails } from '@/design-system/components/ResponsiveDetails';

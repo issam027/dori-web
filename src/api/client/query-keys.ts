@@ -103,7 +103,8 @@ export const queryKeys = {
       queueId: string | undefined,
       dateFrom: string | undefined,
       dateTo: string | undefined,
-    ) => ['appointments', 'queue', queueId, 'range', dateFrom, dateTo] as const,
+      siteId?: string | null,
+    ) => ['appointments', 'site', siteId, 'queue', queueId, 'range', dateFrom, dateTo] as const,
     detail: (registrationId: string | null) => ['appointments', 'detail', registrationId] as const,
   },
   notifications: {

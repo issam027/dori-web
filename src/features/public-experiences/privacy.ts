@@ -30,9 +30,14 @@ export const trackingProgress = (position?: number) => {
 };
 
 export function isPublicDisplaySnapshot(value: unknown): boolean {
-  if (!value || typeof value !== 'object') return false;
-  const keys = JSON.stringify(value).toLowerCase();
-  return !['firstname', 'lastname', 'email', 'phone', 'birthdate', 'personid'].some((key) =>
-    keys.includes(key),
-  );
+  const forbidden = new Set(['firstname', 'lastname', 'email', 'phone', 'phonenumber', 'birthdate', 'personid']);
+  const seen = new WeakSet();
+  const inspect = (node: unknown): boolean => {
+    if (!node || typeof node !== 'object') return true;
+    if (seen.has(node)) return true;
+    seen.add(node);
+    return Object.entries(node).every(([key, child]) =>
+      !forbidden.has(key.replace(/[_-]/g, '').toLowerCase()) && inspect(child));
+  };
+  return Boolean(value && typeof value === 'object' && inspect(value));
 }

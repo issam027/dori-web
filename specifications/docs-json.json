@@ -15958,6 +15958,111 @@
         ]
       }
     },
+    "/api/internal/cron/retention": {
+      "get": {
+        "operationId": "CronController_retentionCron",
+        "summary": "Purger les données techniques expirées",
+        "description": "Purge bornée avec délais de grâce, sans suppression de données métier.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Valeur du paramètre « authorization »."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rétention technique exécutée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "OK",
+                      "description": "Code applicatif du résultat"
+                    },
+                    "translationKey": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null,
+                      "description": "Clé de traduction du message (null si aucun message)"
+                    },
+                    "translationParams": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "example": {},
+                      "description": "Paramètres de traduction"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CronExecutionResponseDto"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "translationKey",
+                    "translationParams",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides (validation échouée)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié — token manquant ou expiré",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Trop de requêtes — limite de débit atteinte",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur interne sans exposition de détails techniques",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ScheduledTasks"
+        ],
+        "security": [
+          {
+            "cron-secret": []
+          }
+        ]
+      }
+    },
     "/api/v1/monitoring/health": {
       "get": {
         "operationId": "MonitoringController_health",
@@ -24713,13 +24818,13 @@
             "description": "Valeur du champ « average wait minutes »."
           },
           "medianWaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 9.2,
             "nullable": true,
             "description": "Valeur du champ « median wait minutes »."
           },
           "p90WaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 24.7,
             "nullable": true,
             "description": "Valeur du champ « p90 wait minutes »."
@@ -24731,13 +24836,13 @@
             "description": "Valeur du champ « average service minutes »."
           },
           "medianServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 6.5,
             "nullable": true,
             "description": "Valeur du champ « median service minutes »."
           },
           "p90ServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 14.3,
             "nullable": true,
             "description": "Valeur du champ « p90 service minutes »."
@@ -24786,13 +24891,13 @@
             "description": "Valeur du champ « average wait minutes »."
           },
           "medianWaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 9.2,
             "nullable": true,
             "description": "Valeur du champ « median wait minutes »."
           },
           "p90WaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 24.7,
             "nullable": true,
             "description": "Valeur du champ « p90 wait minutes »."
@@ -24804,13 +24909,13 @@
             "description": "Valeur du champ « average service minutes »."
           },
           "medianServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 6.5,
             "nullable": true,
             "description": "Valeur du champ « median service minutes »."
           },
           "p90ServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 14.3,
             "nullable": true,
             "description": "Valeur du champ « p90 service minutes »."
@@ -24865,13 +24970,13 @@
             "description": "Valeur du champ « average wait minutes »."
           },
           "medianWaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 9.2,
             "nullable": true,
             "description": "Valeur du champ « median wait minutes »."
           },
           "p90WaitMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 24.7,
             "nullable": true,
             "description": "Valeur du champ « p90 wait minutes »."
@@ -24883,13 +24988,13 @@
             "description": "Valeur du champ « average service minutes »."
           },
           "medianServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 6.5,
             "nullable": true,
             "description": "Valeur du champ « median service minutes »."
           },
           "p90ServiceMinutes": {
-            "type": "object",
+            "type": "number",
             "example": 14.3,
             "nullable": true,
             "description": "Valeur du champ « p90 service minutes »."

@@ -20,6 +20,7 @@ const budgets = {
   initialJsGzip: budgetFromEnvironment('BUNDLE_INITIAL_JS_GZIP_BUDGET', 125_000),
   initialCssGzip: budgetFromEnvironment('BUNDLE_INITIAL_CSS_GZIP_BUDGET', 42_000),
   secondaryJsGzip: budgetFromEnvironment('BUNDLE_SECONDARY_JS_GZIP_BUDGET', 47_000),
+  preloadedJsGzip: budgetFromEnvironment('BUNDLE_PRELOADED_JS_GZIP_BUDGET', 300_000),
   minimumPageChunks: budgetFromEnvironment('BUNDLE_MINIMUM_PAGE_CHUNKS', 15),
 };
 
@@ -55,7 +56,16 @@ const pageChunks = secondaryJavaScript.filter(({ name }) =>
   /(?:Page|AdminPage)-[^/]+\.js$/.test(name),
 );
 
+const preloadedNames = new Set([entry.name, ...Array.from(
+  html.matchAll(new RegExp('<link[^>]+rel="modulepreload"[^>]+href="/assets/([^" ]+[.]js)"', 'g')),
+  (match) => match[1],
+)]);
+const preloadedJavaScript = assets.filter((asset) => preloadedNames.has(asset.name));
+const preloadedGzip = preloadedJavaScript.reduce((total, asset) => total + asset.gzipBytes, 0);
+
 const checks = [
+  { metric: 'preloadedJsGzip', actual: preloadedGzip, budget: budgets.preloadedJsGzip,
+    passed: preloadedGzip <= budgets.preloadedJsGzip },
   {
     metric: 'initialJsGzip',
     actual: entry.gzipBytes,
@@ -85,7 +95,7 @@ const checks = [
 const report = {
   generatedAt: new Date().toISOString(),
   budgets,
-  initial: { javascript: entry, stylesheet },
+  initial: { javascript: entry, stylesheet, preloadedJavaScript, preloadedGzip },
   largestSecondaryJavaScript: largestSecondary ?? null,
   pageChunks: pageChunks.map(({ name, bytes, gzipBytes }) => ({ name, bytes, gzipBytes })),
   checks,

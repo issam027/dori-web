@@ -1,3 +1,4 @@
+import { isPublicDisplaySnapshot } from '../privacy';
 import { useMemo, useState } from 'react';
 import { useMutation, useQueries, useQuery } from '@tanstack/react-query';
 import type {
@@ -42,7 +43,7 @@ export function usePublicTracking(token: string) {
                   headers: { 'X-Registration-Token': token },
                 })
               ).data,
-            realtimeSafetyRefreshIntervalMs,
+            60_000,
             (cause) => {
               if (cause instanceof NormalizedApiError) {
                 const code = cause.code.toUpperCase();
@@ -82,8 +83,11 @@ export function useDisplaySnapshot(options: {
   const displays = useQueries({
     queries: displayedQueueIds.map((queueId) => ({
       queryKey: queryKeys.publicExperience.displaySnapshot(queueId),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        queuesControllerGetDisplay(queueId, undefined, signal),
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const response = await queuesControllerGetDisplay(queueId, undefined, signal);
+        if (!isPublicDisplaySnapshot(response.data)) throw new Error('Unsafe public display response');
+        return response;
+      },
       enabled: options.enabled,
       refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
@@ -95,6 +99,7 @@ export function useKioskCatalog(
   siteId: string | null,
   queueId: string | undefined,
   enabled: boolean,
+  loadRules = true,
 ) {
   const queues = useQuery({
     queryKey: queryKeys.publicExperience.kioskQueues(siteId),
@@ -111,6 +116,8 @@ export function useKioskCatalog(
       queryKey: queryKeys.publicExperience.kioskQueueStatus(queue.queueId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         queuesControllerGetStatus(queue.queueId, undefined, signal),
+      enabled,
+      refetchInterval: 30_000,
     })),
   });
   const tiers = useQuery({
@@ -135,7 +142,7 @@ export function useKioskCatalog(
           undefined,
           signal,
         ),
-      enabled: item.isActive,
+      enabled: enabled && loadRules && item.isActive,
     })),
   });
   return { queues, queueStatuses, tiers, tierRules };

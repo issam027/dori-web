@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, sep } from 'node:path';
+import ts from 'typescript';
 
 const root = process.cwd();
 const sourceRoot = join(root, 'src');
@@ -44,11 +45,16 @@ assertNoMatch(
   'Import direct du client Orval dans une page',
   (path) => generatedControllerImportExceptions.has(relative(root, path).replaceAll('\\', '/')),
 );
-assertNoMatch(
-  authoredFiles,
-  /\b(?:interface|type)\s+\w*Dto\b/,
-  'DTO recopié hors du client généré',
-);
+for (const file of authoredFiles) {
+  const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+  function visit(node) {
+    if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && /Dto$/.test(node.name.text)) {
+      failures.push('DTO recopié hors du client généré: ' + relative(root, file));
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(source);
+}
 assertNoMatch(
   foundationFiles,
   /from\s+['"]@\/features\//,
@@ -65,6 +71,20 @@ assertNoMatch(
   'Journal applicatif non contrôlé',
 );
 
+for (const file of authoredFiles.filter((path) => !path.includes('.test.') && !path.includes('.spec.'))) {
+  const parts = relative(sourceRoot, file).split(sep);
+  const own = parts[0] === 'features' ? parts[1] : undefined;
+  if (!own) continue;
+  const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+  for (const node of source.statements) {
+    if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) continue;
+    const target = node.moduleSpecifier.text.split('/');
+    if (target[0] === '@' && target[1] === 'features' && target[2] !== own &&
+      target.slice(3).join('/') !== 'public') {
+      failures.push('Détail interne entre features: ' + relative(root, file));
+    }
+  }
+}
 const lockPath = join(root, 'package-lock.json');
 if (!statSync(lockPath).isFile()) failures.push('package-lock.json absent');
 const lock = JSON.parse(readFileSync(lockPath, 'utf8'));

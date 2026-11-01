@@ -25,9 +25,10 @@
     "test:watch": "vitest",
     "pretest:e2e": "node tools/check-generated-client.mjs && vite build",
     "test:e2e": "playwright test",
-    "verify": "npm run api:check && npm run audit:phase11 && npm run audit:i18n && npm run audit:env && npm run audit:tokens && npm run audit:ui && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run audit:bundle && npm run test:e2e",
+    "verify": "npm run api:check && npm run audit:architecture && npm run audit:phase11 && npm run audit:i18n && npm run audit:env && npm run audit:tokens && npm run audit:ui && npm run audit:security && npm run lint && npm run typecheck && npm test && npm run build && npm run audit:bundle && npm run test:e2e",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "audit:architecture": "node tools/architecture-check.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

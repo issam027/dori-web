@@ -21,7 +21,6 @@ export const apiErrorMessages = {
   'apiErrors.SESSION_ALREADY_OPEN': 'Une session de guichet est déjà ouverte.',
   'apiErrors.TIER_NOT_OFFERED_BY_QUEUE': 'Ce niveau de service n’est pas proposé dans cette file.',
   'apiErrors.TIER_IS_SYSTEM': 'Ce niveau de service système ne peut pas être modifié ainsi.',
-  'apiErrors.DUPLICATE_ACTIVE_REGISTRATION': 'Cette personne possède déjà une inscription active pour cette journée.',
   'apiErrors.APPOINTMENT_SLOT_FULL': 'Ce créneau de rendez-vous est complet.',
   'apiErrors.APPOINTMENT_EXPIRED': 'Ce créneau de rendez-vous est déjà passé.',
   'apiErrors.REGISTRATION_NOT_IN_PROGRESS': 'Cette inscription n’est plus en cours de traitement.',

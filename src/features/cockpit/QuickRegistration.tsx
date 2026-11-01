@@ -19,7 +19,7 @@ import {
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { Button } from '@/design-system/components/Button';
 import { printDocument } from '@/shared/printing/print-document';
-import { useQueueServiceSelection } from '@/design-system/use-queue-service-selection';
+import { useQueueServiceSelection } from '@/shared/queue-services/use-queue-service-selection';
 import { useQuickRegistrationData } from './hooks/useQuickRegistrationData';
 
 export function QuickRegistration({

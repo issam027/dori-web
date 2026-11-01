@@ -1,4 +1,4 @@
-import type { CurrentUserResponseDto, UserScopeDto } from '@/api/generated/models';
+import type { CurrentUserResponseDto } from '@/api/generated/models';
 
 export type Permission = string;
 
@@ -16,15 +16,4 @@ export function hasAnyPermission(
   return (
     permissions.length === 0 || permissions.some((permission) => hasPermission(user, permission))
   );
-}
-
-export function isWithinScope(
-  scope: UserScopeDto | undefined,
-  resource: { siteId?: string; queueId?: string },
-): boolean {
-  if (!scope) return false;
-  if (scope.isGlobal) return true;
-  if (resource.siteId !== undefined && !scope.siteIds.includes(resource.siteId)) return false;
-  if (resource.queueId !== undefined && !scope.queueIds.includes(resource.queueId)) return false;
-  return true;
 }
