@@ -3,6 +3,8 @@ import { serviceTierVisualClass } from './service-tier';
 
 describe('serviceTierVisualClass', () => {
   it.each([
+    ['Basic', 'service-tier-free'],
+    ['BASIC', 'service-tier-free'],
     ['FREE', 'service-tier-free'],
     ['Forfait gratuit', 'service-tier-free'],
     ['STANDARD', 'service-tier-standard'],

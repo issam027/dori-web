@@ -11,7 +11,7 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   'onboarding.onboarding.ajouterUneFile': '+ Add a queue',
   'onboarding.onboarding.assistantDeComptesPartage': 'Shared account wizard',
   'onboarding.onboarding.aucunNiveauGratuitStandardOuPremiumActifN':
-    'No active Free, Standard or Premium level is available in the API catalog.',
+    'No active Basic, Standard or Premium level is available in the API catalog.',
   'onboarding.onboarding.brouillon': 'Draft',
   'onboarding.onboarding.brouillonLocal': 'Local draft',
   'onboarding.onboarding.chargementDuCatalogue': 'Loading catalog…',
@@ -146,7 +146,10 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   'onboarding.serviceCurrency': 'Currency',
   'onboarding.inheritedCurrency': 'Inherited from site ({{currency}})',
   'onboarding.defaultService': 'Default service',
-  'onboarding.defaultServiceHint': 'Only one service per queue can be preselected.',
+  'onboarding.defaultServiceHint':
+    'Choose the preselected service for this queue, or None. This choice is independent of included communications.',
+  'onboarding.makeDefaultService': 'Set as default',
+  'onboarding.makeDefaultServiceNamed': 'Set {{name}} as the default service',
   'onboarding.serviceOptions': 'Included communications',
   'onboarding.welcomeSms': 'Welcome SMS',
   'onboarding.welcomeEmail': 'Welcome email',

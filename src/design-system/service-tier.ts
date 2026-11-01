@@ -7,7 +7,8 @@ const normalizeTier = (value?: string) =>
 
 export function serviceTierVisualClass(tierId: string, codeOrName?: string): string {
   const tier = normalizeTier(codeOrName);
-  if (tier.includes('free') || tier.includes('gratuit')) return 'service-tier-free';
+  if (tier.includes('basic') || tier.includes('free') || tier.includes('gratuit'))
+    return 'service-tier-free';
   if (tier.includes('standard')) return 'service-tier-standard';
   if (tier.includes('premium')) return 'service-tier-premium';
   let hash = 0;

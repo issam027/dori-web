@@ -148,7 +148,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'settings.newSite': 'New site',
   'settings.queuesHelp': 'Effective settings, inheritance, desks and operators.',
   'settings.usersHelp': 'Account, email, language, status, password, role and scope.',
-  'settings.tiersHelp': 'Fixed Free, Standard and Premium catalog; availability by queue.',
+  'settings.tiersHelp': 'Fixed Basic, Standard and Premium catalog; availability by queue.',
   'settings.rulesHelp': 'Persistent rules by queue and tier, with local simulation.',
   'settings.queueServices.empty': 'No queue is configured for this site.',
   'settings.queueServices.count': '{{count}} service(s)',

@@ -11,7 +11,7 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   'onboarding.onboarding.ajouterUneFile': '+ إضافة قائمة انتظار',
   'onboarding.onboarding.assistantDeComptesPartage': 'معالج الحسابات المشترك',
   'onboarding.onboarding.aucunNiveauGratuitStandardOuPremiumActifN':
-    'لا يوجد مستوى مجاني أو قياسي أو مميز نشط في دليل API.',
+    'لا يوجد مستوى Basic أو قياسي أو مميز نشط في دليل API.',
   'onboarding.onboarding.brouillon': 'مسودة',
   'onboarding.onboarding.brouillonLocal': 'مسودة محلية',
   'onboarding.onboarding.chargementDuCatalogue': 'جارٍ تحميل الدليل…',
@@ -145,7 +145,10 @@ export const onboarding: DomainTranslations<typeof import('../fr/onboarding').on
   'onboarding.serviceCurrency': 'العملة',
   'onboarding.inheritedCurrency': 'موروثة من الموقع ({{currency}})',
   'onboarding.defaultService': 'الخدمة الافتراضية',
-  'onboarding.defaultServiceHint': 'خدمة واحدة فقط لكل قائمة انتظار يمكن تحديدها مسبقاً.',
+  'onboarding.defaultServiceHint':
+    'اختر الخدمة المحددة مسبقاً لهذه القائمة أو بدون خدمة افتراضية. هذا الاختيار مستقل عن الاتصالات المضمنة.',
+  'onboarding.makeDefaultService': 'تعيين كافتراضي',
+  'onboarding.makeDefaultServiceNamed': 'تعيين {{name}} كخدمة افتراضية',
   'onboarding.serviceOptions': 'الاتصالات المشمولة',
   'onboarding.welcomeSms': 'رسالة ترحيب قصيرة (SMS)',
   'onboarding.welcomeEmail': 'بريد ترحيب إلكتروني',

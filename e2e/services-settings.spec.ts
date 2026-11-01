@@ -6,7 +6,7 @@ import {
   installApiScenario,
 } from './support/scenario-fixtures';
 
-for (const width of [320, 390, 1440]) {
+for (const width of [320, 390, 768, 1440]) {
   test('default is optional and independent of options at ' + width, async ({ page }) => {
     await page.setViewportSize({ width, height: 960 });
     const queues = [
@@ -18,7 +18,7 @@ for (const width of [320, 390, 1440]) {
         currency: 'TND',
       }),
     ];
-    const tiers = ['Gratuit', 'Premium', 'Express'].map((tierName, index) => ({
+    const tiers = ['Basic', 'Premium', 'Express'].map((tierName, index) => ({
       tierId: '00000000-0000-4000-8000-00000000000' + (index + 1),
       tierName,
       tierCode: tierName,
@@ -95,7 +95,17 @@ for (const width of [320, 390, 1440]) {
     await panel.getByRole('combobox').first().selectOption(queues[1]!.queueId);
     const defaultSelect = panel.locator('.queue-default-service select');
     await expect(defaultSelect).toHaveValue(tiers[1]!.tierId);
-    await defaultSelect.selectOption(tiers[0]!.tierId);
+    const makeFreeDefault = panel.getByRole('button', {
+      name: 'Définir Basic comme service par défaut',
+      exact: true,
+    });
+    await expect(makeFreeDefault).toBeVisible();
+    await expect(
+      panel.getByRole('button', { name: 'Définir Express comme service par défaut', exact: true }),
+    ).toHaveCount(0);
+    await makeFreeDefault.click();
+    await expect(defaultSelect).toHaveValue(tiers[0]!.tierId);
+    await expect(makeFreeDefault).toHaveCount(0);
     await expect(defaultSelect).toBeEnabled();
     expect(patches[0]).toMatchObject({
       queueId: queues[1]!.queueId,
@@ -108,8 +118,11 @@ for (const width of [320, 390, 1440]) {
     await expect(defaultSelect).toBeEnabled();
     expect(patches[1]!.body).toEqual({ isDefault: false });
     await expect(defaultSelect).toHaveValue('');
+    await expect(
+      panel.getByRole('button', { name: 'Définir Basic comme service par défaut', exact: true }),
+    ).toBeVisible();
     const free = panel.locator('.tier-config-card').first();
-    await expect(free.getByRole('button', { name: /sactiver Gratuit$/i })).toBeDisabled();
+    await expect(free.getByRole('button', { name: /sactiver Basic$/i })).toBeDisabled();
     await free.locator('summary').click();
     await free.getByRole('spinbutton').fill('12.5');
     await free.getByRole('button', { name: /^enregistrer$/i }).click();
@@ -119,6 +132,9 @@ for (const width of [320, 390, 1440]) {
     await expect(defaultSelect).toHaveValue('');
     await panel.getByRole('button', { name: /sactiver Premium$/i }).click();
     await expect(panel.getByRole('button', { name: 'Activer Premium', exact: true })).toBeVisible();
+    await expect(
+      panel.getByRole('button', { name: 'Définir Premium comme service par défaut', exact: true }),
+    ).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );

@@ -462,7 +462,7 @@ Une valeur absente hérite du site. L’édition réutilise exactement le même 
 - édition : `PATCH /api/v1/queues/{queueId}/tiers/{tierId}` ;
 - dissociation : `DELETE` correspondant.
 
-Ne proposer que Gratuit, Standard, Premium. Configurer prix, devise héritée/surchargée, ordre et valeur par défaut.
+Ne proposer que Basic, Standard, Premium. Configurer prix, devise héritée/surchargée, ordre et valeur par défaut.
 
 Étape 5 — comptes et affectations :
 
@@ -509,7 +509,7 @@ Forfaits : catalogue fixe lu par `GET /tiers`, puis associations par file. La cr
 Notifications par forfait/file :
 
 - règles : `GET/POST/PATCH/DELETE /queues/{queueId}/tiers/{tierId}/notification-rules` ;
-- Gratuit : aucune règle dans le produit ;
+- Basic : aucune règle dans le produit ;
 - Standard : Threshold ;
 - Premium : Welcome et Threshold ;
 - `includeTrackingLink` disponible pour les deux types ;
@@ -677,7 +677,7 @@ Les traductions globales ne sont administrables que par Root/Admin, mais leur bu
 8. écran public sans PII ;
 9. notes consultation/ajout ;
 10. onboarding complet et reprise après erreur ;
-11. association Gratuit/Standard/Premium et règles ;
+11. association Basic/Standard/Premium et règles ;
 12. permissions Root/Admin/Manager/Hôtesse/Kiosque.
 
 Tests visuels aux largeurs desktop, tablette, mobile, TV 16:9 et pour les quatre thèmes. Les captures de référence doivent être comparées à la maquette validée.

@@ -13,7 +13,7 @@ const premiumId = '00000000-0000-4000-8000-000000000002';
 async function scenario(page: Page, mode: 'sole' | 'default' | 'none', kiosk = false) {
   await useFixedClock(page, '2026-10-09T08:15:00Z');
   const tiers = [
-    { tierId: freeId, tierName: 'Gratuit', tierCode: 'free', isActive: true },
+    { tierId: freeId, tierName: 'Basic', tierCode: 'free', isActive: true },
     { tierId: premiumId, tierName: 'Premium', tierCode: 'premium', isActive: true },
   ];
   await installApiScenario(page, {
@@ -142,7 +142,7 @@ test('onboarding saves no default even when queue creation supplied a free defau
   page,
 }) => {
   const tiers = [
-    { tierId: freeId, tierName: 'Gratuit', tierCode: 'free', isActive: true },
+    { tierId: freeId, tierName: 'Basic', tierCode: 'free', isActive: true },
     { tierId: premiumId, tierName: 'Premium', tierCode: 'premium', isActive: true },
   ];
   const patches: Record<string, unknown>[] = [];

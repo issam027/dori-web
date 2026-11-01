@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, Power, PowerOff, Save, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, Power, PowerOff, Save, SlidersHorizontal, Star } from 'lucide-react';
 import type {
   NotificationRuleResponseDto,
   QueueResponseDto,
@@ -161,6 +161,7 @@ export function QueueServiceSettings({
                           </option>
                         ))}
                     </select>
+                    <small>{t('onboarding.defaultServiceHint')}</small>
                   </label>
                   <div className="queue-service-grid">
                     {availableTiers.map((tier, index) => {
@@ -367,6 +368,26 @@ function TierConfigurationCard({
           )}
         </Button>
       </header>
+      {association?.isActive && !association.isDefault ? (
+        <div className="tier-default-action">
+          <Button
+            icon={<Star />}
+            label={t('onboarding.makeDefaultService')}
+            labelMode="always"
+            aria-label={t('onboarding.makeDefaultServiceNamed', { name: tier.tierName })}
+            pending={pending}
+            onClick={() => {
+              void execute(
+                () =>
+                  serviceTiersControllerUpdateQueueTier(queue.queueId, tier.tierId, {
+                    isDefault: true,
+                  }),
+                t('settings.queueServices.saved'),
+              );
+            }}
+          />
+        </div>
+      ) : null}
       {association?.isActive ? (
         <details className="tier-settings-disclosure">
           <summary aria-label={t('common.edit') + ' ' + tier.tierName}>

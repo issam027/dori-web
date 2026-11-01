@@ -10,7 +10,7 @@ export const onboarding = {
   'onboarding.onboarding.ajouterUneFile': '+ Ajouter une file',
   'onboarding.onboarding.assistantDeComptesPartage': 'Assistant de comptes partagé',
   'onboarding.onboarding.aucunNiveauGratuitStandardOuPremiumActifN':
-    'Aucun niveau Gratuit, Standard ou Premium actif n’est disponible dans le catalogue API.',
+    'Aucun niveau Basic, Standard ou Premium actif n’est disponible dans le catalogue API.',
   'onboarding.onboarding.brouillon': 'Brouillon',
   'onboarding.onboarding.brouillonLocal': 'Brouillon local',
   'onboarding.onboarding.chargementDuCatalogue': 'Chargement du catalogue…',
@@ -146,7 +146,10 @@ export const onboarding = {
   'onboarding.serviceCurrency': 'Devise',
   'onboarding.inheritedCurrency': 'Héritée du site ({{currency}})',
   'onboarding.defaultService': 'Service par défaut',
-  'onboarding.defaultServiceHint': 'Un seul service par file peut être présélectionné.',
+  'onboarding.defaultServiceHint':
+    'Choisissez le service présélectionné pour cette file, ou Aucun. Ce choix est indépendant des communications incluses.',
+  'onboarding.makeDefaultService': 'Définir par défaut',
+  'onboarding.makeDefaultServiceNamed': 'Définir {{name}} comme service par défaut',
   'onboarding.serviceOptions': 'Communications incluses',
   'onboarding.welcomeSms': 'SMS de bienvenue',
   'onboarding.welcomeEmail': 'Email de bienvenue',

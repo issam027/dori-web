@@ -27,8 +27,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'edge.noCommands': 'لم يتم إرسال أي أمر.',
   'edge.commandQueued': 'تمت إضافة الأمر',
   'edge.tokenTitle': 'رمز التركيب',
-  'edge.tokenWarning':
-    'احفظ بيانات الاعتماد الآن. لن يظهر الرمز مرة أخرى بعد إغلاق هذه النافذة.',
+  'edge.tokenWarning': 'احفظ بيانات الاعتماد الآن. لن يظهر الرمز مرة أخرى بعد إغلاق هذه النافذة.',
   'edge.copyToken': 'نسخ الرمز',
   'edge.credentialsTitle': 'بيانات اعتماد التركيب',
   'edge.credentialsHelp': 'اضبط هاتين القيمتين على وكيل هذا التركيب الداخلي.',
@@ -140,7 +139,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'settings.newSite': 'موقع جديد',
   'settings.queuesHelp': 'الإعدادات الفعلية والوراثة والشبابيك والأعوان.',
   'settings.usersHelp': 'الحساب والبريد واللغة والحالة وكلمة المرور والدور ونطاق العمل.',
-  'settings.tiersHelp': 'الدليل الثابت: مجاني وقياسي ومميز؛ التوفر حسب قائمة الانتظار.',
+  'settings.tiersHelp': 'الدليل الثابت: Basic وقياسي ومميز؛ التوفر حسب قائمة الانتظار.',
   'settings.rulesHelp': 'قواعد العمل المعتمدة حسب قائمة الانتظار ومستوى الخدمة.',
   'settings.queueServices.empty': 'لا توجد قائمة انتظار مهيأة لهذا الموقع.',
   'settings.queueServices.count': '{{count}} خدمة/خدمات',

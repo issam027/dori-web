@@ -1286,6 +1286,26 @@ table td small {
   margin-bottom: 16px;
   font-weight: 700;
 }
+.queue-default-service > small {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+}
+.queue-service-settings .tier-default-action {
+  padding: 0 16px 16px;
+}
+.queue-service-settings .tier-default-action > .button {
+  min-height: 44px;
+  white-space: normal;
+}
+@media (max-width: 720px) {
+  .queue-service-settings .tier-default-action {
+    padding: 0 14px 14px;
+  }
+  .queue-service-settings .tier-default-action > .button {
+    width: 100%;
+  }
+}
 .queue-default-service select {
   width: 100%;
   min-width: 0;

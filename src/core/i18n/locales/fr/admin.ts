@@ -150,7 +150,7 @@ export const admin = {
   'settings.newSite': 'Nouveau site',
   'settings.queuesHelp': 'Paramètres effectifs, héritage, guichets et opérateurs.',
   'settings.usersHelp': 'Compte, email, langue, statut, mot de passe, rôle et périmètre.',
-  'settings.tiersHelp': 'Catalogue fixe Gratuit, Standard et Premium ; disponibilité par file.',
+  'settings.tiersHelp': 'Catalogue fixe Basic, Standard et Premium ; disponibilité par file.',
   'settings.rulesHelp': 'Règles persistantes par file et niveau, avec simulation locale.',
   'settings.queueServices.empty': 'Aucune file n’est configurée pour ce site.',
   'settings.queueServices.count': '{{count}} service(s)',

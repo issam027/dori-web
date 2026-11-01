@@ -431,7 +431,7 @@ La recherche utilise le numéro de ticket ou le couple `lastName` + `scheduledTi
 
 1. L'usager sélectionne **« Je viens sans Rendez-vous »**.
 2. **Choix du Service / File** : Grandes tuiles illustrées affichant en direct le temps d'attente estimé (ex. _« ~ 12 minutes »_).
-3. **Choix du Forfait** : Affichage transparent des options (ex. _« Standard - Gratuit »_ vs _« Coupe-file Prioritaire - 25.000 TND »_).
+3. **Choix du Forfait** : Affichage transparent des options (ex. _« Standard - Basic »_ vs _« Coupe-file Prioritaire - 25.000 TND »_).
 4. **Saisie Rapide des Coordonnées** : Pavé numérique tactile pour le téléphone portable et clavier alphabétique pour le nom.
 
 ### 5.4 Génération de Ticket Numérique & Impression Thermique
