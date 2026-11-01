@@ -656,13 +656,50 @@
   .quick-login-grid {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 47.5rem), (max-height: 31.25rem) and (pointer: coarse) {
   .login-showcase {
-    min-height: 27rem;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding: 1.25rem;
+    align-content: start;
   }
 
-  .login-showcase-preview {
-    width: min(15rem, 64%);
+  .login-showcase-visual {
+    display: none;
+  }
+
+  .login-showcase-pause {
+    width: 2.75rem;
+    height: 2.75rem;
+    inset-inline-start: auto;
+    inset-inline-end: 1rem;
+  }
+
+  .login-showcase-slide {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .login-showcase-slide h2 {
+    font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+    line-height: 1.2;
+  }
+
+  .login-showcase-dots {
+    min-width: 0;
+    justify-content: space-between;
+    gap: 0.25rem;
+    margin-top: 1rem;
+  }
+
+  .login-showcase-dots button {
+    flex: 0 1 2.75rem;
+    min-width: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-height: 2.75rem;
   }
 }
 
@@ -1300,7 +1337,9 @@
   min-width: 0;
   grid-template-columns: minmax(0, 1fr);
 }
-.appointments-page > * { min-width: 0; }
+.appointments-page > * {
+  min-width: 0;
+}
 .week-calendar {
   min-width: 0;
   max-width: 100%;
