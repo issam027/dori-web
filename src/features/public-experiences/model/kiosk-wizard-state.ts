@@ -9,8 +9,8 @@ export interface KioskWizardState {
 export type KioskWizardAction =
   | { type: 'START_WALKIN' }
   | { type: 'START_APPOINTMENT' }
-  | { type: 'NEXT' }
-  | { type: 'BACK' }
+  | { type: 'NEXT'; skipService?: boolean }
+  | { type: 'BACK'; skipService?: boolean }
   | { type: 'SHOW_RESULT' }
   | { type: 'RESET' };
 
@@ -26,10 +26,14 @@ export function kioskWizardReducer(
     case 'START_APPOINTMENT':
       return { flow: 'appointment', walkinStep: 1 };
     case 'NEXT':
+      if (state.flow === 'walkin' && state.walkinStep === 2 && action.skipService)
+        return { ...state, walkinStep: 4 };
       return state.flow === 'walkin' && state.walkinStep < 4
         ? { ...state, walkinStep: (state.walkinStep + 1) as KioskWalkinStep }
         : state;
     case 'BACK':
+      if (state.flow === 'walkin' && state.walkinStep === 4 && action.skipService)
+        return { ...state, walkinStep: 2 };
       if (state.flow !== 'walkin' || state.walkinStep === 1) return initialKioskWizardState;
       return { ...state, walkinStep: (state.walkinStep - 1) as KioskWalkinStep };
     case 'SHOW_RESULT':

@@ -9,6 +9,7 @@ import { createAppointment } from './appointment-actions';
 import { appointmentUtcIso, dateInTimeZone, isSlotAvailable, slotTime } from './appointment-rules';
 import { notify } from '@/core/notifications/notification-store';
 import { invalidateAppointments } from '@/api/client/query-invalidations';
+import { useQueueServiceSelection } from '@/design-system/use-queue-service-selection';
 import { useAppointmentTiers, useAvailability } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
 import { FormField } from '@/design-system/components/FormField';
@@ -45,12 +46,16 @@ export function AppointmentEditor({
     initialPerson ? { kind: 'existing', person: initialPerson } : null,
   );
   const [queueId, setQueueId] = useState(initialQueueId ?? queues[0]?.queueId ?? '');
-  const [tierId, setTierId] = useState(initialTierId ?? '');
   const [date, setDate] = useState(initialDate);
   const [time, setTime] = useState(initialTime ?? '09:00');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const tiers = useAppointmentTiers('appointment-editor');
+  const tiers = useAppointmentTiers(queueId);
+  const { activeTiers, tierId, setTierId } = useQueueServiceSelection(
+    queueId,
+    tiers.data?.data.items,
+    initialTierId,
+  );
   const availability = useAvailability(queueId, date);
   const serviceTimeZone = availability.data?.data.timezone || timeZone;
   const submit = async () => {
@@ -209,7 +214,7 @@ export function AppointmentEditor({
                     setQueueId(e.target.value);
                   }}
                 >
-                  <option value={0}>{__t('common.choose')}</option>
+                  <option value="">{__t('common.choose')}</option>
                   {queues
                     .filter((q) => q.appointmentsEnabled)
                     .map((q) => (
@@ -219,21 +224,24 @@ export function AppointmentEditor({
                     ))}
                 </select>
               </FormField>
-              <FormField label={__t('common.tier')}>
-                <select
-                  value={tierId}
-                  onChange={(e) => {
-                    setTierId(e.target.value);
-                  }}
-                >
-                  <option value={0}>{__t('common.choose')}</option>
-                  {tiers.data?.data.items.map((tier) => (
-                    <option key={tier.tierId} value={tier.tierId}>
-                      {tier.tierName}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+              {activeTiers.length !== 1 ? (
+                <FormField label={__t('common.tier')}>
+                  <select
+                    value={tierId}
+                    onChange={(e) => {
+                      setTierId(e.target.value);
+                    }}
+                  >
+                    <option value="">{__t('common.choose')}</option>
+                    {activeTiers.map((tier) => (
+                      <option key={tier.tierId} value={tier.tierId}>
+                        {tier.isDefault ? __t('onboarding.defaultService') + ' - ' : ''}
+                        {tier.tier?.tierName ?? tier.tierId}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              ) : null}
               <FormField label={__t('common.date')}>
                 <input
                   type="date"

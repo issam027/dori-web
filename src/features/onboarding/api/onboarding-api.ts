@@ -14,6 +14,8 @@ export {
   serviceTiersControllerAssociateTier as associateTier,
   serviceTiersControllerCreateRule as createTierRule,
   serviceTiersControllerFindTiers as findTiers,
+  serviceTiersControllerGetQueueTiers as getQueueTiers,
+  serviceTiersControllerUpdateQueueTier as updateQueueTier,
 } from '@/api/generated/tiers/tiers';
 export {
   usersControllerDeleteUser as deleteUser,

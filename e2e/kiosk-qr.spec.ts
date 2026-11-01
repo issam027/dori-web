@@ -157,8 +157,7 @@ test('shows a real tracking QR on the kiosk ticket', async ({ page }, testInfo) 
   await page.locator('input[autocomplete="family-name"]').fill('Martin');
   await page.getByRole('textbox', { name: /téléphone/i }).fill('612345678');
   await page.locator('.kiosk-actions .primary').click();
-  await page.locator('.kiosk-tier-tiles button').first().click();
-  await page.locator('.kiosk-actions .primary').click();
+  await expect(page.locator('.kiosk-tier-tiles')).toHaveCount(0);
   await page.locator('.kiosk-actions .primary').click();
 
   const qr = page.locator('.kiosk-ticket-result img.tracking-qr-image');

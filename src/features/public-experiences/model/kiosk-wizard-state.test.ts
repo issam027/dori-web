@@ -41,3 +41,11 @@ describe('kioskWizardReducer', () => {
     expect(kioskWizardReducer(inProgress, { type: 'RESET' })).toEqual(initialKioskWizardState);
   });
 });
+
+it('skips the service choice in both directions when the queue has one active service', () => {
+  const identity = { flow: 'walkin', walkinStep: 2 } as const;
+  const review = kioskWizardReducer(identity, { type: 'NEXT', skipService: true });
+  expect(review.walkinStep).toBe(4);
+  expect(kioskWizardReducer(review, { type: 'BACK', skipService: true })).toEqual(identity);
+  expect(kioskWizardReducer(identity, { type: 'NEXT' }).walkinStep).toBe(3);
+});

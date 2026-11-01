@@ -23,8 +23,11 @@ async function fillRequiredIdentity(page: Page) {
 
 async function reachTicketConfirmation(page: Page) {
   await page.getByRole('button', { name: /continuer vers le ticket/i }).click();
-  await page.getByLabel('File', { exact: true }).last().selectOption({ label: 'Accueil E2E' });
-  await page.getByLabel(/forfait/i).selectOption({ index: 1 });
+  await page
+    .getByRole('dialog')
+    .getByRole('combobox', { name: /^file/i })
+    .selectOption({ label: 'Accueil E2E' });
+  await expect(page.getByLabel(/forfait/i)).toHaveCount(0);
 }
 
 test('known-person search starts at three characters and exposes five-result pagination', async ({
@@ -171,7 +174,7 @@ test('a registration conflict stays in context and gives an actionable notificat
 }) => {
   const conflict: ApiScenarioHandler = async ({ method, path, route }) => {
     if (method !== 'POST' || path !== '/api/v1/registrations') return false;
-    await route.fulfill(apiFailure(409, 'PHONE_ALREADY_USED'));
+    await route.fulfill(apiFailure(409, 'DUPLICATE_ACTIVE_REGISTRATION'));
     return true;
   };
   await installApiScenario(page, {
@@ -184,8 +187,8 @@ test('a registration conflict stays in context and gives an actionable notificat
   await reachTicketConfirmation(page);
   await page.getByRole('button', { name: /créer le ticket/i }).click();
 
-  await expect(page.getByRole('alert')).toContainText(/inscription active/i);
-  await expect(page.getByRole('alert')).toContainText(/choisissez un autre créneau/i);
+  await expect(page.getByRole('alert')).toContainText(/(?:inscription|rendez-vous) acti/i);
+  await expect(page.getByRole('alert')).toContainText(/journ.e/i);
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page).toHaveURL(/\/desk$/);
 });

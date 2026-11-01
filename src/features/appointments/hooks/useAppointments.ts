@@ -4,7 +4,7 @@ import {
   registrationsControllerFindRegistrations,
   registrationsControllerGetAvailability,
 } from '@/api/generated/registrations/registrations';
-import { serviceTiersControllerFindTiers } from '@/api/generated/tiers/tiers';
+import { serviceTiersControllerGetQueueTiers } from '@/api/generated/tiers/tiers';
 import { queryKeys } from '@/api/client/query-keys';
 
 export function useAppointments(options: {
@@ -93,10 +93,16 @@ export function useAvailabilityRange(queueId: string | undefined, dates: readonl
   });
 }
 
-export function useAppointmentTiers(usage = 'appointments') {
+export function useAppointmentTiers(queueId: string) {
   return useQuery({
-    queryKey: queryKeys.tiers.catalog(usage),
+    queryKey: queryKeys.tiers.byQueue(queueId),
+    enabled: Boolean(queueId),
     queryFn: ({ signal }) =>
-      serviceTiersControllerFindTiers({ page: 1, pageSize: 100 }, undefined, signal),
+      serviceTiersControllerGetQueueTiers(
+        queueId,
+        { page: 1, pageSize: 100, sort: 'displayOrder:asc' },
+        undefined,
+        signal,
+      ),
   });
 }

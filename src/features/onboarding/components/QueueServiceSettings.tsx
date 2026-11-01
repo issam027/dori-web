@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronDown, Save, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, Power, PowerOff, Save, SlidersHorizontal } from 'lucide-react';
 import type {
   NotificationRuleResponseDto,
   QueueResponseDto,
@@ -35,6 +35,7 @@ export function QueueServiceSettings({
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const [defaultPending, setDefaultPending] = useState(false);
   const [queueId, setQueueId] = useState(queues[0]?.queueId ?? '');
   const selectedQueue = queues.find((queue) => queue.queueId === queueId) ?? queues[0];
   const queueTierQueries = useQueries({
@@ -71,6 +72,10 @@ export function QueueServiceSettings({
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeys.tiers.byQueue(queueId) }),
       queryClient.invalidateQueries({ queryKey: queryKeys.tiers.rules(queueId, tierId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.publicExperience.kioskTiers(queueId) }),
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.publicExperience.kioskTierRules(queueId, tierId),
+      }),
     ]);
   };
   const availableTiers = tiers.filter((tier) => tier.isActive);
@@ -119,44 +124,83 @@ export function QueueServiceSettings({
                   }}
                 />
               ) : (
-                <div className="queue-service-grid">
-                  {availableTiers.map((tier, index) => {
-                    const association = queueTiers.find((item) => item.tierId === tier.tierId);
-                    const globalIndex = associations.findIndex(
-                      (item) => item.queueId === queue.queueId && item.tierId === tier.tierId,
-                    );
-                    const rules = ruleQueries[globalIndex]?.data?.data.items ?? [];
-                    if (association?.isActive && ruleQueries[globalIndex]?.isPending) {
-                      return (
-                        <div key={tier.tierId} aria-label={tier.tierName}>
-                          <DorifyLoader compact />
-                        </div>
+                <>
+                  <label className="queue-default-service">
+                    <span>{t('onboarding.defaultService')}</span>
+                    <select
+                      value={
+                        queueTiers.find((item) => item.isActive && item.isDefault)?.tierId ?? ''
+                      }
+                      disabled={defaultPending || !queueTiers.some((item) => item.isActive)}
+                      onChange={(event) => {
+                        const tierId = event.target.value;
+                        const targetTierId =
+                          tierId ||
+                          queueTiers.find((item) => item.isActive && item.isDefault)?.tierId;
+                        if (!targetTierId) return;
+                        setDefaultPending(true);
+                        void serviceTiersControllerUpdateQueueTier(queue.queueId, targetTierId, {
+                          isDefault: Boolean(tierId),
+                        })
+                          .then(() => refresh(queue.queueId, tierId))
+                          .then(() =>
+                            notify({ tone: 'success', title: t('settings.queueServices.saved') }),
+                          )
+                          .catch(notifyError)
+                          .finally(() => setDefaultPending(false));
+                      }}
+                    >
+                      <option value="">{t('common.none')}</option>
+                      {queueTiers
+                        .filter((item) => item.isActive)
+                        .map((item) => (
+                          <option key={item.tierId} value={item.tierId}>
+                            {item.tier?.tierName ??
+                              tiers.find((tier) => tier.tierId === item.tierId)?.tierName ??
+                              item.tierId}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <div className="queue-service-grid">
+                    {availableTiers.map((tier, index) => {
+                      const association = queueTiers.find((item) => item.tierId === tier.tierId);
+                      const globalIndex = associations.findIndex(
+                        (item) => item.queueId === queue.queueId && item.tierId === tier.tierId,
                       );
-                    }
-                    if (association?.isActive && ruleQueries[globalIndex]?.isError) {
+                      const rules = ruleQueries[globalIndex]?.data?.data.items ?? [];
+                      if (association?.isActive && ruleQueries[globalIndex]?.isPending) {
+                        return (
+                          <div key={tier.tierId} aria-label={tier.tierName}>
+                            <DorifyLoader compact />
+                          </div>
+                        );
+                      }
+                      if (association?.isActive && ruleQueries[globalIndex]?.isError) {
+                        return (
+                          <div key={tier.tierId} aria-label={tier.tierName}>
+                            <ErrorState
+                              onRetry={() => {
+                                void ruleQueries[globalIndex]?.refetch();
+                              }}
+                            />
+                          </div>
+                        );
+                      }
                       return (
-                        <div key={tier.tierId} aria-label={tier.tierName}>
-                          <ErrorState
-                            onRetry={() => {
-                              void ruleQueries[globalIndex]?.refetch();
-                            }}
-                          />
-                        </div>
+                        <TierConfigurationCard
+                          key={JSON.stringify([tier.tierId, association, rules])}
+                          queue={queue}
+                          tier={tier}
+                          association={association}
+                          rules={rules}
+                          order={index + 1}
+                          refresh={refresh}
+                        />
                       );
-                    }
-                    return (
-                      <TierConfigurationCard
-                        key={JSON.stringify([tier.tierId, association, rules])}
-                        queue={queue}
-                        tier={tier}
-                        association={association}
-                        rules={rules}
-                        order={index + 1}
-                        refresh={refresh}
-                      />
-                    );
-                  })}
-                </div>
+                    })}
+                  </div>
+                </>
               )}
             </section>
           );
@@ -198,7 +242,6 @@ function TierConfigurationCard({
   const thresholdRule = ruleFor(rules, 'thresholdSms');
   const [price, setPrice] = useState(association?.price ?? 0);
   const [currency, setCurrency] = useState(association?.currencyOverride ?? '');
-  const [isDefault, setDefault] = useState(association?.isDefault ?? false);
   const [welcomeSms, setWelcomeSms] = useState(Boolean(welcomeSmsRule));
   const [welcomeEmail, setWelcomeEmail] = useState(Boolean(welcomeEmailRule));
   const [alertSms, setAlertSms] = useState(Boolean(thresholdRule));
@@ -242,7 +285,6 @@ function TierConfigurationCard({
       await serviceTiersControllerUpdateQueueTier(queue.queueId, tier.tierId, {
         price,
         currency: currency || null,
-        isDefault,
       });
       await Promise.all([
         reconcile(welcomeSmsRule, welcomeSms, {
@@ -287,9 +329,15 @@ function TierConfigurationCard({
           variant="unstyled"
           type="button"
           className="tier-choice tier-choice-toggle"
-          aria-label={tier.tierName}
-          aria-pressed={Boolean(association?.isActive)}
-          disabled={pending}
+          aria-label={
+            (association?.isActive ? t('onboarding.settings.desactiver') : t('common.activate')) +
+            ' ' +
+            tier.tierName
+          }
+          disabled={pending || Boolean(association?.isActive && tier.isSystem)}
+          unavailableReason={
+            association?.isActive && tier.isSystem ? t('apiErrors.TIER_IS_SYSTEM') : undefined
+          }
           onClick={() =>
             void execute(
               () =>
@@ -300,7 +348,7 @@ function TierConfigurationCard({
                       price: 0,
                       currency: null,
                       displayOrder: order,
-                      isDefault: order === 1,
+                      isDefault: false,
                     }),
               association?.isActive
                 ? t('settings.queueServices.disabled')
@@ -308,15 +356,15 @@ function TierConfigurationCard({
             )
           }
         >
-          <span className={`status-badge ${association?.isActive ? 'status-success' : ''}`}>
-            {association?.isActive ? (
-              <>
-                <Check /> {t('onboarding.serviceEnabled')}
-              </>
-            ) : (
-              t('onboarding.enableService')
-            )}
-          </span>
+          {association?.isActive ? (
+            <>
+              <PowerOff aria-hidden="true" /> {t('onboarding.settings.desactiver')}
+            </>
+          ) : (
+            <>
+              <Power aria-hidden="true" /> {t('common.activate')}
+            </>
+          )}
         </Button>
       </header>
       {association?.isActive ? (
@@ -356,19 +404,6 @@ function TierConfigurationCard({
                 </select>
               </label>
             </div>
-            <label className="tier-default-option">
-              <input
-                type="radio"
-                name={`default-tier-${queue.queueId}`}
-                checked={isDefault}
-                onChange={() => {
-                  setDefault(true);
-                }}
-              />
-              <span>
-                <strong>{t('onboarding.defaultService')}</strong>
-              </span>
-            </label>
             <fieldset className="tier-options-fieldset">
               <legend>{t('onboarding.serviceOptions')}</legend>
               <label>

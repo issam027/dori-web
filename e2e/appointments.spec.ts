@@ -44,7 +44,7 @@ async function selectNewPerson(page: Page) {
   await page.getByRole('textbox', { name: /^nom/i }).fill('Rendezvous');
   await page.getByRole('textbox', { name: /téléphone/i }).fill('+33698765432');
   await page.getByRole('button', { name: /^continuer/i }).click();
-  await page.getByLabel(/forfait/i).selectOption({ label: 'Standard E2E' });
+  await expect(page.getByLabel(/forfait/i)).toHaveCount(0);
 }
 
 async function openEmptySlot(page: Page) {

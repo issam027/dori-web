@@ -128,11 +128,7 @@ test('kiosk completes the walk-in journey and purges personal data', async ({ pa
   await page.getByRole('textbox', { name: /téléphone/i }).fill('20 123 456');
   await expect(page.getByText(/\+21620123456/)).toBeVisible();
   await page.getByRole('button', { name: /continuer/i }).click();
-  const tier = page.getByRole('button', { name: /standard/i });
-  await expect(tier).toContainText(/SMS.*inclus/i);
-  await expect(tier).toContainText(/Lien de suivi.*inclus/i);
-  await tier.click();
-  await page.getByRole('button', { name: /continuer/i }).click();
+  await expect(page.locator('.kiosk-tier-tiles')).toHaveCount(0);
   await expect(page.locator('.kiosk-review')).toContainText('Lina');
   await expect(page.locator('.kiosk-review')).toContainText('lina.martin@example.test');
   await expect(page.locator('.kiosk-review')).toContainText('+21620123456');

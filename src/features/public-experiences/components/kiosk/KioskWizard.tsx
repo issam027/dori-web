@@ -1,3 +1,4 @@
+import { useQueueServiceSelection } from '@/design-system/use-queue-service-selection';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
 import {
@@ -14,7 +15,6 @@ import {
 } from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
-  QueueTierResponseDto,
   RegistrationResponseDto,
 } from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
@@ -54,7 +54,6 @@ export function KioskWizard() {
   const site = useSite(activeSiteId);
   const [{ flow, walkinStep }, dispatch] = useReducer(kioskWizardReducer, initialKioskWizardState);
   const [queueId, setQueueId] = useState<string>();
-  const [tier, setTier] = useState<QueueTierResponseDto>();
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
@@ -66,20 +65,6 @@ export function KioskWizard() {
   const handlePrintReady = useCallback(() => {
     setPrintReady(true);
   }, []);
-  const purge = useCallback(() => {
-    dispatch({ type: 'RESET' });
-    setQueueId(undefined);
-    setTier(undefined);
-    setLastName('');
-    setFirstName('');
-    setEmail('');
-    setPhone('');
-    setScheduledTime('');
-    setFound(undefined);
-    setResult(undefined);
-    setPrintReady(false);
-  }, []);
-  const watchdog = useKioskWatchdog(purge, kioskIdleMs(import.meta.env.VITE_KIOSK_IDLE_MS));
   const scopeSites = user?.scope.siteIds ?? [];
   const validScope =
     Boolean(activeSiteId) &&
@@ -93,6 +78,27 @@ export function KioskWizard() {
     queueId,
     validScope,
   );
+  const { activeTiers, tier, setTierId } = useQueueServiceSelection(
+    queueId,
+    tiers.data?.data.items,
+  );
+  const skipService = activeTiers.length === 1;
+  const steps = skipService ? [1, 2, 4] : [1, 2, 3, 4];
+  const visibleStep = steps.indexOf(walkinStep) + 1;
+  const purge = useCallback(() => {
+    dispatch({ type: 'RESET' });
+    setQueueId(undefined);
+    setTierId('');
+    setLastName('');
+    setFirstName('');
+    setEmail('');
+    setPhone('');
+    setScheduledTime('');
+    setFound(undefined);
+    setResult(undefined);
+    setPrintReady(false);
+  }, [setTierId]);
+  const watchdog = useKioskWatchdog(purge, kioskIdleMs(import.meta.env.VITE_KIOSK_IDLE_MS));
   const phoneValid = /^\+[1-9]\d{6,14}$/.test(phone);
   const emailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const { register, lookup, checkIn } = useKioskRegistration({
@@ -257,16 +263,19 @@ export function KioskWizard() {
         <div className="kiosk-panel">
           <div
             className="kiosk-progress"
-            aria-label={__t('wizard.progress', { step: String(walkinStep), stepCount: '4' })}
+            aria-label={__t('wizard.progress', {
+              step: String(visibleStep),
+              stepCount: String(steps.length),
+            })}
           >
-            {[1, 2, 3, 4].map((step) => (
+            {steps.map((step) => (
               <span className={step <= walkinStep ? 'done' : ''} key={step} />
             ))}
           </div>
           <div className="kiosk-stage-title">
             <span>
               {__t('common.etape')}
-              {walkinStep} {__t('kiosk.walkIn.totalSteps')}
+              {visibleStep} / {steps.length}
             </span>
             <h1>
               {
@@ -302,7 +311,7 @@ export function KioskWizard() {
                     key={queue.queueId}
                     onClick={() => {
                       setQueueId(queue.queueId);
-                      setTier(undefined);
+                      setTierId('');
                     }}
                   >
                     <small>{__t('public-experiences.kiosk.serviceDisponible')}</small>
@@ -397,76 +406,74 @@ export function KioskWizard() {
           {walkinStep === 3 ? (
             <KioskTierStep>
               <div className="kiosk-tiles kiosk-tier-tiles">
-                {tiers.data?.data.items
-                  .filter((item) => item.isActive)
-                  .map((item) => {
-                    const tierIndex = tiers.data.data.items.findIndex(
+                {activeTiers.map((item) => {
+                  const tierIndex =
+                    tiers.data?.data.items.findIndex(
                       (candidate) => candidate.tierId === item.tierId,
-                    );
-                    const rules =
-                      tierRules[tierIndex]?.data?.data.items.filter((rule) => rule.isActive) ?? [];
-                    const hasWelcome = rules.some((rule) => rule.notificationType === 'welcome');
-                    const hasThreshold = rules.some(
-                      (rule) => rule.notificationType === 'threshold',
-                    );
-                    const hasSms = rules.some((rule) => rule.channel === 'sms');
-                    const hasTracking = rules.some((rule) => rule.includeTrackingLink);
-                    return (
-                      <Button
-                        variant="unstyled"
-                        type="button"
-                        className={tier?.tierId === item.tierId ? 'selected' : ''}
-                        key={item.tierId}
-                        onClick={() => {
-                          setTier(item);
-                        }}
-                      >
-                        <small>
-                          {item.isDefault
-                            ? __t('public-experiences.kiosk.recommande')
-                            : __t('public-experiences.kiosk.optionDisponible')}
-                        </small>
-                        <strong>
-                          {item.tier?.tierName ??
-                            __t('kiosk.tier.name', {
-                              value0: item.tierId,
-                            })}
-                        </strong>
-                        <span>
-                          {new Intl.NumberFormat(undefined, {
-                            style: 'currency',
-                            currency: item.currency,
-                          }).format(item.price)}
-                        </span>
-                        <ul className="kiosk-tier-benefits">
-                          <li className={hasSms ? 'included' : ''}>
-                            {__t('common.sms')}
-                            {hasSms
-                              ? __t('public-experiences.kiosk.inclus')
-                              : __t('public-experiences.kiosk.nonConfigure')}
-                          </li>
-                          <li className={hasWelcome ? 'included' : ''}>
-                            {__t('public-experiences.kiosk.messageDeBienvenue')}
-                            {hasWelcome
-                              ? __t('public-experiences.kiosk.inclus')
-                              : __t('public-experiences.kiosk.nonConfigure')}
-                          </li>
-                          <li className={hasThreshold ? 'included' : ''}>
-                            {__t('public-experiences.kiosk.alerteDApproche')}
-                            {hasThreshold
-                              ? __t('public-experiences.kiosk.incluse')
-                              : __t('public-experiences.kiosk.nonConfiguree')}
-                          </li>
-                          <li className={hasTracking ? 'included' : ''}>
-                            {__t('public-experiences.kiosk.lienDeSuivi')}
-                            {hasTracking
-                              ? __t('public-experiences.kiosk.inclus')
-                              : __t('public-experiences.kiosk.nonConfigure')}
-                          </li>
-                        </ul>
-                      </Button>
-                    );
-                  })}
+                    ) ?? -1;
+                  const rules =
+                    tierRules[tierIndex]?.data?.data.items.filter((rule) => rule.isActive) ?? [];
+                  const hasWelcome = rules.some((rule) => rule.notificationType === 'welcome');
+                  const hasThreshold = rules.some((rule) => rule.notificationType === 'threshold');
+                  const hasSms = rules.some((rule) => rule.channel === 'sms');
+                  const hasTracking = rules.some((rule) => rule.includeTrackingLink);
+                  return (
+                    <Button
+                      variant="unstyled"
+                      type="button"
+                      className={tier?.tierId === item.tierId ? 'selected' : ''}
+                      key={item.tierId}
+                      aria-pressed={tier?.tierId === item.tierId}
+                      onClick={() => {
+                        setTierId(item.tierId);
+                      }}
+                    >
+                      <small>
+                        {item.isDefault
+                          ? __t('onboarding.defaultService')
+                          : __t('public-experiences.kiosk.optionDisponible')}
+                      </small>
+                      <strong>
+                        {item.tier?.tierName ??
+                          __t('kiosk.tier.name', {
+                            value0: item.tierId,
+                          })}
+                      </strong>
+                      <span>
+                        {new Intl.NumberFormat(undefined, {
+                          style: 'currency',
+                          currency: item.currency,
+                        }).format(item.price)}
+                      </span>
+                      <ul className="kiosk-tier-benefits">
+                        <li className={hasSms ? 'included' : ''}>
+                          {__t('common.sms')}
+                          {hasSms
+                            ? __t('public-experiences.kiosk.inclus')
+                            : __t('public-experiences.kiosk.nonConfigure')}
+                        </li>
+                        <li className={hasWelcome ? 'included' : ''}>
+                          {__t('public-experiences.kiosk.messageDeBienvenue')}
+                          {hasWelcome
+                            ? __t('public-experiences.kiosk.inclus')
+                            : __t('public-experiences.kiosk.nonConfigure')}
+                        </li>
+                        <li className={hasThreshold ? 'included' : ''}>
+                          {__t('public-experiences.kiosk.alerteDApproche')}
+                          {hasThreshold
+                            ? __t('public-experiences.kiosk.incluse')
+                            : __t('public-experiences.kiosk.nonConfiguree')}
+                        </li>
+                        <li className={hasTracking ? 'included' : ''}>
+                          {__t('public-experiences.kiosk.lienDeSuivi')}
+                          {hasTracking
+                            ? __t('public-experiences.kiosk.inclus')
+                            : __t('public-experiences.kiosk.nonConfigure')}
+                        </li>
+                      </ul>
+                    </Button>
+                  );
+                })}
               </div>
             </KioskTierStep>
           ) : null}
@@ -567,7 +574,7 @@ export function KioskWizard() {
               onClick={() => {
                 clearRegistrationError();
                 if (walkinStep === 1) purge();
-                else dispatch({ type: 'BACK' });
+                else dispatch({ type: 'BACK', skipService });
               }}
             >
               <ArrowLeft aria-hidden="true" />
@@ -579,13 +586,18 @@ export function KioskWizard() {
               className="primary"
               disabled={
                 (walkinStep === 1 && !queueId) ||
-                (walkinStep === 2 && (!lastName.trim() || !phoneValid || !emailValid)) ||
+                (walkinStep === 2 &&
+                  (!lastName.trim() ||
+                    !phoneValid ||
+                    !emailValid ||
+                    tiers.isPending ||
+                    activeTiers.length === 0)) ||
                 (walkinStep === 3 && !tier) ||
                 (walkinStep === 4 && register.isPending)
               }
               onClick={() => {
                 if (walkinStep === 4) register.mutate();
-                else dispatch({ type: 'NEXT' });
+                else dispatch({ type: 'NEXT', skipService });
               }}
             >
               {walkinStep === 4

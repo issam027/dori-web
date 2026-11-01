@@ -10,6 +10,8 @@ import {
   createTierRule,
   deleteSite,
   findTiers,
+  getQueueTiers,
+  updateQueueTier,
   removeQueue,
   updateQueue,
   updateSite,
@@ -152,7 +154,7 @@ export function OnboardingWizard() {
               price: configuration?.price ?? 0,
               currency: configuration?.currency || null,
               displayOrder: configuration?.displayOrder ?? index + 1,
-              isDefault: configuration?.isDefault ?? index === 0,
+              isDefault: configuration?.isDefault ?? false,
             });
             if (configuration?.welcomeSms)
               await createTierRule(queueId, tier.tierId, {
@@ -174,6 +176,18 @@ export function OnboardingWizard() {
                 thresholdValue: configuration.alertPosition,
                 includeTrackingLink: configuration.includeTrackingLink,
               });
+          }
+          // Queue creation initially enables the free tier as default. Respect an
+          // explicit "none" choice even if that tier was not selected in this step.
+          if (
+            !selected.some((tier) => draft.tierConfigurations[queueId]?.[tier.tierId]?.isDefault)
+          ) {
+            const current = await getQueueTiers(queueId, { page: 1, pageSize: 100 });
+            for (const item of current.data.items.filter(
+              (item) => item.isActive && item.isDefault,
+            )) {
+              await updateQueueTier(queueId, item.tierId, { isDefault: false });
+            }
           }
           done.add(queueId);
           value = { ...value, associatedTierQueueIds: [...done] };
@@ -786,23 +800,19 @@ function TiersStep({
       ),
     );
     if (!removing)
-      currentConfigurations[tierKey] = defaultConfiguration(
-        nextSelected.length,
-        selected.length === 0,
-      );
+      currentConfigurations[tierKey] = defaultConfiguration(nextSelected.length, false);
 
-    const hasDefault = nextSelected.some((current) => currentConfigurations[current]?.isDefault);
     const nextConfigurations = Object.fromEntries(
       nextSelected.map((current, index) => {
         const currentKey = current;
         const configuration =
-          currentConfigurations[currentKey] ?? defaultConfiguration(index + 1, index === 0);
+          currentConfigurations[currentKey] ?? defaultConfiguration(index + 1, false);
         return [
           currentKey,
           {
             ...configuration,
             displayOrder: index + 1,
-            isDefault: hasDefault ? configuration.isDefault : index === 0,
+            isDefault: configuration.isDefault,
           },
         ];
       }),
@@ -823,9 +833,8 @@ function TiersStep({
     const selected = draft.selectedTierIds[queueKey] ?? [];
     const currentConfigurations = { ...(draft.tierConfigurations[queueKey] ?? {}) };
     const current =
-      currentConfigurations[tierKey] ??
-      defaultConfiguration(selected.indexOf(tierId) + 1, selected[0] === tierId);
-    if (patch.isDefault) {
+      currentConfigurations[tierKey] ?? defaultConfiguration(selected.indexOf(tierId) + 1, false);
+    if (patch.isDefault || !tierId) {
       selected.forEach((selectedTierId) => {
         const selectedKey = selectedTierId;
         const configuration =
@@ -834,7 +843,7 @@ function TiersStep({
         currentConfigurations[selectedKey] = { ...configuration, isDefault: false };
       });
     }
-    currentConfigurations[tierKey] = { ...current, ...patch };
+    if (tierId) currentConfigurations[tierKey] = { ...current, ...patch };
     save({
       ...draft,
       tierConfigurations: {
@@ -870,15 +879,32 @@ function TiersStep({
                   : __t('onboarding.onboarding.selectionRequise')}
               </span>
             </div>
+            {selected.length ? (
+              <label className="queue-default-service">
+                <span>{__t('onboarding.defaultService')}</span>
+                <select
+                  value={
+                    selected.find((id) => draft.tierConfigurations[queueKey]?.[id]?.isDefault) ?? ''
+                  }
+                  onChange={(event) => configure(queueId, event.target.value, { isDefault: true })}
+                >
+                  <option value="">{__t('common.none')}</option>
+                  {fixed
+                    .filter((tier) => selected.includes(tier.tierId))
+                    .map((tier) => (
+                      <option key={tier.tierId} value={tier.tierId}>
+                        {tier.tierName}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            ) : null}
             <div className="tier-card-grid">
               {fixed.map((tier) => {
                 const isSelected = selected.includes(tier.tierId);
                 const configuration =
                   draft.tierConfigurations[queueKey]?.[tier.tierId] ??
-                  defaultConfiguration(
-                    selected.indexOf(tier.tierId) + 1,
-                    selected[0] === tier.tierId,
-                  );
+                  defaultConfiguration(selected.indexOf(tier.tierId) + 1, false);
                 const notificationsEnabled =
                   configuration.welcomeSms || configuration.welcomeEmail || configuration.alertSms;
                 return (
@@ -946,19 +972,6 @@ function TiersStep({
                             </select>
                           </label>
                         </div>
-                        <label className="tier-default-option">
-                          <input
-                            type="radio"
-                            name={`default-tier-${queueId}`}
-                            checked={configuration.isDefault}
-                            onChange={() => {
-                              configure(queueId, tier.tierId, { isDefault: true });
-                            }}
-                          />
-                          <span>
-                            <strong>{__t('onboarding.defaultService')}</strong>
-                          </span>
-                        </label>
                         <fieldset className="tier-options-fieldset">
                           <legend>{__t('onboarding.serviceOptions')}</legend>
                           <label>

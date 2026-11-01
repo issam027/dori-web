@@ -19,6 +19,7 @@ import {
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { Button } from '@/design-system/components/Button';
 import { printDocument } from '@/shared/printing/print-document';
+import { useQueueServiceSelection } from '@/design-system/use-queue-service-selection';
 import { useQuickRegistrationData } from './hooks/useQuickRegistrationData';
 
 export function QuickRegistration({
@@ -31,7 +32,6 @@ export function QuickRegistration({
   const { t: __t, i18n } = useTranslation();
   const [choice, setChoice] = useState<PersonChoice | null>(null);
   const [queueId, setQueueId] = useState(queues[0]?.queueId ?? '');
-  const [tierId, setTierId] = useState('');
   const [entryType, setEntryType] = useState<'walkin' | 'appointment'>('walkin');
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
@@ -48,7 +48,10 @@ export function QuickRegistration({
     appointmentDate,
     entryType === 'appointment',
   );
-  const activeTiers = tiers.data?.data.items.filter((item) => item.isActive) ?? [];
+  const { activeTiers, tierId, setTierId } = useQueueServiceSelection(
+    queueId,
+    tiers.data?.data.items,
+  );
   const serviceTimeZone = availability.data?.data.timezone || site.data?.data.timezone || 'UTC';
   const availableSlots = availability.data?.data.days[0]?.slots?.filter(isSlotAvailable) ?? [];
   const submit = async () => {
@@ -307,7 +310,7 @@ export function QuickRegistration({
                       setAppointmentTime('');
                     }}
                   >
-                    <option value={0}>{__t('common.choose')}</option>
+                    <option value="">{__t('common.choose')}</option>
                     {queues.map((queue) => (
                       <option key={queue.queueId} value={queue.queueId}>
                         {queue.queueName}
@@ -315,29 +318,32 @@ export function QuickRegistration({
                     ))}
                   </select>
                 </FormField>
-                <FormField label={__t('common.tier')} required>
-                  <select
-                    value={tierId}
-                    onChange={(e) => {
-                      setTierId(e.target.value);
-                    }}
-                  >
-                    <option value={0}>{__t('common.choose')}</option>
-                    {activeTiers.map((tier) => (
-                      <option key={tier.tierId} value={tier.tierId}>
-                        {tier.tier?.tierName ??
-                          __t('queue-operations.quickRegistration.serviceFallback', {
-                            id: tier.tierId,
-                          })}{' '}
-                        ·{' '}
-                        {new Intl.NumberFormat(i18n.language, {
-                          style: 'currency',
-                          currency: tier.currency,
-                        }).format(tier.price)}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
+                {activeTiers.length !== 1 ? (
+                  <FormField label={__t('common.tier')} required>
+                    <select
+                      value={tierId}
+                      onChange={(e) => {
+                        setTierId(e.target.value);
+                      }}
+                    >
+                      <option value="">{__t('common.choose')}</option>
+                      {activeTiers.map((tier) => (
+                        <option key={tier.tierId} value={tier.tierId}>
+                          {tier.isDefault ? __t('onboarding.defaultService') + ' - ' : ''}
+                          {tier.tier?.tierName ??
+                            __t('queue-operations.quickRegistration.serviceFallback', {
+                              id: tier.tierId,
+                            })}{' '}
+                          ·{' '}
+                          {new Intl.NumberFormat(i18n.language, {
+                            style: 'currency',
+                            currency: tier.currency,
+                          }).format(tier.price)}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                ) : null}
                 <FormField label={__t('common.type')}>
                   <select
                     value={entryType}

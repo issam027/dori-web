@@ -114,7 +114,7 @@ export function useKioskCatalog(
     })),
   });
   const tiers = useQuery({
-    queryKey: queryKeys.publicExperience.kioskTiers(queueId),
+    queryKey: queryKeys.tiers.byQueue(queueId),
     enabled: Boolean(queueId),
     queryFn: ({ signal }) =>
       serviceTiersControllerGetQueueTiers(
@@ -126,7 +126,7 @@ export function useKioskCatalog(
   });
   const tierRules = useQueries({
     queries: (tiers.data?.data.items ?? []).map((item) => ({
-      queryKey: queryKeys.publicExperience.kioskTierRules(item.queueId, item.tierId),
+      queryKey: queryKeys.tiers.rules(item.queueId, item.tierId),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         serviceTiersControllerGetRules(
           item.queueId,

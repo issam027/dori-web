@@ -1277,3 +1277,32 @@ table td small {
   justify-content: center;
   gap: 6px;
 }
+
+.queue-default-service {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 32rem);
+  min-width: 0;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+.queue-default-service select {
+  width: 100%;
+  min-width: 0;
+}
+.queue-service-settings .tier-choice-toggle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  color: var(--color-primary);
+}
+.queue-service-settings .tier-choice-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+.queue-service-settings .tier-choice-toggle:disabled {
+  opacity: 0.55;
+}
