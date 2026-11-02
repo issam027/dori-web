@@ -287,4 +287,10 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.confirmTakeoverTitle': 'Take over this counter?',
   'cockpit.confirmTakeoverDescription': 'The currently open session will be replaced.',
   'cockpit.lastSync': 'Synced {{time}}',
+  'cockpit.calmTitle': 'No one is waiting in your queues',
+  'cockpit.calmBody': 'Use this quieter period to anticipate arrivals and balance the workload.',
+  'cockpit.calmActive': 'Current service is still in progress.',
+  'cockpit.calmNext': 'Keep an eye on upcoming arrivals and adjust counters to demand.',
+  'cockpit.calmAppointments': 'Appointments remaining today: {{count}}.',
+  'cockpit.calmAgenda': 'Prepare for appointments',
 };

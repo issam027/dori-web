@@ -1,9 +1,27 @@
+import { CockpitCalmState } from './components/CockpitCalmState';
+import { hasAnyPermission } from '@/core/permissions/permissions';
 import { QueueCard } from './components/CockpitQueueCard';
 import { personName } from './model/cockpit-presentation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { BellRing, CalendarClock, CheckCircle2, History, LayoutGrid, Lightbulb, MonitorUp, PhoneCall, RefreshCw, Search, TriangleAlert, Users, UserX, Volume2, VolumeX } from 'lucide-react';
+import {
+  BellRing,
+  CalendarClock,
+  CheckCircle2,
+  History,
+  LayoutGrid,
+  Lightbulb,
+  MonitorUp,
+  PhoneCall,
+  RefreshCw,
+  Search,
+  TriangleAlert,
+  Users,
+  UserX,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import {
   ErrorCode,
   type CockpitQueueItemDto,
@@ -85,7 +103,8 @@ export function CockpitPage() {
   const [mobileTab, setMobileTab] = useState<'work' | 'summary' | 'activity'>('work');
   const queryClient = useQueryClient();
   const siteId = useScopeStore((state) => state.activeSiteId);
-  const userId = useSessionStore((state) => state.user?.userId);
+  const user = useSessionStore((state) => state.user);
+  const userId = user?.userId;
   const cockpit = useCockpit(siteId);
   const site = useSite(siteId);
   const actions = useCockpitActions(siteId);
@@ -475,6 +494,16 @@ export function CockpitPage() {
                 ))}
               </div>
             </section>
+          ) : queues.length > 0 && totals.waiting === 0 && !cockpit.isError ? (
+            <CockpitCalmState
+              hidden={mobile && mobileTab !== 'work'}
+              activeCalls={totals.activeCalls}
+              appointments={totals.appointments}
+              canViewAppointments={hasAnyPermission(user, [
+                'appointment_manage',
+                'appointment_checkin',
+              ])}
+            />
           ) : null}
 
           {activeQueues.length ? (

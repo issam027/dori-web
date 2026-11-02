@@ -293,4 +293,12 @@ export const operations = {
   'cockpit.confirmTakeoverTitle': 'Reprendre ce guichet ?',
   'cockpit.confirmTakeoverDescription': 'La session actuellement ouverte sera remplacée.',
   'cockpit.lastSync': 'Synchronisé {{time}}',
+  'cockpit.calmTitle': 'Aucune personne en attente sur vos files',
+  'cockpit.calmBody':
+    'Profitez de cette accalmie pour anticiper les arrivées et lisser l’activité.',
+  'cockpit.calmActive': 'Les prises en charge en cours se poursuivent.',
+  'cockpit.calmNext':
+    'Gardez un œil sur les prochaines arrivées et adaptez les guichets à l’affluence.',
+  'cockpit.calmAppointments': 'Rendez-vous restants aujourd’hui : {{count}}.',
+  'cockpit.calmAgenda': 'Préparer les rendez-vous',
 } as const;

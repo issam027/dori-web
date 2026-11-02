@@ -299,4 +299,10 @@ export const operations: DomainTranslations<typeof import('../fr/operations').op
   'cockpit.confirmTakeoverTitle': 'استلام هذا الشباك؟',
   'cockpit.confirmTakeoverDescription': 'سيتم استبدال الجلسة المفتوحة حالياً.',
   'cockpit.lastSync': 'آخر مزامنة {{time}}',
+  'cockpit.calmTitle': 'لا أحد ينتظر في قوائم الانتظار الخاصة بك',
+  'cockpit.calmBody': 'استفد من هذه الفترة الهادئة لاستباق وصول الزوار وتوزيع النشاط.',
+  'cockpit.calmActive': 'تتواصل خدمة الأشخاص الذين تتم رعايتهم حاليا.',
+  'cockpit.calmNext': 'تابع وصول الزوار القادمين واضبط عدد الشبابيك حسب الإقبال.',
+  'cockpit.calmAppointments': 'المواعيد المتبقية اليوم: {{count}}.',
+  'cockpit.calmAgenda': 'الاستعداد للمواعيد',
 };

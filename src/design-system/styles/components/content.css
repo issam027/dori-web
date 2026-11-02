@@ -1517,3 +1517,25 @@
     transition: none;
   }
 }
+
+.cockpit-calm-state {
+  border-color: color-mix(in srgb, var(--color-success) 26%, var(--color-line));
+  background: color-mix(in srgb, var(--color-success) 5%, var(--color-surface));
+}
+.cockpit-calm-state article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+}
+.cockpit-calm-state article > svg {
+  color: var(--color-success);
+}
+@media (max-width: 42rem) {
+  .cockpit-calm-state article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .cockpit-calm-state article > .button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
