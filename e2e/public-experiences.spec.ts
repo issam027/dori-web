@@ -254,3 +254,55 @@ for (const scenario of [
     await expect(page.locator('body')).not.toContainText(scenario.code.toLowerCase());
   });
 }
+
+test('cloud tracking receives SSE snapshots without periodic REST reads', async ({ page }) => {
+  let reads = 0;
+  let connections = 0;
+  await installApiScenario(page, {
+    handlers: [
+      async ({ path, route }) => {
+        if (path === '/api/v1/public/registrations/position') {
+          reads++;
+          await route.fulfill({
+            json: apiEnvelope({
+              ticketNumber: 'INTRA-42',
+              status: 'waiting',
+              registrationStatus: 'waiting',
+              position: 3,
+              estimatedWaitMinutes: 6,
+              sourceConnectivity: 'online',
+            }),
+          });
+          return true;
+        }
+        if (path === '/api/v1/realtime/tracking') {
+          connections++;
+          await route.fulfill({
+            contentType: 'text/event-stream',
+            body:
+              'event: tracking_changed\nid: 2\ndata: ' +
+              JSON.stringify({
+                ticketNumber: 'INTRA-42',
+                status: 'in_progress',
+                registrationStatus: 'in_progress',
+                position: 0,
+                counterName: 'Guichet 2',
+                sourceConnectivity: 'online',
+              }) +
+              '\n\n',
+          });
+          return true;
+        }
+        return false;
+      },
+    ],
+  });
+  await page.clock.install();
+  await page.goto('/track?token=550e8400-e29b-41d4-a716-446655440000');
+  await expect(page.locator('.tracking-status-in_progress')).toBeVisible();
+  await expect(page.getByText('Guichet 2', { exact: true }).first()).toBeVisible();
+  expect(connections).toBeGreaterThan(0);
+  expect(reads).toBe(1);
+  await page.clock.fastForward(65_000);
+  expect(reads).toBe(1);
+});

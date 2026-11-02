@@ -154,8 +154,7 @@ export const admin = {
   'settings.rulesHelp': 'Règles persistantes par file et niveau, avec simulation locale.',
   'settings.queueServices.empty': 'Aucune file n’est configurée pour ce site.',
   'settings.queueServices.count': '{{count}} service(s)',
-  'settings.queueServices.activateFirst':
-    'Activez d’abord un service dans l’onglet Niveaux de service.',
+  'settings.queueServices.activateFirst': 'Activez d’abord un service dans l’onglet Services.',
   'settings.queueServices.active': 'Actif',
   'settings.queueServices.disable': 'Désactiver',
   'settings.queueServices.enable': 'Activer et configurer',

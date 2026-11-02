@@ -112,7 +112,7 @@ export const common = {
   'common.min': 'min',
   'common.name': 'Nom',
   'common.next': 'Suivant',
-  'common.niveauxDeService': 'Niveaux de service',
+  'common.niveauxDeService': 'Services',
   'common.notifications': 'Notifications',
   'common.nouvellePersonne': 'Nouvelle personne',
   'common.ouverture': 'Ouverture',

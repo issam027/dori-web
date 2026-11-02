@@ -1866,8 +1866,8 @@
   margin: 0 0 4px;
   color: var(--color-accent);
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .sr-only {

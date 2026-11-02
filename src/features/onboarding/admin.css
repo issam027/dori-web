@@ -274,7 +274,7 @@ table td small {
   border: 1px solid var(--color-line);
   border-radius: 14px;
   background: var(--color-surface);
-  box-shadow: 0 10px 28px rgb(20 42 58 / 6%);
+  box-shadow: var(--shadow-card);
 }
 
 .admin-table-wrap table {
@@ -292,11 +292,11 @@ table td small {
 }
 
 .admin-table-wrap th {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  background: var(--color-surface-muted);
   color: var(--color-ink);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.045em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
   text-transform: uppercase;
 }
 
@@ -307,12 +307,12 @@ table td small {
 }
 
 .admin-table-wrap tbody tr:nth-child(even) {
-  background: color-mix(in srgb, var(--color-muted) 4%, transparent);
+  background: color-mix(in srgb, var(--color-muted) 2%, transparent);
 }
 
-.admin-table-wrap tbody tr:hover {
-  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
-  box-shadow: inset 3px 0 0 var(--color-accent);
+.admin-table-wrap tbody tr:hover,
+.admin-table-wrap tbody tr:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface));
 }
 
 .admin-table-wrap tbody tr:last-child td {

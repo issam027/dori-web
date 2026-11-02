@@ -20,7 +20,7 @@ describe('SettingsNavigation', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('link', { name: 'Sites' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Niveaux de service' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Services' })).toBeVisible();
     await user.click(screen.getByRole('link', { name: /files/i }));
     expect(screen.getByText('/settings/queues')).toBeVisible();
   });

@@ -51,6 +51,14 @@
 .page-header-copy {
   min-width: 0;
 }
+.app-shell .page-header h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.app-shell .page-header h1:lang(ar) {
+  letter-spacing: normal;
+}
 .page-title-row {
   display: flex;
   align-items: center;
@@ -187,10 +195,15 @@
   flex: 0 0 auto;
 }
 .nav-links a {
+  border-inline-start: 3px solid transparent;
   transition:
     color 0.16s ease,
     background-color 0.16s ease,
     transform 0.16s ease;
+}
+.nav-links a:not(.active):hover {
+  color: white;
+  background: rgb(255 255 255 / 6%);
 }
 .nav-links a.active {
   color: white;
@@ -226,6 +239,9 @@
 .sidebar.is-collapsed .legal-link {
   justify-content: center;
   padding-inline: 0;
+}
+.sidebar.is-collapsed .nav-links a {
+  border-inline-start: 0;
 }
 .sidebar.is-collapsed .nav-links a.active {
   border-inline-start: 0;

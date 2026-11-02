@@ -99,7 +99,7 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
       gateway.disconnect();
     };
   }, [channel, credential, getCredential, queueKey, refreshCredential]);
-  return health;
+  return queueKey ? health : 'degraded';
 }
 
 export function useQueueDisplayRealtime(

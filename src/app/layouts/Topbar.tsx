@@ -11,6 +11,7 @@ import { Button } from '@/design-system/components/Button';
 export function Topbar({
   sites,
   activeSiteId,
+  portfolioAvailable = sites.length > 1,
   pageHeaderVisible,
   pageTitle,
   onLogout,
@@ -21,6 +22,7 @@ export function Topbar({
 }: {
   sites: readonly { id: string; name: string }[];
   activeSiteId: string | null;
+  portfolioAvailable?: boolean;
   pageHeaderVisible: boolean;
   pageTitle?: string;
   onLogout: () => void;
@@ -164,7 +166,7 @@ export function Topbar({
                 <span>{t('mobile.preferences')}</span>
                 <ThemeSwitcher />
               </div>
-              {sites.length > 1 ? (
+              {portfolioAvailable ? (
                 <Link
                   to="/portfolio"
                   role="menuitem"

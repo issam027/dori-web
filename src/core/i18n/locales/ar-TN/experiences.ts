@@ -69,6 +69,7 @@ export const experiences: Record<string, string> = {
   'realtime.connection.active': 'الاتصال المباشر يخدم',
   'realtime.connection.connecting': 'قاعد يتصل بالتحديثات المباشرة...',
   'realtime.connection.degraded': 'وضع محدود · تحديث كل 30 ثانية',
+  'realtime.connection.reconnecting': 'اتقص الاتصال · قاعدين نعاودو نتصلو',
   'tracking.error.invalidTitle': 'ليان المتابعة داخل في حيط',
   'tracking.error.invalidText': 'الليان هذا ما يقابل حتى تذكرة، ثبّت في الليان اللي وصلك.',
   'tracking.error.expiredTitle': 'ليان المتابعة وفا وقتو',

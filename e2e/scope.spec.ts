@@ -55,8 +55,8 @@ test('one active site is selected automatically while inactive sites keep portfo
   });
   await page.goto('/desk');
 
-  await expect.poll(() => siteQueries.length).toBeGreaterThanOrEqual(2);
-  expect(siteQueries).toContain('?page=1&pageSize=100&isActive=true');
+  await expect.poll(() => siteQueries.length).toBe(1);
+  expect(siteQueries).toEqual(['?page=1&pageSize=100']);
   await expect
     .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
     .toBe(alpha.siteId);
@@ -151,4 +151,68 @@ test('a kiosk account is restricted to device mode and public experiences', asyn
   await expect(page).toHaveURL(/\/display$/);
   await page.goto('/desk');
   await expect(page).toHaveURL(/\/forbidden$/);
+});
+
+test('cockpit refresh skips site listing once the active site has been restored', async ({
+  page,
+}) => {
+  const siteQueries: string[] = [];
+  await installApiScenario(page, {
+    profile: 'root',
+    sites: [alpha, inactiveBeta],
+    handlers: [
+      ({ path, url }) => {
+        if (path === '/api/v1/sites') siteQueries.push(url.search);
+        return false;
+      },
+    ],
+  });
+  for (const reload of [false, true]) {
+    siteQueries.length = 0;
+    const cockpitLoaded = page.waitForResponse(
+      (response) => response.url().includes('/sites/' + alpha.siteId + '/cockpit') && response.ok(),
+    );
+    if (reload) await page.reload();
+    else await page.goto('/desk');
+    await cockpitLoaded;
+    await expect(page.locator('main .page-header h1')).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+      .toBe(alpha.siteId);
+    expect(siteQueries).toEqual(reload ? [] : ['?page=1&pageSize=100']);
+  }
+});
+
+test('a restored site avoids site listing across operational routes and loads it in the portfolio', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
+  });
+  const siteQueries: string[] = [];
+  await installApiScenario(page, {
+    profile: 'root',
+    sites: [alpha, beta],
+    handlers: [
+      ({ path, url }) => {
+        if (path === '/api/v1/sites') siteQueries.push(url.search);
+        return false;
+      },
+    ],
+  });
+  for (const route of ['/desk', '/persons', '/appointments', '/reports', '/profile']) {
+    await page.goto(route);
+    await expect(page.locator('main .page-header h1')).toBeVisible();
+    expect(siteQueries).toEqual([]);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('.mobile-account-trigger').click();
+  await expect(page.getByRole('menuitem', { name: /changer de site/i })).toBeVisible();
+  expect(siteQueries).toEqual([]);
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.getByRole('button', { name: /administration/i }).click();
+  await page.getByRole('link', { name: /portefeuille de sites/i }).click();
+  await expect(page.locator('.site-card')).toHaveCount(2);
+  expect(siteQueries).toEqual(['?page=1&pageSize=100']);
 });

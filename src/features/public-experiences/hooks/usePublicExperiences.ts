@@ -33,35 +33,34 @@ import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 export function usePublicTracking(token: string) {
   const [position, setPosition] = useState<RegistrationPositionResponseDto>();
   const [error, setError] = useState<'invalid' | 'expired' | 'unavailable'>();
-  const gateway = useMemo(
-    () =>
-      token
-        ? new PollingRealtimeGateway(
-            async () =>
-              (
-                await registrationsControllerGetPublicPosition({
-                  headers: { 'X-Registration-Token': token },
-                })
-              ).data,
-            60_000,
-            (cause) => {
-              if (cause instanceof NormalizedApiError) {
-                const code = cause.code.toUpperCase();
-                if (cause.status === 410 || code.includes('EXPIRED')) {
-                  setError('expired');
-                  return;
-                }
-                if (cause.status === 404 || code.includes('INVALID')) {
-                  setError('invalid');
-                  return;
-                }
+  const gateway = useMemo(() => {
+    return token
+      ? new PollingRealtimeGateway(
+          async () =>
+            (
+              await registrationsControllerGetPublicPosition({
+                headers: { 'X-Registration-Token': token },
+              })
+            ).data,
+          // Tracking is updated by SSE; REST is used only for initial/manual reads.
+          0,
+          (cause) => {
+            if (cause instanceof NormalizedApiError) {
+              const code = cause.code.toUpperCase();
+              if (cause.status === 410 || code.includes('EXPIRED')) {
+                setError('expired');
+                return;
               }
-              setError('unavailable');
-            },
-          )
-        : null,
-    [token],
-  );
+              if (cause.status === 404 || code.includes('INVALID')) {
+                setError('invalid');
+                return;
+              }
+            }
+            setError('unavailable');
+          },
+        )
+      : null;
+  }, [token]);
   return { gateway, position, setPosition, error, setError };
 }
 
@@ -85,7 +84,8 @@ export function useDisplaySnapshot(options: {
       queryKey: queryKeys.publicExperience.displaySnapshot(queueId),
       queryFn: async ({ signal }: { signal: AbortSignal }) => {
         const response = await queuesControllerGetDisplay(queueId, undefined, signal);
-        if (!isPublicDisplaySnapshot(response.data)) throw new Error('Unsafe public display response');
+        if (!isPublicDisplaySnapshot(response.data))
+          throw new Error('Unsafe public display response');
         return response;
       },
       enabled: options.enabled,

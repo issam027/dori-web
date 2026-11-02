@@ -40,3 +40,19 @@ describe('PollingRealtimeGateway', () => {
     gateway.disconnect();
   });
 });
+
+it('supports SSE-only tracking without periodic REST requests', async () => {
+  vi.useFakeTimers();
+  const snapshot = vi.fn(() => Promise.resolve({ position: 2 }));
+  const gateway = new PollingRealtimeGateway(snapshot, 0);
+  try {
+    await gateway.connect();
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(snapshot).toHaveBeenCalledTimes(1);
+    await gateway.refresh();
+    expect(snapshot).toHaveBeenCalledTimes(2);
+  } finally {
+    gateway.disconnect();
+    vi.useRealTimers();
+  }
+});

@@ -134,6 +134,7 @@ export const experiences = {
   'realtime.connection.active': 'Temps réel actif',
   'realtime.connection.connecting': 'Connexion au temps réel…',
   'realtime.connection.degraded': 'Mode dégradé · actualisation toutes les 30 s',
+  'realtime.connection.reconnecting': 'Connexion interrompue · reconnexion en cours',
   'tracking.waiting.far.text':
     'Vous pouvez patienter sereinement, nous vous préviendrons à l’approche de votre tour.',
   'tracking.waiting.far.title': 'Votre tour est encore un peu loin',

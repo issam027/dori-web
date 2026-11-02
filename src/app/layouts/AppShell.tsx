@@ -46,8 +46,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [pageHeaderVisible, setPageHeaderVisible] = useState(false);
   const [pageTitle, setPageTitle] = useState<string>();
   const appContentRef = useRef<HTMLElement>(null);
-  const activeSitesQuery = useSites('context-switcher');
-  const accessibleSitesQuery = useSites('portfolio', true, true);
+  const requiresSite = routeRequiresActiveSite(location.pathname);
+  const accessibleSitesQuery = useSites('portfolio', requiresSite && activeSiteId === null, true);
   const activeSiteQuery = useSite(activeSiteId);
   const accessibleSites = useMemo(() => {
     const items = accessibleSitesQuery.data?.data.items ?? [];
@@ -55,12 +55,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       (site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId),
     );
   }, [accessibleSitesQuery.data, user]);
-  const activeAccessibleSites = useMemo(() => {
-    const items = activeSitesQuery.data?.data.items ?? [];
-    return items.filter(
-      (site) => user?.scope.isGlobal || user?.scope.siteIds.includes(site.siteId),
-    );
-  }, [activeSitesQuery.data, user]);
+  const portfolioAvailable = accessibleSitesQuery.data
+    ? accessibleSites.length > 1
+    : user?.scope.isGlobal || (user?.scope.siteIds.length ?? 0) > 1;
+  const activeAccessibleSites = useMemo(
+    () => accessibleSites.filter((site) => site.isActive),
+    [accessibleSites],
+  );
   const sites = useMemo(() => {
     const scoped = activeAccessibleSites.map((site) => ({
       id: site.siteId,
@@ -124,13 +125,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       visibilityObserver.disconnect();
     };
   }, [location.pathname]);
-  const requiresSite = routeRequiresActiveSite(location.pathname);
   const effectiveSidebarCollapsed = mobileViewport ? false : mediumViewport || sidebarCollapsed;
 
   return (
     <div className={`app-shell${effectiveSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
       <SidebarAccordion
-        portfolioAvailable={accessibleSites.length > 1}
+        portfolioAvailable={portfolioAvailable}
         collapsed={effectiveSidebarCollapsed}
         mobileOpen={mobileNavigationOpen}
         onToggleCollapsed={() => {
@@ -156,6 +156,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="app-column">
         <Topbar
           sites={sites}
+          portfolioAvailable={portfolioAvailable}
           activeSiteId={activeSiteId}
           pageHeaderVisible={pageHeaderVisible}
           pageTitle={pageTitle}

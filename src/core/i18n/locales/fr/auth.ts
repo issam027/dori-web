@@ -63,6 +63,6 @@ export const auth = {
   'login.showcase.management.eyebrow': 'Administration centralisée',
   'login.showcase.management.title': 'Configurez aujourd’hui, faites évoluer demain',
   'login.showcase.management.description':
-    'Sites, files, utilisateurs, rôles, niveaux de service et traductions sont administrés depuis un espace unique et sécurisé.',
+    'Sites, files, utilisateurs, rôles, services et traductions sont administrés depuis un espace unique et sécurisé.',
   'login.showcase.management.metric': 'Une plateforme adaptable',
 } as const;

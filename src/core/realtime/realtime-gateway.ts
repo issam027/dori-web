@@ -23,6 +23,7 @@ export class PollingRealtimeGateway<TSnapshot> implements RealtimeGateway<TSnaps
   async connect(): Promise<void> {
     if (this.timer) return;
     await this.refresh();
+    if (this.intervalMs <= 0) return;
     this.timer = setInterval(() => {
       void this.refresh().catch(() => undefined);
     }, this.intervalMs);

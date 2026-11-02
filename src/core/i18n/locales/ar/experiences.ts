@@ -131,6 +131,7 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'realtime.connection.active': 'الاتصال المباشر نشط',
   'realtime.connection.connecting': 'جارٍ الاتصال بالتحديثات المباشرة…',
   'realtime.connection.degraded': 'وضع محدود · تحديث كل 30 ثانية',
+  'realtime.connection.reconnecting': 'انقطع الاتصال · جاري إعادة الاتصال',
   'tracking.waiting.far.text': 'تفضلوا بالاستراحة، سنعلمكم فور اقتراب نوبتكم.',
   'tracking.waiting.far.title': 'ما زال هناك متسع من الوقت',
   'tracking.waiting.near.text': 'يرجى الاقتراب من قاعة الشبابيك ومتابعة الهاتف.',
