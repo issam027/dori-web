@@ -201,4 +201,10 @@ export const admin = {
   'settings.addManager': 'Affecter un utilisateur',
   'settings.removeManager': 'Retirer',
   'settings.noManagers': 'Aucun administrateur ou manager directement affecté.',
+  'edge.commandStatus.pending': 'En attente',
+  'edge.commandStatus.acknowledged': 'Reçue',
+  'edge.commandStatus.succeeded': 'Réussie',
+  'edge.commandStatus.failed': 'Échec',
+  'edge.commandStatus.timedOut': 'Délai dépassé',
+  'kiosk.print.paperWidth': 'Largeur du rouleau',
 } as const;

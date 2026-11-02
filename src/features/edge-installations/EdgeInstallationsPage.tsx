@@ -132,7 +132,7 @@ export function EdgeInstallationsPage() {
                         t('edge.neverConnected')}
                     </small>
                   </span>
-                  <span className="cluster">
+                  <span className="edge-installation-actions">
                     <StatusBadge
                       tone={installation.deploymentStatus === 'active' ? 'success' : 'danger'}
                     >
@@ -160,7 +160,7 @@ export function EdgeInstallationsPage() {
                   <h2>{selected.name}</h2>
                   <p>{selected.installationId}</p>
                 </div>
-                <span className="cluster">
+                <span className="edge-installation-actions">
                   <StatusBadge tone={selected.deploymentStatus === 'active' ? 'success' : 'danger'}>
                     {t(`edge.deploymentStatus.${selected.deploymentStatus}`)}
                   </StatusBadge>
@@ -169,7 +169,7 @@ export function EdgeInstallationsPage() {
                   </StatusBadge>
                 </span>
               </div>
-              <div className="cluster">
+              <div className="edge-installation-actions">
                 <Button
                   variant={selected.deploymentStatus === 'active' ? 'danger' : 'primary'}
                   label={t(
@@ -212,7 +212,9 @@ export function EdgeInstallationsPage() {
                           <strong>{command.type}</strong>
                           <small>{formatDateTime(command.createdAt, i18n.language)}</small>
                         </span>
-                        <StatusBadge>{command.status}</StatusBadge>
+                        <StatusBadge tone={command.status === 'timedOut' ? 'warning' : 'neutral'}>
+                          {t('edge.commandStatus.' + command.status)}
+                        </StatusBadge>
                       </div>
                     ))}
                   </div>

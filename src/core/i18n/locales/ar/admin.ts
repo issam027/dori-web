@@ -187,4 +187,10 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'settings.addManager': 'إضافة مسؤول',
   'settings.removeManager': 'إزالة',
   'settings.noManagers': 'لا يوجد أي مسؤول معيّن لهذا الموقع حالياً.',
+  'edge.commandStatus.pending': 'قيد الانتظار',
+  'edge.commandStatus.acknowledged': 'تم الاستلام',
+  'edge.commandStatus.succeeded': 'نجح',
+  'edge.commandStatus.failed': 'فشل',
+  'edge.commandStatus.timedOut': 'انتهت المهلة',
+  'kiosk.print.paperWidth': 'عرض لفة الورق',
 };

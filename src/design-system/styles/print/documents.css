@@ -310,237 +310,93 @@ body[data-print-kiosk-ticket] > #root {
   }
 }
 
-body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
-  position: static;
-  display: grid !important;
-  width: min(80mm, 100%);
-  margin: 0 auto;
-  align-content: start;
-  gap: 7mm;
-  border: 1px solid var(--u);
-  border-radius: 4mm;
-  padding: 7mm;
-  color: var(--f) !important;
-  background: var(--a) !important;
-  box-shadow: none;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  visibility: visible !important;
-}
-body[data-print-kiosk-ticket] > .kiosk-ticket-print-document * {
-  visibility: visible !important;
-}
-html body[data-print-kiosk-ticket] {
-  display: block !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: var(--a) !important;
-}
-html body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
-  position: absolute !important;
-  top: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%);
-}
-@media print {
-  .public-header,
-  .public-layout > footer,
-  .kiosk-result > button,
-  .kiosk-result-actions {
-    display: none !important;
-  }
-  .kiosk-result {
-    min-height: 100vh;
-  }
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .receipt-80mm,
-  .receipt-80mm * {
-    visibility: visible;
-  }
-  .receipt-80mm {
-    position: absolute;
-    inset: 0;
-    border: 0;
-  }
-  .print-hidden {
-    display: none !important;
-  }
-}
+.passage-print-document,
+.passage-print-header,
+.passage-print-legal,
 .kiosk-ticket-print-document {
   display: none;
 }
+
+body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
+  display: grid;
+  box-sizing: border-box;
+  width: var(--ticket-paper-width, 58mm);
+  gap: 3mm;
+  margin: 0;
+  padding: 3mm;
+  border: 0;
+  border-radius: 0;
+  background: var(--a);
+  color: var(--f);
+  box-shadow: none;
+  font:
+    10pt/1.3 Arial,
+    sans-serif;
+  text-align: center;
+  overflow-wrap: anywhere;
+  page: dorify-ticket;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document :is(header, main, footer) {
+  display: grid;
+  justify-items: center;
+  gap: 2mm;
+  min-width: 0;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document :is(header, footer) {
+  padding-block: 2mm;
+  border-block-end: 0.2mm dashed var(--f);
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document footer {
+  border-block-end: 0;
+  border-block-start: 0.2mm dashed var(--f);
+  font-size: 8pt;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document :is(p, figure, h1) {
+  margin: 0;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document * {
+  color: var(--f) !important;
+  visibility: visible !important;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document h1 {
+  font-size: 28pt;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document .tracking-qr {
+  display: grid;
+  justify-items: center;
+  gap: 2mm;
+  min-height: 0;
+  width: 100%;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document .tracking-qr-image {
+  width: 32mm;
+  height: 32mm;
+  max-width: 100%;
+}
+body[data-print-kiosk-ticket] .kiosk-ticket-print-document figcaption {
+  font-size: 8pt;
+}
 @media print {
+  html:has(body[data-print-kiosk-ticket]),
   body[data-print-kiosk-ticket] {
+    display: block !important;
+    width: auto;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: var(--a) !important;
   }
-  body[data-print-kiosk-ticket] > #root {
+  body[data-print-kiosk-ticket] > :not(.kiosk-ticket-print-document) {
     display: none !important;
   }
   body[data-print-kiosk-ticket] > .kiosk-ticket-print-document {
-    position: static;
-    display: grid;
-    width: min(80mm, 100%);
-    margin: 0 auto;
-    align-content: start;
-    gap: 7mm;
-    border: 1px solid var(--u);
-    border-radius: 4mm;
-    padding: 7mm;
-    color: var(--f) !important;
-    background: var(--a) !important;
-    box-shadow: none;
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
-  .kiosk-ticket-print-document header {
-    display: grid;
-    gap: 1mm;
-    padding-bottom: 4mm;
-    border-bottom: 1px dashed var(--c);
-  }
-  .kiosk-ticket-print-document header strong {
-    font-size: 20pt;
-    letter-spacing: 0.08em;
-  }
-  .kiosk-ticket-print-document header span,
-  .kiosk-ticket-print-document main > small {
-    color: var(--p) !important;
-    font-size: 9pt;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .kiosk-ticket-print-document main {
-    display: grid;
-    justify-items: center;
-    gap: 3mm;
-  }
-  .kiosk-ticket-print-document h1 {
-    margin: 0;
-    color: var(--f) !important;
-    font-size: 38pt;
-    line-height: 1;
-    letter-spacing: 0.1em;
-  }
-  .kiosk-ticket-print-document p {
-    margin: 0;
-    color: var(--ar) !important;
-    font-size: 9pt;
-  }
-  .kiosk-ticket-print-document .kiosk-print-queue {
-    color: var(--f) !important;
-    font-size: 13pt;
-    font-weight: 700;
-  }
-  .kiosk-ticket-print-document .tracking-qr {
-    display: grid;
-    justify-items: center;
-    gap: 2mm;
-    margin: 2mm 0;
-  }
-  .kiosk-ticket-print-document .tracking-qr-image {
-    display: block;
-    width: 38mm;
-    height: 38mm;
-  }
-  .kiosk-ticket-print-document .tracking-qr figcaption {
-    max-width: 55mm;
-    color: var(--ar) !important;
-    font-size: 8pt;
-  }
-  .kiosk-ticket-print-document footer {
-    display: grid;
-    gap: 2mm;
-    padding-top: 4mm;
-    border-top: 1px dashed var(--c);
-    color: var(--p) !important;
-    font-size: 7.5pt;
-  }
-}
-.passage-print-document {
-  display: none;
-}
-
-.passage-print-header,
-.passage-print-legal {
-  display: none;
-}
-
-@media print {
-  body[data-print-kiosk-ticket] > #root {
-    display: block !important;
-  }
-  body[data-print-kiosk-ticket] > #root * {
-    visibility: hidden !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result,
-  body[data-print-kiosk-ticket] .kiosk-result * {
-    visibility: visible !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result {
-    position: absolute;
-    inset: 0 auto auto 50%;
-    display: block;
-    width: min(80mm, 100%);
-    margin: 0;
-    border: 1px solid var(--u);
-    border-radius: 4mm;
-    padding: 7mm;
-    color: var(--f) !important;
-    background: var(--a) !important;
-    box-shadow: none;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    transform: translateX(-50%);
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header {
-    display: grid;
-    gap: 1mm;
-    padding-bottom: 4mm;
-    border-bottom: 1px dashed var(--c);
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header strong {
-    font-size: 20pt;
-    letter-spacing: 0.08em;
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-header small {
-    color: var(--p) !important;
-    font-size: 9pt;
-    text-transform: uppercase;
-  }
-  body[data-print-kiosk-ticket] .kiosk-result-heading,
-  body[data-print-kiosk-ticket] .kiosk-result-guidance,
-  body[data-print-kiosk-ticket] .kiosk-result-actions {
-    display: none !important;
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result {
-    display: grid;
-    justify-items: center;
-    gap: 3mm;
-    margin: 5mm 0;
-    border: 0;
-    padding: 0;
-    background: var(--a);
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result > div > strong {
-    margin: 3mm 0 1mm;
-    color: var(--f) !important;
-    font-size: 38pt;
-  }
-  body[data-print-kiosk-ticket] .kiosk-ticket-result .tracking-qr-image {
-    width: 38mm;
-    height: 38mm;
-  }
-  body[data-print-kiosk-ticket] .kiosk-inline-print-footer {
-    display: block;
-    padding-top: 4mm;
-    border-top: 1px dashed var(--c);
-    color: var(--p) !important;
-    font-size: 8pt;
+    position: static !important;
+    transform: none !important;
+    break-inside: avoid;
+    print-color-adjust: exact;
   }
 }

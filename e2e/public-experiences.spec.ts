@@ -150,6 +150,34 @@ test('kiosk completes the walk-in journey and purges personal data', async ({ pa
       "document.querySelector('.kiosk-screen').scrollHeight <= document.querySelector('.kiosk-screen').clientHeight",
     ),
   ).toBe(true);
+
+  // Real print layout: selected roll width, one PDF page, no hidden application pages.
+  await page.evaluate(() => {
+    window.print = () => undefined;
+  });
+  for (const width of ['58', '80']) {
+    await page.getByLabel(/largeur du rouleau/i).selectOption(width);
+    await page.getByRole('button', { name: /imprimer mon ticket/i }).click();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#root')).toHaveCSS('display', 'none');
+    await expect(page.locator('.kiosk-ticket-print-document')).toHaveCSS('position', 'static');
+    expect(
+      await page
+        .locator('.kiosk-ticket-print-document .tracking-qr-image')
+        .evaluate((image) => image.getBoundingClientRect().width),
+    ).toBeGreaterThan(110);
+    const pdf = await page.pdf({ preferCSSPageSize: true, displayHeaderFooter: false });
+    const structure = pdf.toString('latin1');
+    expect(structure.match(/\/Type\s*\/Page\b/g)).toHaveLength(1);
+    const box = /\/MediaBox\s*\[0 0 ([\d.]+) ([\d.]+)\]/.exec(structure);
+    if (!box) throw new Error('Missing PDF page dimensions');
+    expect(Number(box[1])).toBeCloseTo((Number(width) / 25.4) * 72, 0);
+    expect(Number(box[2])).toBeLessThan(500);
+
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.emulateMedia({ media: 'screen' });
+    await expect(page.locator('#root')).not.toHaveCSS('display', 'none');
+  }
   await page.getByRole('button', { name: /terminer/i }).click();
   await expect(page.getByRole('heading', { name: /comment pouvons-nous/i })).toBeVisible();
   await page.getByRole('button', { name: /sans rendez-vous/i }).click();

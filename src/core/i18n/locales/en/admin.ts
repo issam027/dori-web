@@ -197,4 +197,10 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'settings.addManager': 'Assign user',
   'settings.removeManager': 'Remove',
   'settings.noManagers': 'No admin or manager is directly assigned.',
+  'edge.commandStatus.pending': 'Pending',
+  'edge.commandStatus.acknowledged': 'Acknowledged',
+  'edge.commandStatus.succeeded': 'Succeeded',
+  'edge.commandStatus.failed': 'Failed',
+  'edge.commandStatus.timedOut': 'Timed out',
+  'kiosk.print.paperWidth': 'Paper roll width',
 };

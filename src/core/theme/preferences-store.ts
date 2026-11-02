@@ -4,6 +4,8 @@ import { nextTheme, type AccentColor, type Theme } from './theme';
 
 interface PreferencesState {
   theme: Theme;
+  ticketPaperWidthMm: 58 | 80;
+  setTicketPaperWidthMm: (width: 58 | 80) => void;
   locale: string;
   accentColor: AccentColor;
   setTheme: (theme: Theme) => void;
@@ -16,6 +18,8 @@ export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
       theme: 'light',
+      ticketPaperWidthMm: 58,
+      setTicketPaperWidthMm: (ticketPaperWidthMm) => set({ ticketPaperWidthMm }),
       locale: 'fr',
       accentColor: 'lagoon',
       setTheme: (theme) => set({ theme }),
@@ -25,7 +29,12 @@ export const usePreferencesStore = create<PreferencesState>()(
     }),
     {
       name: 'dori-preferences',
-      partialize: ({ theme, locale, accentColor }) => ({ theme, locale, accentColor }),
+      partialize: ({ theme, locale, accentColor, ticketPaperWidthMm }) => ({
+        theme,
+        locale,
+        accentColor,
+        ticketPaperWidthMm,
+      }),
     },
   ),
 );
