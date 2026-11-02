@@ -1,4 +1,9 @@
-import { useState } from 'react';
+import {
+  chartMaximum,
+  comparisonChartData,
+  type ComparisonMetric,
+} from './utils/report-chart-data';
+import { useMemo, useState } from 'react';
 import type { QueueResponseDto } from '@/api/generated/models';
 import type {
   ReportBucketViewModel,
@@ -14,29 +19,6 @@ import { SvgChartTooltip } from '@/design-system/components/SvgChartTooltip';
 import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
 
 type View = 'trend' | 'comparison' | 'distribution';
-type Metric =
-  | 'registered'
-  | 'served'
-  | 'walkin'
-  | 'appointments'
-  | 'noShow'
-  | 'cancelled'
-  | 'expired'
-  | 'averageWaitMinutes'
-  | 'medianWaitMinutes'
-  | 'p90WaitMinutes'
-  | 'averageServiceMinutes'
-  | 'medianServiceMinutes'
-  | 'p90ServiceMinutes'
-  | 'noShowRate';
-type ComparisonMetric =
-  | 'registered'
-  | 'served'
-  | 'noShow'
-  | 'cancelled'
-  | 'averageWaitMinutes'
-  | 'averageServiceMinutes'
-  | 'noShowRate';
 type Series = { id: string; label: string; color: string; values: number[] };
 
 const palette = [
@@ -68,8 +50,7 @@ function Chart({
   const { i18n } = useTranslation();
   const mobile = useMediaQuery(MOBILE_QUERY);
   const [hovered, setHovered] = useState<number>();
-  const values = series.flatMap((item) => item.values);
-  const max = Math.max(...values, 1);
+  const max = useMemo(() => chartMaximum(series), [series]);
   const width = mobile ? 240 : 700;
   const height = 230;
   const x = (index: number) =>
@@ -351,44 +332,6 @@ function TrendChart({ buckets }: { buckets: readonly ReportBucketViewModel[] }) 
   );
 }
 
-function groupId(group: ReportGroupViewModel, index: number) {
-  const value =
-    group.dimension.queueId ??
-    group.dimension.queue_id ??
-    group.dimension.id ??
-    group.dimension.value ??
-    group.dimension.key;
-  return typeof value === 'number' || typeof value === 'string' ? String(value) : String(index);
-}
-function groupLabel(
-  group: ReportGroupViewModel,
-  index: number,
-  fallback: (number: number) => string,
-) {
-  const label =
-    group.dimension.queueName ??
-    group.dimension.queue_name ??
-    group.dimension.label ??
-    group.dimension.name ??
-    group.dimension.queueCode ??
-    group.dimension.queue_code;
-  return typeof label === 'string' ? label : fallback(index + 1);
-}
-function metricValue(bucket: ReportMetricsViewModel, metric: Metric) {
-  if (
-    metric === 'registered' ||
-    metric === 'served' ||
-    metric === 'walkin' ||
-    metric === 'appointments' ||
-    metric === 'noShow' ||
-    metric === 'cancelled' ||
-    metric === 'expired'
-  )
-    return bucket.volume[metric];
-  if (metric === 'noShowRate') return (bucket.rates.noShowRate ?? 0) * 100;
-  return bucket.timing[metric] ?? 0;
-}
-
 function ComparisonChart({
   groups,
   queues,
@@ -399,44 +342,19 @@ function ComparisonChart({
   const { t } = useTranslation();
   const [selected, setSelected] = useState<string[] | null>(null);
   const [metric, setMetric] = useState<ComparisonMetric>('registered');
-  const available = groups.map((group, index) => {
-    const id = groupId(group, index);
-    const queue = queues.find((item) => item.queueId === id) ?? queues[index];
-    return {
-      group,
-      id,
-      label: queue
-        ? `${queue.queueCode} · ${queue.queueName}`
-        : groupLabel(group, index, (number) => t('reports.visual.queueFallback', { number })),
-    };
-  });
-  const selectedAvailable = selected?.filter((id) => available.some((item) => item.id === id));
-  const effective = selectedAvailable ?? available.slice(0, 3).map((item) => item.id);
-  const visible = available.filter((item) => effective.includes(item.id));
-  const periods = [
-    ...new Set(visible.flatMap((item) => item.group.buckets.map((bucket) => bucket.periodStart))),
-  ].sort();
-  const bucketByPeriod = new Map(
-    visible.flatMap((item) =>
-      item.group.buckets.map((bucket) => [bucket.periodStart, bucket] as const),
-    ),
+  const {
+    available,
+    effective,
+    visible,
+    buckets,
+    series: comparisonSeries,
+  } = comparisonChartData(groups, queues, selected, metric, (number) =>
+    t('reports.visual.queueFallback', { number }),
   );
-  const buckets = periods.flatMap((period) => {
-    const bucket = bucketByPeriod.get(period);
-    return bucket ? [bucket] : [];
-  });
-  const series = visible.map((item) => {
-    const index = available.findIndex((candidate) => candidate.id === item.id);
-    const valuesByPeriod = new Map(
-      item.group.buckets.map((bucket) => [bucket.periodStart, metricValue(bucket, metric)]),
-    );
-    return {
-      id: item.id,
-      label: item.label,
-      color: palette[index % palette.length] ?? '#5b8def',
-      values: periods.map((period) => valuesByPeriod.get(period) ?? 0),
-    };
-  });
+  const series = comparisonSeries.map((item) => ({
+    ...item,
+    color: palette[item.index % palette.length] ?? 'var(--color-primary)',
+  }));
   return (
     <div className="report-comparison">
       <div className="report-comparison-controls">
