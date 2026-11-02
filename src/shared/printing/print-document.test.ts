@@ -40,4 +40,18 @@ describe('printDocument', () => {
     expect(printSpy).not.toHaveBeenCalled();
     expect(document.body.dataset.printTest).toBeUndefined();
   });
+
+  it('restores the interface and cancels timers if the browser refuses printing', () => {
+    vi.spyOn(window, 'print').mockImplementation(() => {
+      throw new Error('Print unavailable');
+    });
+    const onAfterPrint = vi.fn();
+    expect(() => printDocument({ datasetKey: 'printTest', onAfterPrint })).toThrow(
+      'Print unavailable',
+    );
+    expect(document.body.dataset.printTest).toBeUndefined();
+    expect(vi.getTimerCount()).toBe(0);
+    window.dispatchEvent(new Event('afterprint'));
+    expect(onAfterPrint).not.toHaveBeenCalled();
+  });
 });

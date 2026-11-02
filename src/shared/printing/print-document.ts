@@ -32,7 +32,13 @@ export function printDocument({
     onAfterPrint?.();
   };
   const start = () => {
-    if (active) window.print();
+    if (!active) return;
+    try {
+      window.print();
+    } catch (error) {
+      cleanup();
+      throw error;
+    }
   };
 
   window.addEventListener('afterprint', finish, { once: true });
