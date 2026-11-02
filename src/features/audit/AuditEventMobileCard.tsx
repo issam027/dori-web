@@ -1,3 +1,4 @@
+import { auditActionLabel } from './audit-actions';
 import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { AuditEventResponseDto } from '@/api/generated/models';
@@ -17,7 +18,7 @@ export function AuditEventMobileCard({
   const { t } = useTranslation();
   return (
     <DataTableMobileCard
-      title={event.action}
+      title={auditActionLabel(event.action, t)}
       subtitle={occurredAt}
       badge={
         <StatusBadge tone={event.outcome === 'success' ? 'success' : 'danger'}>

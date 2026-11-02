@@ -80,3 +80,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.audit-action-label {
+  display: block;
+  max-inline-size: clamp(9rem, 18vw, 22rem);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

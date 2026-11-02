@@ -1,3 +1,4 @@
+import { auditActionCodes, auditActionLabel } from './audit-actions';
 import { useState } from 'react';
 import { Eye, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -105,14 +106,20 @@ export function AuditPage() {
           </label>
           <label>
             {t('audit.fields.action')}
-            <input
+            <select
               value={action}
-              maxLength={100}
               onChange={(event) => {
                 setAction(event.target.value);
                 setPage(1);
               }}
-            />
+            >
+              <option value="">{t('audit.filters.allActions')}</option>
+              {auditActionCodes.map((code) => (
+                <option key={code} value={code}>
+                  {auditActionLabel(code, t)}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             {t('audit.fields.targetType')}
@@ -197,7 +204,13 @@ export function AuditPage() {
                   header: t('audit.fields.actor'),
                   render: (row) => row.actorDisplayName ?? t('audit.systemActor'),
                 },
-                { key: 'action', header: t('audit.fields.action'), render: (row) => row.action },
+                {
+                  key: 'action',
+                  header: t('audit.fields.action'),
+                  render: (row) => (
+                    <span className="audit-action-label">{auditActionLabel(row.action, t)}</span>
+                  ),
+                },
                 {
                   key: 'target',
                   header: t('audit.fields.target'),

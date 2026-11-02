@@ -1,3 +1,4 @@
+import { auditActionLabel } from './audit-actions';
 import { useTranslation } from 'react-i18next';
 import type { AuditEventDetailResponseDto } from '@/api/generated/models';
 import { formatDateTime } from '@/core/i18n/date-format';
@@ -26,7 +27,7 @@ export function AuditEventDetail({ event }: { event: AuditEventDetailResponseDto
           </div>
           <div>
             <dt>{t('audit.fields.action')}</dt>
-            <dd>{event.actionDisplayName || event.action}</dd>
+            <dd>{auditActionLabel(event.action, t)}</dd>
           </div>
           <div>
             <dt>{t('audit.fields.outcome')}</dt>
@@ -104,6 +105,12 @@ export function AuditEventDetail({ event }: { event: AuditEventDetailResponseDto
         <section aria-labelledby="audit-detail-context">
           <h3 id="audit-detail-context">{t('audit.detail.context')}</h3>
           <dl className="detail-list">
+            <div>
+              <dt>{t('audit.fields.actionCode')}</dt>
+              <dd>
+                <code>{event.action}</code>
+              </dd>
+            </div>
             <div>
               <dt>{t('audit.fields.site')}</dt>
               <dd>{value(event.siteScopeDisplayName)}</dd>

@@ -69,15 +69,16 @@ describe('AuditPage', () => {
 
     renderPage();
     const actor = (await screen.findAllByText('Ada Lovelace')).at(0);
-    const action = screen.getAllByText('site.update').at(0);
+    const action = screen.getByText('Modification d’un site', { selector: '.audit-action-label' });
     const viewButton = screen.getAllByRole('button', { name: /voir le détail/i }).at(0);
-    if (!actor || !action || !viewButton) throw new Error('The audit event row is incomplete');
+    if (!actor || !viewButton) throw new Error('The audit event row is incomplete');
     expect(actor).toBeVisible();
     expect(action).toBeVisible();
 
     await userEvent.click(viewButton);
     expect(await screen.findByRole('dialog')).toBeVisible();
-    expect(await screen.findByText('Modification du site')).toBeVisible();
+    expect(screen.getByRole('dialog')).toHaveTextContent('Modification d’un site');
+    expect(screen.getByRole('dialog')).toHaveTextContent('site.update');
     expect(screen.getByText('corr-01JXYZ')).toBeVisible();
   });
 
