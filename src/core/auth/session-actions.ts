@@ -6,14 +6,16 @@ import {
   authControllerMe,
 } from '@/api/generated/authentification/authentification';
 import { sitesControllerFindSite } from '@/api/generated/sites/sites';
-import { useScopeStore } from '@/core/scope/scope-store';
+import { readStoredSiteId, useScopeStore } from '@/core/scope/scope-store';
 import { useBrandStore } from '@/core/theme/brand-store';
 import { useSessionStore } from './session-store';
-import { getAccessToken, setAccessToken } from './access-token';
+import { getAccessToken, setAccessToken, publishSessionEnded } from './access-token';
 import { useOperationStore } from '@/shared/queue-operations/operation-store';
 import { queryKeys } from '@/api/client/query-keys';
 import { clearOwnedStorage, storageKeys } from '@/core/storage/storage-keys';
 import { refreshAccessToken } from '@/api/client/http-client';
+
+let contextChangeVersion = 0;
 
 export function getRememberedUsername(): string {
   return localStorage.getItem(storageKeys.local.rememberedUsername) ?? '';
@@ -32,8 +34,7 @@ export async function hydrateSession(): Promise<void> {
   useSessionStore.getState().beginHydration();
   try {
     const response = await authControllerMe();
-    useSessionStore.getState().authenticate(response.data);
-    const restoredSite = useScopeStore.getState().activeSiteId;
+    const restoredSite = readStoredSiteId();
     const restoredSiteIsAllowed =
       restoredSite !== null &&
       (response.data.scope.isGlobal || response.data.scope.siteIds.includes(restoredSite));
@@ -48,6 +49,7 @@ export async function hydrateSession(): Promise<void> {
     } else {
       useScopeStore.getState().clear();
     }
+    useSessionStore.getState().authenticate(response.data);
   } catch (error: unknown) {
     useSessionStore.getState().clear();
     useScopeStore.getState().clear();
@@ -76,7 +78,9 @@ export async function clearSession(queryClient: QueryClient): Promise<void> {
   await expireSession(queryClient);
 }
 
-export async function expireSession(queryClient: QueryClient): Promise<void> {
+export async function expireSession(queryClient: QueryClient, broadcast = true): Promise<void> {
+  contextChangeVersion++;
+  if (broadcast) publishSessionEnded();
   useSessionStore.getState().clear();
   useScopeStore.getState().clear();
   useBrandStore.getState().reset();
@@ -91,9 +95,11 @@ export async function changeActiveSite(
   siteId: string,
   scope: UserScopeDto,
 ): Promise<void> {
+  const version = ++contextChangeVersion;
   const previousSiteId = useScopeStore.getState().activeSiteId;
   if (previousSiteId !== siteId) {
     await queryClient.cancelQueries();
+    if (version !== contextChangeVersion) return;
     queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== 'sites' });
   }
   useScopeStore.getState().setActiveSite(siteId, scope);
@@ -101,15 +107,24 @@ export async function changeActiveSite(
   if (previousSiteId !== null && previousSiteId !== siteId) {
     useOperationStore.getState().reset();
   }
-  const response = await queryClient.query({
-    queryKey: queryKeys.sites.detail(siteId),
-    queryFn: () => sitesControllerFindSite(siteId),
-  });
-  useBrandStore.getState().applySite(response.data);
+  try {
+    const response = await queryClient.query({
+      queryKey: queryKeys.sites.detail(siteId),
+      queryFn: ({ signal }) => sitesControllerFindSite(siteId, undefined, signal),
+    });
+    if (version === contextChangeVersion && useScopeStore.getState().activeSiteId === siteId) {
+      useBrandStore.getState().applySite(response.data);
+    }
+  } catch (error) {
+    if (version !== contextChangeVersion) return;
+    throw error;
+  }
 }
 
 export async function clearActiveSiteContext(queryClient: QueryClient): Promise<void> {
+  const version = ++contextChangeVersion;
   await queryClient.cancelQueries();
+  if (version !== contextChangeVersion) return;
   useScopeStore.getState().clear();
   useBrandStore.getState().reset();
   useOperationStore.getState().reset();

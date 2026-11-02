@@ -74,10 +74,26 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [activeAccessibleSites, activeSiteQuery.data]);
   useEffect(() => {
     const onlySite = activeAccessibleSites.length === 1 ? activeAccessibleSites[0] : undefined;
-    if (!user || activeSiteId !== null || !onlySite) return;
+    if (
+      !requiresSite ||
+      accessibleSitesQuery.isFetching ||
+      !accessibleSitesQuery.isSuccess ||
+      !user ||
+      activeSiteId !== null ||
+      !onlySite
+    )
+      return;
     useScopeStore.getState().setActiveSite(onlySite.siteId, user.scope);
     void activate(onlySite.siteId, user.scope);
-  }, [activate, activeAccessibleSites, activeSiteId, user]);
+  }, [
+    activate,
+    activeAccessibleSites,
+    activeSiteId,
+    user,
+    requiresSite,
+    accessibleSitesQuery.isFetching,
+    accessibleSitesQuery.isSuccess,
+  ]);
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
     const mediumQuery = window.matchMedia('(min-width: 621px) and (max-width: 900px)');
@@ -179,7 +195,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         />
         <IntraDeploymentStatusGate>
           <main ref={appContentRef} className="app-content">
-            <AppErrorBoundary variant="embedded" resetKey={location.pathname}>
+            <AppErrorBoundary
+              key={activeSiteId ?? 'no-site'}
+              variant="embedded"
+              resetKey={location.pathname}
+            >
               {requiresSite && activeSiteId === null && !activeSiteQuery.isLoading ? (
                 <div className="site-required-card">
                   <EmptyState

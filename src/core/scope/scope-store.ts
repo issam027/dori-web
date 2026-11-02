@@ -10,8 +10,17 @@ interface ScopeState {
   clear: () => void;
 }
 
-const activeSiteStorageKey = storageKeys.session.activeSiteId;
-const storedSiteId = sessionStorage.getItem(activeSiteStorageKey);
+const activeSiteStorageKey = storageKeys.local.activeSiteId;
+
+export function readSharedSiteId(): string | null {
+  return localStorage.getItem(activeSiteStorageKey);
+}
+
+export function readStoredSiteId(): string | null {
+  // Existing tabs migrate their selection after scope validation during hydration.
+  return readSharedSiteId() ?? sessionStorage.getItem(storageKeys.session.activeSiteId);
+}
+const storedSiteId = readStoredSiteId();
 
 function assertScoped(
   resourceId: string,
@@ -29,7 +38,8 @@ export const useScopeStore = create<ScopeState>((set) => ({
   activeQueueId: null,
   setActiveSite: (siteId, scope) => {
     assertScoped(siteId, scope.siteIds, scope.isGlobal, 'Site');
-    sessionStorage.setItem(activeSiteStorageKey, siteId);
+    localStorage.setItem(activeSiteStorageKey, siteId);
+    sessionStorage.removeItem(storageKeys.session.activeSiteId);
     set({ activeSiteId: siteId, activeQueueId: null });
   },
   setActiveQueue: (queueId, scope) => {
@@ -37,7 +47,8 @@ export const useScopeStore = create<ScopeState>((set) => ({
     set({ activeQueueId: queueId });
   },
   clear: () => {
-    sessionStorage.removeItem(activeSiteStorageKey);
+    localStorage.removeItem(activeSiteStorageKey);
+    sessionStorage.removeItem(storageKeys.session.activeSiteId);
     set({ activeSiteId: null, activeQueueId: null });
   },
 }));

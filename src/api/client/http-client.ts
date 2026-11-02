@@ -3,7 +3,12 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { clearAccessToken, getAccessToken, setAccessToken } from '@/core/auth/access-token';
+import {
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+  getSessionGeneration,
+} from '@/core/auth/access-token';
 import { normalizeApiError } from '@/core/errors/normalized-api-error';
 
 // In deployed builds, API calls deliberately stay on the frontend origin.
@@ -29,6 +34,7 @@ interface RefreshResponse {
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
+  _sharedTokenRetry?: boolean;
 }
 
 type AuthenticationExpiredListener = () => void;
@@ -50,18 +56,25 @@ function isPublicOperation(url?: string): boolean {
 
 export async function refreshAccessToken(): Promise<string> {
   if (!refreshPromise) {
-    refreshPromise = refreshClient
-      .post<RefreshResponse>('/api/v1/auth/refresh', {})
-      .then((response) => {
-        const token = response.data.data.accessToken;
-        setAccessToken(token);
-        return token;
-      })
-      .finally(() => {
-        refreshPromise = null;
-      });
+    const previousToken = getAccessToken();
+    const run = async () => {
+      const currentToken = getAccessToken();
+      if (currentToken && currentToken !== previousToken) return currentToken;
+      const sessionGeneration = getSessionGeneration();
+      const response = await refreshClient.post<RefreshResponse>('/api/v1/auth/refresh', {});
+      if (getSessionGeneration() !== sessionGeneration)
+        throw new Error('Session ended during refresh');
+      const token = response.data.data.accessToken;
+      setAccessToken(token);
+      return token;
+    };
+    // Refresh cookies are shared by tabs. Serialize rotation to avoid token reuse.
+    const locks =
+      typeof navigator === 'undefined' ? undefined : (navigator as Partial<Navigator>).locks;
+    refreshPromise = (locks ? locks.request('dori:session-refresh', run) : run()).finally(() => {
+      refreshPromise = null;
+    });
   }
-
   return refreshPromise;
 }
 
@@ -94,6 +107,16 @@ httpClient.interceptors.response.use(
       !isAuthenticationOperation(originalRequest.url) &&
       !isPublicOperation(originalRequest.url)
     ) {
+      const sharedToken = getAccessToken();
+      if (
+        sharedToken &&
+        !originalRequest._sharedTokenRetry &&
+        originalRequest.headers.get('Authorization') !== 'Bearer ' + sharedToken
+      ) {
+        originalRequest._sharedTokenRetry = true;
+        originalRequest.headers.set('Authorization', 'Bearer ' + sharedToken);
+        return httpClient.request(originalRequest);
+      }
       originalRequest._retry = true;
 
       try {

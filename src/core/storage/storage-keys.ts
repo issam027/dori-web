@@ -1,5 +1,6 @@
 export const storageKeys = {
   local: {
+    activeSiteId: 'dori.activeSiteId',
     rememberedUsername: 'dori.rememberedUsername',
     onboardingDraft: 'dori:onboarding:v3',
     legacyOnboardingDrafts: ['dori:onboarding:v2', 'dori:onboarding:v1'],
@@ -11,6 +12,7 @@ export const storageKeys = {
 } as const;
 
 const ownedLocalStorageKeys = [
+  storageKeys.local.activeSiteId,
   storageKeys.local.rememberedUsername,
   storageKeys.local.onboardingDraft,
   ...storageKeys.local.legacyOnboardingDrafts,

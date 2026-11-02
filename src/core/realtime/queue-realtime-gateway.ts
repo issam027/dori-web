@@ -130,6 +130,7 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
     const eventStream = this.options.eventStream ?? fetchEventSource;
     const requestFetch = this.options.fetch ?? globalThis.fetch;
     let hasOpened = false;
+    let requestedCredential = this.options.getCredential();
     this.controllers.set(queueId, controller);
 
     void eventStream(queueRealtimeUrl(queueId, this.options.channel), {
@@ -139,6 +140,7 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
       fetch: (input, init) => {
         const headers = new Headers(init?.headers);
         const credential = this.options.getCredential();
+        requestedCredential = credential;
         if (this.options.channel === 'display')
           headers.set('Authorization', `Bearer ${credential}`);
         else headers.set('X-Registration-Token', credential);
@@ -154,7 +156,8 @@ export class QueueRealtimeGateway<TChannel extends QueueRealtimeChannel> {
         }
         if (response.status === 401 && this.options.refreshCredential) {
           this.options.onStatusChange?.(queueId, 'reconnecting');
-          await this.options.refreshCredential();
+          if (requestedCredential === this.options.getCredential())
+            await this.options.refreshCredential();
           throw new Error('SSE credential refreshed');
         }
         if (response.status >= 400 && response.status < 500 && response.status !== 429)

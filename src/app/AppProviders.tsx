@@ -10,11 +10,21 @@ import { restoreSession } from '@/core/auth/session-actions';
 import { NotificationCenter } from '@/design-system/components/NotificationCenter';
 import { onAuthenticationExpired } from '@/api/client/http-client';
 import { expireSession } from '@/core/auth/session-actions';
+import { startAccessTokenSync } from '@/core/auth/access-token';
+import { SharedSiteSynchronizer } from '@/core/scope/SharedSiteSynchronizer';
 import { SessionIdleWatchdog } from '@/core/auth/SessionIdleWatchdog';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
   const hydrationStarted = useRef(false);
+
+  useEffect(
+    () =>
+      startAccessTokenSync(() => {
+        void expireSession(queryClient, false);
+      }),
+    [queryClient],
+  );
 
   useEffect(() => {
     if (hydrationStarted.current) return;
@@ -38,6 +48,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
+            <SharedSiteSynchronizer />
             <PreferenceSynchronizer />
             <SessionIdleWatchdog />
             {children}

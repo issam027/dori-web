@@ -35,7 +35,7 @@ test('a single authorized site is activated automatically and portfolio is hidde
   await expect(page.getByRole('button', { name: /administration/i })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /portefeuille de sites/i })).toHaveCount(0);
   await expect
-    .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+    .poll(() => page.evaluate(() => localStorage.getItem('dori.activeSiteId')))
     .toBe('00000000-0000-4000-8000-000000000001');
 });
 
@@ -58,7 +58,7 @@ test('one active site is selected automatically while inactive sites keep portfo
   await expect.poll(() => siteQueries.length).toBe(1);
   expect(siteQueries).toEqual(['?page=1&pageSize=100']);
   await expect
-    .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+    .poll(() => page.evaluate(() => localStorage.getItem('dori.activeSiteId')))
     .toBe(alpha.siteId);
   await page.getByRole('button', { name: /administration/i }).click();
   await expect(page.getByRole('link', { name: /portefeuille de sites/i })).toBeVisible();
@@ -69,8 +69,8 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
   page,
 }) => {
   await page.addInitScript(() => {
-    if (sessionStorage.getItem('dori.activeSiteId') === null) {
-      sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
+    if (localStorage.getItem('dori.activeSiteId') === null) {
+      localStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
     }
   });
   await installApiScenario(page, {
@@ -95,22 +95,22 @@ test('changing site from the portfolio refreshes scoped data and the persistent 
   ]) {
     await page.goto(path);
     await expect
-      .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+      .poll(() => page.evaluate(() => localStorage.getItem('dori.activeSiteId')))
       .toBe(beta.siteId);
   }
 });
 
 test('a stored site outside the authenticated scope is discarded', async ({ page }) => {
   await page.addInitScript(() => {
-    if (sessionStorage.getItem('dori.activeSiteId') === null) {
-      sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000999');
+    if (localStorage.getItem('dori.activeSiteId') === null) {
+      localStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000999');
     }
   });
   await installApiScenario(page, { profile: 'operator', sites: [alpha] });
   await page.goto('/desk');
 
   await expect
-    .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+    .poll(() => page.evaluate(() => localStorage.getItem('dori.activeSiteId')))
     .toBe('00000000-0000-4000-8000-000000000001');
   await expect(page.locator('body')).not.toContainText('00000000-0000-4000-8000-000000000999');
 });
@@ -177,7 +177,7 @@ test('cockpit refresh skips site listing once the active site has been restored'
     await cockpitLoaded;
     await expect(page.locator('main .page-header h1')).toBeVisible();
     await expect
-      .poll(() => page.evaluate(() => sessionStorage.getItem('dori.activeSiteId')))
+      .poll(() => page.evaluate(() => localStorage.getItem('dori.activeSiteId')))
       .toBe(alpha.siteId);
     expect(siteQueries).toEqual(reload ? [] : ['?page=1&pageSize=100']);
   }
@@ -187,7 +187,7 @@ test('a restored site avoids site listing across operational routes and loads it
   page,
 }) => {
   await page.addInitScript(() => {
-    sessionStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
+    localStorage.setItem('dori.activeSiteId', '00000000-0000-4000-8000-000000000001');
   });
   const siteQueries: string[] = [];
   await installApiScenario(page, {
