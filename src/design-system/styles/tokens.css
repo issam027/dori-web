@@ -1,6 +1,8 @@
 /* Generated from the former global stylesheet by tools/split-design-system-css.mjs.
  * Keep rules in their owning family; the import order is defined in index.css. */
 :root {
+  --color-deployment-cloud: #7dd3fc;
+  --color-deployment-intra: #6ee7b7;
   --color-navy: var(--b);
   --color-ink: var(--cm);
   --color-muted: var(--db);
