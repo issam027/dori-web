@@ -105,7 +105,7 @@ export const common: Record<string, string> = {
   'common.slotUnavailable': 'الوقت هذا موش متاح.',
   'common.noDataExport': 'ما فما حتى بيانات باش تتصدّر.',
   'common.currentSite': 'الموقع هذا محلول ديجا.',
-  'common.completeRequiredFields': 'كمّل الخانات الإجبارية باش تكمل.',
+  'common.completeRequiredFields': 'كمّل الخانات الإجبارية',
   'common.unknownQueue': 'قائمة انتظار نكرة',
   'common.unknownTicket': 'تذكرة موش متوفرة',
   'theme.soft-light': 'نهاري متوسط',
