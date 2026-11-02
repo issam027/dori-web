@@ -1,8 +1,9 @@
+import { useCockpitRealtime } from './hooks/useCockpitRealtime';
 import { CockpitCalmState } from './components/CockpitCalmState';
 import { hasAnyPermission } from '@/core/permissions/permissions';
 import { QueueCard } from './components/CockpitQueueCard';
 import { personName } from './model/cockpit-presentation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -29,14 +30,11 @@ import {
 } from '@/api/generated/models';
 import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { queryKeys } from '@/api/client/query-keys';
-import { getAccessToken } from '@/core/auth/access-token';
 import { useSessionStore } from '@/core/auth/session-store';
 import { formatDateTime } from '@/core/i18n/date-format';
 import { notifyError } from '@/core/notifications/error-presentation';
 import { notify } from '@/core/notifications/notification-store';
 import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
-import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
-import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { Button } from '@/design-system/components/Button';
 import { Card, MetricCard } from '@/design-system/components/Card';
@@ -59,7 +57,6 @@ import {
 import {
   mergeCockpitQueue,
   refreshCockpitQueue,
-  shouldSkipCockpitRealtimeRefresh,
   useCockpit,
   useCockpitActions,
 } from './hooks/useCockpit';
@@ -120,50 +117,17 @@ export function CockpitPage() {
   const [queueSearch, setQueueSearch] = useState('');
   const [registrationDetailsDialog, setRegistrationDetailsDialog] =
     useState<RegistrationDetailsDialogState>(null);
-  const realtimeRefreshTimers = useRef(new Map<string, number>());
   const queues = useMemo(() => cockpit.data?.data.queues ?? [], [cockpit.data]);
   const preferences = useCockpitPreferences(siteId, userId);
   const serverNow = useServerClock(cockpit.data?.data.serverTime);
   const queueIds = useMemo(() => queues.map((queue) => queue.queueId), [queues]);
-  const health = useQueueDisplayRealtime({
+  const health = useCockpitRealtime({
+    siteId,
     queueIds,
-    getToken: getAccessToken,
-    onEvent: (event) => {
-      if (!siteId) return;
-      if (shouldSkipCockpitRealtimeRefresh(siteId, event.queueId)) return;
-      const previous = realtimeRefreshTimers.current.get(event.queueId);
-      if (previous !== undefined) window.clearTimeout(previous);
-      const timer = window.setTimeout(() => {
-        realtimeRefreshTimers.current.delete(event.queueId);
-        void refreshCockpitQueue(siteId, event.queueId)
-          .then((incoming) => {
-            queryClient.setQueryData<QueueEngineControllerGetCockpit200>(
-              queryKeys.cockpit.bySite(siteId),
-              (current) => mergeCockpitQueue(current, incoming),
-            );
-          })
-          .catch(notifyError);
-      }, 250);
-      realtimeRefreshTimers.current.set(event.queueId, timer);
-    },
-    onReconnect: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cockpit.bySite(siteId) });
-    },
-  });
-  useDegradedRealtimeRefresh({
-    health,
-    enabled: Boolean(siteId),
     refresh: async () => {
       await cockpit.refetch();
     },
   });
-  useEffect(
-    () => () => {
-      for (const timer of realtimeRefreshTimers.current.values()) window.clearTimeout(timer);
-      realtimeRefreshTimers.current.clear();
-    },
-    [],
-  );
 
   const totals = useMemo(
     () => ({
