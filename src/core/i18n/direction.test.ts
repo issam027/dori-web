@@ -5,8 +5,8 @@ afterEach(async () => {
   await setLanguage('fr');
 });
 
-it.each(['ar', 'ar-TN', 'ar-tn', 'ar_TN', 'tn', 'aeb'])(
-  'applies RTL to Arabic locale %s so trailing punctuation follows the text',
+it.each(['ar'])(
+  'applies RTL to standard Arabic locale %s',
   async (locale) => {
     expect(getDirection(locale)).toBe('rtl');
     await setLanguage(locale);
@@ -15,8 +15,17 @@ it.each(['ar', 'ar-TN', 'ar-tn', 'ar_TN', 'tn', 'aeb'])(
   },
 );
 
+it.each(['ar-TN', 'ar-tn', 'ar_TN', 'tn', 'aeb'])(
+  'applies LTR to Tunisian derja locale %s (screen layout left-to-right)',
+  async (locale) => {
+    expect(getDirection(locale)).toBe('ltr');
+    await setLanguage(locale);
+    expect(document.documentElement.dir).toBe('ltr');
+  },
+);
+
 it.each(['fr', 'en'])('restores LTR when switching from Arabic to %s', async (locale) => {
-  await setLanguage('ar-TN');
+  await setLanguage('ar');
   await setLanguage(locale);
   expect(document.documentElement.dir).toBe('ltr');
 });

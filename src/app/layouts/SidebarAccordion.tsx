@@ -4,8 +4,9 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '@/core/auth/session-store';
 import { hasAnyPermission } from '@/core/permissions/permissions';
-import { ChevronLeft, ChevronRight, ShieldCheck, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Cloud, Server, ShieldCheck, X } from 'lucide-react';
 import { Button } from '@/design-system/components/Button';
+import { deploymentMode, isCloudDeployment } from '@/core/config/deployment-mode';
 import {
   navigationRoutes,
   publicNavigationRoutes,
@@ -112,8 +113,34 @@ export function SidebarAccordion({
       className={`sidebar${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
     >
       <div className="sidebar-brand">
-        <span className="brand-mark">{t('common.d')}</span>
-        <strong className="sidebar-label">{t('app.name')}</strong>
+        <div className="sidebar-brand-content">
+          <span className="brand-mark">{t('common.d')}</span>
+          <div className="sidebar-brand-titles sidebar-label">
+            <strong className="sidebar-brand-name">{t('app.name')}</strong>
+            <span
+              className={`deployment-pill deployment-pill--${deploymentMode}`}
+              title={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
+            >
+              {isCloudDeployment ? (
+                <Cloud size={10} aria-hidden="true" className="deployment-pill-icon" />
+              ) : (
+                <Server size={10} aria-hidden="true" className="deployment-pill-icon" />
+              )}
+              <span>{deploymentMode}</span>
+            </span>
+          </div>
+        </div>
+        <span
+          className={`deployment-collapsed-badge deployment-pill--${deploymentMode}`}
+          title={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
+          aria-label={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
+        >
+          {isCloudDeployment ? (
+            <Cloud size={11} aria-hidden="true" />
+          ) : (
+            <Server size={11} aria-hidden="true" />
+          )}
+        </span>
         <Button
           variant="unstyled"
           className="sidebar-mobile-close"
