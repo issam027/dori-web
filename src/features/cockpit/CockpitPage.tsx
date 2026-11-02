@@ -666,7 +666,7 @@ export function CockpitPage() {
                 </p>
               </div>
               <Card className="admin-filter-card queue-customer-search cockpit-filter-card">
-                <details open>
+                <details>
                   <summary>
                     <span>
                       <Search aria-hidden="true" /> {t('cockpit.searchQueues')}

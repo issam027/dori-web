@@ -324,6 +324,8 @@ test('collapsed cockpit queues preserve the active ticket and its actions', asyn
   });
   await page.setViewportSize({ width: 320, height: 844 });
   await page.goto('/desk');
+  await expect(page.locator('.cockpit-filter-card details').first()).not.toHaveAttribute('open');
+  await page.locator('.cockpit-filter-card summary').first().click();
   await page.locator('.cockpit-filter-preferences > summary').click();
   await expect(page.getByRole('combobox', { name: 'Trier les files' })).toBeVisible();
   const card = page.locator('.cockpit-queue-card');

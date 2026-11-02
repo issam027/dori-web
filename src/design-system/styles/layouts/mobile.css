@@ -465,9 +465,6 @@
   .app-content .cockpit-queue-heading p {
     margin: 0;
   }
-  .app-content .cockpit-filter-card > details > summary {
-    display: none;
-  }
   .app-content .cockpit-filter-grid {
     gap: 12px;
   }
