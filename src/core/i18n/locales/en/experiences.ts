@@ -60,6 +60,7 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'public-experiences.kiosk.creerMonTicket': 'Create my ticket',
   'public-experiences.kiosk.effacementDans': 'Clearing in',
   'kiosk.queue.waitEstimate': 'About {{value0}} min · {{value1}} waiting',
+  'queue.estimateUnavailable': 'Estimate unavailable',
   'public-experiences.kiosk.estimationEnCours': 'Calculating estimate…',
   'kiosk.tier.name': 'Service level {{value0}}',
   'public-experiences.kiosk.heureNonFournie': 'time not provided',

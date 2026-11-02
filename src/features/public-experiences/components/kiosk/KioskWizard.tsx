@@ -2,7 +2,17 @@ import { KioskSuccess } from './KioskSuccess';
 import { useQueueServiceSelection } from '@/shared/queue-services/use-queue-service-selection';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useReducer, useState } from 'react';
-import { ArrowLeft, CalendarCheck2, CalendarX2, Clock3, LockKeyhole, Phone, Search, TriangleAlert, UserRound } from 'lucide-react';
+import {
+  ArrowLeft,
+  CalendarCheck2,
+  CalendarX2,
+  Clock3,
+  LockKeyhole,
+  Phone,
+  Search,
+  TriangleAlert,
+  UserRound,
+} from 'lucide-react';
 import type {
   CreateRegistrationResponseDto,
   RegistrationResponseDto,
@@ -17,7 +27,13 @@ import { NormalizedApiError } from '@/core/errors/normalized-api-error';
 import { useKioskCatalog, useKioskRegistration } from '../../hooks/usePublicExperiences';
 
 import { initialKioskWizardState, kioskWizardReducer } from '../../model/kiosk-wizard-state';
-import { KioskIdentityStep, KioskQueueStep, KioskReviewStep, KioskTierStep, KioskWelcomeStep } from './KioskSteps';
+import {
+  KioskIdentityStep,
+  KioskQueueStep,
+  KioskReviewStep,
+  KioskTierStep,
+  KioskWelcomeStep,
+} from './KioskSteps';
 import { trackingUrlFromToken } from '../../tracking-url';
 import { useSite } from '@/features/portfolio/public';
 import { Button } from '@/design-system/components/Button';
@@ -299,10 +315,12 @@ export function KioskWizard() {
                     <strong>{queue.queueName}</strong>
                     <span className="kiosk-wait-estimate">
                       {queueStatuses[index]?.data
-                        ? __t('kiosk.queue.waitEstimate', {
-                            value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
-                            value1: String(queueStatuses[index].data.data.waitingCount),
-                          })
+                        ? queueStatuses[index].data.data.estimatedWaitMinutes != null
+                          ? __t('kiosk.queue.waitEstimate', {
+                              value0: String(queueStatuses[index].data.data.estimatedWaitMinutes),
+                              value1: String(queueStatuses[index].data.data.waitingCount),
+                            })
+                          : __t('queue.estimateUnavailable')
                         : __t('public-experiences.kiosk.estimationEnCours')}
                     </span>
                     <span>
@@ -727,7 +745,13 @@ export function KioskWizard() {
         </div>
       ) : null}
       {flow === 'result' && result ? (
-        <KioskSuccess result={result} siteName={site.data?.data.siteName} printReady={printReady} onReady={handlePrintReady} onDone={purge} />
+        <KioskSuccess
+          result={result}
+          siteName={site.data?.data.siteName}
+          printReady={printReady}
+          onReady={handlePrintReady}
+          onDone={purge}
+        />
       ) : null}
     </section>
   );

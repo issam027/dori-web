@@ -59,6 +59,7 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'public-experiences.kiosk.creerMonTicket': 'استخراج التذكرة',
   'public-experiences.kiosk.effacementDans': 'سيتم الإغلاق التلقائي خلال',
   'kiosk.queue.waitEstimate': 'حوالي {{value0}} دقيقة · {{value1}} في الانتظار',
+  'queue.estimateUnavailable': 'التقدير غير متاح',
   'public-experiences.kiosk.estimationEnCours': 'جارٍ حساب التوقيت…',
   'kiosk.tier.name': 'صنف الخدمة {{value0}}',
   'public-experiences.kiosk.heureNonFournie': 'التوقيت غير محدد',

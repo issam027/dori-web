@@ -306,3 +306,29 @@ test('cloud tracking receives SSE snapshots without periodic REST reads', async 
   await page.clock.fastForward(65_000);
   expect(reads).toBe(1);
 });
+
+test('tracking shows an unavailable canonical estimate instead of null or a fabricated zero', async ({
+  page,
+}) => {
+  await installApiScenario(page, {
+    handlers: [
+      async ({ path, route }) => {
+        if (path !== '/api/v1/public/registrations/position') return false;
+        await route.fulfill({
+          json: apiEnvelope({
+            ticketNumber: 'NO-DESK',
+            status: 'waiting',
+            registrationStatus: 'waiting',
+            position: 2,
+            estimatedWaitMinutes: null,
+            sourceConnectivity: 'online',
+          }),
+        });
+        return true;
+      },
+    ],
+  });
+  await page.goto('/track?token=550e8400-e29b-41d4-a716-446655440000');
+  await expect(page.locator('.tracking-estimate')).toHaveText('Estimation indisponible');
+  await expect(page.getByText('NO-DESK', { exact: true })).toBeVisible();
+});

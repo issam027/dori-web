@@ -61,6 +61,7 @@ export const experiences = {
   'public-experiences.kiosk.creerMonTicket': 'Créer mon ticket',
   'public-experiences.kiosk.effacementDans': 'Effacement dans',
   'kiosk.queue.waitEstimate': 'Environ {{value0}} min · {{value1}} en attente',
+  'queue.estimateUnavailable': 'Estimation indisponible',
   'public-experiences.kiosk.estimationEnCours': 'Estimation en cours…',
   'kiosk.tier.name': 'Forfait {{value0}}',
   'public-experiences.kiosk.heureNonFournie': 'heure non fournie',
