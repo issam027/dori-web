@@ -60,6 +60,17 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [legalProductionGuard(env), securityHeaders(env), react()],
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: 'locale-fr', test: /[\\/]src[\\/]core[\\/]i18n[\\/]locales[\\/]fr[\\/]/ },
+            ],
+          },
+        },
+      },
+    },
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   };
 });
