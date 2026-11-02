@@ -72,3 +72,11 @@
     gap: var(--space-1);
   }
 }
+
+.audit-target-label {
+  display: block;
+  max-inline-size: clamp(8rem, 16vw, 20rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

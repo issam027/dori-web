@@ -201,8 +201,16 @@ export function AuditPage() {
                 {
                   key: 'target',
                   header: t('audit.fields.target'),
-                  render: (row) =>
-                    row.targetDisplayName ?? `${row.targetType} · ${row.targetId ?? '—'}`,
+                  render: (row) => {
+                    const target =
+                      row.targetDisplayName ??
+                      `${row.targetType} \u00b7 ${row.targetId ?? '\u2014'}`;
+                    return (
+                      <span className="audit-target-label" title={target}>
+                        {target}
+                      </span>
+                    );
+                  },
                 },
                 {
                   key: 'outcome',
