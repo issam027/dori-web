@@ -197,4 +197,5 @@ export const experiences = {
   'kiosk.print.guidance': 'Conservez ce ticket et surveillez l’écran de la salle.',
   'kiosk.print.printedAt': 'Imprimé le {{date}}',
   'kiosk.print.footer': 'DORIFY · Gestion des files et de l’accueil',
+  'kiosk.print.paperSize': '{{width}} mm',
 } as const;

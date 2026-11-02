@@ -98,4 +98,5 @@ export const experiences: Record<string, string> = {
   'public-experiences.deviceMode.deconnexion': 'قاعدين نخرّجو في الجهاز...',
   'public-experiences.deviceMode.choisissezLUsageDeCetAppareilVousPourrez':
     'اختار كيفاش باش تخدم بالجهاز هذا، وتنجّم تبدّل وقت ما تحب.',
+  'kiosk.print.paperSize': '{{width}} مم',
 };

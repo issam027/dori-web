@@ -193,4 +193,5 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'kiosk.print.guidance': 'Keep this ticket and watch the waiting-room display.',
   'kiosk.print.printedAt': 'Printed on {{date}}',
   'kiosk.print.footer': 'DORIFY · Queue and reception management',
+  'kiosk.print.paperSize': '{{width}} mm',
 };

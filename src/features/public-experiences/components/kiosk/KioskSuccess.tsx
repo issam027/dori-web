@@ -53,8 +53,8 @@ export function KioskSuccess({
               setPaperWidth(event.target.value === '80' ? 80 : 58);
             }}
           >
-            <option value="58">58 mm</option>
-            <option value="80">80 mm</option>
+            <option value="58">{__t('kiosk.print.paperSize', { width: 58 })}</option>
+            <option value="80">{__t('kiosk.print.paperSize', { width: 80 })}</option>
           </select>
         </label>
         <Button

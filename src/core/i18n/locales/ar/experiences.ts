@@ -190,4 +190,5 @@ export const experiences: DomainTranslations<typeof import('../fr/experiences').
   'kiosk.print.guidance': 'احتفظوا بهذه التذكرة وتابعوا شاشة قاعة الانتظار.',
   'kiosk.print.printedAt': 'تمت الطباعة بتاريخ {{date}}',
   'kiosk.print.footer': 'DORIFY · إدارة قوائم الانتظار والاستقبال',
+  'kiosk.print.paperSize': '{{width}} مم',
 };
