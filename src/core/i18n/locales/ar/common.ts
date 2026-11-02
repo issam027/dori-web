@@ -200,4 +200,6 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.unknownQueue': 'قائمة انتظار غير معروفة',
   'common.unknownTicket': 'تذكرة غير متوفرة',
   'controlRoom.queue': 'قائمة انتظار تحت المراقبة',
+  'deployment.cloud': 'منظومة سحابية',
+  'deployment.intra': 'منظومة محلية',
 };

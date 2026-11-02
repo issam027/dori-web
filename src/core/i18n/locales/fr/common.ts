@@ -196,4 +196,6 @@ export const common = {
   'common.unknownQueue': 'File non identifiée',
   'common.unknownTicket': 'Ticket non renseigné',
   'controlRoom.queue': 'File supervisée',
+  'deployment.cloud': 'Mode cloud',
+  'deployment.intra': 'Mode intra',
 } as const;

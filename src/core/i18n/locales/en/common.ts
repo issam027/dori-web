@@ -196,4 +196,6 @@ export const common: DomainTranslations<typeof import('../fr/common').common> = 
   'common.unknownQueue': 'Unknown queue',
   'common.unknownTicket': 'Ticket unavailable',
   'controlRoom.queue': 'Monitored queue',
+  'deployment.cloud': 'Cloud deployment',
+  'deployment.intra': 'Intra deployment',
 };

@@ -119,7 +119,7 @@ export function SidebarAccordion({
             <strong className="sidebar-brand-name">{t('app.name')}</strong>
             <span
               className={`deployment-pill deployment-pill--${deploymentMode}`}
-              title={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
+              title={t(isCloudDeployment ? 'deployment.cloud' : 'deployment.intra')}
             >
               {isCloudDeployment ? (
                 <Cloud size={10} aria-hidden="true" className="deployment-pill-icon" />
@@ -132,8 +132,8 @@ export function SidebarAccordion({
         </div>
         <span
           className={`deployment-collapsed-badge deployment-pill--${deploymentMode}`}
-          title={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
-          aria-label={isCloudDeployment ? 'Mode Cloud' : 'Mode Intra'}
+          title={t(isCloudDeployment ? 'deployment.cloud' : 'deployment.intra')}
+          aria-label={t(isCloudDeployment ? 'deployment.cloud' : 'deployment.intra')}
         >
           {isCloudDeployment ? (
             <Cloud size={11} aria-hidden="true" />

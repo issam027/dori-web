@@ -115,4 +115,6 @@ export const common: Record<string, string> = {
   'bootstrap.description': 'وحدات الخدمة باش تتزاد كعبة كعبة حسب البرنامج.',
   'common.europeParis': 'أوروبا/باريس',
   'controlRoom.queue': 'قائمة انتظار تحت العين',
+  'deployment.cloud': 'السيستام في الكلاود',
+  'deployment.intra': 'السيستام عندك في البلاصة',
 };
