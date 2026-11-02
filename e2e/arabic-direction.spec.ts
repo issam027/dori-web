@@ -29,6 +29,10 @@ for (const locale of ['ar', 'ar-TN']) {
         }, locale);
         await page.goto('/desk');
         await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr');
+        await expect(page.locator('.nav-section-toggle').first()).toHaveCSS(
+          'direction',
+          locale === 'ar' ? 'rtl' : 'ltr',
+        );
         const heading = page.locator('.feedback-state[role="alert"] h2');
         await expect(heading).toBeVisible();
         const positions = await heading.evaluate((element) => {

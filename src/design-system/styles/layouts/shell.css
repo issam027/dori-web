@@ -200,7 +200,7 @@
   color: white;
   background: rgb(255 255 255 / 6%);
 }
-:is([dir='rtl'], :lang(ar)) .nav-section-toggle {
+[dir='rtl'] .nav-section-toggle {
   direction: rtl;
   font-size: 16px;
   line-height: 1.45;
