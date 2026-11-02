@@ -152,7 +152,7 @@ it('isolates names, localized dates and Latin notes in an Arabic dialog', async 
   try {
     renderNotes();
     const note = await screen.findByText('Note existante');
-    expect(screen.getByRole('dialog')).toHaveAttribute('dir', 'rtl');
+    expect(screen.getByRole('dialog')).toHaveAttribute('dir', 'ltr');
     expect(note).toHaveAttribute('dir', 'auto');
     const author = screen.getByText('Ada', { selector: 'bdi' });
     expect(author.tagName).toBe('BDI');

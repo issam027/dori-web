@@ -1,3 +1,5 @@
+import { getDirection, getTextDirection } from './config';
+
 export type DateValue = string | number | Date;
 
 function validDate(value: DateValue | null | undefined): Date | undefined {
@@ -12,7 +14,12 @@ export function formatDateValue(
   options: Intl.DateTimeFormatOptions,
 ): string | undefined {
   const date = validDate(value);
-  return date ? new Intl.DateTimeFormat(locale, options).format(date) : undefined;
+  if (!date) return undefined;
+  const formatted = new Intl.DateTimeFormat(locale, options).format(date);
+  // Arabic date groups retain their reading order inside the Tunisian LTR layout.
+  return getTextDirection(locale) !== getDirection(locale)
+    ? '\u2067' + formatted + '\u2069'
+    : formatted;
 }
 
 export function formatDateTime(

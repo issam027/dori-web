@@ -23,7 +23,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { Button } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
-import { getDirection } from '@/core/i18n/config';
+import { getTextDirection } from '@/core/i18n/config';
 
 export function PersonNotesViewer({
   personId,
@@ -227,7 +227,7 @@ export function PersonNotesViewer({
                     })}
                 </bdi>{' '}
                 <span aria-hidden="true">·</span>{' '}
-                <bdi dir={getDirection(i18n.language)}>
+                <bdi dir={getTextDirection(i18n.language)}>
                   <time dateTime={current.createdAt}>
                     {formatDateTime(current.createdAt, i18n.language)}
                   </time>

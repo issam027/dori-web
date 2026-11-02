@@ -23,3 +23,12 @@ describe('date formatting', () => {
     expect(formatDateTime('invalid', 'fr-FR')).toBeUndefined();
   });
 });
+
+it('isolates an Arabic Tunisian date from adjacent Latin text in LTR screens', () => {
+  const value = '2026-10-31T11:57:00Z';
+  const formatted = new Intl.DateTimeFormat('ar-TN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value));
+  expect(formatDateTime(value, 'ar-TN')).toBe('\u2067' + formatted + '\u2069');
+});

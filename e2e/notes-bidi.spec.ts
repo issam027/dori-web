@@ -71,7 +71,7 @@ for (const width of [390, 1440]) {
       await page.goto('/persons');
       await page.locator('.person-notes-button:visible').first().click();
       const dialog = page.getByRole('dialog');
-      await expect(dialog).toHaveAttribute('dir', 'rtl');
+      await expect(dialog).toHaveAttribute('dir', 'ltr');
       const note = dialog.locator('blockquote');
       await expect(note).toHaveText(content);
       await expect(note).toHaveCSS('direction', 'ltr');

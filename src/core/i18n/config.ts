@@ -50,3 +50,8 @@ function isRtl(locale: string): boolean {
 export function getDirection(locale: string): 'rtl' | 'ltr' {
   return isRtl(locale) ? 'rtl' : 'ltr';
 }
+
+/** Direction of localized text, independent from the Tunisian LTR screen layout. */
+export function getTextDirection(locale: string): 'rtl' | 'ltr' {
+  return normalizeLocale(locale).startsWith('ar') ? 'rtl' : 'ltr';
+}

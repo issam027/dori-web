@@ -29,3 +29,26 @@ p:last-child {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Tunisian screens keep LTR layout; each text paragraph follows its own script. */
+html:lang(ar-TN)
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    blockquote,
+    small,
+    figcaption,
+    label,
+    legend,
+    dt,
+    dd,
+    td,
+    th,
+    button,
+    .button-label
+  ) {
+  unicode-bidi: plaintext;
+}
