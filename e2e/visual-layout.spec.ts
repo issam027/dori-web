@@ -525,6 +525,8 @@ test('phase 8 tracking consumes its token and works on mobile RTL in four themes
   await expect(page.getByRole('banner')).toContainText('DORIFY');
   await expect(page.locator('.tracking-screen')).toBeVisible();
   await expect(page.getByText('A014')).toBeVisible();
+  // The long reconnection label must also fit in the narrow RTL layout.
+  await expect(page.locator('.realtime-connection-indicator.is-degraded')).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
   await page.evaluate("document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'");
   for (const theme of ['light', 'soft-light', 'soft-dark', 'dark']) {
