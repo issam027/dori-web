@@ -23,6 +23,7 @@ import { useSessionStore } from '@/core/auth/session-store';
 import { hasPermission } from '@/core/permissions/permissions';
 import { Button } from '@/design-system/components/Button';
 import { formatDateTime } from '@/core/i18n/date-format';
+import { getDirection } from '@/core/i18n/config';
 
 export function PersonNotesViewer({
   personId,
@@ -54,6 +55,8 @@ export function PersonNotesViewer({
   const updateNote = useUpdatePersonNote(personId);
   const deleteNote = useDeletePersonNote(personId);
   const displayName = personName?.trim() || __t('persons.notes.unknownPerson');
+  // Isolate the name from the surrounding translated sentence.
+  const isolatedDisplayName = `\u2068${displayName}\u2069`;
   const items = notes.data?.data.items ?? [];
   const current = items[index];
   const returnToNotes = () => {
@@ -123,8 +126,8 @@ export function PersonNotesViewer({
                   : 'persons.personNotesViewer.nouvelleNote',
               ) +
               ' - ' +
-              displayName
-            : __t('persons.notes.title', { name: displayName })
+              isolatedDisplayName
+            : __t('persons.notes.title', { name: isolatedDisplayName })
         }
         description={__t('persons.personNotesViewer.historiquePartageAvecLesOperateursAutorises')}
         actions={
@@ -199,6 +202,7 @@ export function PersonNotesViewer({
             <label>
               {__t('persons.personNotesViewer.contenuDeLaNote')}
               <textarea
+                dir="auto"
                 aria-label={__t('persons.personNotesViewer.nouvelleNote')}
                 rows={6}
                 placeholder={__t('persons.personNotesViewer.exDocumentsAVerifierBesoinDAssistance')}
@@ -212,15 +216,22 @@ export function PersonNotesViewer({
         ) : current ? (
           <article className="note-viewer-panel">
             <div className="note-content-block">
-              <blockquote>{current.content}</blockquote>
+              <blockquote dir="auto">{current.content}</blockquote>
             </div>
             <div className="note-meta-row">
               <small className="note-meta">
-                {current.authorUsername ??
-                  __t('persons.notes.userReference', {
-                    value0: current.createdByUserId,
-                  })}{' '}
-                · {formatDateTime(current.createdAt, i18n.language)}
+                <bdi>
+                  {current.authorUsername ??
+                    __t('persons.notes.userReference', {
+                      value0: current.createdByUserId,
+                    })}
+                </bdi>{' '}
+                <span aria-hidden="true">·</span>{' '}
+                <bdi dir={getDirection(i18n.language)}>
+                  <time dateTime={current.createdAt}>
+                    {formatDateTime(current.createdAt, i18n.language)}
+                  </time>
+                </bdi>
               </small>
               {canManage ? (
                 <div className="note-inline-actions">

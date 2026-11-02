@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, CircleAlert, X } from 'lucide-react';
 import { Button, ButtonLabelModeProvider } from './Button';
 import { DorifyLoader } from './DorifyLoader';
+import { getDirection } from '@/core/i18n/config';
 
 interface ModalProps {
   open: boolean;
@@ -32,7 +33,7 @@ export function Modal({
   loading = false,
   mobileLayout = 'fullscreen',
 }: ModalProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const contentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -57,6 +58,7 @@ export function Modal({
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
           ref={contentRef}
+          dir={getDirection(i18n.language)}
           data-mobile-layout={mobileLayout}
           className={`dialog-content${className ? ` ${className}` : ''}`}
         >

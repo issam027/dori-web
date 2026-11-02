@@ -1,3 +1,4 @@
+import { setLanguage } from '@/core/i18n/i18n';
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
@@ -144,4 +145,25 @@ it('closes editing on cancel', async () => {
   await user.click(screen.getByRole('button', { name: /^modifier$/i }));
   await user.click(screen.getByRole('button', { name: /^annuler$/i }));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('isolates names, localized dates and Latin notes in an Arabic dialog', async () => {
+  await setLanguage('ar-TN');
+  try {
+    renderNotes();
+    const note = await screen.findByText('Note existante');
+    expect(screen.getByRole('dialog')).toHaveAttribute('dir', 'rtl');
+    expect(note).toHaveAttribute('dir', 'auto');
+    const author = screen.getByText('Ada', { selector: 'bdi' });
+    expect(author.tagName).toBe('BDI');
+    const date = document.querySelector('.note-meta time');
+    expect(date).toHaveAttribute('dateTime', '2026-10-31T10:00:00Z');
+    expect(date?.parentElement).toHaveAttribute('dir', 'rtl');
+    expect(date?.parentElement?.tagName).toBe('BDI');
+    expect(screen.getByRole('dialog').querySelector('h2')?.textContent).toContain(
+      '\u2068Ada Lovelace\u2069',
+    );
+  } finally {
+    await setLanguage('fr');
+  }
 });
