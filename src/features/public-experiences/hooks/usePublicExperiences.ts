@@ -1,6 +1,9 @@
+import { getAccessToken } from '@/core/auth/access-token';
+import { useQueueDisplayRealtime } from '@/core/realtime/use-queue-realtime';
+import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 import { isPublicDisplaySnapshot } from '../privacy';
 import { useMemo, useState } from 'react';
-import { useMutation, useQueries, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   CreateRegistrationDto,
   CreateRegistrationResponseDto,
@@ -117,8 +120,28 @@ export function useKioskCatalog(
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         queuesControllerGetStatus(queue.queueId, undefined, signal),
       enabled,
-      refetchInterval: 30_000,
+      refetchInterval: realtimeSafetyRefreshIntervalMs,
     })),
+  });
+  const queryClient = useQueryClient();
+  const queueIds = (queues.data?.data.items ?? []).map((queue) => queue.queueId);
+  const refreshStatus = (ids: readonly string[]) => {
+    ids.forEach((id) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.publicExperience.kioskQueueStatus(id),
+      });
+    });
+  };
+  const health = useQueueDisplayRealtime({
+    queueIds: enabled ? queueIds : [],
+    getToken: getAccessToken,
+    onEvent: (event) => { refreshStatus([event.queueId]); },
+    onReconnect: (id) => { refreshStatus([id]); },
+  });
+  useDegradedRealtimeRefresh({
+    health,
+    enabled: enabled && queueIds.length > 0,
+    refresh: () => { refreshStatus(queueIds); },
   });
   const tiers = useQuery({
     queryKey: queryKeys.tiers.byQueue(queueId),

@@ -1,7 +1,7 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useEffect, useEffectEvent, useState } from 'react';
 import type { RegistrationPositionResponseDto } from '@/api/generated/models';
-import type { QueueRealtimeHealth } from './queue-realtime-gateway';
+import { realtimeHeartbeatTimeoutMs, type QueueRealtimeHealth } from './queue-realtime-gateway';
 
 const statuses = new Set([
   'booked',
@@ -71,7 +71,7 @@ export function useReplicatedTrackingRealtime(options: {
     let lastMessage = Date.now();
     const base = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
     const watchdog = window.setInterval(() => {
-      if (Date.now() - lastMessage > 35_000) setHealth('degraded');
+      if (Date.now() - lastMessage > realtimeHeartbeatTimeoutMs) setHealth('degraded');
     }, 5_000);
     void fetchEventSource(base + '/api/v1/realtime/tracking', {
       signal: controller.signal,
@@ -79,8 +79,7 @@ export function useReplicatedTrackingRealtime(options: {
       headers: { Accept: 'text/event-stream', 'X-Registration-Token': options.token },
       onopen: (response) => {
         if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
-          lastMessage = Date.now();
-          setHealth('active');
+          setHealth(Date.now() - lastMessage > realtimeHeartbeatTimeoutMs ? 'degraded' : 'active');
           return Promise.resolve();
         }
         if ([401, 403, 410].includes(response.status)) onExpired();
@@ -105,8 +104,9 @@ export function useReplicatedTrackingRealtime(options: {
         throw new Error('Tracking stream closed');
       },
       onerror: (error: unknown) => {
-        setHealth('degraded');
         if (error instanceof RejectedTrackingStream) throw error;
+        // Brief reconnects do not activate REST fallback while the last heartbeat is fresh.
+        if (Date.now() - lastMessage > realtimeHeartbeatTimeoutMs) setHealth('degraded');
         return 3000;
       },
     }).catch(() => {

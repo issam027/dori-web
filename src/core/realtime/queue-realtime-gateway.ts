@@ -17,7 +17,9 @@ export interface QueueDisplayChangedEvent {
     | 'appointment_checked_in'
     | 'registration_called'
     | 'registration_served'
-    | 'registration_no_show';
+    | 'registration_no_show'
+    | 'registration_recalled'
+    | 'estimation_updated';
   timestamp: string;
 }
 
@@ -54,6 +56,8 @@ const channelContracts = {
       'registration_called',
       'registration_served',
       'registration_no_show',
+      'registration_recalled',
+      'estimation_updated',
     ]),
   },
   tracking: { event: 'queue_position_changed' },
@@ -79,7 +83,7 @@ function isQueueEvent(
   )
     return false;
   return channel === 'tracking'
-    ? !('reason' in event)
+    ? event.reason === undefined || event.reason === 'estimation_updated'
     : typeof event.reason === 'string' && channelContracts.display.reasons.has(event.reason);
 }
 

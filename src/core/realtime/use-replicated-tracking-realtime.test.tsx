@@ -76,3 +76,27 @@ it('reports expiry without retrying unauthorized access', async () => {
   ).rejects.toThrow();
   expect(expired).toHaveBeenCalledOnce();
 });
+
+it('uses REST fallback only after heartbeat loss, not on a short reconnect', async () => {
+  vi.useFakeTimers();
+  const { result, unmount } = renderHook(() =>
+    useReplicatedTrackingRealtime({ enabled: true, token: 'opaque', onSnapshot: vi.fn() }),
+  );
+  const options = mocks.stream.mock.calls[0]?.[1];
+  if (!options) throw new Error('Missing stream');
+  try {
+    act(() => options.onmessage?.({ event: 'heartbeat', id: '', data: '{}' }));
+    expect(result.current).toBe('active');
+    act(() => {
+      options.onerror?.(new Error('transient disconnect'));
+    });
+    expect(result.current).toBe('active');
+    await act(() => vi.advanceTimersByTimeAsync(40_000));
+    expect(result.current).toBe('degraded');
+    act(() => options.onmessage?.({ event: 'heartbeat', id: '', data: '{}' }));
+    expect(result.current).toBe('active');
+  } finally {
+    unmount();
+    vi.useRealTimers();
+  }
+});

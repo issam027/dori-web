@@ -264,3 +264,30 @@ describe('QueueRealtimeGateway', () => {
     expect(harness.requests.every(({ options }) => options.signal?.aborted)).toBe(true);
   });
 });
+
+it.each(['display', 'tracking'] as const)(
+  'accepts canonical estimation notifications on %s',
+  (channel) => {
+    const harness = createEventStreamHarness();
+    const onEvent = vi.fn();
+    const gateway = new QueueRealtimeGateway({
+      channel,
+      getCredential: () => 'credential',
+      onEvent,
+      onReconnect: vi.fn(),
+      eventStream: harness.eventStream,
+    });
+    gateway.connect(['queue-1']);
+    harness.requests[0]?.options.onmessage?.({
+      event: channel === 'display' ? 'queue_display_changed' : 'queue_position_changed',
+      data: JSON.stringify({
+        queueId: 'queue-1',
+        reason: 'estimation_updated',
+        timestamp: '2026-11-03T10:00:00Z',
+      }),
+      id: '1',
+    });
+    expect(onEvent).toHaveBeenCalledOnce();
+    gateway.disconnect();
+  },
+);

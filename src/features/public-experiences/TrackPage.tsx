@@ -1,3 +1,4 @@
+import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 import { useContextLocale } from '@/core/i18n/use-context-locale';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
@@ -77,6 +78,12 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     },
   });
   const realtimeHealth = position?.queueId ? queueHealth : replicatedHealth;
+  useDegradedRealtimeRefresh({
+    health: realtimeHealth,
+    enabled:
+      Boolean(position) && !completed && trackingError !== 'expired' && trackingError !== 'invalid',
+    refresh: () => gateway?.refresh().catch(() => undefined),
+  });
 
   useEffect(() => {
     if (!gateway) return;
@@ -95,7 +102,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     void gateway
       .connect()
       .then(() => {
-        // The first snapshot is fetched before the polling timer is installed.
+        // Terminal snapshots need no further realtime subscription.
         if (terminalSnapshotReceived) gateway.disconnect();
       })
       .catch(() => undefined);
