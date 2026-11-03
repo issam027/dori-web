@@ -10,6 +10,7 @@ function edgeInstallationsRealtimeUrl(): string {
 export function subscribeEdgeInstallations(
   onChange: () => void,
   signal: AbortSignal,
+  onHeartbeat: () => void = () => undefined,
 ): Promise<void> {
   let opened = false;
   return fetchEventSource(edgeInstallationsRealtimeUrl(), {
@@ -38,6 +39,7 @@ export function subscribeEdgeInstallations(
       throw new Error(`Installation SSE request failed with status ${String(response.status)}`);
     },
     onmessage: (message) => {
+      if (message.event === 'heartbeat') onHeartbeat();
       if (message.event === 'edge_installations_changed') onChange();
     },
     onclose: () => {

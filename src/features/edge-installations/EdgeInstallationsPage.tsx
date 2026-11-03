@@ -1,3 +1,4 @@
+import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
 import { useState, type SyntheticEvent } from 'react';
 import { Activity, CloudCog, Copy, Plus, RefreshCw, TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +35,7 @@ export function EdgeInstallationsPage() {
   const { t, i18n } = useTranslation();
   const installations = useEdgeInstallations();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  useEdgeInstallationsRealtime(selectedId);
+  const realtimeHealth = useEdgeInstallationsRealtime(selectedId);
   const detail = useEdgeInstallation(selectedId);
   const createInstallation = useCreateEdgeInstallation();
   const createCommand = useCreateEdgeCommand(selectedId);
@@ -88,6 +89,7 @@ export function EdgeInstallationsPage() {
   return (
     <div className="page-stack edge-installations-page">
       <PageHeader
+        status={<RealtimeConnectionIndicator health={realtimeHealth} sseOnly />}
         eyebrow={t('nav.edgeInstallations')}
         title={t('edge.title')}
         description={t('edge.description')}

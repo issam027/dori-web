@@ -2533,6 +2533,9 @@
 .realtime-connection-indicator {
   --realtime-indicator-color: var(--color-info);
   --realtime-indicator-soft: var(--color-info-soft);
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-align: start;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -2548,6 +2551,7 @@
 }
 
 .realtime-connection-indicator i {
+  flex-shrink: 0;
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 50%;
@@ -4192,4 +4196,10 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+}
+
+.kiosk-connection-status {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--space-2);
 }

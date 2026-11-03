@@ -1,7 +1,8 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import type { RegistrationPositionResponseDto } from '@/api/generated/models';
-import { realtimeHeartbeatTimeoutMs, type QueueRealtimeHealth } from './queue-realtime-gateway';
+import type { QueueRealtimeHealth } from './queue-realtime-gateway';
+import { useHeartbeatHealth } from './use-heartbeat-health';
 
 const statuses = new Set([
   'booked',
@@ -62,24 +63,21 @@ export function useReplicatedTrackingRealtime(options: {
   onExpired?: () => void;
   onSnapshot: (snapshot: RegistrationPositionResponseDto) => void;
 }): QueueRealtimeHealth {
-  const [health, setHealth] = useState<QueueRealtimeHealth>('connecting');
+  const { health, heartbeat, fail } = useHeartbeatHealth(
+    options.enabled && options.token ? [options.token] : [],
+  );
   const onSnapshot = useEffectEvent(options.onSnapshot);
   const onExpired = useEffectEvent(options.onExpired ?? (() => undefined));
   useEffect(() => {
     if (!options.enabled || !options.token) return;
     const controller = new AbortController();
-    let lastMessage = Date.now();
     const base = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    const watchdog = window.setInterval(() => {
-      if (Date.now() - lastMessage > realtimeHeartbeatTimeoutMs) setHealth('degraded');
-    }, 5_000);
     void fetchEventSource(base + '/api/v1/realtime/tracking', {
       signal: controller.signal,
       openWhenHidden: true,
       headers: { Accept: 'text/event-stream', 'X-Registration-Token': options.token },
       onopen: (response) => {
         if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
-          setHealth(Date.now() - lastMessage > realtimeHeartbeatTimeoutMs ? 'degraded' : 'active');
           return Promise.resolve();
         }
         if ([401, 403, 410].includes(response.status)) onExpired();
@@ -88,34 +86,29 @@ export function useReplicatedTrackingRealtime(options: {
         throw new Error('Tracking stream unavailable');
       },
       onmessage: (message) => {
-        lastMessage = Date.now();
         if (message.event === 'heartbeat') {
-          setHealth('active');
+          heartbeat(options.token);
           return;
         }
         if (message.event !== 'tracking_changed') return;
         const snapshot = parseReplicatedTracking(message.data);
         if (snapshot) {
           onSnapshot(snapshot);
-          setHealth('active');
-        } else setHealth('degraded');
+        } else fail();
       },
       onclose: () => {
         throw new Error('Tracking stream closed');
       },
       onerror: (error: unknown) => {
         if (error instanceof RejectedTrackingStream) throw error;
-        // Brief reconnects do not activate REST fallback while the last heartbeat is fresh.
-        if (Date.now() - lastMessage > realtimeHeartbeatTimeoutMs) setHealth('degraded');
         return 3000;
       },
     }).catch(() => {
-      if (!controller.signal.aborted) setHealth('degraded');
+      if (!controller.signal.aborted) fail();
     });
     return () => {
       controller.abort();
-      window.clearInterval(watchdog);
     };
-  }, [options.enabled, options.token]);
+  }, [options.enabled, options.token, heartbeat, fail]);
   return health;
 }

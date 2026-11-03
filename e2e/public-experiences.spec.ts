@@ -317,7 +317,7 @@ test('cloud tracking receives SSE snapshots without periodic REST reads', async 
                 counterName: 'Guichet 2',
                 sourceConnectivity: 'online',
               }) +
-              '\n\n',
+              '\n\nevent: heartbeat\ndata: {}\n\n',
           });
           return true;
         }

@@ -135,13 +135,19 @@ export function useKioskCatalog(
   const health = useQueueDisplayRealtime({
     queueIds: enabled ? queueIds : [],
     getToken: getAccessToken,
-    onEvent: (event) => { refreshStatus([event.queueId]); },
-    onReconnect: (id) => { refreshStatus([id]); },
+    onEvent: (event) => {
+      refreshStatus([event.queueId]);
+    },
+    onReconnect: (id) => {
+      refreshStatus([id]);
+    },
   });
   useDegradedRealtimeRefresh({
     health,
     enabled: enabled && queueIds.length > 0,
-    refresh: () => { refreshStatus(queueIds); },
+    refresh: () => {
+      refreshStatus(queueIds);
+    },
   });
   const tiers = useQuery({
     queryKey: queryKeys.tiers.byQueue(queueId),
@@ -168,7 +174,7 @@ export function useKioskCatalog(
       enabled: enabled && loadRules && item.isActive,
     })),
   });
-  return { queues, queueStatuses, tiers, tierRules };
+  return { queues, queueStatuses, tiers, tierRules, realtimeHealth: health };
 }
 
 export function useKioskRegistration(options: {

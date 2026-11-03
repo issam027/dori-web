@@ -1,3 +1,4 @@
+import { useHeartbeatHealth } from '@/core/realtime/use-heartbeat-health';
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { CreateEdgeCommandDtoType } from '@/api/generated/models';
@@ -31,6 +32,7 @@ export function useEdgeInstallation(installationId: string | null) {
 }
 
 export function useEdgeInstallationsRealtime(installationId: string | null) {
+  const { health, heartbeat, fail } = useHeartbeatHealth(['edge-installations']);
   const client = useQueryClient();
   useEffect(() => {
     const controller = new AbortController();
@@ -40,11 +42,16 @@ export function useEdgeInstallationsRealtime(installationId: string | null) {
         void client.invalidateQueries({ queryKey: edgeInstallationKeys.detail(installationId) });
       }
     };
-    void subscribeEdgeInstallations(invalidate, controller.signal).catch(() => undefined);
+    void subscribeEdgeInstallations(invalidate, controller.signal, () => {
+      heartbeat('edge-installations');
+    }).catch(() => {
+      if (!controller.signal.aborted) fail();
+    });
     return () => {
       controller.abort();
     };
-  }, [client, installationId]);
+  }, [client, installationId, heartbeat, fail]);
+  return health;
 }
 
 export function useCreateEdgeInstallation() {

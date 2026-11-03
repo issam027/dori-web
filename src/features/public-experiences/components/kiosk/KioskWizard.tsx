@@ -1,3 +1,4 @@
+import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
 import { KioskSuccess } from './KioskSuccess';
 import { useQueueServiceSelection } from '@/shared/queue-services/use-queue-service-selection';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +70,7 @@ export function KioskWizard() {
       (user.userType !== 'kiosk' ||
         (!user.scope.isGlobal && scopeSites.length === 1 && activeSiteId === scopeSites[0])),
     );
-  const { queues, queueStatuses, tiers, tierRules } = useKioskCatalog(
+  const { queues, queueStatuses, tiers, tierRules, realtimeHealth } = useKioskCatalog(
     activeSiteId,
     queueId,
     validScope,
@@ -209,6 +210,11 @@ export function KioskWizard() {
         event.preventDefault();
       }}
     >
+      {queueStatuses.length > 0 ? (
+        <div className="kiosk-connection-status">
+          <RealtimeConnectionIndicator health={realtimeHealth} />
+        </div>
+      ) : null}
       {watchdog.warning && flow !== 'home' ? (
         <div className="kiosk-timeout" role="alertdialog" aria-live="assertive">
           <strong>{__t('public-experiences.kiosk.sessionInactive')}</strong>

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useHeartbeatHealth } from './use-heartbeat-health';
+import { useCallback, useEffect, useEffectEvent } from 'react';
 import {
   QueueRealtimeGateway,
   type QueueDisplayChangedEvent,
@@ -7,7 +8,6 @@ import {
   type QueueRealtimeEvent,
   type QueueRealtimeHealth,
   type QueueRealtimeStatus,
-  realtimeHeartbeatTimeoutMs,
 } from './queue-realtime-gateway';
 import { refreshAccessToken } from '@/api/client/http-client';
 import { useRealtimeStatusStore } from './realtime-status-store';
@@ -39,10 +39,8 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
   const externalError = useEffectEvent(options.onError ?? (() => undefined));
   const updateStatus = useRealtimeStatusStore((state) => state.updateStatus);
   const reportError = useRealtimeStatusStore((state) => state.reportError);
-  const [health, setHealth] = useState<QueueRealtimeHealth>('connecting');
-  const heartbeats = useRef(new Map<string, number>());
+  const { health, heartbeat } = useHeartbeatHealth(options.queueIds);
   const onStatusChange = useEffectEvent((queueId: string, status: QueueRealtimeStatus) => {
-    if (status === 'connecting') setHealth('connecting');
     updateStatus(channel, queueId, status);
     externalStatusChange(queueId, status);
   });
@@ -51,36 +49,8 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     externalError(queueId, error);
   });
   const onHeartbeat = useEffectEvent((queueId: string) => {
-    const now = Date.now();
-    heartbeats.current.set(queueId, now);
-    const queueIds = queueKey ? queueKey.split(',') : [];
-    if (
-      queueIds.every((id) => {
-        const lastHeartbeat = heartbeats.current.get(id);
-        return lastHeartbeat !== undefined && now - lastHeartbeat <= realtimeHeartbeatTimeoutMs;
-      })
-    )
-      setHealth('active');
+    heartbeat(queueId);
   });
-
-  useEffect(() => {
-    heartbeats.current.clear();
-    if (!queueKey) return;
-    const startedAt = Date.now();
-    const timer = window.setInterval(() => {
-      const now = Date.now();
-      const queueIds = queueKey.split(',');
-      const allHealthy = queueIds.every((queueId) => {
-        const lastHeartbeat = heartbeats.current.get(queueId);
-        return lastHeartbeat !== undefined && now - lastHeartbeat <= realtimeHeartbeatTimeoutMs;
-      });
-      if (allHealthy) setHealth('active');
-      else if (now - startedAt >= realtimeHeartbeatTimeoutMs) setHealth('degraded');
-    }, 5_000);
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [queueKey]);
 
   useEffect(() => {
     if (!credential || !queueKey) return;

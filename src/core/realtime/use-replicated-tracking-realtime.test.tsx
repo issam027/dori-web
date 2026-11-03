@@ -51,6 +51,10 @@ it('opens one token-header stream, receives snapshots directly and aborts on unm
   await act(async () => {
     await options.onopen?.(new Response('', { headers: { 'content-type': 'text/event-stream' } }));
   });
+  expect(result.current).toBe('connecting');
+  act(() => {
+    options.onmessage?.({ event: 'heartbeat', id: '', data: '{}' });
+  });
   expect(result.current).toBe('active');
   act(() => {
     options.onmessage?.({ event: 'tracking_changed', id: '2', data: JSON.stringify(snapshot) });
