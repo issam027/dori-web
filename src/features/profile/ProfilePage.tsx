@@ -100,10 +100,9 @@ export function ProfilePage() {
   const submitPassword = handlePasswordSubmit(async ({ currentPassword, newPassword }) => {
     try {
       await changePassword({ currentPassword, newPassword });
-      await hydrateSession();
       resetPassword();
-      setPasswordEditing(false);
-      notify({ tone: 'success', title: __t('profile.passwordUpdated') });
+      await expireSession(queryClient);
+      void navigate('/login', { replace: true, state: { passwordChanged: true } });
     } catch (error) {
       notifyError(error);
     }

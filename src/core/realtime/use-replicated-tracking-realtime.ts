@@ -4,6 +4,7 @@ import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import type { QueueRealtimeHealth } from './queue-realtime-gateway';
 
 const statuses = new Set([
+  'booked',
   'waiting',
   'in_progress',
   'served',
@@ -36,6 +37,8 @@ export function parseReplicatedTracking(data: string): RegistrationPositionRespo
     if (item.sourceConnectivity !== 'online' && item.sourceConnectivity !== 'offline')
       return undefined;
     return {
+      languagePreference:
+        typeof item.languagePreference === 'string' ? item.languagePreference : undefined,
       status: item.status,
       registrationStatus:
         item.registrationStatus as RegistrationPositionResponseDto['registrationStatus'],

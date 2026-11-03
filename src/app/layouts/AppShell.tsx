@@ -2,7 +2,7 @@ import { MOBILE_QUERY } from '@/shared/useMediaQuery';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { clearSession } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
 import { CommandPalette } from './CommandPalette';
@@ -47,6 +47,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [pageTitle, setPageTitle] = useState<string>();
   const appContentRef = useRef<HTMLElement>(null);
   const requiresSite = routeRequiresActiveSite(location.pathname);
+  const navigate = useNavigate();
+  const afterLogin = Boolean((location.state as { afterLogin?: boolean } | null)?.afterLogin);
   const accessibleSitesQuery = useSites('portfolio', requiresSite && activeSiteId === null, true);
   const activeSiteQuery = useSite(activeSiteId);
   const accessibleSites = useMemo(() => {
@@ -62,6 +64,26 @@ export function AppShell({ children }: { children: ReactNode }) {
     () => accessibleSites.filter((site) => site.isActive),
     [accessibleSites],
   );
+  useEffect(() => {
+    if (
+      afterLogin &&
+      requiresSite &&
+      activeSiteId === null &&
+      accessibleSitesQuery.isSuccess &&
+      !accessibleSitesQuery.isFetching &&
+      activeAccessibleSites.length > 1
+    ) {
+      void navigate('/portfolio', { replace: true });
+    }
+  }, [
+    afterLogin,
+    requiresSite,
+    activeSiteId,
+    accessibleSitesQuery.isSuccess,
+    accessibleSitesQuery.isFetching,
+    activeAccessibleSites.length,
+    navigate,
+  ]);
   const sites = useMemo(() => {
     const scoped = activeAccessibleSites.map((site) => ({
       id: site.siteId,

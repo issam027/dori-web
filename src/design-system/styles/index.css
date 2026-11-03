@@ -6,6 +6,7 @@
 @import './components/overlays.css';
 @import './layouts/shell.css';
 @import './features/application.css';
+@import './features/password-change.css';
 @import './experiences/kiosk.css';
 @import './experiences/display.css';
 @import './experiences/tracking.css';

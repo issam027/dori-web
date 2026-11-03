@@ -22,7 +22,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { getRememberedUsername, login } from '@/core/auth/session-actions';
 import { useSessionStore } from '@/core/auth/session-store';
-import { findFirstAuthorizedPath } from '@/app/protected-routes';
+import { findLoginDestination } from '@/app/protected-routes';
 import { FormField } from '@/design-system/components/FormField';
 import {
   loginShowcaseKey,
@@ -180,7 +180,8 @@ export function LoginPage() {
     return (
       <Navigate
         replace
-        to={user.mustChangePassword ? '/change-password' : findFirstAuthorizedPath(user)}
+        state={{ afterLogin: true }}
+        to={findLoginDestination(user, (location.state as { from?: string } | null)?.from)}
       />
     );
 
@@ -194,14 +195,10 @@ export function LoginPage() {
       const current = useSessionStore.getState().user;
       const requested = (location.state as { from?: string } | null)?.from;
       if (current)
-        void navigate(
-          current.mustChangePassword
-            ? '/change-password'
-            : current.userType === 'kiosk'
-              ? '/device-mode'
-              : (requested ?? findFirstAuthorizedPath(current)),
-          { replace: true },
-        );
+        void navigate(findLoginDestination(current, requested), {
+          replace: true,
+          state: { afterLogin: true },
+        });
     } catch {
       setApiError(__t('auth.login.identifiantOuMotDePasseIncorrect'));
     } finally {
@@ -224,6 +221,11 @@ export function LoginPage() {
           <p className="eyebrow">{__t('auth.login.connexionSecurisee')}</p>
           <h1 id="login-title">{__t('auth.login.bienvenueSurVotreEspace')}</h1>
           <p>{__t('auth.login.connectezVousAvecVotreIdentifiantDori')}</p>
+          {(location.state as { passwordChanged?: boolean } | null)?.passwordChanged ? (
+            <p role="status" className="login-password-success">
+              {__t('auth.changePassword.success')}
+            </p>
+          ) : null}
           <form
             className="form-stack"
             onSubmit={(event) => {

@@ -51,7 +51,6 @@ export const profile = {
   'profile.passwordConfirmation': 'Confirmation',
   'profile.passwordLength': 'Le mot de passe doit contenir entre 10 et 20 caractères.',
   'profile.updatePassword': 'Mettre à jour le mot de passe',
-  'profile.passwordUpdated': 'Mot de passe mis à jour',
   'profile.globalLogout.action': 'Déconnecter toutes mes sessions',
   'profile.globalLogout.help': 'Révoque les sessions ouvertes sur tous vos appareils.',
   'profile.globalLogout.confirmTitle': 'Déconnecter toutes vos sessions ?',

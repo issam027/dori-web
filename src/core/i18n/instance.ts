@@ -56,10 +56,14 @@ export async function ensureLocaleLoaded(input: string): Promise<SupportedLocale
   return locale;
 }
 
+let languageChangeVersion = 0;
+
 /** The one way to switch the UI language: loads catalogs first, then activates (also sets lang/dir). */
+
 export async function setLanguage(input: string): Promise<SupportedLocale> {
+  const version = ++languageChangeVersion;
   const locale = await ensureLocaleLoaded(input);
-  await i18n.changeLanguage(locale);
+  if (version === languageChangeVersion) await i18n.changeLanguage(locale);
   return locale;
 }
 

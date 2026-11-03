@@ -33,10 +33,8 @@ test('login uses the real form flow and redirects to the first authorized route'
   await page.getByRole('textbox', { name: /email ou nom utilisateur/i }).fill('operator.e2e');
   await page.getByLabel(/mot de passe/i).fill('Root@123456');
   await page.getByRole('button', { name: /se connecter/i }).click();
-  await expect(page).toHaveURL(/\/portfolio$/);
-  await expect(
-    page.getByRole('main').getByRole('heading', { name: /portefeuille/i }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/desk$/);
+  await expect(page.getByText('Site E2E Alpha').first()).toBeVisible();
 });
 
 test('refreshing a private route restores session and active single-site context', async ({

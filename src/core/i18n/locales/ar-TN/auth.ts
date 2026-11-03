@@ -1,5 +1,11 @@
 // Tunisian derja (familiar street register). Partial: missing keys fall back to ar, then fr.
 export const auth: Record<string, string> = {
+  'auth.changePassword.securityTitle': 'أمّن الكونت متاعك',
+  'auth.changePassword.requiredHelp': 'اختار مودباس جديد باش تكمّل تخدم في الفضاء متاعك.',
+  'auth.changePassword.sessionHelp': 'كي تسجّل، عاود ادخل بالمودباس الجديد متاعك.',
+  'auth.changePassword.showPasswords': 'ورّيني المودباسات',
+  'auth.changePassword.saveAndSignIn': 'نسجّل ونعاود ندخل',
+  'auth.changePassword.success': 'المودباس تبدّل. عاود ادخل باش تكمّل.',
   'auth.changePassword.changerLeMotDePasse': 'بدّل المودباس',
   'auth.changePassword.passwordHint': 'اختار مودباس كاسح بين 10 و20 حرف، موش 123456 يا باهي!',
   'auth.changePassword.confirmation': 'عاود اكتب المودباس للتأكيد',

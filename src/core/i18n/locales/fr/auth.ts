@@ -1,5 +1,13 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const auth = {
+  'auth.changePassword.securityTitle': 'Sécuriser votre accès',
+  'auth.changePassword.requiredHelp':
+    'Choisissez un nouveau mot de passe pour continuer à utiliser votre espace.',
+  'auth.changePassword.sessionHelp':
+    'Après validation, reconnectez-vous avec votre nouveau mot de passe.',
+  'auth.changePassword.showPasswords': 'Afficher les mots de passe',
+  'auth.changePassword.saveAndSignIn': 'Enregistrer et me reconnecter',
+  'auth.changePassword.success': 'Mot de passe modifié. Reconnectez-vous pour continuer.',
   'auth.changePassword.changerLeMotDePasse': 'Changer le mot de passe',
   'auth.changePassword.passwordHint': 'Choisissez un mot de passe de 10 à 20 caractères.',
   'auth.changePassword.confirmation': 'Confirmation',

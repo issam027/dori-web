@@ -1,6 +1,12 @@
 import type { DomainTranslations } from '../../types';
 
 export const auth: DomainTranslations<typeof import('../fr/auth').auth> = {
+  'auth.changePassword.securityTitle': 'تأمين حسابك',
+  'auth.changePassword.requiredHelp': 'اختر كلمة مرور جديدة لمواصلة استخدام فضاء العمل.',
+  'auth.changePassword.sessionHelp': 'بعد الحفظ، سجّل الدخول من جديد بكلمة المرور الجديدة.',
+  'auth.changePassword.showPasswords': 'إظهار كلمات المرور',
+  'auth.changePassword.saveAndSignIn': 'حفظ وإعادة تسجيل الدخول',
+  'auth.changePassword.success': 'تمّ تغيير كلمة المرور. سجّل الدخول من جديد للمتابعة.',
   'auth.changePassword.changerLeMotDePasse': 'تغيير كلمة المرور',
   'auth.changePassword.passwordHint': 'اختر كلمة مرور قوية بين 10 و20 حرفاً.',
   'auth.changePassword.confirmation': 'تأكيد كلمة المرور',

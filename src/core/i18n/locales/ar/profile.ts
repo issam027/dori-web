@@ -51,7 +51,6 @@ export const profile: DomainTranslations<typeof import('../fr/profile').profile>
   'profile.passwordConfirmation': 'تأكيد كلمة المرور',
   'profile.passwordLength': 'يجب أن تتراوح كلمة المرور بين 10 و20 حرفاً.',
   'profile.updatePassword': 'تحيين كلمة المرور',
-  'profile.passwordUpdated': 'تم تحيين كلمة المرور بنجاح',
   'profile.globalLogout.action': 'تسجيل الخروج من كافة الجلسات',
   'profile.globalLogout.help': 'إلغاء وإغلاق الجلسات المفتوحة على جميع الأجهزة.',
   'profile.globalLogout.confirmTitle': 'تسجيل الخروج من كافة الجلسات؟',

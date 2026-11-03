@@ -100,7 +100,7 @@ export const paginated = <T>(items: T[], page = 1, pageSize = 100) => ({
   items,
 });
 
-function buildUser(profile: TestProfile = 'root', overrides: Record<string, unknown> = {}) {
+export function buildUser(profile: TestProfile = 'root', overrides: Record<string, unknown> = {}) {
   const technical = profile === 'kiosk';
   return {
     userId: technical

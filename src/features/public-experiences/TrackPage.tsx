@@ -1,3 +1,4 @@
+import { useContextLocale } from '@/core/i18n/use-context-locale';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Clock3, RefreshCw, TriangleAlert, XCircle } from 'lucide-react';
@@ -45,6 +46,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     error: trackingError,
     setError,
   } = usePublicTracking(token);
+  useContextLocale(token, position?.languagePreference);
   const [consent, setConsent] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const previousStatus = useRef('');

@@ -1,3 +1,5 @@
+import { usePreferencesStore } from '@/core/theme/preferences-store';
+import { normalizeLocale } from '@/core/i18n/config';
 import type { QueryClient } from '@tanstack/react-query';
 import type { LoginDto, UserScopeDto } from '@/api/generated/models';
 import {
@@ -27,10 +29,10 @@ export async function login(credentials: LoginDto, rememberUsername: boolean): P
   if (rememberUsername)
     localStorage.setItem(storageKeys.local.rememberedUsername, credentials.username);
   else localStorage.removeItem(storageKeys.local.rememberedUsername);
-  await hydrateSession();
+  await hydrateSession({ locale: response.data.user.languagePreference });
 }
 
-export async function hydrateSession(): Promise<void> {
+export async function hydrateSession(options: { locale?: string | null } = {}): Promise<void> {
   useSessionStore.getState().beginHydration();
   try {
     const response = await authControllerMe();
@@ -49,6 +51,8 @@ export async function hydrateSession(): Promise<void> {
     } else {
       useScopeStore.getState().clear();
     }
+    const profileLocale = options.locale ?? response.data.languagePreference;
+    if (profileLocale) usePreferencesStore.getState().setLocale(normalizeLocale(profileLocale));
     useSessionStore.getState().authenticate(response.data);
   } catch (error: unknown) {
     useSessionStore.getState().clear();

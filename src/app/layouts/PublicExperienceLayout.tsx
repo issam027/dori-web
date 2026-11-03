@@ -1,3 +1,5 @@
+import { useScopeStore } from '@/core/scope/scope-store';
+import { useContextLocale } from '@/core/i18n/use-context-locale';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -19,11 +21,13 @@ export function PublicExperienceLayout({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useSessionStore((state) => state.user);
-  const kioskSiteId =
-    mode === 'kiosk' && user?.userType === 'kiosk' && !user.scope.isGlobal
-      ? (user.scope.siteIds[0] ?? null)
-      : null;
-  const kioskSite = useSite(kioskSiteId);
+  const activeSiteId = useScopeStore((state) => state.activeSiteId);
+  const siteMode = mode === 'kiosk' || mode === 'display';
+  const siteId = siteMode
+    ? (activeSiteId ?? (user?.scope.siteIds.length === 1 ? (user.scope.siteIds[0] ?? null) : null))
+    : null;
+  const kioskSite = useSite(siteId);
+  useContextLocale(siteId, kioskSite.data?.data.defaultLocale);
   const logoutStarted = useRef(false);
   const disconnectRequested =
     (mode === 'kiosk' || mode === 'display' || mode === 'tracking') &&

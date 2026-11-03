@@ -64,7 +64,7 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
   },
   {
     path: '/portfolio',
-    permissions: ['site_view'],
+    permissions: ['site_view', 'session_operate'],
     component: lazyNamed(() => import('@/features/portfolio/PortfolioPage'), 'PortfolioPage'),
     frame: 'shell',
   },
@@ -319,6 +319,13 @@ export const publicNavigationRoutes: readonly NavigationRouteDefinition[] = [
 ];
 
 export function findFirstAuthorizedPath(user: CurrentUserResponseDto): string {
+  const multipleSites = user.scope.isGlobal || user.scope.siteIds.length > 1;
+  if (
+    user.userType !== 'kiosk' &&
+    !multipleSites &&
+    hasAnyPermission(user, ['registration_call', 'session_operate'])
+  )
+    return '/desk';
   const route = protectedRoutes.find((candidate) => {
     if (!candidate.allUserTypes) {
       if (user.userType === 'kiosk' && !candidate.technicalUser) return false;
@@ -327,4 +334,18 @@ export function findFirstAuthorizedPath(user: CurrentUserResponseDto): string {
     return hasAnyPermission(user, candidate.permissions);
   });
   return route?.path.replace('/*', '') ?? '/profile';
+}
+
+export function findLoginDestination(user: CurrentUserResponseDto, requested?: string): string {
+  if (user.mustChangePassword) return '/change-password';
+  if (user.userType === 'kiosk') return '/device-mode';
+  if (
+    requested?.startsWith('/') &&
+    !requested.startsWith('//') &&
+    !['/change-password', '/login'].includes(requested.split(/[?#]/)[0] ?? '')
+  )
+    return requested;
+  if (user.scope.isGlobal && hasAnyPermission(user, ['registration_call', 'session_operate']))
+    return '/desk';
+  return findFirstAuthorizedPath(user);
 }

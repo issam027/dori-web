@@ -19,6 +19,12 @@ beforeEach(() => {
   mocks.stream.mockReset();
   mocks.stream.mockReturnValue(new Promise(() => undefined));
 });
+it('preserves the ticket language in replicated snapshots', () => {
+  expect(
+    parseReplicatedTracking(JSON.stringify({ ...snapshot, languagePreference: 'ar-TN' }))
+      ?.languagePreference,
+  ).toBe('ar-TN');
+});
 it('accepts public snapshots and rejects malformed states', () => {
   expect(parseReplicatedTracking(JSON.stringify(snapshot))).toEqual(
     expect.objectContaining({ position: 3, estimatedWaitMinutes: null }),
