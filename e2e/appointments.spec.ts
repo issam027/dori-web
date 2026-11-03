@@ -322,14 +322,14 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
   });
   await page.goto('/appointments');
   await expect.poll(() => expectedListQuery).toBe(true);
-  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
+  await page.locator('.calendar-event-button').filter({ hasText: 'Personne Test' }).click();
   await expect(page.getByRole('dialog', { name: /rendez-vous R001/i })).toBeVisible();
   await expect(page.getByRole('dialog')).toContainText(/personne test/i);
   await page.getByRole('button', { name: /marquer comme présent/i }).click();
   await expect.poll(() => checkInCalls).toBe(1);
   await page.getByRole('button', { name: /terminer/i }).click();
 
-  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
+  await page.locator('.calendar-event-button').filter({ hasText: 'Personne Test' }).click();
   await page.getByRole('button', { name: /^reprogrammer$/i }).click();
   await page.getByLabel(/nouvelle date/i).fill('2026-10-10');
   await page.getByRole('button', { name: /10:00.*1 place/i }).click();
@@ -339,7 +339,7 @@ test('an existing calendar appointment can be opened, checked in, rescheduled an
   await expect.poll(() => noteBodies.length).toBe(1);
   expect(noteBodies[0]).toMatch(/reprogrammation.*R001.*2026-10-09.*2026-10-10/i);
 
-  await page.getByRole('button', { name: 'Personne Test', exact: true }).click();
+  await page.locator('.calendar-event-button').filter({ hasText: 'Personne Test' }).click();
   await page.getByRole('button', { name: /annuler le rendez-vous/i }).click();
   await page.getByLabel(/motif de l’annulation/i).fill('Demande téléphonique du client');
   await page.getByRole('button', { name: /confirmer l’annulation/i }).click();
@@ -361,44 +361,14 @@ test('a site without appointment-enabled queues explains that appointments are u
   await expect(page.locator('.week-calendar')).toHaveCount(0);
 });
 
-test('the queue calendar renders API-closed days compactly and prevents appointment creation', async ({
+test('the queue calendar renders configured closed days compactly and prevents appointment creation', async ({
   page,
 }) => {
-  const closedDay: ApiScenarioHandler = async ({ method, path, url, route }) => {
-    if (
-      method === 'GET' &&
-      path === '/api/v1/queues/00000000-0000-4000-8000-000000000010/availability'
-    ) {
-      const dateFrom = url.searchParams.get('dateFrom') ?? '';
-      const dateTo = url.searchParams.get('dateTo') ?? dateFrom;
-      await route.fulfill({
-        json: apiEnvelope({
-          queueId: '00000000-0000-4000-8000-000000000010',
-          timezone: 'Europe/Paris',
-          dateFrom,
-          dateTo,
-          days: [
-            {
-              businessDate: '2026-10-06',
-              isOpen: false,
-              capacity: 0,
-              booked: 0,
-              available: 0,
-              slots: [],
-            },
-          ],
-        }),
-      });
-      return true;
-    }
-    return false;
-  };
   await useFixedClock(page);
   await installApiScenario(page, {
     profile: 'operator',
     sites: [site],
-    queues: [appointmentQueue],
-    handlers: [closedDay],
+    queues: [buildQueue({ ...appointmentQueue, workingDays: [1, 3, 4, 5] })],
   });
   await page.goto('/appointments');
   const closed = page.locator('.calendar-day.is-closed').filter({ hasText: '2026-10-06' });
@@ -415,3 +385,64 @@ test('the queue calendar renders API-closed days compactly and prevents appointm
   await expect(page.getByText(/aucun rendez-vous pour cette journée/i)).toHaveCount(0);
   await expect(page.getByRole('button', { name: /nouveau rendez-vous/i })).toHaveCount(0);
 });
+
+for (const width of [390, 1440]) {
+  test(
+    'calendar avoids availability until booking and shows state icons at ' + String(width),
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await useFixedClock(page, '2026-10-09T08:15:00Z');
+      let availabilityCalls = 0;
+      await installApiScenario(page, {
+        profile: 'operator',
+        sites: [site],
+        queues: [appointmentQueue],
+        handlers: [
+          async ({ path, route }) => {
+            if (path.endsWith('/availability')) {
+              availabilityCalls += 1;
+              return false;
+            }
+            if (path !== '/api/v1/registrations') return false;
+            await route.fulfill({
+              json: apiEnvelope(
+                paginated([
+                  buildAppointment({
+                    registrationId: '00000000-0000-4000-8000-000000000501',
+                    status: 'booked',
+                    appointmentStatus: 'booked',
+                    scheduledTime: '2026-10-09T07:00:00Z',
+                    firstName: 'Booked',
+                    lastName: 'Person',
+                  }),
+                  buildAppointment({
+                    registrationId: '00000000-0000-4000-8000-000000000502',
+                    status: 'served',
+                    appointmentStatus: 'checked_in',
+                    scheduledTime: '2026-10-09T08:00:00Z',
+                    firstName: 'Served',
+                    lastName: 'Person',
+                  }),
+                ]),
+              ),
+            });
+            return true;
+          },
+        ],
+      });
+      await page.goto('/appointments');
+      const cards = page.locator(width < 768 ? '.agenda-item' : '.calendar-event-button');
+      await expect(cards.filter({ hasText: 'Booked Person' })).toBeVisible();
+      await expect(cards.filter({ hasText: 'Booked Person' }).getByRole('img')).toHaveCount(0);
+      await expect(cards.filter({ hasText: 'Served Person' }).getByRole('img')).toHaveCount(1);
+      await page.reload();
+      await expect(cards.filter({ hasText: 'Served Person' }).getByRole('img')).toBeVisible();
+      expect(availabilityCalls).toBe(0);
+      if (width > 768) {
+        await page.getByRole('button', { name: 'Mois', exact: true }).click();
+        await expect(cards.filter({ hasText: 'Served Person' }).getByRole('img')).toBeVisible();
+        expect(availabilityCalls).toBe(0);
+      }
+    },
+  );
+}

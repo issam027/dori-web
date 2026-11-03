@@ -16,11 +16,12 @@ import {
 import { serviceTierVisualClass } from '@/design-system/service-tier';
 import { useQueues } from '@/features/queues/public';
 import { useSite } from '@/features/portfolio/public';
-import { useAppointment, useAppointments, useAvailabilityRange } from './hooks/useAppointments';
+import { useAppointment, useAppointments } from './hooks/useAppointments';
 import { Button } from '@/design-system/components/Button';
 import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 import { ErrorState } from '@/design-system/components/FeedbackState';
 import { MOBILE_QUERY, useMediaQuery } from '@/shared/useMediaQuery';
+import { AppointmentStatusIcon } from './AppointmentStatusIcon';
 import { MobileAgenda } from './MobileAgenda';
 
 export function AppointmentsPage() {
@@ -68,9 +69,8 @@ export function AppointmentsPage() {
       ? weekDates(anchor)
       : monthDates(anchor);
   const appointmentsQuery = useAppointments({ siteId, queueId: selectedQueue?.queueId, dates });
-  const availabilityQuery = useAvailabilityRange(selectedQueue?.queueId, dates);
-  const calendarLoading = appointmentsQuery.isPending || availabilityQuery.isPending;
-  const calendarError = appointmentsQuery.isError || availabilityQuery.isError;
+  const calendarLoading = appointmentsQuery.isPending;
+  const calendarError = appointmentsQuery.isError;
   const appointments = useMemo(() => appointmentsQuery.data ?? [], [appointmentsQuery.data]);
   const selected = useAppointment(selectedId);
   const personName = (appointment: RegistrationResponseDto) =>
@@ -99,12 +99,7 @@ export function AppointmentsPage() {
   }, [appointments, timeZone]);
 
   const byDate = (date: string): RegistrationResponseDto[] => appointmentsByDate.get(date) ?? [];
-  const availabilityByDate = new Map(
-    (availabilityQuery.data?.data.days ?? []).map((day) => [day.businessDate, day]),
-  );
   const isOpen = (date: string) => {
-    const availability = availabilityByDate.get(date);
-    if (availability) return availability.isOpen;
     const weekdayNumber = new Date(`${date}T00:00:00Z`).getUTCDay() || 7;
     return selectedQueue?.workingDays.includes(weekdayNumber) ?? true;
   };
@@ -268,7 +263,7 @@ export function AppointmentsPage() {
           {calendarError ? (
             <ErrorState
               onRetry={() => {
-                void Promise.all([appointmentsQuery.refetch(), availabilityQuery.refetch()]);
+                void appointmentsQuery.refetch();
               }}
             />
           ) : calendarLoading ? (
@@ -417,6 +412,7 @@ export function AppointmentsPage() {
                                           className="appointment-status-dot"
                                           aria-hidden="true"
                                         />
+                                        <AppointmentStatusIcon appointment={item} />
                                         <span className="appointment-event-name">{name}</span>
                                       </Button>
                                     );
@@ -545,6 +541,7 @@ export function AppointmentsPage() {
                             }}
                           >
                             <span className="appointment-status-dot" aria-hidden="true" />
+                            <AppointmentStatusIcon appointment={item} />
                             <span className="appointment-event-name">{name}</span>
                             <time className="appointment-event-time" dateTime={item.scheduledTime}>
                               {itemTime}

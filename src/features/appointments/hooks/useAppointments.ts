@@ -17,7 +17,12 @@ export function useAppointments(options: {
   const dateTo = options.dates.at(-1);
 
   return useQuery({
-    queryKey: queryKeys.appointments.byQueueRange(options.queueId, dateFrom, dateTo, options.siteId),
+    queryKey: queryKeys.appointments.byQueueRange(
+      options.queueId,
+      dateFrom,
+      dateTo,
+      options.siteId,
+    ),
     queryFn: async ({ signal }: { signal: AbortSignal }) => {
       const params = {
         siteId: options.siteId ?? undefined,
@@ -72,22 +77,6 @@ export function useAvailability(queueId: string, date: string, enabled = true) {
         signal,
       ),
     enabled: enabled && Boolean(queueId) && date.length > 0,
-  });
-}
-
-export function useAvailabilityRange(queueId: string | undefined, dates: readonly string[]) {
-  const dateFrom = dates[0];
-  const dateTo = dates.at(-1);
-  return useQuery({
-    queryKey: queryKeys.availabilityRange(queueId, dateFrom, dateTo),
-    queryFn: ({ signal }) =>
-      registrationsControllerGetAvailability(
-        queueId ?? '',
-        { dateFrom: dateFrom ?? '', dateTo: dateTo ?? '' },
-        undefined,
-        signal,
-      ),
-    enabled: queueId !== undefined && Boolean(dateFrom && dateTo),
   });
 }
 

@@ -3,8 +3,8 @@ import { CalendarDays, CalendarOff, ChevronLeft, ChevronRight, Plus } from 'luci
 import type { RegistrationResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { EmptyState } from '@/design-system/components/FeedbackState';
-import { StatusBadge } from '@/design-system/components/StatusBadge';
-import { appointmentLocalParts, appointmentStatusKey, weekDates } from './appointment-rules';
+import { AppointmentStatusIcon } from './AppointmentStatusIcon';
+import { appointmentLocalParts, weekDates } from './appointment-rules';
 
 export function MobileAgenda({
   date,
@@ -126,7 +126,7 @@ export function MobileAgenda({
                     {[item.firstName, item.lastName].filter(Boolean).join(' ') ||
                       t('appointments.calendar.unknownPerson')}
                   </strong>
-                  <StatusBadge>{t(appointmentStatusKey(item))}</StatusBadge>
+                  <AppointmentStatusIcon appointment={item} />
                   {item.tierName ? <small>{item.tierName}</small> : null}
                 </div>
                 <Button

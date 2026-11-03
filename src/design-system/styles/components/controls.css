@@ -1151,3 +1151,29 @@ input:is([type='checkbox'], [type='radio']):user-invalid {
   color: var(--color-text-muted);
   font-size: 0.72rem;
 }
+
+/* Keep state visible without adding a text badge to compact calendar cards. */
+.calendar-event-button,
+.agenda-item {
+  position: relative;
+}
+.calendar-event-button:has(.appointment-state-icon) {
+  padding-inline-end: 24px;
+}
+.agenda-item:has(.appointment-state-icon) {
+  padding-inline-end: 34px;
+}
+.appointment-state-icon {
+  position: absolute;
+  inset-block-start: 5px;
+  inset-inline-end: 5px;
+  display: inline-flex;
+  color: currentColor;
+  opacity: 0.75;
+  pointer-events: none;
+}
+.appointment-state-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 1.75;
+}
