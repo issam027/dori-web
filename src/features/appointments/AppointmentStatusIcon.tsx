@@ -2,7 +2,7 @@ import {
   CalendarClock,
   CheckCheck,
   CircleCheck,
-  Clock,
+  CalendarX2,
   Hourglass,
   UserCheck,
   UserX,
@@ -24,7 +24,7 @@ const icons: Record<Exclude<AppointmentVisualStatus, 'booked'>, LucideIcon> = {
   'in-progress': Hourglass,
   served: CheckCheck,
   'no-show': UserX,
-  expired: Clock,
+  expired: CalendarX2,
   cancelled: X,
 };
 
