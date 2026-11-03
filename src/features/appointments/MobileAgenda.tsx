@@ -122,11 +122,13 @@ export function MobileAgenda({
                     : '—'}
                 </time>
                 <div>
-                  <strong>
-                    {[item.firstName, item.lastName].filter(Boolean).join(' ') ||
-                      t('appointments.calendar.unknownPerson')}
-                  </strong>
-                  <AppointmentStatusIcon appointment={item} />
+                  <div className="agenda-item-name">
+                    <strong>
+                      {[item.firstName, item.lastName].filter(Boolean).join(' ') ||
+                        t('appointments.calendar.unknownPerson')}
+                    </strong>
+                    <AppointmentStatusIcon appointment={item} />
+                  </div>
                   {item.tierName ? <small>{item.tierName}</small> : null}
                 </div>
                 <Button

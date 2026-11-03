@@ -1152,25 +1152,25 @@ input:is([type='checkbox'], [type='radio']):user-invalid {
   font-size: 0.72rem;
 }
 
-/* Keep state visible without adding a text badge to compact calendar cards. */
-.calendar-event-button,
-.agenda-item {
-  position: relative;
+/* Keep state aligned with the name at the end of each appointment row. */
+.agenda-item-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
 }
-.calendar-event-button:has(.appointment-state-icon) {
-  padding-inline-end: 24px;
-}
-.agenda-item:has(.appointment-state-icon) {
-  padding-inline-end: 34px;
+.agenda-item-name strong {
+  min-width: 0;
 }
 .appointment-state-icon {
-  position: absolute;
-  inset-block-start: 5px;
-  inset-inline-end: 5px;
   display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  order: 1;
+  margin-inline-start: auto;
   color: currentColor;
   opacity: 0.75;
-  pointer-events: none;
 }
 .appointment-state-icon svg {
   width: 13px;
