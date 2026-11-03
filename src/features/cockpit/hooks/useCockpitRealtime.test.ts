@@ -134,4 +134,31 @@ describe('cockpit realtime lifecycle', () => {
     expect(mocks.setQueryData).toHaveBeenCalledTimes(1);
     unmount();
   });
+  it('cancels refreshes and ignores late events for a queue removed from the active scope', async () => {
+    mocks.refreshQueue.mockResolvedValue({});
+    const { rerender, unmount } = renderHook(
+      ({ queueIds }) =>
+        useCockpitRealtime({ siteId: 'site-1', queueIds, refresh: () => Promise.resolve() }),
+      { initialProps: { queueIds: ['queue-1'] } },
+    );
+    act(() => {
+      mocks.listener?.onEvent({ queueId: 'queue-1' });
+    });
+    rerender({ queueIds: ['queue-2'] });
+    act(() => {
+      mocks.listener?.onEvent({ queueId: 'queue-1' });
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
+    expect(mocks.refreshQueue).not.toHaveBeenCalled();
+    act(() => {
+      mocks.listener?.onEvent({ queueId: 'queue-2' });
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
+    expect(mocks.refreshQueue).toHaveBeenCalledExactlyOnceWith('site-1', 'queue-2');
+    unmount();
+  });
 });

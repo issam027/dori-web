@@ -23,6 +23,7 @@ export function useCockpitRealtime({
   refresh: () => Promise<void>;
 }) {
   const queryClient = useQueryClient();
+  const queueKey = [...queueIds].sort().join(',');
   const timers = useRef(new Map<string, number>());
   const generation = useRef(0);
   const revisions = useRef(new Map<string, number>());
@@ -34,14 +35,19 @@ export function useCockpitRealtime({
       timers.current.clear();
       revisions.current.clear();
     },
-    [siteId],
+    [siteId, queueKey],
   );
 
   const health = useQueueDisplayRealtime({
     queueIds,
     getToken: getAccessToken,
     onEvent: (event) => {
-      if (!siteId || shouldSkipCockpitRealtimeRefresh(siteId, event.queueId)) return;
+      if (
+        !siteId ||
+        !queueIds.includes(event.queueId) ||
+        shouldSkipCockpitRealtimeRefresh(siteId, event.queueId)
+      )
+        return;
       const previous = timers.current.get(event.queueId);
       if (previous !== undefined) window.clearTimeout(previous);
       const scheduledGeneration = generation.current;
