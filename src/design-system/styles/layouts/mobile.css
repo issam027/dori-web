@@ -1162,3 +1162,69 @@
     font-size: max(16px, 1rem);
   }
 }
+
+.appointment-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .dialog-content.appointment-action-dialog[data-mobile-layout] .dialog-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    white-space: normal;
+    overflow: visible;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout] .appointment-summary-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column: 1 / -1;
+    gap: 10px;
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout] .appointment-summary-actions:empty {
+    display: none;
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout]
+    .appointment-summary-actions
+    > .button-primary {
+    grid-column: 1 / -1;
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout]
+    .dialog-actions:has(.appointment-summary-actions > .button)
+    > .button:first-child,
+  .dialog-content.appointment-action-cancel[data-mobile-layout]
+    .dialog-actions
+    > .button:first-child,
+  .dialog-content.appointment-action-reschedule[data-mobile-layout]
+    .dialog-actions
+    > .button:first-child {
+    display: none;
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout] .dialog-actions .button {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    height: auto;
+    aspect-ratio: auto;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.35;
+    white-space: normal;
+  }
+  .dialog-content.appointment-action-dialog[data-mobile-layout]
+    .dialog-actions
+    .button
+    > .button-label {
+    display: inline;
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
+  }
+}

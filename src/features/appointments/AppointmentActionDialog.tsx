@@ -204,7 +204,7 @@ export function AppointmentActionDialog({
       </Button>
     </>
   ) : mode === 'summary' ? (
-    <>
+    <div className="appointment-summary-actions">
       {manageable ? (
         <>
           {checkInAllowed ? (
@@ -267,7 +267,7 @@ export function AppointmentActionDialog({
           <span className="button-label">{t('appointments.actions.createFollowUp')}</span>
         </Button>
       ) : null}
-    </>
+    </div>
   ) : mode === 'cancel' ? (
     <>
       <Button
@@ -366,6 +366,10 @@ export function AppointmentActionDialog({
       }
       hideDismissAction={Boolean(checkedIn)}
       actions={actions}
+      className={
+        'appointment-action-dialog appointment-action-' + mode + (checkedIn ? ' is-confirmed' : '')
+      }
+      dismissLabel={t('common.close')}
     >
       <div className="appointment-details-dialog">
         <div className="wizard-track appointment-action-track" aria-hidden="true">
@@ -383,7 +387,7 @@ export function AppointmentActionDialog({
               <h3>{personName}</h3>
               <strong>{checkedIn.ticketNumber}</strong>
               <p>
-                {queueName} · {t('common.enAttente')}
+                {queueName} Â· {t('common.enAttente')}
               </p>
             </div>
             <div className="quick-registration-tracking">
@@ -410,7 +414,7 @@ export function AppointmentActionDialog({
                 <small>{t('appointments.actions.person')}</small>
                 <h3>{personName}</h3>
                 <p>
-                  {[details?.phoneNumber, details?.email].filter(Boolean).join(' · ') ||
+                  {[details?.phoneNumber, details?.email].filter(Boolean).join(' Â· ') ||
                     t('appointments.actions.noContact')}
                 </p>
               </div>
@@ -440,7 +444,7 @@ export function AppointmentActionDialog({
               </div>
               <div>
                 <dt>{t('appointments.actions.service')}</dt>
-                <dd>{queueName ?? '—'}</dd>
+                <dd>{queueName ?? 'â€”'}</dd>
               </div>
               <div>
                 <dt>{t('appointments.actions.ticket')}</dt>
@@ -470,7 +474,7 @@ export function AppointmentActionDialog({
                       : null,
                   ]
                     .filter(Boolean)
-                    .join(' · ')}
+                    .join(' Â· ')}
                 </small>
               </div>
             ) : null}
