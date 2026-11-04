@@ -787,7 +787,7 @@
 }
 
 .site-summary span + span::before {
-  content: '·';
+  content: 'Â·';
   margin-inline-end: var(--space-2);
 }
 
@@ -2284,7 +2284,7 @@
   }
 }
 
-/* Public experiences — material previews aligned with the SaaS reference mockup. */
+/* Public experiences â€” material previews aligned with the SaaS reference mockup. */
 .experience-preview {
   width: 100%;
   margin: 0 auto;
@@ -2686,13 +2686,16 @@
   padding: 2rem;
   color: var(--color-ink);
   text-align: center;
-  background:
-    radial-gradient(
-      circle at 50% 42%,
-      color-mix(in srgb, var(--color-primary) 14%, transparent),
-      transparent 16rem
-    ),
-    var(--color-background);
+  background-color: var(--color-background);
+  background-image: radial-gradient(
+    circle closest-side at center,
+    color-mix(in srgb, var(--color-primary) 12%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 5%, transparent) 45%,
+    transparent 85%
+  );
+  background-size: min(22rem, 100%) 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .dorify-loader strong {
@@ -2743,11 +2746,8 @@
   min-height: 12rem;
   border: 0;
   border-radius: 0;
-  background: radial-gradient(
-    circle at 50% 42%,
-    color-mix(in srgb, var(--color-primary) 9%, transparent),
-    transparent 16rem
-  );
+  background-color: transparent;
+  background-size: min(16rem, 100%) 100%;
 }
 
 @keyframes dorify-queue {
