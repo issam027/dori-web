@@ -1,7 +1,7 @@
 .announcement-title-summary,
 .announcement-target-summary {
   display: block;
-  max-width: 15rem;
+  max-width: 12rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

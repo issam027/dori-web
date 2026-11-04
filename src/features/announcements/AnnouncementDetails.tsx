@@ -67,7 +67,9 @@ export function AnnouncementDetails({
               <dd>{formatDateTime(item.endsAt, i18n.language)}</dd>
             </div>
           </dl>
-          {!item.canWithdraw ? <p>{t('announcements.readOnly')}</p> : null}
+          {!item.canWithdraw && item.status !== 'withdrawn' ? (
+            <p>{t('announcements.readOnly')}</p>
+          ) : null}
         </div>
       )}
     </Modal>

@@ -1,4 +1,6 @@
 export const admin: Record<string, string> = {
+  'announcements.nature': 'نوع الميساج',
+  'announcements.recipients': 'شكون باش يشوفو',
   'announcements.filtersTitle': 'لوّج على ميساج',
   'announcements.filtersHint': 'ضيّق اللّوجة حسب شكون باش يشوف الميساج، حالتو ولا وقتاش يظهر.',
   'announcements.searchPlaceholder': 'لوّج في العنوان ولا في الميساج…',
@@ -17,8 +19,7 @@ export const admin: Record<string, string> = {
   'announcements.resultCount': '{{count}} ميساج',
   'announcements.edit': 'بدّل الميساج',
   'announcements.updated': 'الميساج تبدّل',
-  'announcements.deleteConfirm': 'نفسخو «{{title}}»؟ ما عادش باش يظهر في الشاشات المعنيّة.',
-  'announcements.deleted': 'الميساج تفسخ',
+
   'announcements.invalidDateFilter': 'نهار النهاية لازم يكون كيف نهار البداية ولا بعدو.',
   'announcements.title': 'ميساجات على الخدمة',
   'announcements.description': 'وصّل المعلومة للفروع اللي تتصرّف فيهم وللنّسخ الداخليّة متاعك.',
@@ -27,7 +28,8 @@ export const admin: Record<string, string> = {
   'announcements.published': 'الميساج تبعث',
   'announcements.withdraw': 'نحّي الميساج',
   'announcements.withdrawn': 'الميساج تنحّى',
-  'announcements.withdrawConfirm': 'تحبّ تنحّي «{{title}}» من عند الناس الكلّ اللي وصلهم؟',
+  'announcements.withdrawConfirm':
+    'نحّيو «{{title}}» من الشاشات؟ الميساج يبقى في السجلّ وتنجم ترجع تشوفو.',
   'announcements.scope.sites': 'الفروع',
   'announcements.scope.installations': 'النّسخ الداخليّة',
   'announcements.audience': 'لشكون باش يوصل الميساج',

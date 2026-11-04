@@ -1,5 +1,7 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const admin = {
+  'announcements.nature': 'Nature de l’annonce',
+  'announcements.recipients': 'Destinataires',
   'announcements.filtersTitle': 'Rechercher une annonce',
   'announcements.filtersHint': 'Affinez les résultats par destinataire, état ou période.',
   'announcements.searchPlaceholder': 'Rechercher dans le titre ou le message…',
@@ -18,9 +20,7 @@ export const admin = {
   'announcements.resultCount': '{{count}} annonce(s)',
   'announcements.edit': 'Modifier l’annonce',
   'announcements.updated': 'Annonce modifiée',
-  'announcements.deleteConfirm':
-    'Supprimer « {{title}} » ? Elle sera retirée des écrans concernés.',
-  'announcements.deleted': 'Annonce supprimée',
+
   'announcements.invalidDateFilter':
     'La date de fin doit être postérieure ou égale à la date de début.',
   'announcements.title': 'Annonces d’exploitation',
@@ -31,7 +31,8 @@ export const admin = {
   'announcements.published': 'Annonce publiée',
   'announcements.withdraw': 'Retirer l’annonce',
   'announcements.withdrawn': 'Annonce retirée',
-  'announcements.withdrawConfirm': 'Retirer « {{title}} » de tous ses destinataires ?',
+  'announcements.withdrawConfirm':
+    'Retirer « {{title}} » des écrans ? L’annonce restera consultable dans l’historique.',
   'announcements.scope.sites': 'Sites',
   'announcements.scope.installations': 'Installations intra',
   'announcements.audience': 'Destinataires des annonces',

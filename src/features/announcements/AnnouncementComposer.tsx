@@ -27,6 +27,8 @@ export function AnnouncementComposer({
   recipients,
   initialTargetId,
   initialAnnouncement,
+  allowedScopes,
+  onScopeChange,
   loading,
   onClose,
 }: {
@@ -34,6 +36,8 @@ export function AnnouncementComposer({
   recipients: AnnouncementRecipient[];
   initialTargetId?: string;
   initialAnnouncement?: AnnouncementResponseDto;
+  allowedScopes?: readonly CreateAnnouncementDto['scope'][];
+  onScopeChange?: (scope: CreateAnnouncementDto['scope']) => void;
   loading: boolean;
   onClose: () => void;
 }) {
@@ -163,6 +167,24 @@ export function AnnouncementComposer({
           handleSubmit(event);
         }}
       >
+        {!initialAnnouncement && allowedScopes && allowedScopes.length > 1 && onScopeChange ? (
+          <FormField label={t('announcements.nature')} required>
+            <select
+              value={scope}
+              onChange={(event) => {
+                setSelected([]);
+                setSearch('');
+                onScopeChange(event.target.value as CreateAnnouncementDto['scope']);
+              }}
+            >
+              {allowedScopes.map((value) => (
+                <option key={value} value={value}>
+                  {t(`announcements.scope.${value}`)}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        ) : null}
         <fieldset className="announcement-recipients">
           <legend>{t(`announcements.scope.${scope}`)}</legend>
           <input

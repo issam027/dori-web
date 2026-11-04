@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'announcements.nature': 'نوع الإعلان',
+  'announcements.recipients': 'الجهات المستهدفة',
   'announcements.filtersTitle': 'البحث عن إعلان',
   'announcements.filtersHint': 'حدّد النتائج حسب الجهة المستهدفة أو الحالة أو فترة العرض.',
   'announcements.searchPlaceholder': 'ابحث في العنوان أو نص الإعلان…',
@@ -19,8 +21,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'announcements.resultCount': 'عدد الإعلانات: {{count}}',
   'announcements.edit': 'تعديل الإعلان',
   'announcements.updated': 'تمّ تعديل الإعلان',
-  'announcements.deleteConfirm': 'هل تريد حذف «{{title}}»؟ سيُسحب من الشاشات المعنيّة.',
-  'announcements.deleted': 'تمّ حذف الإعلان',
+
   'announcements.invalidDateFilter': 'يجب أن يساوي تاريخ النهاية تاريخ البداية أو يأتي بعده.',
   'announcements.title': 'إعلانات الاستغلال',
   'announcements.description': 'أعلم المواقع التي تديرها أو التركيبات الداخلية التابعة لك.',
@@ -29,7 +30,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'announcements.published': 'تم نشر الإعلان',
   'announcements.withdraw': 'سحب الإعلان',
   'announcements.withdrawn': 'تم سحب الإعلان',
-  'announcements.withdrawConfirm': 'هل تريد سحب «{{title}}» من جميع الجهات المعنية؟',
+  'announcements.withdrawConfirm':
+    'هل تريد سحب «{{title}}» من الشاشات؟ سيظلّ الإعلان متاحًا للاطّلاع عليه في السجلّ.',
   'announcements.scope.sites': 'المواقع',
   'announcements.scope.installations': 'التركيبات الداخلية',
   'announcements.audience': 'الجهات المعنية بالإعلانات',

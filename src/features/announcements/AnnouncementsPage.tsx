@@ -38,7 +38,7 @@ import {
   useAnnouncement,
   useAnnouncements,
   useAnnouncementAdministrationRealtime,
-  useDeleteAnnouncement,
+  useWithdrawAnnouncement,
 } from './use-announcements';
 import './announcements-page.css';
 
@@ -54,10 +54,17 @@ export function AnnouncementsPage() {
   const canSites = hasAnyPermission(user, ['site_edit']);
   const canInstallations =
     isCloudDeployment && hasAnyPermission(user, ['edge_installation_manage']);
-  const scope: CreateAnnouncementDto['scope'] =
-    (params.get('scope') === 'installations' && canInstallations) || !canSites
+  const allowedScopes: CreateAnnouncementDto['scope'][] = [
+    ...(canSites ? ['sites' as const] : []),
+    ...(canInstallations ? ['installations' as const] : []),
+  ];
+  const [createScope, setCreateScope] = useState<CreateAnnouncementDto['scope']>(() =>
+    params.get('scope') === 'installations' && canInstallations
       ? 'installations'
-      : 'sites';
+      : canSites
+        ? 'sites'
+        : 'installations',
+  );
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
   const search = useDebouncedFilter(searchDraft);
@@ -72,10 +79,9 @@ export function AnnouncementsPage() {
   const [compose, setCompose] = useState(params.get('compose') === '1');
   const [viewing, setViewing] = useState<string>();
   const [editing, setEditing] = useState<string>();
-  const [deleting, setDeleting] = useState<AnnouncementResponseDto>();
+  const [withdrawing, setWithdrawing] = useState<AnnouncementResponseDto>();
   const periodInvalid = Boolean(dateFrom && dateTo && dateFrom > dateTo);
   const query: AnnouncementsControllerListParams = {
-    scope,
     page,
     pageSize: 10,
     sort,
@@ -88,18 +94,25 @@ export function AnnouncementsPage() {
   };
   const announcements = useAnnouncements(query, !periodInvalid);
   const health = useAnnouncementAdministrationRealtime();
-  const remove = useDeleteAnnouncement();
-  const needRecipients = filtersOpen || compose || Boolean(editing);
-  const sites = useSites('context-switcher', needRecipients && scope === 'sites');
-  const installations = useEdgeInstallations(needRecipients && scope === 'installations');
-  const recipients =
-    scope === 'sites'
-      ? (sites.data?.data.items ?? []).map((item) => ({ id: item.siteId, name: item.siteName }))
-      : (installations.data?.data ?? []).map((item) => ({
-          id: item.installationId,
-          name: item.name,
-        }));
-  const recipientsLoading = scope === 'sites' ? sites.isPending : installations.isPending;
+  const withdraw = useWithdrawAnnouncement();
+  const needRecipients = filtersOpen || compose;
+  const sites = useSites(
+    'context-switcher',
+    canSites && needRecipients && (filtersOpen || createScope === 'sites'),
+  );
+  const installations = useEdgeInstallations(
+    canInstallations && needRecipients && (filtersOpen || createScope === 'installations'),
+  );
+  const siteRecipients = (sites.data?.data.items ?? []).map((item) => ({
+    id: item.siteId,
+    name: item.siteName,
+  }));
+  const installationRecipients = (installations.data?.data ?? []).map((item) => ({
+    id: item.installationId,
+    name: item.name,
+  }));
+  const recipients = createScope === 'sites' ? siteRecipients : installationRecipients;
+  const recipientsLoading = createScope === 'sites' ? sites.isPending : installations.isPending;
   const data = announcements.data?.data;
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
@@ -152,8 +165,8 @@ export function AnnouncementsPage() {
       onEdit={() => {
         setEditing(item.announcementId);
       }}
-      onDelete={() => {
-        setDeleting(item);
+      onWithdraw={() => {
+        setWithdrawing(item);
       }}
     />
   );
@@ -218,22 +231,6 @@ export function AnnouncementsPage() {
         }
       >
         <div className="admin-filter-grid announcement-filter-grid">
-          {canSites && canInstallations ? (
-            <label>
-              {t('announcements.audience')}
-              <select
-                value={scope}
-                onChange={(event) => {
-                  setParams({ scope: event.target.value });
-                  setTargetId('');
-                  setPage(1);
-                }}
-              >
-                <option value="sites">{t('announcements.scope.sites')}</option>
-                <option value="installations">{t('announcements.scope.installations')}</option>
-              </select>
-            </label>
-          ) : null}
           <label>
             {t('common.status')}
             <select
@@ -269,7 +266,7 @@ export function AnnouncementsPage() {
             </select>
           </label>
           <label>
-            {t(`announcements.scope.${scope}`)}
+            {t('announcements.recipients')}
             <select
               value={targetId}
               onChange={(event) => {
@@ -278,11 +275,24 @@ export function AnnouncementsPage() {
               }}
             >
               <option value="">{t('announcements.allTargets')}</option>
-              {recipients.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
+              {canSites ? (
+                <optgroup label={t('announcements.scope.sites')}>
+                  {siteRecipients.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ) : null}
+              {canInstallations ? (
+                <optgroup label={t('announcements.scope.installations')}>
+                  {installationRecipients.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ) : null}
             </select>
           </label>
           <label>
@@ -358,6 +368,16 @@ export function AnnouncementsPage() {
           emptyTitle={t('announcements.empty')}
           emptyDescription={t('announcements.emptyHelp')}
           columns={[
+            ...(isCloudDeployment
+              ? [
+                  {
+                    key: 'nature',
+                    header: t('announcements.nature'),
+                    render: (item: AnnouncementResponseDto) =>
+                      t(`announcements.scope.${item.scope}`),
+                  },
+                ]
+              : []),
             {
               key: 'title',
               header: t('announcements.subject'),
@@ -377,7 +397,7 @@ export function AnnouncementsPage() {
               header: t('common.status'),
               render: (item) => <AnnouncementStatus item={item} />,
             },
-            { key: 'targets', header: t(`announcements.scope.${scope}`), render: targets },
+            { key: 'targets', header: t('announcements.recipients'), render: targets },
             {
               key: 'endsAt',
               header: t('announcements.endsAt'),
@@ -396,11 +416,19 @@ export function AnnouncementsPage() {
               title={<bdi dir="auto">{item.title}</bdi>}
               badge={<AnnouncementStatus item={item} />}
               fields={[
+                ...(isCloudDeployment
+                  ? [
+                      {
+                        label: t('announcements.nature'),
+                        value: t(`announcements.scope.${item.scope}`),
+                      },
+                    ]
+                  : []),
                 {
                   label: t('announcements.importance'),
                   value: <AnnouncementSeverity item={item} />,
                 },
-                { label: t(`announcements.scope.${scope}`), value: targets(item) },
+                { label: t('announcements.recipients'), value: targets(item) },
                 { label: t('announcements.endsAt'), value: formatDate(item.endsAt), wide: true },
               ]}
               actions={actions(item, true)}
@@ -415,10 +443,13 @@ export function AnnouncementsPage() {
       </Card>
       {compose ? (
         <AnnouncementComposer
-          scope={scope}
+          scope={createScope}
+          allowedScopes={allowedScopes}
+          onScopeChange={setCreateScope}
           recipients={recipients}
           initialTargetId={
-            params.get('targetId') ?? (scope === 'sites' ? (activeSiteId ?? undefined) : undefined)
+            params.get('targetId') ??
+            (createScope === 'sites' ? (activeSiteId ?? undefined) : undefined)
           }
           loading={recipientsLoading}
           onClose={closeComposer}
@@ -440,32 +471,32 @@ export function AnnouncementsPage() {
         <AnnouncementEditor
           key={editing}
           id={editing}
-          recipients={recipients}
-          loading={recipientsLoading}
           onClose={() => {
             setEditing(undefined);
           }}
         />
       ) : null}
       <ConfirmDialog
-        open={Boolean(deleting)}
+        open={Boolean(withdrawing)}
         onOpenChange={(open) => {
-          if (!open && !remove.isPending) setDeleting(undefined);
+          if (!open && !withdraw.isPending) setWithdrawing(undefined);
         }}
-        title={t('common.delete')}
+        title={t('announcements.withdraw')}
         description={
-          <bdi dir="auto">{t('announcements.deleteConfirm', { title: deleting?.title ?? '' })}</bdi>
+          <bdi dir="auto">
+            {t('announcements.withdrawConfirm', { title: withdrawing?.title ?? '' })}
+          </bdi>
         }
-        confirmLabel={t('common.delete')}
+        confirmLabel={t('announcements.withdraw')}
         destructive
-        pending={remove.isPending}
+        pending={withdraw.isPending}
         onConfirm={() => {
-          if (deleting)
-            remove.mutate(deleting.announcementId, {
+          if (withdrawing)
+            withdraw.mutate(withdrawing.announcementId, {
               onSuccess: () => {
-                notify({ tone: 'success', title: t('announcements.deleted') });
+                notify({ tone: 'success', title: t('announcements.withdrawn') });
                 setPage(1);
-                setDeleting(undefined);
+                setWithdrawing(undefined);
               },
               onError: notifyError,
             });
@@ -474,20 +505,23 @@ export function AnnouncementsPage() {
     </div>
   );
 }
-function AnnouncementEditor({
-  id,
-  recipients,
-  loading,
-  onClose,
-}: {
-  id: string;
-  recipients: { id: string; name: string }[];
-  loading: boolean;
-  onClose: () => void;
-}) {
+function AnnouncementEditor({ id, onClose }: { id: string; onClose: () => void }) {
   const { t } = useTranslation();
   const detail = useAnnouncement(id);
   const item = detail.data?.data;
+  const sites = useSites('context-switcher', item?.scope === 'sites');
+  const installations = useEdgeInstallations(item?.scope === 'installations');
+  const recipients =
+    item?.scope === 'sites'
+      ? (sites.data?.data.items ?? []).map((target) => ({
+          id: target.siteId,
+          name: target.siteName,
+        }))
+      : (installations.data?.data ?? []).map((target) => ({
+          id: target.installationId,
+          name: target.name,
+        }));
+  const loading = item?.scope === 'sites' ? sites.isPending : installations.isPending;
   if (!item || detail.isError || !item.canEdit)
     return (
       <Modal

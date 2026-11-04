@@ -5,7 +5,7 @@ import {
   announcementsControllerList,
   announcementsControllerDetail,
   announcementsControllerUpdate,
-  announcementsControllerRemove,
+  announcementsControllerWithdraw,
 } from '@/api/generated/announcements/announcements';
 import type {
   CreateAnnouncementDto,
@@ -45,10 +45,10 @@ export function useSaveAnnouncement(id?: string) {
     onSuccess: () => client.invalidateQueries({ queryKey: announcementKeys.all }),
   });
 }
-export function useDeleteAnnouncement() {
+export function useWithdrawAnnouncement() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => announcementsControllerRemove(id),
+    mutationFn: (id: string) => announcementsControllerWithdraw(id),
     onSuccess: () => client.invalidateQueries({ queryKey: announcementKeys.all }),
   });
 }

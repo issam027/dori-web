@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'announcements.nature': 'Announcement type',
+  'announcements.recipients': 'Recipients',
   'announcements.filtersTitle': 'Find an announcement',
   'announcements.filtersHint': 'Narrow results by recipient, status or display period.',
   'announcements.searchPlaceholder': 'Search the title or message…',
@@ -19,9 +21,7 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'announcements.resultCount': '{{count}} announcement(s)',
   'announcements.edit': 'Edit announcement',
   'announcements.updated': 'Announcement updated',
-  'announcements.deleteConfirm':
-    'Delete “{{title}}”? It will be removed from the affected screens.',
-  'announcements.deleted': 'Announcement deleted',
+
   'announcements.invalidDateFilter': 'The end date must be on or after the start date.',
   'announcements.title': 'Operational announcements',
   'announcements.description': 'Keep your managed sites and intra installations informed.',
@@ -30,7 +30,8 @@ export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
   'announcements.published': 'Announcement published',
   'announcements.withdraw': 'Withdraw announcement',
   'announcements.withdrawn': 'Announcement withdrawn',
-  'announcements.withdrawConfirm': 'Withdraw “{{title}}” from all its recipients?',
+  'announcements.withdrawConfirm':
+    'Withdraw “{{title}}” from screens? It will remain available in the history.',
   'announcements.scope.sites': 'Sites',
   'announcements.scope.installations': 'Intra installations',
   'announcements.audience': 'Announcement recipients',
