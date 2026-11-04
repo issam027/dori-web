@@ -5,6 +5,7 @@ const siteIndependentPaths = new Set([
   '/onboarding',
   '/health',
   '/audit',
+  '/announcements',
   '/legal',
   '/admin/translations',
   '/admin/edge-installations',

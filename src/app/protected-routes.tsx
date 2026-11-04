@@ -13,6 +13,7 @@ import {
   Languages,
   LayoutDashboard,
   Monitor,
+  Megaphone,
   ScrollText,
   ServerCog,
   Settings,
@@ -51,6 +52,15 @@ export interface NavigationRouteDefinition {
 }
 
 export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
+  {
+    path: '/announcements',
+    permissions: ['site_edit', 'edge_installation_manage'],
+    component: lazyNamed(
+      () => import('@/features/announcements/AnnouncementsPage'),
+      'AnnouncementsPage',
+    ),
+    frame: 'shell',
+  },
   {
     path: '/device-mode',
     permissions: [],
@@ -189,6 +199,12 @@ const navigationMetadata: Readonly<
     Omit<NavigationRouteDefinition, 'path' | 'permissions'> & { navigationPath?: string }
   >
 > = {
+  '/announcements': {
+    id: 'announcements',
+    labelKey: 'nav.announcements',
+    section: 'administration',
+    icon: Megaphone,
+  },
   '/portfolio': {
     id: 'portfolio',
     labelKey: 'nav.portfolio',

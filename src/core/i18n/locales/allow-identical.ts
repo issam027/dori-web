@@ -2,6 +2,12 @@
 // This is a ratchet: adding a key here must be a conscious review decision.
 export const ALLOW_IDENTICAL = {
   en: [
+    // Reviewed FR/EN cognates used in operational announcement labels.
+    'announcements.scope.sites',
+    'announcements.message',
+    'announcements.importance',
+    'announcements.severity.info',
+    'announcements.severity.critical',
     // The SI millimetre symbol is identical in English and French.
     'kiosk.print.paperSize',
     'audit.fields.action',

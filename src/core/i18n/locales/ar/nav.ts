@@ -1,6 +1,7 @@
 import type { DomainTranslations } from '../../types';
 
 export const nav: DomainTranslations<typeof import('../fr/nav').nav> = {
+  'nav.announcements': 'الإعلانات',
   'nav.system': 'النظام',
   'commands.goTo': 'فتح {{page}}',
   'commands.noResults': 'لا توجد أي نتيجة تطابق بحثكم.',

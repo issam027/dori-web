@@ -1,5 +1,6 @@
 // Tunisian derja (familiar street register). Partial: missing keys fall back to ar, then fr.
 export const nav: Record<string, string> = {
+  'nav.announcements': 'الميساجات',
   'nav.system': 'السيستام',
   'commands.goTo': 'امشي لـ {{page}}',
   'commands.noResults': 'ما فما حتى أمر يقابل بحثك، ثبّت في الكلمة.',

@@ -9,6 +9,7 @@ describe('active site route rules', () => {
     '/onboarding',
     '/health',
     '/audit',
+    '/announcements',
     '/legal',
     '/admin/translations',
   ])('allows %s without an active site', (pathname) => {

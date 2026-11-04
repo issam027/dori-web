@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
 import { useState, type SyntheticEvent } from 'react';
-import { Activity, CloudCog, Copy, Plus, RefreshCw, TriangleAlert } from 'lucide-react';
+import { Activity, CloudCog, Copy, Plus, RefreshCw, TriangleAlert, Megaphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type {
   EdgeInstallationCredentialResponseDto,
@@ -33,6 +34,7 @@ function statusTone(status: string): 'success' | 'warning' | 'neutral' {
 
 export function EdgeInstallationsPage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const installations = useEdgeInstallations();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const realtimeHealth = useEdgeInstallationsRealtime(selectedId);
@@ -94,14 +96,25 @@ export function EdgeInstallationsPage() {
         title={t('edge.title')}
         description={t('edge.description')}
         actions={
-          <Button
-            variant="primary"
-            icon={<Plus />}
-            label={t('edge.register')}
-            onClick={() => {
-              setCreateOpen(true);
-            }}
-          />
+          <>
+            <Button
+              icon={<Megaphone />}
+              label={t('announcements.new')}
+              onClick={() => {
+                const params = new URLSearchParams({ scope: 'installations', compose: '1' });
+                if (selectedId) params.set('targetId', selectedId);
+                void navigate('/announcements?' + params.toString());
+              }}
+            />
+            <Button
+              variant="primary"
+              icon={<Plus />}
+              label={t('edge.register')}
+              onClick={() => {
+                setCreateOpen(true);
+              }}
+            />
+          </>
         }
       />
 

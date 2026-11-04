@@ -1,3 +1,4 @@
+import { admin } from './admin';
 import { common } from './common';
 import { nav } from './nav';
 import { auth } from './auth';
@@ -10,6 +11,7 @@ import { errors } from './errors';
 import { audit } from './audit';
 
 export const arTNDomains = {
+  admin,
   common,
   nav,
   auth,
@@ -22,6 +24,7 @@ export const arTNDomains = {
   audit,
 };
 export const arTN: Record<string, string> = {
+  ...admin,
   ...common,
   ...nav,
   ...auth,

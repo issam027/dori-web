@@ -241,3 +241,64 @@ it('reports a rejected public token without refreshing the user session', async 
   stop();
   await tick();
 });
+
+it('combines anonymous announcements and tracking into one public POST without leaking credentials', async () => {
+  const h = harness();
+  const notice = vi.fn(),
+    ticket = vi.fn();
+  const stop = [
+    h.transport.subscribe({ kind: 'announcements', siteId: 'site-a' }, { onMessage: notice }),
+    h.transport.subscribe(
+      { kind: 'tracking', mode: 'replicated', getToken: () => 'private-ticket' },
+      { onMessage: ticket },
+    ),
+  ];
+  await tick();
+  expect(h.requests).toHaveLength(1);
+  expect(urlText(h.requests[0]?.url)).toContain('/public/realtime/events');
+  expect(h.options().method).toBe('POST');
+  expect(JSON.parse(bodyText(h.options()))).toEqual({
+    announcements: true,
+    announcementSiteId: 'site-a',
+    tracking: 'replicated',
+  });
+  expect(bodyText(h.options())).not.toContain('private-ticket');
+  await h.options().fetch?.('stream', { headers: h.options().headers });
+  const headers = new Headers(h.fetch.mock.calls[0]?.[1]?.headers);
+  expect(headers.get('Authorization')).toBeNull();
+  expect(headers.get('X-Registration-Token')).toBe('private-ticket');
+  h.options().onmessage?.(message('announcements'));
+  expect(notice).toHaveBeenCalledTimes(1);
+  expect(ticket).not.toHaveBeenCalled();
+  expect(h.maxActive()).toBe(1);
+  stop.forEach((unsubscribe) => { unsubscribe(); });
+  await tick();
+});
+it('keeps site announcements, their administration and queue display on one authenticated connection', async () => {
+  const h = harness();
+  const stop = [
+    h.transport.subscribe({ kind: 'announcements', siteId: 'site-a' }, { onMessage: vi.fn() }),
+    h.transport.subscribe({ kind: 'announcements-admin' }, { onMessage: vi.fn() }),
+    h.transport.subscribe({ kind: 'display', queueIds: ['queue-a'] }, { onMessage: vi.fn() }),
+  ];
+  await tick();
+  expect(h.requests).toHaveLength(1);
+  expect(JSON.parse(bodyText(h.options()))).toMatchObject({
+    announcements: true,
+    announcementAdministration: true,
+    announcementSiteId: 'site-a',
+    queueIds: ['queue-a'],
+  });
+  stop[0]?.();
+  const next = h.transport.subscribe(
+    { kind: 'announcements', siteId: 'site-b' },
+    { onMessage: vi.fn() },
+  );
+  await tick();
+  expect(h.options().signal?.aborted).toBe(true);
+  expect(JSON.parse(bodyText(h.options(1)))).toMatchObject({ announcementSiteId: 'site-b' });
+  expect(h.maxActive()).toBe(1);
+  stop.forEach((unsubscribe) => { unsubscribe(); });
+  next();
+  await tick();
+});

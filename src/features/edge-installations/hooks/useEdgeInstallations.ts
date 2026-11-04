@@ -16,9 +16,10 @@ export const edgeInstallationKeys = {
   detail: (installationId: string | null) => ['edge-installations', installationId] as const,
 };
 
-export function useEdgeInstallations() {
+export function useEdgeInstallations(enabled = true) {
   return useQuery({
     queryKey: edgeInstallationKeys.all,
+    enabled,
     queryFn: ({ signal }) => fetchEdgeInstallations(signal),
   });
 }

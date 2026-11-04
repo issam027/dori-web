@@ -1,0 +1,126 @@
+.announcement-scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.announcement-history {
+  display: grid;
+}
+.announcement-history-row {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  min-width: 0;
+}
+.announcement-history-row:last-child {
+  border-bottom: 0;
+}
+.announcement-history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.announcement-history-heading > div {
+  min-width: 0;
+}
+.announcement-history-heading h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.announcement-row-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.announcement-history-message {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.announcement-history-targets {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+.announcement-history-period {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+.announcement-history-period time {
+  unicode-bidi: isolate;
+}
+.announcement-recipients {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.announcement-recipients legend {
+  padding-inline: var(--space-2);
+  font-weight: 700;
+}
+.announcement-recipient-list {
+  max-height: 12rem;
+  overflow-y: auto;
+  display: grid;
+  gap: var(--space-1);
+}
+.announcement-recipient-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-1);
+}
+.announcement-recipient-option input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  min-height: 0;
+}
+.announcement-recipient-option span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.announcement-period {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.announcement-preview {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.announcement-delivery-help {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+.announcement-composer .dialog-actions {
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+  .announcement-period {
+    grid-template-columns: 1fr;
+  }
+  .announcement-history-heading {
+    flex-wrap: wrap;
+  }
+  .announcement-composer .dialog-actions .button {
+    flex: 1 1 0;
+    min-height: 48px;
+    white-space: normal;
+    height: auto;
+  }
+}

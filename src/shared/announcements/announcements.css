@@ -1,0 +1,81 @@
+.installation-announcements {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  min-width: 0;
+  flex: 0 0 auto;
+}
+.announcement-notice {
+  --announcement-tone: var(--color-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--announcement-tone) 32%, var(--color-border));
+  border-inline-start: 4px solid var(--announcement-tone);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--announcement-tone) 7%, var(--color-surface));
+  color: var(--color-text);
+}
+.announcement-notice.is-warning {
+  --announcement-tone: var(--color-warning);
+}
+.announcement-notice.is-critical {
+  --announcement-tone: var(--color-danger);
+}
+.announcement-notice > svg {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  color: var(--announcement-tone);
+  margin-block-start: 2px;
+}
+.announcement-notice-content {
+  min-width: 0;
+  flex: 1;
+}
+.announcement-notice-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.announcement-notice-heading strong {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+.announcement-notice-heading > span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.announcement-notice p {
+  margin: var(--space-1) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.public-layout.public-display:has(> .installation-announcements) > main {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 0;
+}
+.public-layout.public-display > .installation-announcements {
+  max-height: 30dvh;
+  overflow: auto;
+}
+.public-layout.public-display:has(> .installation-announcements) .display-screen {
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+@media (max-width: 640px) {
+  .installation-announcements {
+    padding: var(--space-2) var(--space-3);
+  }
+  .announcement-notice {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+}

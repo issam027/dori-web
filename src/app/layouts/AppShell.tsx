@@ -1,3 +1,4 @@
+import { AnnouncementsBanner } from '@/shared/announcements/AnnouncementsBanner';
 import { MOBILE_QUERY } from '@/shared/useMediaQuery';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -215,6 +216,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             });
           }}
         />
+        <AnnouncementsBanner />
         <IntraDeploymentStatusGate>
           <main ref={appContentRef} className="app-content">
             <AppErrorBoundary

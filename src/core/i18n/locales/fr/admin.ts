@@ -1,5 +1,58 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const admin = {
+  'announcements.title': 'Annonces d’exploitation',
+  'announcements.description':
+    'Informez les sites que vous gérez ou les installations intra de votre parc.',
+  'announcements.new': 'Publier une annonce',
+  'announcements.publish': 'Publier',
+  'announcements.published': 'Annonce publiée',
+  'announcements.withdraw': 'Retirer l’annonce',
+  'announcements.withdrawn': 'Annonce retirée',
+  'announcements.withdrawConfirm': 'Retirer « {{title}} » de tous ses destinataires ?',
+  'announcements.scope.sites': 'Sites',
+  'announcements.scope.installations': 'Installations intra',
+  'announcements.audience': 'Destinataires des annonces',
+  'announcements.subject': 'Titre',
+  'announcements.message': 'Message',
+  'announcements.importance': 'Importance',
+  'announcements.severity.info': 'Information',
+  'announcements.severity.warning': 'Attention',
+  'announcements.severity.critical': 'Urgent',
+  'announcements.startsAt': 'Début d’affichage',
+  'announcements.endsAt': 'Fin d’affichage',
+  'announcements.periodHelp':
+    'Horaires : {{timezone}}. Début vide = maintenant. Affichage limité à 30 jours.',
+  'announcements.invalidWindow':
+    'Choisissez une fin future, après le début, pour une durée maximale de 30 jours. Le début doit être dans les 90 prochains jours.',
+  'announcements.required':
+    'Choisissez au moins un destinataire et renseignez le titre et le message.',
+  'announcements.siteAudience':
+    'Visible sur toutes les pages et les écrans publics des sites choisis. Les sites d’un intra se gèrent depuis cet intra.',
+  'announcements.installationAudience':
+    'Visible sur toute l’installation intra, pour l’ensemble de ses sites et de ses écrans publics locaux.',
+  'announcements.siteDeliveryHelp': 'Les écrans connectés sont mis à jour automatiquement.',
+  'announcements.relayHelp':
+    'Relayée au prochain contact de l’installation. Une installation hors ligne la recevra à sa reconnexion, si l’annonce est encore valable.',
+  'announcements.preview': 'Aperçu du bandeau',
+  'announcements.previewPlaceholder':
+    'Votre message apparaîtra sous le header, sans masquer le contenu de la page.',
+  'announcements.searchRecipients': 'Rechercher un destinataire',
+  'announcements.selectAll': 'Tout sélectionner',
+  'announcements.noRecipients': 'Aucun destinataire disponible',
+  'announcements.selected': 'Destinataires sélectionnés : {{count}}',
+  'announcements.history': 'Historique de diffusion',
+  'announcements.empty': 'Aucune annonce',
+  'announcements.emptyHelp':
+    'Publiez une annonce pour prévenir d’une maintenance, d’une interruption ou d’une mise à jour.',
+  'announcements.status.scheduled': 'Programmée',
+  'announcements.status.active': 'En cours d’affichage',
+  'announcements.status.expired': 'Terminée',
+  'announcements.status.withdrawn': 'Retirée',
+  'announcements.periodFrom': 'Du',
+  'announcements.periodUntil': 'Au',
+  'announcements.readOnly':
+    'Cette annonce couvre aussi d’autres sites : son retrait nécessite un périmètre plus large.',
+  'announcements.banner': 'Annonces de service',
   'admin.users.temporaryPasswordTitle': 'Mot de passe temporaire',
   'admin.users.temporaryPasswordDescription':
     'Copiez ce mot de passe maintenant. Il ne sera plus affiché après la fermeture.',

@@ -1,6 +1,56 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'announcements.title': 'Operational announcements',
+  'announcements.description': 'Keep your managed sites and intra installations informed.',
+  'announcements.new': 'Publish an announcement',
+  'announcements.publish': 'Publish',
+  'announcements.published': 'Announcement published',
+  'announcements.withdraw': 'Withdraw announcement',
+  'announcements.withdrawn': 'Announcement withdrawn',
+  'announcements.withdrawConfirm': 'Withdraw “{{title}}” from all its recipients?',
+  'announcements.scope.sites': 'Sites',
+  'announcements.scope.installations': 'Intra installations',
+  'announcements.audience': 'Announcement recipients',
+  'announcements.subject': 'Title',
+  'announcements.message': 'Message',
+  'announcements.importance': 'Importance',
+  'announcements.severity.info': 'Information',
+  'announcements.severity.warning': 'Warning',
+  'announcements.severity.critical': 'Urgent',
+  'announcements.startsAt': 'Display from',
+  'announcements.endsAt': 'Display until',
+  'announcements.periodHelp':
+    'Time zone: {{timezone}}. Leave the start empty for now. Maximum display period: 30 days.',
+  'announcements.invalidWindow':
+    'Choose a future end after the start, for at most 30 days. The start must be within the next 90 days.',
+  'announcements.required': 'Choose at least one recipient and enter a title and message.',
+  'announcements.siteAudience':
+    'Shown on all pages and public screens of the selected sites. Manage an intra’s sites from that intra.',
+  'announcements.installationAudience':
+    'Shown across each selected intra installation, on all its sites and local public screens.',
+  'announcements.siteDeliveryHelp': 'Connected screens update automatically.',
+  'announcements.relayHelp':
+    'Delivered on the installation’s next contact. An offline installation receives it when it reconnects, if it has not expired.',
+  'announcements.preview': 'Banner preview',
+  'announcements.previewPlaceholder':
+    'Your message appears below the header without covering the page content.',
+  'announcements.searchRecipients': 'Find a recipient',
+  'announcements.selectAll': 'Select all',
+  'announcements.noRecipients': 'No recipients available',
+  'announcements.selected': 'Selected recipients: {{count}}',
+  'announcements.history': 'Publication history',
+  'announcements.empty': 'No announcements',
+  'announcements.emptyHelp': 'Publish a notice about maintenance, a disruption or an update.',
+  'announcements.status.scheduled': 'Scheduled',
+  'announcements.status.active': 'Showing now',
+  'announcements.status.expired': 'Ended',
+  'announcements.status.withdrawn': 'Withdrawn',
+  'announcements.periodFrom': 'From',
+  'announcements.periodUntil': 'Until',
+  'announcements.readOnly':
+    'This notice also covers other sites; withdrawing it requires wider access.',
+  'announcements.banner': 'Service announcements',
   'admin.users.temporaryPasswordTitle': 'Temporary password',
   'admin.users.temporaryPasswordDescription':
     'Copy this password now. It will not be displayed again after closing.',

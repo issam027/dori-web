@@ -1,6 +1,8 @@
 import type { DomainTranslations } from '../../types';
 
 export const audit: DomainTranslations<typeof import('../fr/audit').audit> = {
+  'audit.eventActions.announcement.publish': 'نشر إعلان',
+  'audit.eventActions.announcement.withdraw': 'سحب إعلان',
   'audit.eyebrow': 'النظام',
   'audit.title': 'سجل التدقيق',
   'audit.description': 'راجع العمليات الحساسة واطّلع على سياق تنفيذها.',

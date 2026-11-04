@@ -1,3 +1,4 @@
+import { useAnnouncementTrackingQueue } from '@/shared/announcements/announcements-context';
 import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 import { useContextLocale } from '@/core/i18n/use-context-locale';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +49,7 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
     setError,
   } = usePublicTracking(token);
   useContextLocale(token, position?.languagePreference);
+  useAnnouncementTrackingQueue(position?.queueId);
   const [consent, setConsent] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const previousStatus = useRef('');

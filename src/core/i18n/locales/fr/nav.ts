@@ -1,5 +1,6 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const nav = {
+  'nav.announcements': 'Annonces',
   'nav.system': 'Système',
   'commands.goTo': 'Ouvrir {{page}}',
   'commands.noResults': 'Aucune commande ne correspond à votre recherche.',

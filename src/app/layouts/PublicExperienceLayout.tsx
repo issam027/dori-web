@@ -1,3 +1,4 @@
+import { AnnouncementsBanner } from '@/shared/announcements/AnnouncementsBanner';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { useContextLocale } from '@/core/i18n/use-context-locale';
 import { useEffect, useRef, type ReactNode } from 'react';
@@ -59,6 +60,7 @@ export function PublicExperienceLayout({
         <strong>{mode === 'kiosk' ? (kioskSite.data?.data.siteName ?? '') : t('app.name')}</strong>
         <LocaleSwitcher />
       </header>
+      <AnnouncementsBanner />
       <main>{children}</main>
       {mode !== 'display' && mode !== 'kiosk' ? (
         <footer>

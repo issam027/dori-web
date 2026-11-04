@@ -9,6 +9,8 @@ import { refreshAccessToken } from '@/api/client/http-client';
 export type TabRealtimeSelection =
   | { kind: 'display'; queueIds: readonly string[] }
   | { kind: 'local-status' }
+  | { kind: 'announcements'; siteId?: string }
+  | { kind: 'announcements-admin' }
   | { kind: 'installations' }
   | { kind: 'tracking'; mode: 'direct' | 'replicated'; queueId?: string; getToken: () => string };
 export type TabRealtimeStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed' | 'closed';
@@ -87,9 +89,27 @@ export class TabRealtimeTransport {
     const entries = [...this.entries.values()];
     if (!entries.length) return undefined;
     const base = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    const authenticated = entries.some((entry) => entry.selection.kind !== 'tracking');
+    const authenticated = entries.some(
+      (entry) => entry.selection.kind !== 'tracking' && entry.selection.kind !== 'announcements',
+    );
     const tickets = entries.flatMap((entry) =>
       entry.selection.kind === 'tracking' ? [entry.selection] : [],
+    );
+    const announcements = entries.some((entry) => entry.selection.kind === 'announcements');
+    const announcementSites = [
+      ...new Set(
+        entries.flatMap((entry) =>
+          entry.selection.kind === 'announcements' && entry.selection.siteId
+            ? [entry.selection.siteId]
+            : [],
+        ),
+      ),
+    ];
+    if (announcementSites.length > 1)
+      throw new Error('A tab can display announcements for only one site at a time');
+    const announcementSiteId = announcementSites[0];
+    const announcementAdministration = entries.some(
+      (entry) => entry.selection.kind === 'announcements-admin',
     );
     const tracking = tickets[0];
     const token = tracking?.getToken();
@@ -114,13 +134,31 @@ export class TabRealtimeTransport {
         queueIds,
         localStatus: entries.some((entry) => entry.selection.kind === 'local-status'),
         installations: entries.some((entry) => entry.selection.kind === 'installations'),
+        ...(announcements ? { announcements: true } : {}),
+        ...(announcementSiteId ? { announcementSiteId } : {}),
+        ...(announcementAdministration ? { announcementAdministration: true } : {}),
         tracking: tracking?.mode ?? 'none',
         ...(tracking?.queueId ? { trackingQueueId: tracking.queueId } : {}),
       });
       return {
-        key: body + ':' + (token ?? ''),
+        key: 'authenticated:' + body + ':' + (token ?? ''),
         url: base + '/api/v1/realtime/events',
         authenticated,
+        body,
+        token,
+      };
+    }
+    if (announcements) {
+      const body = JSON.stringify({
+        announcements: true,
+        ...(announcementSiteId ? { announcementSiteId } : {}),
+        tracking: tracking?.mode ?? 'none',
+        ...(tracking?.queueId ? { trackingQueueId: tracking.queueId } : {}),
+      });
+      return {
+        key: 'public:' + body + ':' + (token ?? ''),
+        url: base + '/api/v1/public/realtime/events',
+        authenticated: false,
         body,
         token,
       };
@@ -172,7 +210,7 @@ export class TabRealtimeTransport {
     for (const { listener } of this.entries.values()) listener.onStatus?.('connecting');
     const requestFetch = this.options.fetch ?? globalThis.fetch;
     connection.task = (this.options.eventStream ?? fetchEventSource)(plan.url, {
-      method: plan.authenticated ? 'POST' : 'GET',
+      method: plan.body ? 'POST' : 'GET',
       body: plan.body,
       signal: controller.signal,
       openWhenHidden: true,
@@ -254,6 +292,8 @@ export class TabRealtimeTransport {
 
   private matches(selection: TabRealtimeSelection, message: EventSourceMessage): boolean {
     if (message.event === 'heartbeat') return true;
+    if (selection.kind === 'announcements') return message.event === 'announcements';
+    if (selection.kind === 'announcements-admin') return message.event === 'announcements_changed';
     if (selection.kind === 'local-status') return message.event === 'edge_local_status';
     if (selection.kind === 'installations') return message.event === 'edge_installations_changed';
     if (selection.kind === 'tracking')

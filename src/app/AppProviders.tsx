@@ -1,3 +1,4 @@
+import { AnnouncementsProvider } from '@/shared/announcements/AnnouncementsProvider';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
@@ -51,7 +52,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             <SharedSiteSynchronizer />
             <PreferenceSynchronizer />
             <SessionIdleWatchdog />
-            {children}
+            <AnnouncementsProvider>{children}</AnnouncementsProvider>
             <NotificationCenter />
           </BrowserRouter>
         </QueryClientProvider>
