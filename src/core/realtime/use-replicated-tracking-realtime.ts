@@ -1,4 +1,4 @@
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { tabRealtimeTransport } from './tab-realtime-transport';
 import { useEffect, useEffectEvent } from 'react';
 import type { RegistrationPositionResponseDto } from '@/api/generated/models';
 import type { QueueRealtimeHealth } from './queue-realtime-gateway';
@@ -56,7 +56,6 @@ export function parseReplicatedTracking(data: string): RegistrationPositionRespo
   }
 }
 
-class RejectedTrackingStream extends Error {}
 export function useReplicatedTrackingRealtime(options: {
   enabled: boolean;
   token: string;
@@ -70,45 +69,27 @@ export function useReplicatedTrackingRealtime(options: {
   const onExpired = useEffectEvent(options.onExpired ?? (() => undefined));
   useEffect(() => {
     if (!options.enabled || !options.token) return;
-    const controller = new AbortController();
-    const base = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    void fetchEventSource(base + '/api/v1/realtime/tracking', {
-      signal: controller.signal,
-      openWhenHidden: true,
-      headers: { Accept: 'text/event-stream', 'X-Registration-Token': options.token },
-      onopen: (response) => {
-        if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
-          return Promise.resolve();
-        }
-        if ([401, 403, 410].includes(response.status)) onExpired();
-        if ([400, 401, 403, 404, 410].includes(response.status))
-          throw new RejectedTrackingStream('Tracking stream rejected');
-        throw new Error('Tracking stream unavailable');
+    return tabRealtimeTransport.subscribe(
+      { kind: 'tracking', mode: 'replicated', getToken: () => options.token },
+      {
+        onMessage: (message) => {
+          if (message.event === 'heartbeat') {
+            heartbeat(options.token);
+            return;
+          }
+          if (message.event !== 'tracking_changed') return;
+          const snapshot = parseReplicatedTracking(message.data);
+          if (snapshot) onSnapshot(snapshot);
+          else fail();
+        },
+        onRejected: (status) => {
+          if ([401, 403, 410].includes(status)) onExpired();
+        },
+        onStatus: (status) => {
+          if (status === 'failed') fail();
+        },
       },
-      onmessage: (message) => {
-        if (message.event === 'heartbeat') {
-          heartbeat(options.token);
-          return;
-        }
-        if (message.event !== 'tracking_changed') return;
-        const snapshot = parseReplicatedTracking(message.data);
-        if (snapshot) {
-          onSnapshot(snapshot);
-        } else fail();
-      },
-      onclose: () => {
-        throw new Error('Tracking stream closed');
-      },
-      onerror: (error: unknown) => {
-        if (error instanceof RejectedTrackingStream) throw error;
-        return 3000;
-      },
-    }).catch(() => {
-      if (!controller.signal.aborted) fail();
-    });
-    return () => {
-      controller.abort();
-    };
+    );
   }, [options.enabled, options.token, heartbeat, fail]);
   return health;
 }

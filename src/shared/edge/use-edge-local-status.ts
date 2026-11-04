@@ -1,13 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { tabRealtimeTransport } from '@/core/realtime/tab-realtime-transport';
 import { useEffect } from 'react';
 import { edgeLocalControllerStatus } from '@/api/generated/edge-local-status/edge-local-status';
 import type {
   EdgeLocalControllerStatus200,
   EdgeLocalStatusResponseDto,
 } from '@/api/generated/models';
-import { getAccessToken } from '@/core/auth/access-token';
-import { refreshAccessToken } from '@/api/client/http-client';
 import { isCloudDeployment } from '@/core/config/deployment-mode';
 import { useHeartbeatHealth } from '@/core/realtime/use-heartbeat-health';
 import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
@@ -60,8 +58,6 @@ export function parseEdgeLocalStatus(data: string): EdgeLocalStatusResponseDto |
   }
 }
 
-class RejectedLocalStatusStream extends Error {}
-
 /** Mounted once by the application gate. All other consumers share its query cache. */
 export function useEdgeLocalStatusRealtime() {
   const client = useQueryClient();
@@ -69,66 +65,39 @@ export function useEdgeLocalStatusRealtime() {
   const { health, heartbeat, fail } = useHeartbeatHealth(enabled ? ['edge-local-status'] : []);
   useEffect(() => {
     if (!enabled) return;
-    const controller = new AbortController();
-    const base = import.meta.env.PROD ? '' : import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    void fetchEventSource(base + '/api/v1/edge/local-status/events', {
-      signal: controller.signal,
-      openWhenHidden: true,
-      headers: { Accept: 'text/event-stream' },
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        const credential = getAccessToken();
-        if (credential) headers.set('Authorization', `Bearer ${credential}`);
-        return fetch(input, { ...init, headers });
-      },
-      onopen: async (response) => {
-        if (response.ok && response.headers.get('content-type')?.includes('text/event-stream'))
-          return;
-        if (response.status === 401) {
-          try {
-            await refreshAccessToken();
-          } catch {
-            throw new RejectedLocalStatusStream('Session unavailable');
+    let active = true;
+    const unsubscribe = tabRealtimeTransport.subscribe(
+      { kind: 'local-status' },
+      {
+        onMessage: (message) => {
+          if (message.event === 'heartbeat') {
+            heartbeat('edge-local-status');
+            return;
           }
-          throw new Error('SSE credential refreshed');
-        }
-        if (response.status >= 400 && response.status < 500 && response.status !== 429)
-          throw new RejectedLocalStatusStream('Local status stream rejected');
-        throw new Error('Local status stream unavailable');
-      },
-      onmessage: (message) => {
-        if (message.event === 'heartbeat') {
-          heartbeat('edge-local-status');
-          return;
-        }
-        if (message.event !== 'edge_local_status') return;
-        const snapshot = parseEdgeLocalStatus(message.data);
-        if (!snapshot) {
-          fail();
-          return;
-        }
-        void client.cancelQueries({ queryKey: edgeLocalStatusKey, exact: true }).then(() => {
-          if (controller.signal.aborted) return;
-          client.setQueryData<EdgeLocalControllerStatus200>(edgeLocalStatusKey, {
-            code: 'OK',
-            translationKey: null,
-            translationParams: {},
-            data: snapshot,
+          if (message.event !== 'edge_local_status') return;
+          const snapshot = parseEdgeLocalStatus(message.data);
+          if (!snapshot) {
+            fail();
+            return;
+          }
+          void client.cancelQueries({ queryKey: edgeLocalStatusKey, exact: true }).then(() => {
+            if (!active) return;
+            client.setQueryData<EdgeLocalControllerStatus200>(edgeLocalStatusKey, {
+              code: 'OK',
+              translationKey: null,
+              translationParams: {},
+              data: snapshot,
+            });
           });
-        });
+        },
+        onStatus: (status) => {
+          if (status === 'failed') fail();
+        },
       },
-      onclose: () => {
-        throw new Error('Local status stream closed');
-      },
-      onerror: (error: unknown) => {
-        if (error instanceof RejectedLocalStatusStream) throw error;
-        return 3000;
-      },
-    }).catch(() => {
-      if (!controller.signal.aborted) fail();
-    });
+    );
     return () => {
-      controller.abort();
+      active = false;
+      unsubscribe();
     };
   }, [client, enabled, heartbeat, fail]);
   useDegradedRealtimeRefresh({

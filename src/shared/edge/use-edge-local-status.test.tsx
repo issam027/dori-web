@@ -34,7 +34,18 @@ const streamOptions = () => {
 };
 beforeEach(() => {
   mocks.stream.mockReset();
-  mocks.stream.mockReturnValue(new Promise(() => undefined));
+  mocks.stream.mockImplementation(
+    (_url, options) =>
+      new Promise((resolve) =>
+        options.signal?.addEventListener(
+          'abort',
+          () => {
+            resolve();
+          },
+          { once: true },
+        ),
+      ),
+  );
 });
 afterEach(() => vi.useRealTimers());
 
@@ -102,6 +113,7 @@ it('enables recovery reads only when the stream is degraded and stops them after
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     ),
   });
+  await act(() => vi.advanceTimersByTimeAsync(1));
   const options = streamOptions();
   act(() => options.onmessage?.({ event: 'heartbeat', id: '', data: '{}' }));
   expect(result.current).toBe('active');

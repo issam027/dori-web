@@ -9,21 +9,15 @@ import {
   type QueueRealtimeHealth,
   type QueueRealtimeStatus,
 } from './queue-realtime-gateway';
-import { refreshAccessToken } from '@/api/client/http-client';
 import { useRealtimeStatusStore } from './realtime-status-store';
 
 interface QueueRealtimeOptions<TChannel extends QueueRealtimeChannel> {
   queueIds: readonly string[];
   getCredential: () => string | null | undefined;
-  refreshCredential?: () => Promise<void>;
   onEvent: (event: QueueRealtimeEvent<TChannel>) => void;
   onReconnect: (queueId: string) => void;
   onStatusChange?: (queueId: string, status: QueueRealtimeStatus) => void;
   onError?: (queueId: string, error: unknown) => void;
-}
-
-async function refreshDisplayCredential(): Promise<void> {
-  await refreshAccessToken();
 }
 
 function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
@@ -31,7 +25,7 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
   options: QueueRealtimeOptions<TChannel>,
 ): QueueRealtimeHealth {
   const queueKey = [...new Set(options.queueIds)].sort().join(',');
-  const { getCredential, refreshCredential } = options;
+  const { getCredential } = options;
   const credential = getCredential()?.trim();
   const onEvent = useEffectEvent(options.onEvent);
   const onReconnect = useEffectEvent(options.onReconnect);
@@ -57,7 +51,6 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     const gateway = new QueueRealtimeGateway({
       channel,
       getCredential: () => getCredential()?.trim() ?? '',
-      refreshCredential,
       onEvent,
       onReconnect,
       onStatusChange,
@@ -68,15 +61,12 @@ function useQueueRealtime<TChannel extends QueueRealtimeChannel>(
     return () => {
       gateway.disconnect();
     };
-  }, [channel, credential, getCredential, queueKey, refreshCredential]);
+  }, [channel, credential, getCredential, queueKey]);
   return queueKey ? health : 'degraded';
 }
 
 export function useQueueDisplayRealtime(
-  options: Omit<
-    QueueRealtimeOptions<'display'>,
-    'getCredential' | 'refreshCredential' | 'onEvent'
-  > & {
+  options: Omit<QueueRealtimeOptions<'display'>, 'getCredential' | 'onEvent'> & {
     getToken: () => string | null;
     onEvent: (event: QueueDisplayChangedEvent) => void;
   },
@@ -84,15 +74,11 @@ export function useQueueDisplayRealtime(
   return useQueueRealtime('display', {
     ...options,
     getCredential: options.getToken,
-    refreshCredential: refreshDisplayCredential,
   });
 }
 
 export function useQueueTrackingRealtime(
-  options: Omit<
-    QueueRealtimeOptions<'tracking'>,
-    'getCredential' | 'refreshCredential' | 'onEvent'
-  > & {
+  options: Omit<QueueRealtimeOptions<'tracking'>, 'getCredential' | 'onEvent'> & {
     registrationToken: string | null | undefined;
     onEvent: (event: QueuePositionChangedEvent) => void;
   },

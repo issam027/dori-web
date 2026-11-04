@@ -56,7 +56,10 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   const completed = phase === 'completed';
 
   const queueHealth = useQueueTrackingRealtime({
-    queueIds: position?.queueId && !completed ? [position.queueId] : [],
+    queueIds:
+      position?.queueId && !completed && trackingError !== 'expired' && trackingError !== 'invalid'
+        ? [position.queueId]
+        : [],
     registrationToken: token,
     onEvent: () => {
       void gateway?.refresh().catch(() => undefined);
@@ -67,7 +70,12 @@ export function TrackPage({ preview = false }: { preview?: boolean }) {
   });
 
   const replicatedHealth = useReplicatedTrackingRealtime({
-    enabled: Boolean(position) && !position?.queueId && !completed,
+    enabled:
+      Boolean(position) &&
+      !position?.queueId &&
+      !completed &&
+      trackingError !== 'expired' &&
+      trackingError !== 'invalid',
     token,
     onExpired: () => {
       setError('expired');

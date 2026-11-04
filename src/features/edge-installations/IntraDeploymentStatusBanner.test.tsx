@@ -1,3 +1,4 @@
+import type { FetchEventSourceInit } from '@microsoft/fetch-event-source';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
@@ -5,7 +6,18 @@ import { mockServer } from '@/shared/testing/mock-server';
 import { IntraDeploymentStatusGate } from './IntraDeploymentStatusBanner';
 
 vi.mock('@microsoft/fetch-event-source', () => ({
-  fetchEventSource: vi.fn(() => new Promise(() => undefined)),
+  fetchEventSource: vi.fn(
+    (_url: string, options: FetchEventSourceInit) =>
+      new Promise<void>((resolve) =>
+        options.signal?.addEventListener(
+          'abort',
+          () => {
+            resolve();
+          },
+          { once: true },
+        ),
+      ),
+  ),
 }));
 
 vi.mock('@/core/config/deployment-mode', () => ({
