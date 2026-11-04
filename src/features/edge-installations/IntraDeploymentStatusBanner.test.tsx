@@ -4,6 +4,10 @@ import { http, HttpResponse } from 'msw';
 import { mockServer } from '@/shared/testing/mock-server';
 import { IntraDeploymentStatusGate } from './IntraDeploymentStatusBanner';
 
+vi.mock('@microsoft/fetch-event-source', () => ({
+  fetchEventSource: vi.fn(() => new Promise(() => undefined)),
+}));
+
 vi.mock('@/core/config/deployment-mode', () => ({
   isCloudDeployment: false,
 }));

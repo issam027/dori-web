@@ -1,19 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
 import { LockKeyhole, WifiOff } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { edgeLocalControllerStatus } from '@/api/generated/edge-local-status/edge-local-status';
+import {
+  useEdgeLocalStatus,
+  useEdgeLocalStatusRealtime,
+} from '@/shared/edge/use-edge-local-status';
 import { isCloudDeployment } from '@/core/config/deployment-mode';
 
 export function IntraDeploymentStatusGate({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
-  const status = useQuery({
-    queryKey: ['edge-local-status'],
-    queryFn: ({ signal }) => edgeLocalControllerStatus(undefined, signal),
-    enabled: !isCloudDeployment,
-    refetchInterval: 30_000,
-    retry: 1,
-  });
+  const status = useEdgeLocalStatus();
+  useEdgeLocalStatusRealtime();
 
   if (isCloudDeployment) return children;
 
