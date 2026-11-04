@@ -23,7 +23,7 @@ export function AnnouncementActions({
       <Button
         key="edit"
         size="small"
-        labelMode={mobile ? 'always' : 'icon-only'}
+        labelMode="always"
         icon={<Pencil />}
         label={t('common.edit')}
         title={t('common.edit')}
@@ -34,7 +34,7 @@ export function AnnouncementActions({
       <Button
         key="withdraw"
         size="small"
-        labelMode={mobile ? 'always' : 'icon-only'}
+        labelMode="always"
         variant="danger"
         icon={<Archive />}
         label={t('announcements.withdraw')}
@@ -47,7 +47,7 @@ export function AnnouncementActions({
     <>
       <Button
         size="small"
-        labelMode={mobile ? 'always' : 'icon-only'}
+        labelMode="always"
         icon={<Eye />}
         label={t('common.view')}
         title={t('common.view')}

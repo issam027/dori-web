@@ -68,7 +68,7 @@ export function AnnouncementsPage() {
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState('');
   const search = useDebouncedFilter(searchDraft);
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('active');
   const [severity, setSeverity] = useState('');
   const [targetId, setTargetId] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -196,7 +196,7 @@ export function AnnouncementsPage() {
         context={t('announcements.resultCount', { count: total })}
         activeCount={
           Number(Boolean(searchDraft)) +
-          Number(Boolean(status)) +
+          Number(status !== 'active') +
           Number(Boolean(severity)) +
           Number(Boolean(targetId)) +
           Number(Boolean(dateFrom)) +
@@ -206,7 +206,7 @@ export function AnnouncementsPage() {
         resetLabel={t('common.reset')}
         onReset={() => {
           setSearchDraft('');
-          setStatus('');
+          setStatus('active');
           setSeverity('');
           setTargetId('');
           setDateFrom('');
@@ -406,9 +406,7 @@ export function AnnouncementsPage() {
             {
               key: 'actions',
               header: t('common.actions'),
-              render: (item) => (
-                <div className="table-actions responsive-table-actions">{actions(item)}</div>
-              ),
+              render: (item) => <div className="table-actions">{actions(item)}</div>,
             },
           ]}
           renderMobileRow={(item) => (
