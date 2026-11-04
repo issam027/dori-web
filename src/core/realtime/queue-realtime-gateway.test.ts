@@ -20,7 +20,7 @@ const openedResponse = new Response(null, {
 });
 
 describe('QueueRealtimeGateway', () => {
-  it('opens one authenticated display stream per unique queue', async () => {
+  it('multiplexes unique display queues over one authenticated stream', async () => {
     const harness = createEventStreamHarness();
     const requestFetch = vi
       .fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>()
@@ -38,8 +38,7 @@ describe('QueueRealtimeGateway', () => {
     gateway.connect(['queue-2', 'queue-1', 'queue-1']);
 
     expect(harness.requests.map(({ url }) => url)).toEqual([
-      queueRealtimeUrl('queue-1', 'display'),
-      queueRealtimeUrl('queue-2', 'display'),
+      queueRealtimeUrl(['queue-1', 'queue-2'], 'display'),
     ]);
     const request = harness.requests[0]?.options;
     await request?.fetch?.('stream', { headers: request.headers });
@@ -291,3 +290,45 @@ it.each(['display', 'tracking'] as const)(
     gateway.disconnect();
   },
 );
+
+it('keeps queue heartbeat identity and releases the shared connection', async () => {
+  const harness = createEventStreamHarness();
+  const heartbeat = vi.fn();
+  const event = vi.fn();
+  const status = vi.fn();
+  const gateway = new QueueRealtimeGateway({
+    channel: 'display',
+    getCredential: () => 'jwt',
+    onEvent: event,
+    onReconnect: vi.fn(),
+    onHeartbeat: heartbeat,
+    onStatusChange: status,
+    eventStream: harness.eventStream,
+  });
+  gateway.connect(['a', 'b', 'c', 'd', 'e', 'f']);
+  expect(harness.requests).toHaveLength(1);
+  const request = harness.requests[0];
+  if (!request) throw new Error('Expected one multiplexed stream');
+  const stream = request.options;
+  await stream.onopen?.(openedResponse);
+  stream.onmessage?.({
+    event: 'heartbeat',
+    id: '',
+    data: JSON.stringify({ queueId: 'b', timestamp: '2026-11-03T12:00:00Z' }),
+  });
+  expect(heartbeat.mock.calls).toEqual([['b']]);
+  stream.onmessage?.({
+    event: 'queue_display_changed',
+    id: '1',
+    data: JSON.stringify({
+      queueId: 'f',
+      reason: 'registration_called',
+      timestamp: '2026-11-03T12:00:00Z',
+    }),
+  });
+  expect(event).toHaveBeenCalledWith(expect.objectContaining({ queueId: 'f' }));
+  gateway.disconnect();
+  expect(stream.signal?.aborted).toBe(true);
+  for (const id of ['a', 'b', 'c', 'd', 'e', 'f'])
+    expect(status).toHaveBeenCalledWith(id, 'closed');
+});
