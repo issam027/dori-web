@@ -3,36 +3,52 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   announcementsControllerCreate,
   announcementsControllerList,
-  announcementsControllerWithdraw,
+  announcementsControllerDetail,
+  announcementsControllerUpdate,
+  announcementsControllerRemove,
 } from '@/api/generated/announcements/announcements';
-import type { CreateAnnouncementDto } from '@/api/generated/models';
+import type {
+  CreateAnnouncementDto,
+  AnnouncementsControllerListParams,
+} from '@/api/generated/models';
 import { tabRealtimeTransport } from '@/core/realtime/tab-realtime-transport';
 import { useHeartbeatHealth } from '@/core/realtime/use-heartbeat-health';
 import { useDegradedRealtimeRefresh } from '@/core/realtime/use-degraded-realtime-refresh';
 
 export const announcementKeys = {
   all: ['announcements'] as const,
-  list: (scope: CreateAnnouncementDto['scope'], page: number) =>
-    ['announcements', scope, page] as const,
+  list: (query: AnnouncementsControllerListParams) => ['announcements', 'list', query] as const,
+  detail: (id?: string) => ['announcements', 'detail', id] as const,
 };
-export function useAnnouncements(scope: CreateAnnouncementDto['scope'], page: number) {
+export function useAnnouncements(query: AnnouncementsControllerListParams, enabled = true) {
   return useQuery({
-    queryKey: announcementKeys.list(scope, page),
-    queryFn: ({ signal }) =>
-      announcementsControllerList({ scope, page, pageSize: 10 }, undefined, signal),
+    queryKey: announcementKeys.list(query),
+    queryFn: ({ signal }) => announcementsControllerList(query, undefined, signal),
+    enabled,
   });
 }
-export function usePublishAnnouncement() {
+export function useAnnouncement(id?: string) {
+  return useQuery({
+    queryKey: announcementKeys.detail(id),
+    queryFn: ({ signal }) => announcementsControllerDetail(id ?? '', undefined, signal),
+    enabled: Boolean(id),
+  });
+}
+export function useSaveAnnouncement(id?: string) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (body: CreateAnnouncementDto) => announcementsControllerCreate(body),
+    mutationFn: (body: CreateAnnouncementDto) => {
+      const { targetIds, title, message, severity, startsAt, endsAt } = body;
+      const update = { targetIds, title, message, severity, startsAt, endsAt };
+      return id ? announcementsControllerUpdate(id, update) : announcementsControllerCreate(body);
+    },
     onSuccess: () => client.invalidateQueries({ queryKey: announcementKeys.all }),
   });
 }
-export function useWithdrawAnnouncement() {
+export function useDeleteAnnouncement() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => announcementsControllerWithdraw(id),
+    mutationFn: (id: string) => announcementsControllerRemove(id),
     onSuccess: () => client.invalidateQueries({ queryKey: announcementKeys.all }),
   });
 }

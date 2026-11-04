@@ -1,5 +1,28 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const admin = {
+  'announcements.filtersTitle': 'Rechercher une annonce',
+  'announcements.filtersHint': 'Affinez les résultats par destinataire, état ou période.',
+  'announcements.searchPlaceholder': 'Rechercher dans le titre ou le message…',
+  'announcements.allStatuses': 'Tous les états',
+  'announcements.allSeverities': 'Toutes les importances',
+  'announcements.allTargets': 'Tous les destinataires',
+  'announcements.dateFrom': 'Affichée à partir du',
+  'announcements.dateTo': 'Affichée jusqu’au',
+  'announcements.sort': 'Trier par',
+  'announcements.sort.createdAt:desc': 'Les plus récentes',
+  'announcements.sort.createdAt:asc': 'Les plus anciennes',
+  'announcements.sort.title:asc': 'Titre : A à Z',
+  'announcements.sort.title:desc': 'Titre : Z à A',
+  'announcements.sort.startsAt:asc': 'Début d’affichage croissant',
+  'announcements.sort.endsAt:asc': 'Fin d’affichage croissante',
+  'announcements.resultCount': '{{count}} annonce(s)',
+  'announcements.edit': 'Modifier l’annonce',
+  'announcements.updated': 'Annonce modifiée',
+  'announcements.deleteConfirm':
+    'Supprimer « {{title}} » ? Elle sera retirée des écrans concernés.',
+  'announcements.deleted': 'Annonce supprimée',
+  'announcements.invalidDateFilter':
+    'La date de fin doit être postérieure ou égale à la date de début.',
   'announcements.title': 'Annonces d’exploitation',
   'announcements.description':
     'Informez les sites que vous gérez ou les installations intra de votre parc.',

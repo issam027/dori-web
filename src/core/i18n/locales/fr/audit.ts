@@ -1,5 +1,7 @@
 // FR is the source of truth. Add keys here first; EN/AR then fail to compile until translated.
 export const audit = {
+  'audit.eventActions.announcement.update': 'Annonce modifiée',
+  'audit.eventActions.announcement.delete': 'Annonce supprimée',
   'audit.eventActions.announcement.publish': 'Publication d’une annonce',
   'audit.eventActions.announcement.withdraw': 'Retrait d’une annonce',
   'audit.eyebrow': 'Système',

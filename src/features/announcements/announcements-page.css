@@ -1,60 +1,29 @@
-.announcement-scopes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.announcement-title-summary,
+.announcement-target-summary {
+  display: block;
+  max-width: 15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.announcement-history {
+.announcement-filter-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+.announcement-detail-fields {
   display: grid;
-}
-.announcement-history-row {
-  display: grid;
-  gap: var(--space-3);
-  padding-block: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  min-width: 0;
-}
-.announcement-history-row:last-child {
-  border-bottom: 0;
-}
-.announcement-history-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-.announcement-history-heading > div {
-  min-width: 0;
-}
-.announcement-history-heading h3 {
-  margin: 0 0 var(--space-2);
-  font-size: 1rem;
-  overflow-wrap: anywhere;
-}
-.announcement-row-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.announcement-history-message {
+  gap: var(--space-4);
   margin: 0;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
 }
-.announcement-history-targets {
-  margin: 0;
+.announcement-detail-fields dt {
+  color: var(--color-text-muted);
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+}
+.announcement-detail-fields dd {
+  margin: var(--space-1) 0 0;
   overflow-wrap: anywhere;
 }
-.announcement-history-period {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-  color: var(--color-text-muted);
-  font-size: 0.8125rem;
-}
-.announcement-history-period time {
-  unicode-bidi: isolate;
+.announcement-detail-fields dd bdi {
+  display: block;
 }
 .announcement-recipients {
   display: grid;
@@ -114,13 +83,24 @@
   .announcement-period {
     grid-template-columns: 1fr;
   }
-  .announcement-history-heading {
-    flex-wrap: wrap;
-  }
   .announcement-composer .dialog-actions .button {
     flex: 1 1 0;
     min-height: 48px;
     white-space: normal;
     height: auto;
   }
+}
+
+.announcement-directory-heading {
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-3);
+}
+.announcement-directory-heading .translation-heading-icon {
+  flex: 0 0 auto;
+  float: none;
+  margin: 0;
+}
+.announcement-directory-heading > div {
+  min-width: 0;
 }

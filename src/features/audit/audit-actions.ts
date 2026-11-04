@@ -1,6 +1,8 @@
 import type { TFunction } from 'i18next';
 
 export const auditActionCodes = [
+  'announcement.update',
+  'announcement.delete',
   'announcement.publish',
   'announcement.withdraw',
   'auth.changePassword',

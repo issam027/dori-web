@@ -2,8 +2,12 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2 } from 'lucide-react';
-import type { AnnouncementResponseDto, CreateAnnouncementDto } from '@/api/generated/models';
+import { Megaphone, Plus, Search } from 'lucide-react';
+import type {
+  AnnouncementResponseDto,
+  AnnouncementsControllerListParams,
+  CreateAnnouncementDto,
+} from '@/api/generated/models';
 import { useSessionStore } from '@/core/auth/session-store';
 import { useScopeStore } from '@/core/scope/scope-store';
 import { isCloudDeployment } from '@/core/config/deployment-mode';
@@ -16,20 +20,31 @@ import { useEdgeInstallations } from '@/features/edge-installations/hooks/useEdg
 import { PageHeader } from '@/design-system/components/PageHeader';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { ConfirmDialog } from '@/design-system/components/Modal';
-import { EmptyState, ErrorState } from '@/design-system/components/FeedbackState';
+import { ConfirmDialog, Modal } from '@/design-system/components/Modal';
+import { ErrorState } from '@/design-system/components/FeedbackState';
+import { DataTable } from '@/design-system/components/DataTable';
+import { DataTableMobileCard } from '@/design-system/components/DataTableMobileCard';
+import { FilterPanel } from '@/design-system/components/FilterPanel';
 import { Pagination } from '@/design-system/components/Pagination';
-import { StatusBadge } from '@/design-system/components/StatusBadge';
+import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 import { RealtimeConnectionIndicator } from '@/core/realtime/RealtimeConnectionIndicator';
+import { useDebouncedFilter } from '@/shared/forms/useDebouncedFilter';
 import { AnnouncementComposer } from './AnnouncementComposer';
+import { AnnouncementDetails } from './AnnouncementDetails';
+import { AnnouncementActions } from './AnnouncementActions';
+import { AnnouncementSeverity, AnnouncementStatus } from './AnnouncementBadges';
 import {
   announcementKeys,
+  useAnnouncement,
   useAnnouncements,
   useAnnouncementAdministrationRealtime,
-  useWithdrawAnnouncement,
+  useDeleteAnnouncement,
 } from './use-announcements';
 import './announcements-page.css';
 
+function dateBoundary(value: string, end = false): string | undefined {
+  return value ? new Date(value + (end ? 'T23:59:59.999' : 'T00:00:00')).toISOString() : undefined;
+}
 export function AnnouncementsPage() {
   const { t, i18n } = useTranslation();
   const client = useQueryClient();
@@ -44,13 +59,39 @@ export function AnnouncementsPage() {
       ? 'installations'
       : 'sites';
   const [page, setPage] = useState(1);
+  const [searchDraft, setSearchDraft] = useState('');
+  const search = useDebouncedFilter(searchDraft);
+  const [status, setStatus] = useState('');
+  const [severity, setSeverity] = useState('');
+  const [targetId, setTargetId] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [sort, setSort] =
+    useState<NonNullable<AnnouncementsControllerListParams['sort']>>('createdAt:desc');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [compose, setCompose] = useState(params.get('compose') === '1');
-  const [withdrawing, setWithdrawing] = useState<AnnouncementResponseDto | null>(null);
-  const announcements = useAnnouncements(scope, page);
+  const [viewing, setViewing] = useState<string>();
+  const [editing, setEditing] = useState<string>();
+  const [deleting, setDeleting] = useState<AnnouncementResponseDto>();
+  const periodInvalid = Boolean(dateFrom && dateTo && dateFrom > dateTo);
+  const query: AnnouncementsControllerListParams = {
+    scope,
+    page,
+    pageSize: 10,
+    sort,
+    search: search || undefined,
+    status: (status || undefined) as AnnouncementsControllerListParams['status'],
+    severity: (severity || undefined) as AnnouncementsControllerListParams['severity'],
+    targetId: targetId || undefined,
+    dateFrom: dateBoundary(dateFrom),
+    dateTo: dateBoundary(dateTo, true),
+  };
+  const announcements = useAnnouncements(query, !periodInvalid);
   const health = useAnnouncementAdministrationRealtime();
-  const withdraw = useWithdrawAnnouncement();
-  const sites = useSites('context-switcher', compose && scope === 'sites');
-  const installations = useEdgeInstallations(compose && scope === 'installations');
+  const remove = useDeleteAnnouncement();
+  const needRecipients = filtersOpen || compose || Boolean(editing);
+  const sites = useSites('context-switcher', needRecipients && scope === 'sites');
+  const installations = useEdgeInstallations(needRecipients && scope === 'installations');
   const recipients =
     scope === 'sites'
       ? (sites.data?.data.items ?? []).map((item) => ({ id: item.siteId, name: item.siteName }))
@@ -58,8 +99,11 @@ export function AnnouncementsPage() {
           id: item.installationId,
           name: item.name,
         }));
+  const recipientsLoading = scope === 'sites' ? sites.isPending : installations.isPending;
   const data = announcements.data?.data;
-  // Refresh once at the next visible period boundary, not at a polling interval.
+  const items = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const formatDate = (value: string) => formatDateTime(value, i18n.language);
   useEffect(() => {
     if (!data) return;
     const observed = Date.parse(data.observedAt);
@@ -74,14 +118,14 @@ export function AnnouncementsPage() {
     );
     const timer = window.setTimeout(
       () => {
-        void client.invalidateQueries({ queryKey: announcementKeys.list(scope, page) });
+        void client.invalidateQueries({ queryKey: announcementKeys.all });
       },
       Math.min(2147483647, delay),
     );
     return () => {
       window.clearTimeout(timer);
     };
-  }, [data, announcements.dataUpdatedAt, client, scope, page]);
+  }, [data, announcements.dataUpdatedAt, client]);
   const closeComposer = () => {
     setCompose(false);
     const next = new URLSearchParams(params);
@@ -89,12 +133,34 @@ export function AnnouncementsPage() {
     next.delete('targetId');
     setParams(next, { replace: true });
   };
-  if (announcements.isError && !data)
-    return <ErrorState onRetry={() => void announcements.refetch()} />;
+  const targets = (item: AnnouncementResponseDto) => (
+    <span
+      className="announcement-target-summary"
+      title={item.targets.map((target) => target.name).join(' / ')}
+    >
+      <bdi dir="auto">{item.targets[0]?.name ?? t('common.notProvided')}</bdi>
+      {item.targets.length > 1 ? <small> +{item.targets.length - 1}</small> : null}
+    </span>
+  );
+  const actions = (item: AnnouncementResponseDto, mobile = false) => (
+    <AnnouncementActions
+      item={item}
+      mobile={mobile}
+      onView={() => {
+        setViewing(item.announcementId);
+      }}
+      onEdit={() => {
+        setEditing(item.announcementId);
+      }}
+      onDelete={() => {
+        setDeleting(item);
+      }}
+    />
+  );
   return (
-    <div className="page-stack announcements-page">
+    <div className="page-stack admin-page announcements-page">
       <PageHeader
-        eyebrow={t('nav.announcements')}
+        eyebrow={t('nav.administration')}
         title={t('announcements.title')}
         description={t('announcements.description')}
         status={<RealtimeConnectionIndicator health={health} sseOnly />}
@@ -109,111 +175,241 @@ export function AnnouncementsPage() {
           />
         }
       />
-      {canSites && canInstallations ? (
-        <div className="announcement-scopes" role="group" aria-label={t('announcements.audience')}>
-          {(['sites', 'installations'] as const).map((value) => (
-            <Button
-              key={value}
-              variant={scope === value ? 'primary' : 'default'}
-              aria-pressed={scope === value}
-              label={t(`announcements.scope.${value}`)}
-              onClick={() => {
+      <FilterPanel
+        icon={<Search />}
+        title={t('announcements.filtersTitle')}
+        description={t('announcements.filtersHint')}
+        onOpenChange={setFiltersOpen}
+        context={t('announcements.resultCount', { count: total })}
+        activeCount={
+          Number(Boolean(searchDraft)) +
+          Number(Boolean(status)) +
+          Number(Boolean(severity)) +
+          Number(Boolean(targetId)) +
+          Number(Boolean(dateFrom)) +
+          Number(Boolean(dateTo)) +
+          Number(sort !== 'createdAt:desc')
+        }
+        resetLabel={t('common.reset')}
+        onReset={() => {
+          setSearchDraft('');
+          setStatus('');
+          setSeverity('');
+          setTargetId('');
+          setDateFrom('');
+          setDateTo('');
+          setSort('createdAt:desc');
+          setPage(1);
+        }}
+        primary={
+          <label>
+            {t('common.search')}
+            <input
+              type="search"
+              maxLength={200}
+              value={searchDraft}
+              placeholder={t('announcements.searchPlaceholder')}
+              onChange={(event) => {
+                setSearchDraft(event.target.value);
                 setPage(1);
-                setParams({ scope: value });
               }}
             />
-          ))}
+          </label>
+        }
+      >
+        <div className="admin-filter-grid announcement-filter-grid">
+          {canSites && canInstallations ? (
+            <label>
+              {t('announcements.audience')}
+              <select
+                value={scope}
+                onChange={(event) => {
+                  setParams({ scope: event.target.value });
+                  setTargetId('');
+                  setPage(1);
+                }}
+              >
+                <option value="sites">{t('announcements.scope.sites')}</option>
+                <option value="installations">{t('announcements.scope.installations')}</option>
+              </select>
+            </label>
+          ) : null}
+          <label>
+            {t('common.status')}
+            <select
+              value={status}
+              onChange={(event) => {
+                setStatus(event.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">{t('announcements.allStatuses')}</option>
+              {['active', 'scheduled', 'expired', 'withdrawn'].map((value) => (
+                <option key={value} value={value}>
+                  {t(`announcements.status.${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('announcements.importance')}
+            <select
+              value={severity}
+              onChange={(event) => {
+                setSeverity(event.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">{t('announcements.allSeverities')}</option>
+              {['info', 'warning', 'critical'].map((value) => (
+                <option key={value} value={value}>
+                  {t(`announcements.severity.${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t(`announcements.scope.${scope}`)}
+            <select
+              value={targetId}
+              onChange={(event) => {
+                setTargetId(event.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">{t('announcements.allTargets')}</option>
+              {recipients.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('announcements.dateFrom')}
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(event) => {
+                setDateFrom(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('announcements.dateTo')}
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(event) => {
+                setDateTo(event.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <label>
+            {t('announcements.sort')}
+            <select
+              value={sort}
+              onChange={(event) => {
+                setSort(event.target.value as typeof sort);
+                setPage(1);
+              }}
+            >
+              {[
+                'createdAt:desc',
+                'createdAt:asc',
+                'title:asc',
+                'title:desc',
+                'startsAt:asc',
+                'endsAt:asc',
+              ].map((value) => (
+                <option key={value} value={value}>
+                  {t(`announcements.sort.${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-      ) : null}
-      <Card>
-        <div className="card-heading">
+        {periodInvalid ? (
+          <p className="field-error" role="alert">
+            {t('announcements.invalidDateFilter')}
+          </p>
+        ) : null}
+      </FilterPanel>
+      <Card className="settings-card">
+        <div className="card-heading announcement-directory-heading">
+          <span className="translation-heading-icon">
+            <Megaphone aria-hidden="true" />
+          </span>
           <div>
             <h2>{t('announcements.history')}</h2>
-            <p>
-              {t(
-                scope === 'installations'
-                  ? 'announcements.installationAudience'
-                  : 'announcements.siteAudience',
-              )}
-            </p>
+            <p>{t('announcements.resultCount', { count: total })}</p>
           </div>
-          <StatusBadge>{new Intl.NumberFormat(i18n.language).format(data?.total ?? 0)}</StatusBadge>
         </div>
-        {!data?.items.length ? (
-          <EmptyState title={t('announcements.empty')} description={t('announcements.emptyHelp')} />
-        ) : (
-          <div className="announcement-history">
-            {data.items.map((item) => (
-              <article className="announcement-history-row" key={item.announcementId}>
-                <div className="announcement-history-heading">
-                  <div>
-                    <h3>
-                      <bdi dir="auto">{item.title}</bdi>
-                    </h3>
-                    <span className="announcement-row-badges">
-                      <StatusBadge
-                        tone={
-                          item.status === 'active'
-                            ? 'success'
-                            : item.status === 'scheduled'
-                              ? 'warning'
-                              : 'neutral'
-                        }
-                      >
-                        {t(`announcements.status.${item.status}`)}
-                      </StatusBadge>
-                      <StatusBadge
-                        tone={
-                          item.severity === 'critical'
-                            ? 'danger'
-                            : item.severity === 'warning'
-                              ? 'warning'
-                              : 'neutral'
-                        }
-                      >
-                        {t(`announcements.severity.${item.severity}`)}
-                      </StatusBadge>
-                    </span>
-                  </div>
-                  {item.canWithdraw && (item.status === 'active' || item.status === 'scheduled') ? (
-                    <Button
-                      variant="danger"
-                      size="small"
-                      icon={<Trash2 />}
-                      label={t('announcements.withdraw')}
-                      onClick={() => {
-                        setWithdrawing(item);
-                      }}
-                    />
-                  ) : null}
-                </div>
-                <p className="announcement-history-message">
-                  <bdi dir="auto">{item.message}</bdi>
-                </p>
-                <p className="announcement-history-targets">
-                  <strong>{t(`announcements.scope.${item.scope}`)} : </strong>
-                  {item.targets.map((target) => target.name).join(' / ')}
-                </p>
-                <div className="announcement-history-period">
-                  <span>
-                    {t('announcements.periodFrom')}{' '}
-                    <time dateTime={item.startsAt}>
-                      {formatDateTime(item.startsAt, i18n.language)}
-                    </time>
-                  </span>
-                  <span>
-                    {t('announcements.periodUntil')}{' '}
-                    <time dateTime={item.endsAt}>{formatDateTime(item.endsAt, i18n.language)}</time>
-                  </span>
-                </div>
-                {!item.canWithdraw ? <small>{t('announcements.readOnly')}</small> : null}
-              </article>
-            ))}
-          </div>
-        )}
+        <DataTable
+          rows={items}
+          getRowKey={(item) => item.announcementId}
+          caption={t('announcements.title')}
+          loading={announcements.isLoading && !periodInvalid}
+          error={announcements.isError}
+          onRetry={() => void announcements.refetch()}
+          empty={!items.length}
+          emptyTitle={t('announcements.empty')}
+          emptyDescription={t('announcements.emptyHelp')}
+          columns={[
+            {
+              key: 'title',
+              header: t('announcements.subject'),
+              render: (item) => (
+                <b className="announcement-title-summary" title={item.title}>
+                  <bdi dir="auto">{item.title}</bdi>
+                </b>
+              ),
+            },
+            {
+              key: 'severity',
+              header: t('announcements.importance'),
+              render: (item) => <AnnouncementSeverity item={item} />,
+            },
+            {
+              key: 'status',
+              header: t('common.status'),
+              render: (item) => <AnnouncementStatus item={item} />,
+            },
+            { key: 'targets', header: t(`announcements.scope.${scope}`), render: targets },
+            {
+              key: 'endsAt',
+              header: t('announcements.endsAt'),
+              render: (item) => <time dateTime={item.endsAt}>{formatDate(item.endsAt)}</time>,
+            },
+            {
+              key: 'actions',
+              header: t('common.actions'),
+              render: (item) => (
+                <div className="table-actions responsive-table-actions">{actions(item)}</div>
+              ),
+            },
+          ]}
+          renderMobileRow={(item) => (
+            <DataTableMobileCard
+              title={<bdi dir="auto">{item.title}</bdi>}
+              badge={<AnnouncementStatus item={item} />}
+              fields={[
+                {
+                  label: t('announcements.importance'),
+                  value: <AnnouncementSeverity item={item} />,
+                },
+                { label: t(`announcements.scope.${scope}`), value: targets(item) },
+                { label: t('announcements.endsAt'), value: formatDate(item.endsAt), wide: true },
+              ]}
+              actions={actions(item, true)}
+            />
+          )}
+        />
         <Pagination
           page={page}
-          totalPages={Math.ceil((data?.total ?? 0) / 10)}
+          totalPages={Math.max(1, data?.totalPages ?? 1)}
           onPageChange={setPage}
         />
       </Card>
@@ -224,35 +420,105 @@ export function AnnouncementsPage() {
           initialTargetId={
             params.get('targetId') ?? (scope === 'sites' ? (activeSiteId ?? undefined) : undefined)
           }
-          loading={scope === 'sites' ? sites.isPending : installations.isPending}
+          loading={recipientsLoading}
           onClose={closeComposer}
         />
       ) : null}
+      {viewing ? (
+        <AnnouncementDetails
+          id={viewing}
+          onClose={() => {
+            setViewing(undefined);
+          }}
+          onEdit={(id) => {
+            setViewing(undefined);
+            setEditing(id);
+          }}
+        />
+      ) : null}
+      {editing ? (
+        <AnnouncementEditor
+          key={editing}
+          id={editing}
+          recipients={recipients}
+          loading={recipientsLoading}
+          onClose={() => {
+            setEditing(undefined);
+          }}
+        />
+      ) : null}
       <ConfirmDialog
-        open={Boolean(withdrawing)}
+        open={Boolean(deleting)}
         onOpenChange={(open) => {
-          if (!open && !withdraw.isPending) setWithdrawing(null);
+          if (!open && !remove.isPending) setDeleting(undefined);
         }}
-        title={t('announcements.withdraw')}
+        title={t('common.delete')}
         description={
-          <bdi dir="auto">
-            {t('announcements.withdrawConfirm', { title: withdrawing?.title ?? '' })}
-          </bdi>
+          <bdi dir="auto">{t('announcements.deleteConfirm', { title: deleting?.title ?? '' })}</bdi>
         }
-        confirmLabel={t('announcements.withdraw')}
+        confirmLabel={t('common.delete')}
         destructive
-        pending={withdraw.isPending}
+        pending={remove.isPending}
         onConfirm={() => {
-          if (!withdrawing) return;
-          withdraw.mutate(withdrawing.announcementId, {
-            onSuccess: () => {
-              notify({ tone: 'success', title: t('announcements.withdrawn') });
-              setWithdrawing(null);
-            },
-            onError: notifyError,
-          });
+          if (deleting)
+            remove.mutate(deleting.announcementId, {
+              onSuccess: () => {
+                notify({ tone: 'success', title: t('announcements.deleted') });
+                setPage(1);
+                setDeleting(undefined);
+              },
+              onError: notifyError,
+            });
         }}
       />
     </div>
+  );
+}
+function AnnouncementEditor({
+  id,
+  recipients,
+  loading,
+  onClose,
+}: {
+  id: string;
+  recipients: { id: string; name: string }[];
+  loading: boolean;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const detail = useAnnouncement(id);
+  const item = detail.data?.data;
+  if (!item || detail.isError || !item.canEdit)
+    return (
+      <Modal
+        open
+        onOpenChange={(open) => {
+          if (!open) onClose();
+        }}
+        title={t('common.edit')}
+      >
+        {detail.isError || item ? (
+          <ErrorState onRetry={() => void detail.refetch()} />
+        ) : (
+          <DorifyLoader compact />
+        )}
+      </Modal>
+    );
+  const choices = [
+    ...new Map(
+      [
+        ...recipients,
+        ...item.targets.map((target) => ({ id: target.targetId, name: target.name })),
+      ].map((target) => [target.id, target]),
+    ).values(),
+  ];
+  return (
+    <AnnouncementComposer
+      scope={item.scope}
+      recipients={choices}
+      initialAnnouncement={item}
+      loading={loading}
+      onClose={onClose}
+    />
   );
 }

@@ -1,18 +1,22 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send } from 'lucide-react';
-import type { CreateAnnouncementDto } from '@/api/generated/models';
+import type { CreateAnnouncementDto, AnnouncementResponseDto } from '@/api/generated/models';
 import { Button } from '@/design-system/components/Button';
 import { Modal } from '@/design-system/components/Modal';
 import { FormField } from '@/design-system/components/FormField';
 import { AnnouncementNotice } from '@/shared/announcements/AnnouncementsBanner';
 import { notify } from '@/core/notifications/notification-store';
 import { notifyError } from '@/core/notifications/error-presentation';
-import { usePublishAnnouncement } from './use-announcements';
+import { useSaveAnnouncement } from './use-announcements';
 
 export interface AnnouncementRecipient {
   id: string;
   name: string;
+}
+function dateInput(value: string) {
+  const date = new Date(value);
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 function nextDayInput() {
   const date = new Date(Date.now() + 86400000);
@@ -22,24 +26,38 @@ export function AnnouncementComposer({
   scope,
   recipients,
   initialTargetId,
+  initialAnnouncement,
   loading,
   onClose,
 }: {
   scope: CreateAnnouncementDto['scope'];
   recipients: AnnouncementRecipient[];
   initialTargetId?: string;
+  initialAnnouncement?: AnnouncementResponseDto;
   loading: boolean;
   onClose: () => void;
 }) {
   const { t, i18n } = useTranslation();
-  const publish = usePublishAnnouncement();
-  const [selected, setSelected] = useState<string[]>(initialTargetId ? [initialTargetId] : []);
+  const publish = useSaveAnnouncement(initialAnnouncement?.announcementId);
+  const [selected, setSelected] = useState<string[]>(
+    initialAnnouncement
+      ? initialAnnouncement.targets.map((target) => target.targetId)
+      : initialTargetId
+        ? [initialTargetId]
+        : [],
+  );
   const [search, setSearch] = useState('');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [severity, setSeverity] = useState<CreateAnnouncementDto['severity']>('info');
-  const [startsAt, setStartsAt] = useState('');
-  const [endsAt, setEndsAt] = useState(nextDayInput);
+  const [title, setTitle] = useState(initialAnnouncement?.title ?? '');
+  const [message, setMessage] = useState(initialAnnouncement?.message ?? '');
+  const [severity, setSeverity] = useState<CreateAnnouncementDto['severity']>(
+    initialAnnouncement?.severity ?? 'info',
+  );
+  const [startsAt, setStartsAt] = useState(
+    initialAnnouncement ? dateInput(initialAnnouncement.startsAt) : '',
+  );
+  const [endsAt, setEndsAt] = useState(() =>
+    initialAnnouncement ? dateInput(initialAnnouncement.endsAt) : nextDayInput(),
+  );
   const [error, setError] = useState('');
   const validSelected = selected.filter((id) =>
     recipients.some((recipient) => recipient.id === id),
@@ -57,8 +75,18 @@ export function AnnouncementComposer({
       event.timeStamp >= performance.timeOrigin
         ? event.timeStamp
         : performance.timeOrigin + event.timeStamp;
-    const start = startsAt ? Date.parse(startsAt) : now,
-      end = Date.parse(endsAt);
+    const start = startsAt
+        ? Date.parse(
+            initialAnnouncement && startsAt === dateInput(initialAnnouncement.startsAt)
+              ? initialAnnouncement.startsAt
+              : startsAt,
+          )
+        : now,
+      end = Date.parse(
+        initialAnnouncement && endsAt === dateInput(initialAnnouncement.endsAt)
+          ? initialAnnouncement.endsAt
+          : endsAt,
+      );
     if (
       !Number.isFinite(start) ||
       !Number.isFinite(end) ||
@@ -89,7 +117,7 @@ export function AnnouncementComposer({
         onSuccess: () => {
           notify({
             tone: 'success',
-            title: t('announcements.published'),
+            title: t(initialAnnouncement ? 'announcements.updated' : 'announcements.published'),
             message: t(
               scope === 'installations'
                 ? 'announcements.relayHelp'
@@ -108,7 +136,7 @@ export function AnnouncementComposer({
       onOpenChange={(open) => {
         if (!open && !publish.isPending) onClose();
       }}
-      title={t('announcements.new')}
+      title={t(initialAnnouncement ? 'announcements.edit' : 'announcements.new')}
       description={t(
         scope === 'installations'
           ? 'announcements.installationAudience'
@@ -122,7 +150,7 @@ export function AnnouncementComposer({
           form="announcement-compose"
           variant="primary"
           icon={<Send />}
-          label={t('announcements.publish')}
+          label={t(initialAnnouncement ? 'common.save' : 'announcements.publish')}
           pending={publish.isPending}
           disabled={loading || !validSelected.length || !title.trim() || !message.trim() || !endsAt}
         />

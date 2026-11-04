@@ -1,4 +1,6 @@
 export const audit: Record<string, string> = {
+  'audit.eventActions.announcement.update': 'الميساج تبدّل',
+  'audit.eventActions.announcement.delete': 'الميساج تفسخ',
   'audit.eventActions.announcement.publish': 'ميساج تبعث',
   'audit.eventActions.announcement.withdraw': 'ميساج تنحّى',
   'audit.eyebrow': 'السيستام',

@@ -1,6 +1,28 @@
 import type { DomainTranslations } from '../../types';
 
 export const admin: DomainTranslations<typeof import('../fr/admin').admin> = {
+  'announcements.filtersTitle': 'Find an announcement',
+  'announcements.filtersHint': 'Narrow results by recipient, status or display period.',
+  'announcements.searchPlaceholder': 'Search the title or message…',
+  'announcements.allStatuses': 'All statuses',
+  'announcements.allSeverities': 'All priorities',
+  'announcements.allTargets': 'All recipients',
+  'announcements.dateFrom': 'Displayed from',
+  'announcements.dateTo': 'Displayed until',
+  'announcements.sort': 'Sort by',
+  'announcements.sort.createdAt:desc': 'Newest first',
+  'announcements.sort.createdAt:asc': 'Oldest first',
+  'announcements.sort.title:asc': 'Title: A to Z',
+  'announcements.sort.title:desc': 'Title: Z to A',
+  'announcements.sort.startsAt:asc': 'Display start, earliest first',
+  'announcements.sort.endsAt:asc': 'Display end, earliest first',
+  'announcements.resultCount': '{{count}} announcement(s)',
+  'announcements.edit': 'Edit announcement',
+  'announcements.updated': 'Announcement updated',
+  'announcements.deleteConfirm':
+    'Delete “{{title}}”? It will be removed from the affected screens.',
+  'announcements.deleted': 'Announcement deleted',
+  'announcements.invalidDateFilter': 'The end date must be on or after the start date.',
   'announcements.title': 'Operational announcements',
   'announcements.description': 'Keep your managed sites and intra installations informed.',
   'announcements.new': 'Publish an announcement',
