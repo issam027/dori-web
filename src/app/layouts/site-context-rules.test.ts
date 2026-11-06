@@ -11,6 +11,7 @@ describe('active site route rules', () => {
     '/audit',
     '/announcements',
     '/legal',
+    '/admin/site-requests',
     '/admin/translations',
   ])('allows %s without an active site', (pathname) => {
     expect(routeRequiresActiveSite(pathname)).toBe(false);

@@ -4,11 +4,12 @@ import { hasAnyPermission, type Permission } from './permissions';
 import { DorifyLoader } from '@/design-system/components/DorifyLoader';
 
 interface ProtectedRouteProps {
+  rootOnly?: boolean;
   permissions?: readonly Permission[];
   userTypes?: readonly string[];
 }
 
-export function ProtectedRoute({ permissions = [], userTypes }: ProtectedRouteProps) {
+export function ProtectedRoute({ permissions = [], userTypes, rootOnly }: ProtectedRouteProps) {
   const location = useLocation();
   const status = useSessionStore((state) => state.status);
   const user = useSessionStore((state) => state.user);
@@ -20,6 +21,7 @@ export function ProtectedRoute({ permissions = [], userTypes }: ProtectedRoutePr
   if (user.mustChangePassword && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
   }
+  if (rootOnly && !user.roles.includes('root')) return <Navigate to="/forbidden" replace />;
   if (userTypes && !userTypes.includes(user.userType)) {
     return <Navigate to="/forbidden" replace />;
   }

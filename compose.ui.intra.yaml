@@ -12,8 +12,15 @@ services:
       context: .
       target: runtime
       args:
-        VITE_APP_ENV: development
+        VITE_APP_ENV: ${VITE_APP_ENV:-development}
         VITE_DORIFY_DEPLOYMENT_MODE: intra
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
+        VITE_KIOSK_IDLE_MS: ${VITE_KIOSK_IDLE_MS:-30000}
+        VITE_SESSION_IDLE_MINUTES: ${VITE_SESSION_IDLE_MINUTES:-30}
+        VITE_LEGAL_ENTITY_NAME: ${VITE_LEGAL_ENTITY_NAME:-Dorify - demonstration}
+        VITE_LEGAL_ADDRESS: ${VITE_LEGAL_ADDRESS:-Adresse du responsable Dorify a renseigner}
+        VITE_LEGAL_EMAIL: ${VITE_LEGAL_EMAIL:-legal@dorify.fr}
+        VITE_LEGAL_REGISTRATION: ${VITE_LEGAL_REGISTRATION:-Immatriculation a renseigner}
         VITE_PUBLIC_TRACKING_URL: ${PUBLIC_TRACKING_URL:-http://localhost:58080}
     restart: unless-stopped
     ports:

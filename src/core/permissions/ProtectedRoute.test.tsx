@@ -30,3 +30,28 @@ it('forces users flagged by the API onto the password change route', () => {
   expect(screen.getByText('Mot de passe imposé')).toBeVisible();
   expect(screen.queryByText('Files')).not.toBeInTheDocument();
 });
+
+it.each(['admin', 'root'])('restricts a root-only route for %s', (role) => {
+  useSessionStore
+    .getState()
+    .authenticate({
+      userId: '00000000-0000-4000-8000-000000000001',
+      username: 'test',
+      userType: 'human',
+      roles: [role],
+      permissions: ['system_manage'],
+      mustChangePassword: false,
+      scope: { isGlobal: true, siteIds: [], queueIds: [] },
+    });
+  render(
+    <MemoryRouter initialEntries={['/admin/site-requests']}>
+      <Routes>
+        <Route element={<ProtectedRoute rootOnly />}>
+          <Route path="/admin/site-requests" element={<p>Demandes privées</p>} />
+        </Route>
+        <Route path="/forbidden" element={<p>Accès refusé</p>} />
+      </Routes>
+    </MemoryRouter>,
+  );
+  expect(screen.getByText(role === 'root' ? 'Demandes privées' : 'Accès refusé')).toBeVisible();
+});

@@ -189,6 +189,14 @@ export function SidebarAccordion({
             </section>
           );
         })}
+        {isCloudDeployment && user?.roles.includes('root') && (
+          <div className="nav-links">
+            <NavLink to="/admin/site-requests" title="Demandes du site" onClick={onCloseMobile}>
+              <ShieldCheck aria-hidden="true" />
+              <span className="sidebar-label">Demandes du site</span>
+            </NavLink>
+          </div>
+        )}
       </nav>
       <NavLink
         className="legal-link"

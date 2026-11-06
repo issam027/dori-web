@@ -4,6 +4,7 @@ param(
     [string]$IdentityFile = "$PSScriptRoot\..\autres\dorify_key",
     [string]$RemoteDirectory = '/home/ubuntu/dorify',
     [string]$Version = (Get-Date -Format 'yyyyMMdd-HHmmss'),
+    [string]$BuildEnvFile = "$PSScriptRoot\.env.oracle.local",
     [switch]$Migrate,
     [switch]$Seed,
     [switch]$ResetDatabase,
@@ -37,6 +38,16 @@ try {
         # Demo mode is explicit; production mode requires real legal information.
         $buildArgs += @('--build-arg','VITE_APP_ENV=development','--build-arg','VITE_DORIFY_DEPLOYMENT_MODE=cloud','--build-arg','VITE_PUBLIC_TRACKING_URL=https://app.dorify.fr')
     }
+    if (Test-Path -LiteralPath $BuildEnvFile -PathType Leaf) {
+        $allowedBuildKeys = @('VITE_APP_ENV','VITE_DORIFY_DEPLOYMENT_MODE','VITE_PUBLIC_TRACKING_URL','VITE_API_BASE_URL','VITE_KIOSK_IDLE_MS','VITE_SESSION_IDLE_MINUTES','VITE_LEGAL_ENTITY_NAME','VITE_LEGAL_ADDRESS','VITE_LEGAL_EMAIL','VITE_LEGAL_REGISTRATION')
+        foreach ($line in [IO.File]::ReadAllLines((Resolve-Path $BuildEnvFile))) {
+            if ($line -match '^([A-Z_]+)=(.*)$' -and $allowedBuildKeys -contains $matches[1]) {
+                $name = $matches[1]; $value = $matches[2].Trim()
+                if ($value.Length -ge 2 -and (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'")))) { $value = $value.Substring(1,$value.Length-2) }
+                $buildArgs += @('--build-arg',($name + '=' + $value))
+            }
+        }
+    } elseif ($PSBoundParameters.ContainsKey('BuildEnvFile')) { throw 'Web build environment file not found' }
     Invoke-Native docker ($buildArgs + @($PSScriptRoot))
     $images = @($image)
     if ($dbCommand) {

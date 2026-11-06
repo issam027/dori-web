@@ -39,6 +39,7 @@ export interface ProtectedRouteDefinition {
   experienceMode?: 'kiosk' | 'display';
   publicMode?: 'public' | 'device';
   cloudOnly?: boolean;
+  rootOnly?: boolean;
 }
 
 export interface NavigationRouteDefinition {
@@ -189,6 +190,17 @@ export const protectedRoutes: readonly ProtectedRouteDefinition[] = [
     path: '/audit',
     permissions: ['audit_view'],
     component: lazyNamed(() => import('@/features/audit/AuditPage'), 'AuditPage'),
+    frame: 'shell',
+  },
+  {
+    path: '/admin/site-requests',
+    permissions: [],
+    rootOnly: true,
+    cloudOnly: true,
+    component: lazyNamed(
+      () => import('@/features/site-requests/SiteRequestsPage'),
+      'SiteRequestsPage',
+    ),
     frame: 'shell',
   },
 ];
@@ -343,6 +355,8 @@ export function findFirstAuthorizedPath(user: CurrentUserResponseDto): string {
   )
     return '/desk';
   const route = protectedRoutes.find((candidate) => {
+    if (candidate.cloudOnly && !isCloudDeployment) return false;
+    if (candidate.rootOnly && !user.roles.includes('root')) return false;
     if (!candidate.allUserTypes) {
       if (user.userType === 'kiosk' && !candidate.technicalUser) return false;
       if (user.userType !== 'kiosk' && candidate.technicalUser) return false;

@@ -160,6 +160,7 @@ function AppRoutes() {
             element={
               <ProtectedRoute
                 permissions={route.permissions}
+                rootOnly={route.rootOnly}
                 userTypes={
                   route.allUserTypes ? undefined : route.technicalUser ? ['kiosk'] : ['human']
                 }
