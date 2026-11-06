@@ -1,0 +1,22 @@
+name: cloud-dorify-ui
+
+services:
+  app:
+    image: ${WEB_IMAGE:?Set WEB_IMAGE to a versioned cloud image}
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    ports:
+      - '127.0.0.1:8080:8080'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+networks:
+  default:
+    external: true
+    name: dorify-cloud-network

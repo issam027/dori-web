@@ -13,3 +13,4 @@ Thumbs.db
 debug.log
 src/api/generated/
 specifications/audits/
+*.tar
